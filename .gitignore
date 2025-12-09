@@ -1,0 +1,32 @@
+﻿# Dependencies
+node_modules/
+.venv/
+.venv311/
+__pycache__/
+*.pyc
+
+# Data (your memories stay local)
+data/
+*.faiss
+*.pkl
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+frontend/build/
+frontend/.svelte-kit/
+dist/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

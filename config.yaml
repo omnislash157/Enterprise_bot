@@ -1,0 +1,126 @@
+# ENTERPRISE BOT - Driscoll Fork
+# All smart features OFF - dumb chatbot mode
+# Memory pipeline dormant but available for future Pro tier
+
+# =============================================================================
+# DEPLOYMENT
+# =============================================================================
+deployment:
+  mode: enterprise
+  tier: basic              # basic = dumb, pro = memory, full = everything
+
+# =============================================================================
+# TENANT (Driscoll is first customer)
+# =============================================================================
+tenant:
+  id: driscoll
+  name: "Driscoll Foods"
+  allowed_domains:
+    - driscollfoods.com
+    - gmail.com            # For testing
+  docs_root: ./manuals/Driscoll
+  default_division: warehouse
+
+# =============================================================================
+# FEATURE FLAGS - THE MASTER SWITCHES
+# =============================================================================
+features:
+  # MEMORY SYSTEM (OFF for basic tier)
+  memory_pipelines: false       # No 5-lane retrieval
+  session_memory: false         # Don't remember within session
+
+  # CONTEXT STUFFING (ON - this is the dumb bot)
+  context_stuffing: true        # Load docs into prompt
+
+  # COGNITIVE FEATURES (ALL OFF)
+  metacognitive_mirror: false   # No phase detection
+  cognitive_profiler: false     # No user profiling
+  evolution_engine: false       # No self-improvement
+  reasoning_traces: false       # No decision logging
+
+  # EXTRACTION (OFF - no chat import)
+  chat_import: false            # Dormant
+
+  # UI FEATURES
+  ui:
+    swarm_loop: false
+    memory_space_3d: false
+    chat_basic: true
+    dark_mode: true
+    analytics_dashboard: false
+
+# =============================================================================
+# MODEL
+# =============================================================================
+model:
+  provider: xai
+  name: grok-4-fast-reasoning
+  max_tokens: 8192
+  temperature: 0.5              # Lower = more consistent
+  context_window: 2000000
+
+# =============================================================================
+# DOCUMENT STUFFING
+# =============================================================================
+docs:
+  docs_dir: ./manuals/Driscoll
+  max_tokens_per_request: 200000
+  include_shared: true
+
+  stuffing:
+    enabled: true
+    max_tokens_per_division: 200000
+
+# =============================================================================
+# VOICE (Professional, not Venom)
+# =============================================================================
+voice:
+  style: corporate              # corporate | helpful | troll
+  company_name: "Driscoll Foods"
+  sign_off: false               # No "- Your AI Assistant" stuff
+  default: corporate
+
+  templates:
+    corporate:
+      personality: professional
+      snark_level: 0
+
+    troll:
+      personality: sarcastic
+      snark_level: 7
+
+  division_voice:
+    sales: corporate
+    transportation: troll
+    operations: corporate
+    default: corporate
+
+# =============================================================================
+# PATHS
+# =============================================================================
+paths:
+  data_dir: ./data              # Will be empty (no memories yet)
+  manuals_root: ./manuals
+
+# =============================================================================
+# RETRIEVAL (only when memory_pipelines: true - dormant)
+# =============================================================================
+retrieval:
+  process_top_k: 10
+  episodic_top_k: 5
+  session_top_k: 5
+  min_score: 0.3
+
+# =============================================================================
+# MEMORY PIPELINE (dormant - available for pro tier)
+# =============================================================================
+memory_pipeline:
+  batch_interval: 5.0
+  max_batch_size: 10
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+logging:
+  level: INFO
+  format: "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
