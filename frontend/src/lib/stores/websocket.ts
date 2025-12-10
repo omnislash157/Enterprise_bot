@@ -7,6 +7,28 @@ interface WebSocketState {
 	error: string | null;
 }
 
+// Build WebSocket URL from environment or current location
+function getWebSocketUrl(sessionId: string): string {
+	// Check for explicit API URL from environment
+	const apiUrl = import.meta.env.VITE_API_URL;
+
+	if (apiUrl) {
+		// Convert http(s) to ws(s)
+		const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
+		const host = new URL(apiUrl).host;
+		return `${wsProtocol}://${host}/ws/${sessionId}`;
+	}
+
+	// Fallback: use current page location (works for same-origin deploys)
+	if (typeof window !== 'undefined') {
+		const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+		return `${wsProtocol}://${window.location.host}/ws/${sessionId}`;
+	}
+
+	// Dev fallback
+	return `ws://localhost:8000/ws/${sessionId}`;
+}
+
 function createWebSocketStore() {
 	const { subscribe, set, update } = writable<WebSocketState>({
 		connected: false,
@@ -23,7 +45,7 @@ function createWebSocketStore() {
 		subscribe,
 
 		connect(sessionId: string) {
-			const url = `ws://localhost:8000/ws/${sessionId}`;
+			const url = getWebSocketUrl(sessionId);
 			
 			try {
 				ws = new WebSocket(url);
