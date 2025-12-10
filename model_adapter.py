@@ -222,6 +222,8 @@ class GrokMessages:
         start = time.time()
 
         response = self.session.post(url, json=payload, timeout=(10, 120))
+        if not response.ok:
+            logger.error(f"xAI API error: {response.status_code} - {response.text}")
         response.raise_for_status()
 
         data = response.json()
@@ -290,6 +292,8 @@ class GrokMessages:
             timeout=(10, 300),  # Longer timeout for streaming
             stream=True,
         )
+        if not response.ok:
+            logger.error(f"xAI API stream error: {response.status_code} - {response.text}")
         response.raise_for_status()
 
         def chunk_generator():
