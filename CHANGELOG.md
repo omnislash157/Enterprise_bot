@@ -1,6 +1,17 @@
 # Changelog
 
-## 2024-12-10 - Enterprise Fork v1 (elegant-borg)
+## 2024-12-10 - Enterprise Fork v1 LIVE (elegant-borg)
+
+**Status: PRODUCTION** - Driscoll Assistant operational.
+
+### Deploy Fixes (same day)
+- `main.py` moved to repo root for Railway imports
+- WebSocket URL uses `window.location.host` for same-origin deploys
+- `config_loader.py` uses script directory, not cwd
+- Division categories default to division name (fixes "No docs found")
+- Model name: `grok-4-fast-reasoning` (not `grok-4-1-fast-reasoning`)
+- Added xAI error logging for debugging
+- `python-docx` added to requirements.txt
 
 ### Removed
 - `cog_twin.py` imports (memory/extraction engine)
