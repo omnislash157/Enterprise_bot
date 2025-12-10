@@ -3,8 +3,8 @@
 	import { Canvas } from '@threlte/core';
 	import { session } from '$lib/stores/session';
 	import ChatOverlay from '$lib/components/ChatOverlay.svelte';
-	import Scene from '$lib/3d/Scene.svelte';
-	import CoreBrain from '$lib/3d/CoreBrain.svelte';
+	import Scene from '$lib/threlte/Scene.svelte';
+	import CoreBrain from '$lib/threlte/CoreBrain.svelte';
 
 	// Generate session ID on mount
 	onMount(() => {
