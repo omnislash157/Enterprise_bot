@@ -25,35 +25,41 @@ from typing import Any, Dict, Optional
 _config: Dict[str, Any] = {}
 _loaded: bool = False
 
+# Directory where this script lives (for finding config.yaml)
+_THIS_DIR = Path(__file__).parent.resolve()
+
 
 def load_config(path: Optional[str] = None) -> Dict[str, Any]:
     """
     Load configuration from yaml file.
-    
+
     Args:
         path: Path to config file. If None, tries:
               1. COGTWIN_CONFIG env var
-              2. enterprise_config.yaml
-              3. config.yaml
-              
+              2. enterprise_config.yaml (in script dir)
+              3. config.yaml (in script dir)
+
     Returns:
         Loaded config dict
     """
     global _config, _loaded
-    
+
     if path is None:
         # Try env var first
         path = os.environ.get("COGTWIN_CONFIG")
-        
+
         if not path:
-            # Try enterprise config
-            if Path("enterprise_config.yaml").exists():
-                path = "enterprise_config.yaml"
-            elif Path("config.yaml").exists():
-                path = "config.yaml"
+            # Look in the same directory as this script (not cwd)
+            enterprise_path = _THIS_DIR / "enterprise_config.yaml"
+            config_path = _THIS_DIR / "config.yaml"
+
+            if enterprise_path.exists():
+                path = str(enterprise_path)
+            elif config_path.exists():
+                path = str(config_path)
             else:
                 raise FileNotFoundError(
-                    "No config found. Set COGTWIN_CONFIG or create enterprise_config.yaml"
+                    f"No config found in {_THIS_DIR}. Set COGTWIN_CONFIG or create config.yaml"
                 )
     
     with open(path) as f:
