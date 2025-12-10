@@ -267,7 +267,8 @@ def get_division_categories(division: str) -> list:
         List of doc category folder names this division can access
     """
     mapping = cfg('docs.division_categories', {})
-    return mapping.get(division, mapping.get('default', ['general']))
+    # If no mapping defined, return the division itself (not 'general')
+    return mapping.get(division, mapping.get('default', [division]))
 
 
 def get_docs_dir() -> str:
