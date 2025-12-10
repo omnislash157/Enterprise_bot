@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { ARTIFACT_TYPES } from '../artifacts/registry';
-  import type { StoredArtifact } from '../stores/artifacts';
-  import { artifacts } from '../stores';
+  import { ARTIFACT_TYPES } from '$lib/artifacts/registry';
+  import type { StoredArtifact } from '$lib/stores/artifacts';
+  import { artifacts } from '$lib/stores';
 
   export let item: StoredArtifact;
 
-  $: meta = ARTIFACT_TYPES[item.artifact.type] || { label: 'Unknown', icon: '❓' };
+  $: meta = ARTIFACT_TYPES[item.artifact.type] || { label: 'Unknown', icon: '?' };
   $: title = item.artifact.title || meta.label;
 </script>
 
