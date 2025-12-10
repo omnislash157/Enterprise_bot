@@ -1,30 +1,28 @@
 """
-Enterprise CogTwin - Config-driven wrapper for enterprise deployment.
+Enterprise Twin - Context-stuffing only mode for Driscoll enterprise deployment.
 
-Conditionally loads memory pipelines or context stuffing based on config.
-Adds tenant context support and division-aware doc loading.
+This is the "dumb bot" version - no memory pipelines, no FAISS, no embeddings.
+Just loads docs and stuffs them into context window.
 
 Usage:
     from enterprise_twin import EnterpriseTwin
 
-    twin = EnterpriseTwin(config_path="enterprise_config.yaml")
+    twin = EnterpriseTwin()
     await twin.start()
 
-    # With tenant context
     async for chunk in twin.think("How do I do X?", tenant=tenant_context):
         print(chunk, end="")
 
-Version: 1.0.0
+Version: 1.0.0 (enterprise-lite)
 """
 
 import asyncio
 import logging
 import os
 import time
-import hashlib
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, AsyncIterator, Dict, Any, List
+from typing import Optional, AsyncIterator, Dict, Any
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -54,16 +52,12 @@ logger = logging.getLogger(__name__)
 
 class EnterpriseTwin:
     """
-    Enterprise-ready CogTwin with config-driven feature flags.
+    Enterprise Twin for context-stuffing mode.
 
-    When memory_pipelines=false:
+    In this enterprise fork:
     - No FAISS, no embeddings, no memory retrieval
     - Just loads docs and stuffs them into context
     - Fast startup, simple operation
-
-    When memory_pipelines=true:
-    - Full CogTwin experience with all 5 lanes
-    - Delegates to CogTwin class
     """
 
     def __init__(
@@ -75,10 +69,10 @@ class EnterpriseTwin:
         Initialize enterprise twin.
 
         Args:
-            config_path: Path to enterprise_config.yaml
+            config_path: Path to config.yaml
             data_dir: Override data directory
         """
-        # Load enterprise config first
+        # Load config
         if config_path:
             load_config(config_path)
         else:
@@ -87,70 +81,57 @@ class EnterpriseTwin:
         self.data_dir = Path(data_dir) if data_dir else Path(cfg("paths.data_dir", "./data"))
         self.model = cfg("model.name", "grok-4-fast-reasoning")
 
-        # Track mode
-        self._memory_mode = memory_enabled()
+        # Track mode (always false in this fork)
+        self._memory_mode = False  # No CogTwin in this fork
         self._context_stuffing_mode = context_stuffing_enabled()
 
-        logger.info(f"Enterprise mode: memory={self._memory_mode}, stuffing={self._context_stuffing_mode}")
+        logger.info(f"Enterprise Twin: memory={self._memory_mode}, stuffing={self._context_stuffing_mode}")
 
-        if self._memory_mode:
-            # Full memory mode - delegate to CogTwin
-            from cog_twin import CogTwin
-            self._twin = CogTwin(data_dir=self.data_dir)
-            self._doc_builder = None
-            self.memory_count = self._twin.memory_count
-            logger.info(f"Full memory mode: {self.memory_count} nodes loaded")
+        # No memory mode support in this fork
+        self._twin = None
+        self.memory_count = 0
 
+        # Initialize LLM client
+        provider = cfg("model.provider", "xai")
+        if provider == "xai":
+            api_key = os.getenv("XAI_API_KEY")
         else:
-            # Context stuffing mode - lightweight
-            self._twin = None
-            self.memory_count = 0
+            api_key = os.getenv("ANTHROPIC_API_KEY")
 
-            # Initialize LLM client directly
-            provider = cfg("model.provider", "xai")
-            if provider == "xai":
-                api_key = os.getenv("XAI_API_KEY")
-            else:
-                api_key = os.getenv("ANTHROPIC_API_KEY")
+        self.client = create_adapter(
+            provider=provider,
+            api_key=api_key,
+            model=self.model,
+        )
 
-            self.client = create_adapter(
-                provider=provider,
-                api_key=api_key,
-                model=self.model,
-            )
+        # Initialize doc loader if stuffing enabled
+        if self._context_stuffing_mode:
+            from doc_loader import DocLoader, DivisionContextBuilder
 
-            # Initialize doc loader if stuffing enabled
-            if self._context_stuffing_mode:
-                from doc_loader import DocLoader, DivisionContextBuilder
-
-                docs_dir = Path(get_docs_dir())
-                if docs_dir.exists():
-                    self._doc_loader = DocLoader(docs_dir)
-                    self._doc_builder = DivisionContextBuilder(self._doc_loader)
-                    stats = self._doc_loader.get_stats()
-                    logger.info(f"DocLoader ready: {stats.total_docs} docs, ~{stats.total_tokens} tokens")
-                else:
-                    self._doc_loader = None
-                    self._doc_builder = None
-                    logger.warning(f"Docs directory not found: {docs_dir}")
+            docs_dir = Path(get_docs_dir())
+            if docs_dir.exists():
+                self._doc_loader = DocLoader(docs_dir)
+                self._doc_builder = DivisionContextBuilder(self._doc_loader)
+                stats = self._doc_loader.get_stats()
+                logger.info(f"DocLoader ready: {stats.total_docs} docs, ~{stats.total_tokens} tokens")
             else:
                 self._doc_loader = None
                 self._doc_builder = None
+                logger.warning(f"Docs directory not found: {docs_dir}")
+        else:
+            self._doc_loader = None
+            self._doc_builder = None
 
         # Track session
         self.session_id = f"enterprise_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         self.query_count = 0
 
     async def start(self):
-        """Start the twin (only needed for memory mode)."""
-        if self._twin:
-            await self._twin.start()
+        """Start the twin."""
         logger.info(f"EnterpriseTwin started: {self.session_id}")
 
     async def stop(self):
         """Stop the twin."""
-        if self._twin:
-            await self._twin.stop()
         logger.info(f"EnterpriseTwin stopped. Queries: {self.query_count}")
 
     async def think(
@@ -162,8 +143,7 @@ class EnterpriseTwin:
         """
         Process user input and generate response.
 
-        In memory mode: delegates to full CogTwin.
-        In stuffing mode: builds context from docs and calls LLM directly.
+        Builds context from docs and calls LLM directly.
 
         Args:
             user_input: The user's query
@@ -174,19 +154,10 @@ class EnterpriseTwin:
             Response chunks
         """
         self.query_count += 1
-
-        if self._memory_mode and self._twin:
-            # Delegate to full CogTwin
-            async for chunk in self._twin.think(user_input, stream=stream):
-                yield chunk
-            return
-
-        # ========== CONTEXT STUFFING MODE ==========
-
         start_time = time.time()
 
         # Determine division from tenant or default
-        division = tenant.division if tenant else "default"
+        division = tenant.division if tenant else cfg("tenant.default_division", "warehouse")
 
         # Build doc context
         doc_context = ""
@@ -195,13 +166,20 @@ class EnterpriseTwin:
             categories = get_division_categories(division)
             max_tokens = get_max_stuffing_tokens()
 
-            # Build context for each category
-            for category in categories:
-                category_context = self._doc_builder.get_context_for_division(
-                    category,
-                    max_tokens=max_tokens // len(categories),
+            if categories:
+                # Build context for each category
+                for category in categories:
+                    category_context = self._doc_builder.get_context_for_division(
+                        category,
+                        max_tokens=max_tokens // len(categories),
+                    )
+                    doc_context += category_context
+            else:
+                # Default: use division directly
+                doc_context = self._doc_builder.get_context_for_division(
+                    division,
+                    max_tokens=max_tokens,
                 )
-                doc_context += category_context
 
             logger.info(f"Stuffed {len(doc_context)} chars of docs for division: {division}")
 
