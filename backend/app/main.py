@@ -8,6 +8,14 @@ No memory pipelines, no FAISS, no embeddings.
 Version: 1.0.0 (Enterprise Fork)
 """
 
+import sys
+from pathlib import Path
+
+# Add project root to path so we can import root-level modules
+# (config_loader, enterprise_twin, enterprise_tenant)
+PROJECT_ROOT = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -16,7 +24,6 @@ import asyncio
 import json
 import os
 import logging
-from pathlib import Path
 from typing import Optional
 
 # Setup logging
@@ -148,8 +155,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Global engine instance
-engine: Optional[EnterpriseTwin] = None
+# Global engine instance (type hint as string to avoid import-time errors)
+engine: Optional["EnterpriseTwin"] = None
 
 # =============================================================================
 # STARTUP
