@@ -8,7 +8,8 @@ export { panels, hasFullscreenPanel, closedPanels } from './panels';
 export type { PanelMode, PanelState, PanelsState } from './panels';
 export { workspaces, activeWorkspace, workspaceCount } from './workspaces';
 export type { Workspace, WorkspacesState } from './workspaces';
-export { swarm, currentAgentTurn, waveProgress, latestFailure, latestFileWrite, AGENT_ORDER } from './swarm';
-export type { SwarmState, AgentState, AgentTurn, SwarmFailure, FileWrite, WaveSummary, AgentName, AgentStatus } from './swarm';
 export { config, configLoading, loadConfig, isEnterpriseMode, isBasicTier, isMemoryEnabled, showSwarm, showMemorySpace, showAnalytics } from './config';
 export type { AppConfig } from './config';
+// Auth
+export { auth, isAuthenticated, currentUser, currentTenant, userTenants, authLoading, authError, getAuthHeaders } from './auth';
+export type { AuthState, UserTenant } from './auth';

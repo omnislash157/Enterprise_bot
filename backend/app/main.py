@@ -16,7 +16,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
@@ -63,6 +63,25 @@ try:
 except ImportError as e:
     logger.error(f"Failed to import enterprise modules: {e}")
     CONFIG_LOADED = False
+
+# =============================================================================
+# AUTH IMPORTS - Supabase 3-Tier System
+# =============================================================================
+
+try:
+    from tenant_service_v2 import (
+        get_user_context,
+        get_tenant_service,
+        UserContext,
+        PermissionTier,
+    )
+    AUTH_ENABLED = True
+    logger.info("[AUTH] tenant_service_v2 loaded successfully")
+except ImportError as e:
+    logger.warning(f"[AUTH] tenant_service_v2 not available: {e}")
+    AUTH_ENABLED = False
+    UserContext = None
+    PermissionTier = None
 
 # =============================================================================
 # EMAIL WHITELIST VERIFICATION
@@ -159,6 +178,59 @@ app.add_middleware(
 engine: Optional["EnterpriseTwin"] = None
 
 # =============================================================================
+# AUTH DEPENDENCY
+# =============================================================================
+
+async def get_auth_context(
+    authorization: str = Header(None),
+    x_tenant_slug: str = Header(None, alias="X-Tenant-Slug")
+) -> Optional["UserContext"]:
+    """
+    FastAPI dependency to get authenticated user context.
+    Returns None if auth is disabled or token is invalid (for graceful fallback).
+    Raise HTTPException for strict auth enforcement.
+    """
+    if not AUTH_ENABLED:
+        return None
+
+    if not authorization:
+        return None
+
+    try:
+        ctx = await get_user_context(authorization, x_tenant_slug)
+        return ctx
+    except PermissionError as e:
+        logger.warning(f"[AUTH] Permission denied: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"[AUTH] Error getting user context: {e}")
+        return None
+
+
+async def require_auth(
+    authorization: str = Header(...),
+    x_tenant_slug: str = Header(None, alias="X-Tenant-Slug")
+) -> "UserContext":
+    """
+    FastAPI dependency that REQUIRES authentication.
+    Use this for protected endpoints.
+    """
+    if not AUTH_ENABLED:
+        raise HTTPException(503, "Authentication system not available")
+
+    if not authorization:
+        raise HTTPException(401, "Authorization header required")
+
+    try:
+        ctx = await get_user_context(authorization, x_tenant_slug)
+        return ctx
+    except PermissionError as e:
+        raise HTTPException(401, str(e))
+    except Exception as e:
+        logger.error(f"[AUTH] Error: {e}")
+        raise HTTPException(500, "Authentication error")
+
+# =============================================================================
 # STARTUP
 # =============================================================================
 
@@ -210,21 +282,73 @@ async def root():
     }
 
 @app.get("/api/config")
-async def get_client_config():
-    """Return UI feature flags to frontend."""
-    if not CONFIG_LOADED:
-        return {
-            "features": {"chat_basic": True, "dark_mode": True},
-            "tier": "basic",
-            "mode": "enterprise",
-            "memory_enabled": False,
+async def get_client_config(ctx: Optional["UserContext"] = Depends(get_auth_context)):
+    """Return UI feature flags to frontend, with user context if authenticated."""
+    base_config = {
+        "features": {"chat_basic": True, "dark_mode": True},
+        "tier": "basic",
+        "mode": "enterprise",
+        "memory_enabled": False,
+        "auth_enabled": AUTH_ENABLED,
+    }
+
+    if CONFIG_LOADED:
+        base_config.update({
+            "features": get_ui_features(),
+            "tier": cfg("deployment.tier", "basic"),
+            "mode": cfg("deployment.mode", "enterprise"),
+            "memory_enabled": memory_enabled(),
+        })
+
+    # Add user context if authenticated
+    if ctx:
+        base_config["user"] = {
+            "email": ctx.user.email,
+            "tier": ctx.tier.name if ctx.tier else "USER",
+            "department": ctx.department.slug if ctx.department else None,
+            "tenant": ctx.tenant.slug if ctx.tenant else None,
         }
-    
+        base_config["features"].update({
+            "credit_lookup": ctx.has_feature("credit_lookup"),
+            "credit_pipeline": ctx.has_feature("credit_pipeline"),
+            "admin_portal": ctx.can_access_admin_portal,
+        })
+
+    return base_config
+
+# =============================================================================
+# AUTH ENDPOINTS
+# =============================================================================
+
+@app.get("/api/whoami")
+async def whoami(ctx: "UserContext" = Depends(require_auth)):
+    """Debug endpoint to check current user context."""
     return {
-        "features": get_ui_features(),
-        "tier": cfg("deployment.tier", "basic"),
-        "mode": cfg("deployment.mode", "enterprise"),
-        "memory_enabled": memory_enabled(),
+        "user": {
+            "id": ctx.user.id,
+            "email": ctx.user.email,
+        },
+        "tenant": {
+            "id": ctx.tenant.id,
+            "slug": ctx.tenant.slug,
+            "name": ctx.tenant.name,
+        } if ctx.tenant else None,
+        "department": {
+            "id": ctx.department.id,
+            "slug": ctx.department.slug,
+            "name": ctx.department.name,
+        } if ctx.department else None,
+        "tier": ctx.tier.name if ctx.tier else "USER",
+        "role": ctx.role,
+        "employee_id": ctx.employee_id,
+        "permissions": {
+            "can_view_all_department_data": ctx.can_view_all_department_data,
+            "can_manage_department_users": ctx.can_manage_department_users,
+            "can_manage_all_users": ctx.can_manage_all_users,
+            "can_access_admin_portal": ctx.can_access_admin_portal,
+        },
+        "data_filter": ctx.get_data_filter(),
+        "context_content_count": len(ctx.context_content),
     }
 
 # =============================================================================
@@ -288,8 +412,146 @@ async def get_session_stats():
     """Get session statistics."""
     if engine is None:
         raise HTTPException(503, "Engine not initialized")
-    
+
     return engine.get_session_stats()
+
+# =============================================================================
+# ADMIN PORTAL ENDPOINTS
+# =============================================================================
+
+class AddUserRequest(BaseModel):
+    email: str
+    department_slug: str
+    role: str = "user"
+    employee_id: Optional[str] = None
+
+class RemoveUserRequest(BaseModel):
+    email: str
+
+class UpdateRoleRequest(BaseModel):
+    email: str
+    new_role: str
+
+
+@app.get("/api/admin/users")
+async def list_users(
+    ctx: "UserContext" = Depends(require_auth),
+    department: Optional[str] = None
+):
+    """
+    List users in tenant.
+    - Dept heads: see only their department's users
+    - Super users: see all users, optionally filter by department
+    """
+    if not ctx.can_manage_department_users:
+        raise HTTPException(403, "Insufficient permissions")
+
+    svc = get_tenant_service()
+    try:
+        users = await svc.list_tenant_users(ctx, department_slug=department)
+        return {"users": users, "count": len(users)}
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+
+
+@app.get("/api/admin/departments")
+async def list_departments(ctx: "UserContext" = Depends(require_auth)):
+    """
+    List departments in tenant.
+    - Dept heads: see only their department
+    - Super users: see all departments
+    """
+    if not ctx.can_manage_department_users:
+        raise HTTPException(403, "Insufficient permissions")
+
+    svc = get_tenant_service()
+
+    if ctx.is_super_user:
+        # Super users see all departments
+        response = svc.supabase.table("tenant_departments").select(
+            "id, slug, name"
+        ).eq("tenant_id", ctx.tenant.id).execute()
+        departments = response.data
+    else:
+        # Dept heads see only their department
+        departments = [{"id": ctx.department.id, "slug": ctx.department.slug, "name": ctx.department.name}] if ctx.department else []
+
+    return {"departments": departments}
+
+
+@app.post("/api/admin/users")
+async def add_user(
+    request: AddUserRequest,
+    ctx: "UserContext" = Depends(require_auth)
+):
+    """
+    Add a user to the tenant.
+    - Super users: can add to any department with any role
+    - Dept heads: can add to their department only, role='user' only, @driscollfoods.com only
+    """
+    if not ctx.can_manage_department_users:
+        raise HTTPException(403, "Insufficient permissions")
+
+    svc = get_tenant_service()
+    try:
+        await svc.add_user_to_tenant(
+            ctx,
+            user_email=request.email,
+            department_slug=request.department_slug,
+            role=request.role,
+            employee_id=request.employee_id,
+        )
+        return {"success": True, "message": f"Added {request.email} to {request.department_slug}"}
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.delete("/api/admin/users")
+async def remove_user(
+    request: RemoveUserRequest,
+    ctx: "UserContext" = Depends(require_auth)
+):
+    """
+    Remove a user from the tenant.
+    - Super users: can remove anyone
+    - Dept heads: can remove users from their department (not dept_heads/admins)
+    """
+    if not ctx.can_manage_department_users:
+        raise HTTPException(403, "Insufficient permissions")
+
+    svc = get_tenant_service()
+    try:
+        await svc.remove_user_from_tenant(ctx, user_email=request.email)
+        return {"success": True, "message": f"Removed {request.email}"}
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.patch("/api/admin/users/role")
+async def update_user_role(
+    request: UpdateRoleRequest,
+    ctx: "UserContext" = Depends(require_auth)
+):
+    """
+    Update a user's role. Super users only.
+    Valid roles: 'user', 'dept_head', 'super_user'
+    """
+    if not ctx.can_manage_all_users:
+        raise HTTPException(403, "Only super users can change roles")
+
+    svc = get_tenant_service()
+    try:
+        await svc.update_user_role(ctx, user_email=request.email, new_role=request.new_role)
+        return {"success": True, "message": f"Updated {request.email} to {request.new_role}"}
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
 
 # =============================================================================
 # WEBSOCKET CONNECTION MANAGER
@@ -322,7 +584,7 @@ manager = ConnectionManager()
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await manager.connect(session_id, websocket)
-    
+
     # Default tenant - verification is OPTIONAL for demo
     # If verify message comes, we use that email
     # If not, we use default tenant (warehouse division)
@@ -333,7 +595,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         zone=None,
         role="user",
     )
-    
+
+    # Track authenticated user context (if they send auth token)
+    user_context: Optional["UserContext"] = None
+
     try:
         # Send connection confirmation
         await websocket.send_json({
@@ -341,14 +606,59 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             "session_id": session_id,
             "timestamp": datetime.utcnow().isoformat(),
         })
-        
+
         while True:
             data = await websocket.receive_json()
             msg_type = data.get("type", "message")
-            
+
             if msg_type == "ping":
                 await websocket.send_json({"type": "pong"})
-            
+
+            elif msg_type == "auth":
+                # Authenticate via Supabase JWT and load context_content
+                if not AUTH_ENABLED:
+                    await websocket.send_json({
+                        "type": "auth_error",
+                        "message": "Authentication system not available",
+                    })
+                    continue
+
+                token = data.get("token", "")
+                tenant_slug = data.get("tenant_slug")
+
+                try:
+                    user_context = await get_user_context(f"Bearer {token}", tenant_slug)
+                    user_email = user_context.user.email
+
+                    # Update tenant context with auth info
+                    tenant = TenantContext(
+                        tenant_id=user_context.tenant.slug if user_context.tenant else "driscoll",
+                        division=user_context.department.slug if user_context.department else tenant.division,
+                        zone=None,
+                        role=user_context.role,
+                        email=user_email,
+                    )
+
+                    await websocket.send_json({
+                        "type": "authenticated",
+                        "email": user_email,
+                        "division": tenant.division,
+                        "tier": user_context.tier.name if user_context.tier else "USER",
+                        "context_docs_count": len(user_context.context_content),
+                    })
+                    logger.info(f"[WS] Authenticated: {user_email}, {len(user_context.context_content)} context docs")
+                except PermissionError as e:
+                    await websocket.send_json({
+                        "type": "auth_error",
+                        "message": str(e),
+                    })
+                except Exception as e:
+                    logger.error(f"[WS] Auth error: {e}")
+                    await websocket.send_json({
+                        "type": "auth_error",
+                        "message": "Authentication failed",
+                    })
+
             elif msg_type == "verify":
                 # Optional email verification handshake
                 email = data.get("email", "")
@@ -379,17 +689,20 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             
             elif msg_type == "message":
                 content = data.get("content", "")
-                
+
                 if engine is None:
                     await websocket.send_json({
                         "type": "error",
                         "message": "Engine not initialized",
                     })
                     continue
-                
-                # Stream response (no verification required for demo)
+
+                # Get context_content from authenticated user (if available)
+                ctx_content = user_context.context_content if user_context else None
+
+                # Stream response
                 response_text = ""
-                async for chunk in engine.think(content, tenant=tenant):
+                async for chunk in engine.think(content, tenant=tenant, context_content=ctx_content):
                     if isinstance(chunk, str) and chunk:
                         response_text += chunk
                         await websocket.send_json({

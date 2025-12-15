@@ -452,6 +452,9 @@
 		flex-direction: column;
 		gap: 1rem;
 		scroll-behavior: smooth;
+		transform: translateZ(0);
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior: contain;
 	}
 
 	.empty-state {

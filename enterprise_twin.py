@@ -139,6 +139,7 @@ class EnterpriseTwin:
         user_input: str,
         tenant: Optional[TenantContext] = None,
         stream: bool = True,
+        context_content: Optional[list] = None,
     ) -> AsyncIterator[str]:
         """
         Process user input and generate response.
@@ -149,6 +150,7 @@ class EnterpriseTwin:
             user_input: The user's query
             tenant: Optional tenant context for division-aware responses
             stream: Whether to stream response chunks
+            context_content: Optional list of context strings from Supabase (overrides local files)
 
         Yields:
             Response chunks
@@ -159,9 +161,13 @@ class EnterpriseTwin:
         # Determine division from tenant or default
         division = tenant.division if tenant else cfg("tenant.default_division", "warehouse")
 
-        # Build doc context
+        # Build doc context - prefer Supabase content if provided
         doc_context = ""
-        if self._doc_builder:
+        if context_content:
+            # Use context from Supabase (tenant_service_v2)
+            doc_context = "\n\n---\n\n".join(context_content)
+            logger.info(f"Using Supabase context: {len(context_content)} docs, {len(doc_context)} chars")
+        elif self._doc_builder:
             # Get categories for this division
             categories = get_division_categories(division)
             max_tokens = get_max_stuffing_tokens()

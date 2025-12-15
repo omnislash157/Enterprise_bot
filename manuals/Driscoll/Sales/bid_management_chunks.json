@@ -1,0 +1,62 @@
+{
+  "knowledge_base": "driscoll_foods_bid_management",
+  "version": "1.0",
+  "chunks": [
+    {
+      "id": "bid_request_process",
+      "category": "bids",
+      "subcategory": "creation",
+      "keywords": ["create bid", "request bid", "new bid", "class bid", "email"],
+      "content": "To request a new class bid at Driscoll Foods, email classbidrequest@driscollfoods.com with the customer name and customer number. This creates the bid in the system for subsequent configuration."
+    },
+    {
+      "id": "bid_navigation",
+      "category": "bids",
+      "subcategory": "system_navigation",
+      "keywords": ["access bid", "open bid", "find bid", "menu 27", "bid maintenance", "CL", "CU"],
+      "content": "Bid File Price Maintenance: Menu 27 > Option 1. Prompt asks 'Current or Future bid? (C/F)' - enter C for current, F for future. Bid Types: CL = class bid, CU = customer bid. Enter bid number, then Down Arrow or F4 for toolbar."
+    },
+    {
+      "id": "bid_toolbar_add_maintain",
+      "category": "bids",
+      "subcategory": "maintenance",
+      "keywords": ["add item", "edit bid", "update price", "maintain bid", "toolbar"],
+      "content": "Bid toolbar: A = Add new item to bid. C = Maintain/update existing item pricing. Access toolbar via F4 or Down Arrow after entering bid number."
+    },
+    {
+      "id": "bid_locking",
+      "category": "bids",
+      "subcategory": "pricing",
+      "keywords": ["lock bid", "reserve lock", "price lock", "produce", "weekly pricing", "R", "L"],
+      "content": "Bid locking options: L = Lock prices for current week or future dates. R = Reserve lock (ideal for percent-based items like weekly produce). Unlocked bids auto-update when buyers change prices. Use R for items priced as percentages that change weekly."
+    },
+    {
+      "id": "bid_update_orders",
+      "category": "bids",
+      "subcategory": "pricing",
+      "keywords": ["update orders", "apply new price", "existing orders", "future orders", "U"],
+      "content": "After changing bid pricing, press U in toolbar to update all already-entered orders with future delivery dates. This pushes the new pricing to orders that were entered before the price change."
+    },
+    {
+      "id": "bid_visual_indicator",
+      "category": "bids",
+      "subcategory": "order_entry",
+      "keywords": ["blue item", "red B", "bid indicator", "alpha search", "order screen"],
+      "content": "Bid items appear as blue text with a red 'B' indicator when searching in the Alpha during order entry. This confirms the item is on the customer's active bid."
+    },
+    {
+      "id": "bid_copy_class_to_class",
+      "category": "bids",
+      "subcategory": "copy_operations",
+      "keywords": ["copy bid", "duplicate bid", "clone bid", "class to class", "COPY"],
+      "content": "Copy class bid: Menu 27 > 1 > C (current) > CL > enter source bid number > F4 to end > type COPY > enter destination customer/bid number."
+    },
+    {
+      "id": "bid_copy_callsheet_to_bid",
+      "category": "bids",
+      "subcategory": "copy_operations",
+      "keywords": ["copy callsheet", "callsheet to bid", "customer callsheet", "convert", "COPY"],
+      "content": "Copy call sheet to bid: Menu 27 > 1 > C (current) > CU > enter customer number > Down Arrow > type COPY > enter destination bid number in NEW CUSTOMER/CLASS field."
+    }
+  ]
+}
