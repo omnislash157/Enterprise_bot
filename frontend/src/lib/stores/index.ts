@@ -12,3 +12,5 @@ export { config, configLoading, loadConfig, isEnterpriseMode, isBasicTier, isMem
 export type { AppConfig } from './config';
 // Auth (stub - disabled)
 export { user, isAuthenticated, signIn, signOut } from './auth';
+// Analytics
+export * from './analytics';

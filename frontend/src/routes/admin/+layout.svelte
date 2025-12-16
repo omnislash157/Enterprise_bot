@@ -54,7 +54,8 @@
 
     // Navigation items
     const navItems = [
-        { path: '/admin', label: 'Dashboard', icon: 'chart' },
+        { path: '/admin', label: 'Nerve Center', icon: 'chart' },
+        { path: '/admin/analytics', label: 'Analytics', icon: 'analytics' },
         { path: '/admin/users', label: 'Users', icon: 'users' },
         { path: '/admin/audit', label: 'Audit Log', icon: 'shield', superOnly: true },
     ];
@@ -89,6 +90,8 @@
                                     &#128202;
                                 {:else if item.icon === 'users'}
                                     &#128101;
+                                {:else if item.icon === 'analytics'}
+                                    &#128200;
                                 {:else if item.icon === 'shield'}
                                     &#128737;
                                 {/if}

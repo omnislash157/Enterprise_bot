@@ -1,6 +1,6 @@
 # Enterprise Bot - Source of Truth File Tree
 
-**Last Updated:** 2024-12-16 (Phase 2 Analytics Engine Complete)
+**Last Updated:** 2024-12-16 (Phase 3 Nerve Center Dashboard Complete)
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
@@ -162,6 +162,14 @@ enterprise_bot/
         │   │   │   ├── RoleModal.svelte     # Role change modal
         │   │   │   ├── CreateUserModal.svelte  # NEW: Single user creation
         │   │   │   └── BatchImportModal.svelte # NEW: Batch CSV import
+        │   │   │   │
+        │   │   │   └── charts/              # Phase 3: Nerve Center Charts
+        │   │   │       ├── chartTheme.ts    # Cyberpunk Chart.js config
+        │   │   │       ├── StatCard.svelte  # Metric display widget
+        │   │   │       ├── LineChart.svelte # Time series (queries/hour)
+        │   │   │       ├── DoughnutChart.svelte # Category breakdown
+        │   │   │       ├── BarChart.svelte  # Department comparison
+        │   │   │       └── RealtimeSessions.svelte # Live sessions widget
         │   │   │
         │   │   └── archive/                 # Archived components
         │   │       ├── AnalyticsDashboard.svelte
@@ -356,6 +364,14 @@ Added full CRUD operations to the admin portal:
 **Frontend:**
 - `CreateUserModal.svelte` - Single user creation form
 - `BatchImportModal.svelte` - CSV/textarea batch import
+        │   │   │   │
+        │   │   │   └── charts/              # Phase 3: Nerve Center Charts
+        │   │   │       ├── chartTheme.ts    # Cyberpunk Chart.js config
+        │   │   │       ├── StatCard.svelte  # Metric display widget
+        │   │   │       ├── LineChart.svelte # Time series (queries/hour)
+        │   │   │       ├── DoughnutChart.svelte # Category breakdown
+        │   │   │       ├── BarChart.svelte  # Department comparison
+        │   │   │       └── RealtimeSessions.svelte # Live sessions widget
 - `UserRow.svelte` - Added edit/deactivate/reactivate action buttons
 - `admin.ts` - Added CRUD store methods
 - `users/+page.svelte` - Integrated all modals with "+ Add User" and "Batch Import" buttons
