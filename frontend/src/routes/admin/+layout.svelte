@@ -26,11 +26,12 @@
 
             if (res.ok) {
                 const data = await res.json();
-                const canAdmin = data.permissions?.can_manage_department_users ||
-                                 data.permissions?.can_access_admin_portal ||
-                                 data.tier === 'SUPER_USER' ||
-                                 data.role === 'super_user' ||
-                                 data.role === 'dept_head';
+                const user = data.user;
+                const canAdmin = user?.can_manage_users ||
+                                 user?.is_super_user ||
+                                 user?.tier === 'SUPER_USER' ||
+                                 user?.role === 'super_user' ||
+                                 user?.role === 'dept_head';
 
                 if (canAdmin) {
                     hasAccess = true;
