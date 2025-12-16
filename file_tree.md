@@ -1,6 +1,6 @@
 # Enterprise Bot - Source of Truth File Tree
 
-**Last Updated:** 2024-12-16 (Phase 1 User CRUD Complete)
+**Last Updated:** 2024-12-16 (Phase 2 Analytics Engine Complete)
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
@@ -39,8 +39,9 @@ enterprise_bot/
 ├── config_loader.py             # YAML config loader, cfg() helper
 ├── schemas.py                   # Pydantic models
 │
-├── Auth & Admin (Phase 2-3 + User CRUD)
-│   ├── auth_schema.py           # DB schema setup for auth tables
+├── Auth & Admin (Phase 1-3 + User CRUD)
+│   ├── auth_schema.py           # DB schema setup for auth + analytics tables
+│   │                            # + init_analytics_tables() for Phase 2
 │   ├── auth_service.py          # User CRUD, permissions, audit logging
 │   │                            # + create_user, update_user, deactivate_user,
 │   │                            #   reactivate_user, batch_create_users
@@ -49,8 +50,18 @@ enterprise_bot/
 │   ├── tenant_service.py        # Department content loading
 │   └── enterprise_tenant.py     # TenantContext dataclass
 │
+├── Analytics Engine (Phase 2 - Nerve Center)
+│   ├── analytics_service.py     # Query logging, classification, aggregation
+│   │                            # + classify_query(), detect_frustration()
+│   │                            # + log_query(), log_event()
+│   │                            # + get_overview_stats(), get_category_breakdown()
+│   └── analytics_routes.py      # Dashboard API endpoints at /api/admin/analytics
+│                                # + GET /overview, /queries, /categories
+│                                # + GET /departments, /errors, /realtime
+│
 ├── Enterprise Twin (Chat Engine)
 │   ├── enterprise_twin.py       # Main chat engine, context stuffing
+│   │                            # + Analytics instrumentation in think()
 │   ├── chat_parser_agnostic.py  # Response parsing
 │   └── model_adapter.py         # Model switching utility
 │
@@ -297,6 +308,34 @@ DRISCOLL_SQL_PASSWORD=...
 
 ## Recent Changes (2024-12-16)
 
+### Phase 2: Analytics Engine (Nerve Center) - COMPLETE
+Full instrumentation layer - "If they fart, we know about it."
+
+**New Database Tables (`auth_schema.py --init-analytics`):**
+- `enterprise.query_log` - Full query storage with auto-classification
+- `enterprise.analytics_events` - Non-query events (login, dept_switch, error)
+- `enterprise.analytics_daily` - Pre-computed daily aggregates
+
+**New Files:**
+- `analytics_service.py` (~400 lines) - The fart detector
+  - Query classification into 10 categories (PROCEDURAL, LOOKUP, TROUBLESHOOTING, etc.)
+  - Frustration signal detection
+  - Repeat question detection (Jaccard similarity)
+  - `log_query()`, `log_event()` for all instrumentation
+  - Dashboard query methods for frontend
+- `analytics_routes.py` (~100 lines) - API at `/api/admin/analytics`
+  - `GET /overview` - Active users, total queries, avg response time, error rate
+  - `GET /queries` - Query counts by hour (for charts)
+  - `GET /categories` - Category breakdown (pie/bar chart)
+  - `GET /departments` - Per-department stats
+  - `GET /errors` - Recent error events
+  - `GET /users/{email}` - User activity stats
+  - `GET /realtime` - Currently active sessions
+
+**Instrumented Files:**
+- `main.py` - Login events, dept_switch events, error events
+- `enterprise_twin.py` - Query logging after each think() response
+
 ### Phase 1: User Management CRUD - COMPLETE
 Added full CRUD operations to the admin portal:
 
@@ -329,8 +368,8 @@ Added full CRUD operations to the admin portal:
 1. Rename `credit/credit_page.svelte` → `credit/+page.svelte`
 
 ### Future Sprints
-- **Phase 2:** Department Management CRUD (add/edit departments)
-- **Phase 3:** Dashboard Stats & Analytics
-- **Phase 4:** JWT authentication
+- **Phase 3:** Nerve Center Dashboard UI (frontend for analytics)
+- **Phase 4:** Department Management CRUD (add/edit departments)
+- **Phase 5:** JWT authentication
 - **Memory Sprint:** Enable hive mind with retained memory files
 - **Voice Sprint:** Evaluate venom_voice.py / enterprise_voice.py

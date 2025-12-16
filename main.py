@@ -82,6 +82,15 @@ except ImportError as e:
     logger.warning(f"Admin routes not loaded: {e}")
     ADMIN_ROUTES_LOADED = False
 
+# Analytics service import
+try:
+    from analytics_service import get_analytics_service
+    from analytics_routes import analytics_router
+    ANALYTICS_LOADED = True
+except ImportError as e:
+    logger.warning(f"Analytics service not loaded: {e}")
+    ANALYTICS_LOADED = False
+
 # =============================================================================
 # AUTH DEPENDENCIES
 # =============================================================================
@@ -238,6 +247,11 @@ app.add_middleware(
 if ADMIN_ROUTES_LOADED:
     app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
     logger.info("[STARTUP] Admin routes loaded at /api/admin")
+
+# Include analytics router
+if ANALYTICS_LOADED:
+    app.include_router(analytics_router, prefix="/api/admin/analytics", tags=["analytics"])
+    logger.info("[STARTUP] Analytics routes loaded at /api/admin/analytics")
 
 # Global engine instance
 engine: Optional[EnterpriseTwin] = None
@@ -567,6 +581,20 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                         auth.record_login(user)  # Track login
 
+                        # Log login event to analytics
+                        if ANALYTICS_LOADED:
+                            try:
+                                analytics = get_analytics_service()
+                                analytics.log_event(
+                                    event_type="login",
+                                    user_email=email,
+                                    department=tenant.division,
+                                    session_id=session_id,
+                                    user_id=str(user.id) if hasattr(user, 'id') else None
+                                )
+                            except Exception as ae:
+                                logger.warning(f"Failed to log login event: {ae}")
+
                         await websocket.send_json({
                             "type": "verified",
                             "email": email,
@@ -645,6 +673,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             elif msg_type == "set_division":
                 # Allow changing division mid-session
                 new_division = data.get("division", "warehouse")
+                old_division = tenant.division  # Capture before change
+
                 tenant = TenantContext(
                     tenant_id=tenant.tenant_id,
                     division=new_division,
@@ -652,6 +682,21 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     role=tenant.role,
                     email=tenant.email,
                 )
+
+                # Log department switch event
+                if ANALYTICS_LOADED and old_division != new_division:
+                    try:
+                        analytics = get_analytics_service()
+                        analytics.log_event(
+                            event_type="dept_switch",
+                            user_email=tenant.email or user_email,
+                            session_id=session_id,
+                            from_department=old_division,
+                            to_department=new_division
+                        )
+                    except Exception as ae:
+                        logger.warning(f"Failed to log dept_switch event: {ae}")
+
                 await websocket.send_json({
                     "type": "division_changed",
                     "division": new_division,
@@ -667,6 +712,21 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         manager.disconnect(session_id)
     except Exception as e:
         logger.error(f"[WS] Error in session {session_id}: {e}")
+
+        # Log error event to analytics
+        if ANALYTICS_LOADED:
+            try:
+                analytics = get_analytics_service()
+                analytics.log_event(
+                    event_type="error",
+                    user_email=user_email,
+                    session_id=session_id,
+                    error_type=type(e).__name__,
+                    error_message=str(e)
+                )
+            except:
+                pass  # Don't let analytics errors crash the handler
+
         manager.disconnect(session_id)
 
 

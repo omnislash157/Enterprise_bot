@@ -46,6 +46,13 @@ from enterprise_tenant import TenantContext
 # Model adapter
 from model_adapter import create_adapter
 
+# Analytics (optional)
+try:
+    from analytics_service import get_analytics_service
+    ANALYTICS_AVAILABLE = True
+except ImportError:
+    ANALYTICS_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 
@@ -252,7 +259,8 @@ END OF DOCS. If it ain't above, you don't know it. Don't make shit up.
                     yield chunk
 
             response_obj = stream_response.get_final_message()
-            tokens_used = response_obj.usage.input_tokens + response_obj.usage.output_tokens
+            input_tokens = response_obj.usage.input_tokens
+            output_tokens = response_obj.usage.output_tokens
         else:
             response = self.client.messages.create(
                 model=self.model,
@@ -261,11 +269,31 @@ END OF DOCS. If it ain't above, you don't know it. Don't make shit up.
                 messages=[{"role": "user", "content": user_input}],
             )
             full_response = response.content[0].text
-            tokens_used = response.usage.input_tokens + response.usage.output_tokens
+            input_tokens = response.usage.input_tokens
+            output_tokens = response.usage.output_tokens
             yield full_response
 
+        tokens_used = input_tokens + output_tokens
         elapsed = time.time() - start_time
         logger.info(f"Query complete: {elapsed:.2f}s, {tokens_used} tokens")
+
+        # Log to analytics
+        if ANALYTICS_AVAILABLE:
+            try:
+                analytics = get_analytics_service()
+                analytics.log_query(
+                    user_email=tenant.email if tenant and tenant.email else "unknown",
+                    department=division,
+                    query_text=user_input,
+                    session_id=self.session_id,
+                    response_time_ms=int(elapsed * 1000),
+                    response_length=len(full_response),
+                    tokens_input=input_tokens,
+                    tokens_output=output_tokens,
+                    model_used=self.model,
+                )
+            except Exception as e:
+                logger.warning(f"Failed to log analytics: {e}")
 
     def get_session_stats(self) -> Dict[str, Any]:
         """Get session statistics."""

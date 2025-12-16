@@ -249,6 +249,190 @@ def init_auth_tables():
         print(f"     Gated departments: {', '.join(GATED_DEPARTMENTS)}")
 
 
+def init_analytics_tables():
+    """
+    Create analytics tables in the enterprise schema.
+    Safe to run multiple times (uses IF NOT EXISTS).
+    """
+    with get_connection() as conn:
+        cur = conn.cursor()
+
+        # ---------------------------------------------------------------------
+        # enterprise.query_log - Full query storage with classification
+        # ---------------------------------------------------------------------
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {SCHEMA}.query_log (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+                -- Who/When/Where
+                user_id UUID REFERENCES {SCHEMA}.users(id),
+                user_email VARCHAR(255) NOT NULL,
+                department VARCHAR(50) NOT NULL,
+                session_id VARCHAR(100),
+
+                -- The Query
+                query_text TEXT NOT NULL,
+                query_length INT,
+                query_word_count INT,
+
+                -- Classification (auto-detected)
+                query_category VARCHAR(50),
+                query_subcategory VARCHAR(50),
+                query_keywords TEXT[],
+
+                -- Sentiment
+                sentiment_score FLOAT,
+                frustration_signals TEXT[],
+                is_repeat_question BOOLEAN DEFAULT FALSE,
+                repeat_of_query_id UUID,
+
+                -- Response Metrics
+                response_time_ms INT,
+                response_length INT,
+                tokens_input INT,
+                tokens_output INT,
+                model_used VARCHAR(50),
+
+                -- Session Context
+                query_position_in_session INT,
+                time_since_last_query_ms INT,
+
+                -- Outcome Signals
+                session_ended_quickly BOOLEAN DEFAULT FALSE,
+
+                -- Timestamps
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+
+        # Indexes
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_query_log_time
+            ON {SCHEMA}.query_log(created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_query_log_user
+            ON {SCHEMA}.query_log(user_id, created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_query_log_dept
+            ON {SCHEMA}.query_log(department, created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_query_log_category
+            ON {SCHEMA}.query_log(query_category, created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_query_log_session
+            ON {SCHEMA}.query_log(session_id, created_at);
+        """)
+
+        # ---------------------------------------------------------------------
+        # enterprise.analytics_events - Non-query events
+        # ---------------------------------------------------------------------
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {SCHEMA}.analytics_events (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+                event_type VARCHAR(50) NOT NULL,
+                user_id UUID REFERENCES {SCHEMA}.users(id),
+                user_email VARCHAR(255),
+                department VARCHAR(50),
+
+                -- Event-specific data
+                event_data JSONB,
+
+                -- For dept_switch events
+                from_department VARCHAR(50),
+                to_department VARCHAR(50),
+
+                -- For error events
+                error_type VARCHAR(100),
+                error_message TEXT,
+
+                -- For session events
+                session_id VARCHAR(100),
+                session_duration_ms INT,
+                queries_in_session INT,
+
+                -- Timestamps
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        """)
+
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_events_type_time
+            ON {SCHEMA}.analytics_events(event_type, created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_events_user
+            ON {SCHEMA}.analytics_events(user_id, created_at DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_events_session
+            ON {SCHEMA}.analytics_events(session_id);
+        """)
+
+        # ---------------------------------------------------------------------
+        # enterprise.analytics_daily - Pre-computed aggregates
+        # ---------------------------------------------------------------------
+        cur.execute(f"""
+            CREATE TABLE IF NOT EXISTS {SCHEMA}.analytics_daily (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+                date DATE NOT NULL,
+                department VARCHAR(50),
+
+                -- Volume
+                total_queries INT DEFAULT 0,
+                unique_users INT DEFAULT 0,
+                total_sessions INT DEFAULT 0,
+
+                -- Query Categories
+                queries_procedural INT DEFAULT 0,
+                queries_lookup INT DEFAULT 0,
+                queries_troubleshooting INT DEFAULT 0,
+                queries_policy INT DEFAULT 0,
+                queries_contact INT DEFAULT 0,
+                queries_returns INT DEFAULT 0,
+                queries_inventory INT DEFAULT 0,
+                queries_safety INT DEFAULT 0,
+                queries_other INT DEFAULT 0,
+
+                -- Performance
+                avg_response_time_ms FLOAT,
+                p95_response_time_ms INT,
+
+                -- Quality Signals
+                repeat_questions INT DEFAULT 0,
+                quick_abandons INT DEFAULT 0,
+
+                -- Errors
+                error_count INT DEFAULT 0,
+
+                -- Computed at
+                computed_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+
+                UNIQUE(date, department)
+            );
+        """)
+
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_daily_date
+            ON {SCHEMA}.analytics_daily(date DESC);
+        """)
+        cur.execute(f"""
+            CREATE INDEX IF NOT EXISTS idx_daily_dept
+            ON {SCHEMA}.analytics_daily(department, date DESC);
+        """)
+
+        conn.commit()
+        cur.close()
+
+        print("[OK] Analytics tables created successfully")
+        print(f"     Tables: query_log, analytics_events, analytics_daily")
+
+
 # =============================================================================
 # SEED DATA
 # =============================================================================
@@ -477,12 +661,17 @@ if __name__ == "__main__":
     
     if "--list" in args:
         list_users()
-    
+
+    if "--init-analytics" in args:
+        print("\n[INIT] Creating analytics tables...")
+        init_analytics_tables()
+
     if not args:
         print("Auth Schema Extension")
         print("=" * 60)
         print("\nUsage:")
-        print("  python auth_schema.py --init    # Create tables")
-        print("  python auth_schema.py --seed    # Seed test users")
-        print("  python auth_schema.py --list    # Show users")
+        print("  python auth_schema.py --init           # Create auth tables")
+        print("  python auth_schema.py --seed           # Seed test users")
+        print("  python auth_schema.py --list           # Show users")
+        print("  python auth_schema.py --init-analytics # Create analytics tables")
         print("\nRun --init first, then --seed to set up Driscoll users.")
