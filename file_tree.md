@@ -1,6 +1,6 @@
 # Enterprise Bot - Source of Truth File Tree
 
-**Last Updated:** 2024-12-16 (Phase 3 Nerve Center Dashboard Complete)
+**Last Updated:** 2024-12-16 (Phase 3.5 Threlte Neural Network Visualization)
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
@@ -160,16 +160,23 @@ enterprise_bot/
         │   │   │   ├── UserRow.svelte       # User list row + edit/deactivate btns
         │   │   │   ├── AccessModal.svelte   # Grant/revoke modal
         │   │   │   ├── RoleModal.svelte     # Role change modal
-        │   │   │   ├── CreateUserModal.svelte  # NEW: Single user creation
-        │   │   │   └── BatchImportModal.svelte # NEW: Batch CSV import
+        │   │   │   ├── CreateUserModal.svelte  # Single user creation
+        │   │   │   ├── BatchImportModal.svelte # Batch CSV import
         │   │   │   │
-        │   │   │   └── charts/              # Phase 3: Nerve Center Charts
-        │   │   │       ├── chartTheme.ts    # Cyberpunk Chart.js config
-        │   │   │       ├── StatCard.svelte  # Metric display widget
-        │   │   │       ├── LineChart.svelte # Time series (queries/hour)
-        │   │   │       ├── DoughnutChart.svelte # Category breakdown
-        │   │   │       ├── BarChart.svelte  # Department comparison
-        │   │   │       └── RealtimeSessions.svelte # Live sessions widget
+        │   │   │   ├── charts/              # Phase 3: Nerve Center Charts
+        │   │   │   │   ├── chartTheme.ts    # Cyberpunk Chart.js config
+        │   │   │   │   ├── StatCard.svelte  # Metric display widget
+        │   │   │   │   ├── LineChart.svelte # Time series (queries/hour)
+        │   │   │   │   ├── DoughnutChart.svelte # Category breakdown
+        │   │   │   │   ├── BarChart.svelte  # Department comparison
+        │   │   │   │   ├── RealtimeSessions.svelte # Live sessions widget
+        │   │   │   │   └── NerveCenterWidget.svelte # 3D viz wrapper (Phase 3.5)
+        │   │   │   │
+        │   │   │   └── threlte/             # Phase 3.5: 3D Neural Network
+        │   │   │       ├── NeuralNode.svelte     # Glowing category node w/ Float
+        │   │   │       ├── DataSynapse.svelte    # Curved lines + traveling packets
+        │   │   │       ├── NeuralNetwork.svelte  # 11 category nodes + synapses
+        │   │   │       └── NerveCenterScene.svelte # Full scene + particles
         │   │   │
         │   │   └── archive/                 # Archived components
         │   │       ├── AnalyticsDashboard.svelte
@@ -181,6 +188,7 @@ enterprise_bot/
         │   │   ├── index.ts                 # Store exports
         │   │   ├── auth.ts                  # Auth state & API
         │   │   ├── admin.ts                 # Admin portal state + CRUD methods
+        │   │   ├── analytics.ts             # Phase 3: Dashboard data store
         │   │   ├── credit.ts                # Credit form state
         │   │   ├── websocket.ts             # WS connection
         │   │   ├── session.ts               # Chat session
@@ -203,7 +211,9 @@ enterprise_bot/
             │
             ├── admin/                       # Admin Portal (Phase 3 + CRUD)
             │   ├── +layout.svelte           # Admin layout + sidebar
-            │   ├── +page.svelte             # Dashboard
+            │   ├── +page.svelte             # Nerve Center dashboard
+            │   ├── analytics/
+            │   │   └── +page.svelte         # Analytics deep dive
             │   ├── users/
             │   │   └── +page.svelte         # User management + CRUD modals
             │   └── audit/
@@ -316,6 +326,54 @@ DRISCOLL_SQL_PASSWORD=...
 
 ## Recent Changes (2024-12-16)
 
+### Phase 3.5: Threlte Neural Network Visualization - COMPLETE
+3D reactive visualization of query categories as an interconnected neural network.
+
+**New Files (`admin/threlte/`):**
+- `NeuralNode.svelte` - Glowing node with Float animation, size/glow based on activity
+- `DataSynapse.svelte` - Curved Bezier connections with traveling data packets
+- `NeuralNetwork.svelte` - Complete network: 11 category nodes + 15 synapses + central core
+- `NerveCenterScene.svelte` - Full 3D scene with OrbitControls, fog, grid floor, 100 particles
+
+**New Files (`admin/charts/`):**
+- `NerveCenterWidget.svelte` - Dashboard widget wrapping Threlte Canvas
+
+**Modified Files:**
+- `routes/admin/+page.svelte` - Added 3D widget in 3-column layout
+
+**Visual Features:**
+- Node size = proportional to query count per category
+- Node glow intensity = activity level (real-time)
+- Pulse speed = overall network activity (active users)
+- Synapses = animated connections with brightness based on traffic
+- Data packets = visible on active synapses traveling along curves
+- Central core = wireframe icosahedron pulsing with system activity
+- Auto-rotate camera with orbit controls
+
+---
+
+### Phase 3: Nerve Center Dashboard UI - COMPLETE
+Frontend visualization layer for analytics data.
+
+**New Files:**
+- `analytics.ts` - Svelte store for dashboard data, auto-refresh
+- `charts/chartTheme.ts` - Cyberpunk Chart.js theme (matrix green, cyan, magenta)
+- `charts/StatCard.svelte` - Metric display with loading states
+- `charts/LineChart.svelte` - Time series with gradient fill
+- `charts/DoughnutChart.svelte` - Category breakdown pie chart
+- `charts/BarChart.svelte` - Department comparison bars
+- `charts/RealtimeSessions.svelte` - Live sessions widget with pulse animation
+- `routes/admin/analytics/+page.svelte` - Deep dive analytics page
+
+**Modified Files:**
+- `routes/admin/+page.svelte` - Replaced with Nerve Center dashboard
+- `routes/admin/+layout.svelte` - Added Analytics nav item
+- `stores/index.ts` - Added analytics export
+
+**NPM Dependencies:**
+- `chart.js` - Chart rendering library
+
+
 ### Phase 2: Analytics Engine (Nerve Center) - COMPLETE
 Full instrumentation layer - "If they fart, we know about it."
 
@@ -384,7 +442,6 @@ Added full CRUD operations to the admin portal:
 1. Rename `credit/credit_page.svelte` → `credit/+page.svelte`
 
 ### Future Sprints
-- **Phase 3:** Nerve Center Dashboard UI (frontend for analytics)
 - **Phase 4:** Department Management CRUD (add/edit departments)
 - **Phase 5:** JWT authentication
 - **Memory Sprint:** Enable hive mind with retained memory files

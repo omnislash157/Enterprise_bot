@@ -10,6 +10,7 @@
     import DoughnutChart from '$lib/components/admin/charts/DoughnutChart.svelte';
     import BarChart from '$lib/components/admin/charts/BarChart.svelte';
     import RealtimeSessions from '$lib/components/admin/charts/RealtimeSessions.svelte';
+    import NerveCenterWidget from '$lib/components/admin/charts/NerveCenterWidget.svelte';
 
     let queriesByHour: Array<{ hour: string; count: number }> = [];
 
@@ -77,8 +78,13 @@
         />
     </div>
 
-    <!-- Charts Row -->
-    <div class="charts-row grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    <!-- Charts Row with 3D Neural Network -->
+    <div class="charts-row grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
+        <!-- 3D Neural Network -->
+        <div class="xl:col-span-1">
+            <NerveCenterWidget height="320px" />
+        </div>
+
         <!-- Queries by Hour -->
         <div class="chart-panel panel p-4">
             <h3 class="text-sm font-semibold text-[#808080] mb-4">QUERIES BY HOUR (Today)</h3>
