@@ -66,6 +66,75 @@ except ImportError as e:
     logger.warning(f"Auth service not loaded: {e}")
     AUTH_LOADED = False
 
+# Tenant service import
+try:
+    from tenant_service import get_tenant_service
+    TENANT_SERVICE_LOADED = True
+except ImportError as e:
+    logger.warning(f"Tenant service not loaded: {e}")
+    TENANT_SERVICE_LOADED = False
+
+# =============================================================================
+# AUTH DEPENDENCIES
+# =============================================================================
+
+async def get_current_user(
+    x_user_email: str = Header(None, alias="X-User-Email")
+) -> Optional[dict]:
+    """
+    FastAPI dependency to get current user from header.
+    Returns None if no auth header (allows optional auth).
+    Raises 401 if header present but user not found/allowed.
+    """
+    if not x_user_email:
+        return None
+
+    if not AUTH_LOADED:
+        # Fallback to whitelist check only
+        if email_whitelist.verify(x_user_email):
+            return {"email": x_user_email, "role": "user", "fallback": True}
+        raise HTTPException(401, "Email not authorized")
+
+    auth = get_auth_service()
+    user = auth.get_or_create_user(x_user_email)
+
+    if not user:
+        raise HTTPException(401, "Email domain not authorized")
+
+    # Get department access
+    access_list = auth.get_user_department_access(user)
+
+    return {
+        "id": user.id,
+        "email": user.email,
+        "display_name": user.display_name,
+        "role": user.role,
+        "tier": user.tier.name,
+        "employee_id": user.employee_id,
+        "primary_department": user.primary_department_slug,
+        "departments": [a.department_slug for a in access_list],
+        "is_super_user": user.is_super_user,
+        "can_manage_users": user.can_manage_users,
+    }
+
+
+async def require_auth(
+    user: dict = Depends(get_current_user)
+) -> dict:
+    """Dependency that REQUIRES authentication (raises 401 if not present)."""
+    if not user:
+        raise HTTPException(401, "Authentication required. Send X-User-Email header.")
+    return user
+
+
+async def require_admin(
+    user: dict = Depends(require_auth)
+) -> dict:
+    """Dependency that requires dept_head or super_user role."""
+    if not user.get("can_manage_users"):
+        raise HTTPException(403, "Admin access required")
+    return user
+
 # =============================================================================
 # EMAIL WHITELIST VERIFICATION
 # =============================================================================
@@ -259,87 +328,106 @@ async def get_whitelist_stats():
 # =============================================================================
 
 @app.get("/api/whoami")
-async def whoami(x_user_email: str = Header(None, alias="X-User-Email")):
-    """
-    Return current user's identity and permissions.
-    For testing auth integration.
-    """
-    if not AUTH_LOADED:
-        return {"error": "Auth service not loaded", "fallback": True}
-
-    if not x_user_email:
-        return {"error": "No email header provided", "authenticated": False}
-
-    auth = get_auth_service()
-    user = auth.get_user_by_email(x_user_email)
-
+async def whoami(user: dict = Depends(get_current_user)):
+    """Return current user's identity and permissions."""
     if not user:
-        # Try auto-create for allowed domains
-        user = auth.get_or_create_user(x_user_email)
-
-    if not user:
-        return {"error": "User not found and domain not allowed", "authenticated": False}
-
-    # Get department access
-    access_list = auth.get_user_department_access(user)
+        return {"authenticated": False, "message": "No auth header provided"}
 
     return {
         "authenticated": True,
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "display_name": user.display_name,
-            "role": user.role,
-            "tier": user.tier.name,
-            "primary_department": user.primary_department_slug,
-        },
-        "departments": [
-            {
-                "slug": a.department_slug,
-                "name": a.department_name,
-                "is_dept_head": a.is_dept_head,
-            }
-            for a in access_list
-        ],
-        "can_manage_users": user.can_manage_users,
+        "user": user,
     }
 
 
 @app.get("/api/admin/users")
 async def list_users(
-    x_user_email: str = Header(alias="X-User-Email"),
-    department: str = None
+    department: str = None,
+    user: dict = Depends(require_admin)
 ):
-    """
-    List users. Dept heads see their dept, super users see all.
-    """
-    if not AUTH_LOADED:
-        raise HTTPException(503, "Auth service not loaded")
-
+    """List users. Dept heads see their dept, super users see all."""
     auth = get_auth_service()
-    actor = auth.get_user_by_email(x_user_email)
 
-    if not actor:
-        raise HTTPException(401, "User not found")
-
-    if not actor.can_manage_users:
-        raise HTTPException(403, "Not authorized to view users")
+    # Get the actual User object for auth operations
+    actor = auth.get_user_by_email(user["email"])
 
     try:
-        if actor.is_super_user and not department:
+        if user["is_super_user"] and not department:
             users = auth.list_all_users(actor)
         elif department:
             users = auth.list_users_in_department(actor, department)
+        elif user["primary_department"]:
+            users = auth.list_users_in_department(actor, user["primary_department"])
         else:
-            # Dept head viewing their own dept
-            if actor.primary_department_slug:
-                users = auth.list_users_in_department(actor, actor.primary_department_slug)
-            else:
-                users = []
+            users = []
 
         return {"users": users, "count": len(users)}
     except PermissionError as e:
         raise HTTPException(403, str(e))
+
+
+@app.get("/api/departments")
+async def list_departments(user: dict = Depends(get_current_user)):
+    """
+    List departments.
+    - Authenticated users see their accessible departments
+    - Unauthenticated see all (for login UI dropdown)
+    """
+    if not TENANT_SERVICE_LOADED:
+        raise HTTPException(503, "Tenant service not loaded")
+
+    tenant_svc = get_tenant_service()
+    all_depts = tenant_svc.list_departments()
+
+    if user and not user.get("is_super_user"):
+        # Filter to user's accessible departments
+        accessible = set(user.get("departments", []))
+        all_depts = [d for d in all_depts if d.slug in accessible]
+
+    return {
+        "departments": [
+            {"slug": d.slug, "name": d.name, "description": d.description}
+            for d in all_depts
+        ]
+    }
+
+
+@app.get("/api/content")
+async def get_department_content(
+    department: str = None,
+    user: dict = Depends(require_auth)
+):
+    """
+    Get department content for context stuffing.
+    - Regular users: Only their accessible departments
+    - Super users: Can request any department or all
+    """
+    if not TENANT_SERVICE_LOADED:
+        raise HTTPException(503, "Tenant service not loaded")
+
+    tenant_svc = get_tenant_service()
+
+    # Validate department access
+    if department:
+        if not user["is_super_user"] and department not in user["departments"]:
+            raise HTTPException(403, f"No access to department: {department}")
+        content = tenant_svc.get_all_content_for_context(department)
+    else:
+        # No department specified
+        if user["is_super_user"]:
+            # Super users get everything
+            content = tenant_svc.get_all_content_for_context(None)
+        elif user["departments"]:
+            # Regular users get their primary or first accessible dept
+            dept = user["primary_department"] or user["departments"][0]
+            content = tenant_svc.get_all_content_for_context(dept)
+        else:
+            content = ""
+
+    return {
+        "department": department,
+        "content_length": len(content),
+        "content": content,
+    }
 
 # =============================================================================
 # ANALYTICS ENDPOINTS (Stubbed for Enterprise)

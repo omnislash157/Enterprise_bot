@@ -1,5 +1,6 @@
 import { writable, get } from 'svelte/store';
 import { websocket } from './websocket';
+import { auth } from './auth';
 
 interface Message {
 	role: 'user' | 'assistant';
@@ -160,9 +161,29 @@ function createSessionStore() {
 	return {
 		subscribe,
 
-		init(sessionId: string) {
+		init(sessionId: string, department?: string) {
 			websocket.connect(sessionId);
 			initMessageHandler();
+
+			// Send verify message with auth after connection
+			const email = auth.getEmail();
+			if (email) {
+				// Wait for connection to establish, then verify
+				const checkConnection = setInterval(() => {
+					const wsState = get(websocket as any);
+					if (wsState?.connected) {
+						clearInterval(checkConnection);
+						websocket.send({
+							type: 'verify',
+							email: email,
+							division: department,
+						});
+					}
+				}, 100);
+
+				// Clear interval after 5 seconds if not connected
+				setTimeout(() => clearInterval(checkConnection), 5000);
+			}
 		},
 
 		cleanup() {

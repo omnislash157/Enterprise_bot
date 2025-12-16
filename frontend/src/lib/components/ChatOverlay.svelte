@@ -2,7 +2,9 @@
 	import { onMount, tick } from 'svelte';
 	import { session } from '$lib/stores/session';
 	import { websocket } from '$lib/stores/websocket';
+	import { auth, currentUser } from '$lib/stores/auth';
 	import { marked } from 'marked';
+	import DepartmentSelector from './DepartmentSelector.svelte';
 
 	// Configure marked
 	marked.setOptions({
@@ -171,13 +173,29 @@
 	onMount(() => {
 		// Focus input on mount
 		inputElement?.focus();
-		
+
 		return () => {
 			if (animationFrame) {
 				cancelAnimationFrame(animationFrame);
 			}
 		};
 	});
+
+	// ========================================
+	// AUTH HANDLERS
+	// ========================================
+	function handleDepartmentChange(department: string) {
+		// Send set_division message to backend
+		websocket.send({
+			type: 'set_division',
+			division: department,
+		});
+	}
+
+	function handleLogout() {
+		auth.logout();
+		// Page will redirect to login via +layout.svelte
+	}
 
 	// ========================================
 	// COMPUTED
@@ -213,6 +231,9 @@
 						<span class="logo-icon">◈</span>
 						<h1>Driscoll Intelligence</h1>
 					</div>
+					<div class="header-center">
+						<DepartmentSelector on:change={(e) => handleDepartmentChange(e.detail)} />
+					</div>
 					<div class="header-right">
 						<div class="connection-indicator" class:connected={$websocket.connected}>
 							<span class="pulse-dot"></span>
@@ -220,6 +241,12 @@
 								{$websocket.connected ? 'Online' : 'Connecting...'}
 							</span>
 						</div>
+						{#if $currentUser}
+							<button class="logout-btn" on:click={handleLogout} title="Sign out">
+								<span class="user-email">{$currentUser.email.split('@')[0]}</span>
+								<span class="logout-icon">⏻</span>
+							</button>
+						{/if}
 					</div>
 				</header>
 
@@ -400,6 +427,17 @@
 		gap: 0.75rem;
 	}
 
+	.header-center {
+		display: flex;
+		align-items: center;
+	}
+
+	.header-right {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
 	.logo-icon {
 		font-size: 1.5rem;
 		color: #00ff41;
@@ -412,6 +450,37 @@
 		color: #e0e0e0;
 		margin: 0;
 		letter-spacing: 0.5px;
+	}
+
+	.logout-btn {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.35rem 0.75rem;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(255, 255, 255, 0.1);
+		border-radius: 6px;
+		color: #888;
+		font-size: 0.8rem;
+		cursor: pointer;
+		transition: all 0.2s;
+	}
+
+	.logout-btn:hover {
+		background: rgba(255, 68, 68, 0.1);
+		border-color: rgba(255, 68, 68, 0.3);
+		color: #ff4444;
+	}
+
+	.user-email {
+		max-width: 100px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.logout-icon {
+		font-size: 0.9rem;
 	}
 
 	.connection-indicator {

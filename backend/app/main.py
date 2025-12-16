@@ -59,10 +59,12 @@ try:
     )
     from enterprise_twin import EnterpriseTwin
     from enterprise_tenant import TenantContext
+    from tenant_service import get_driscoll_content
     CONFIG_LOADED = True
 except ImportError as e:
     logger.error(f"Failed to import enterprise modules: {e}")
     CONFIG_LOADED = False
+    get_driscoll_content = None
 
 # =============================================================================
 # AUTH IMPORTS - Supabase 3-Tier System
@@ -697,8 +699,15 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
                     continue
 
-                # Get context_content from authenticated user (if available)
-                ctx_content = user_context.context_content if user_context else None
+                # Get context_content from authenticated user OR fall back to Driscoll content
+                if user_context:
+                    ctx_content = user_context.context_content
+                elif get_driscoll_content:
+                    # No auth - use Driscoll content for the current division
+                    department_content = get_driscoll_content(tenant.division)
+                    ctx_content = [department_content] if department_content else None
+                else:
+                    ctx_content = None
 
                 # Stream response
                 response_text = ""
