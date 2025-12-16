@@ -4,29 +4,31 @@
 
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { analyticsStore, categories, departments, errors } from '$lib/stores/analytics';
+    import {
+        analyticsStore,
+        categories,
+        departments,
+        errors,
+        periodHours as periodHoursStore
+    } from '$lib/stores/analytics';
     import LineChart from '$lib/components/admin/charts/LineChart.svelte';
     import DoughnutChart from '$lib/components/admin/charts/DoughnutChart.svelte';
     import BarChart from '$lib/components/admin/charts/BarChart.svelte';
+    import ExportButton from '$lib/components/admin/charts/ExportButton.svelte';
+    import DateRangePicker from '$lib/components/admin/charts/DateRangePicker.svelte';
+    import {
+        exportQueries,
+        exportCategories,
+        exportDepartments,
+        exportErrors
+    } from '$lib/utils/csvExport';
 
     let queriesByHour: Array<{ hour: string; count: number }> = [];
-    let periodHours = 24;
-
-    const periodOptions = [
-        { value: 24, label: '24 Hours' },
-        { value: 72, label: '3 Days' },
-        { value: 168, label: '7 Days' },
-    ];
-
-    async function changePeriod(hours: number) {
-        periodHours = hours;
-        analyticsStore.setPeriodHours(hours);
-    }
 
     onMount(async () => {
         await analyticsStore.loadAll();
 
-        analyticsStore.subscribe(s => {
+        analyticsStore.subscribe((s) => {
             queriesByHour = s.queriesByHour;
         });
     });
@@ -45,21 +47,18 @@
         </div>
 
         <!-- Period Selector -->
-        <div class="period-selector flex gap-2">
-            {#each periodOptions as opt}
-                <button
-                    class="px-3 py-1 text-sm rounded {periodHours === opt.value ? 'bg-[#00ff41] text-black' : 'bg-[#1a1a1a] text-[#808080]'}"
-                    on:click={() => changePeriod(opt.value)}
-                >
-                    {opt.label}
-                </button>
-            {/each}
-        </div>
+        <DateRangePicker
+            hours={$periodHoursStore}
+            on:change={(e) => analyticsStore.reloadWithPeriod(e.detail.hours)}
+        />
     </div>
 
     <!-- Query Volume Trend -->
     <div class="chart-section panel p-4 mb-6">
-        <h3 class="text-sm font-semibold text-[#808080] mb-4">QUERY VOLUME TREND</h3>
+        <div class="chart-header flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-[#808080]">QUERY VOLUME TREND</h3>
+            <ExportButton on:click={() => exportQueries(queriesByHour)} />
+        </div>
         <LineChart data={queriesByHour} label="Queries" height="250px" />
     </div>
 
@@ -67,13 +66,19 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Category Breakdown -->
         <div class="chart-section panel p-4">
-            <h3 class="text-sm font-semibold text-[#808080] mb-4">QUERY CATEGORIES</h3>
+            <div class="chart-header flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-[#808080]">QUERY CATEGORIES</h3>
+                <ExportButton on:click={() => exportCategories($categories)} />
+            </div>
             <DoughnutChart data={$categories} height="280px" />
         </div>
 
         <!-- Department Comparison -->
         <div class="chart-section panel p-4">
-            <h3 class="text-sm font-semibold text-[#808080] mb-4">DEPARTMENT COMPARISON</h3>
+            <div class="chart-header flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-[#808080]">DEPARTMENT COMPARISON</h3>
+                <ExportButton on:click={() => exportDepartments($departments)} />
+            </div>
             <BarChart
                 data={$departments}
                 labelKey="department"
@@ -85,7 +90,10 @@
 
     <!-- Response Time by Department -->
     <div class="chart-section panel p-4 mb-6">
-        <h3 class="text-sm font-semibold text-[#808080] mb-4">RESPONSE TIME BY DEPARTMENT</h3>
+        <div class="chart-header flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-[#808080]">RESPONSE TIME BY DEPARTMENT</h3>
+            <ExportButton on:click={() => exportDepartments($departments)} />
+        </div>
         <BarChart
             data={$departments}
             labelKey="department"
@@ -96,7 +104,13 @@
 
     <!-- Recent Errors -->
     <div class="errors-section panel p-4">
-        <h3 class="text-sm font-semibold text-[#808080] mb-4">RECENT ERRORS</h3>
+        <div class="chart-header flex items-center justify-between mb-4">
+            <h3 class="text-sm font-semibold text-[#808080]">RECENT ERRORS</h3>
+            <ExportButton
+                on:click={() => exportErrors($errors)}
+                disabled={$errors.length === 0}
+            />
+        </div>
 
         {#if $errors.length === 0}
             <div class="text-center text-[#808080] py-8">

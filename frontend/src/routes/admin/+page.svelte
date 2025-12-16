@@ -4,13 +4,23 @@
 
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { analyticsStore, overview, categories, departments, realtimeSessions } from '$lib/stores/analytics';
+    import {
+        analyticsStore,
+        overview,
+        categories,
+        departments,
+        realtimeSessions,
+        periodHours
+    } from '$lib/stores/analytics';
     import StatCard from '$lib/components/admin/charts/StatCard.svelte';
     import LineChart from '$lib/components/admin/charts/LineChart.svelte';
     import DoughnutChart from '$lib/components/admin/charts/DoughnutChart.svelte';
     import BarChart from '$lib/components/admin/charts/BarChart.svelte';
     import RealtimeSessions from '$lib/components/admin/charts/RealtimeSessions.svelte';
     import NerveCenterWidget from '$lib/components/admin/charts/NerveCenterWidget.svelte';
+    import ExportButton from '$lib/components/admin/charts/ExportButton.svelte';
+    import DateRangePicker from '$lib/components/admin/charts/DateRangePicker.svelte';
+    import { exportQueries, exportCategories, exportDepartments } from '$lib/utils/csvExport';
 
     let queriesByHour: Array<{ hour: string; count: number }> = [];
 
@@ -19,7 +29,7 @@
         analyticsStore.startAutoRefresh();
 
         // Subscribe to queries data
-        analyticsStore.subscribe(s => {
+        analyticsStore.subscribe((s) => {
             queriesByHour = s.queriesByHour;
         });
     });
@@ -42,9 +52,15 @@
             </h1>
             <p class="text-sm text-[#808080] mt-1">Operational Intelligence Dashboard</p>
         </div>
-        <div class="status flex items-center gap-2">
-            <span class="live-indicator"></span>
-            <span class="text-sm text-[#00ff41]">Live</span>
+        <div class="header-controls flex items-center gap-4">
+            <DateRangePicker
+                hours={$periodHours}
+                on:change={(e) => analyticsStore.reloadWithPeriod(e.detail.hours)}
+            />
+            <div class="status flex items-center gap-2">
+                <span class="live-indicator"></span>
+                <span class="text-sm text-[#00ff41]">Live</span>
+            </div>
         </div>
     </div>
 
@@ -87,13 +103,19 @@
 
         <!-- Queries by Hour -->
         <div class="chart-panel panel p-4">
-            <h3 class="text-sm font-semibold text-[#808080] mb-4">QUERIES BY HOUR (Today)</h3>
+            <div class="chart-header flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-[#808080]">QUERIES BY HOUR</h3>
+                <ExportButton on:click={() => exportQueries(queriesByHour)} />
+            </div>
             <LineChart data={queriesByHour} label="Queries" height="200px" />
         </div>
 
         <!-- Query Categories -->
         <div class="chart-panel panel p-4">
-            <h3 class="text-sm font-semibold text-[#808080] mb-4">QUERY CATEGORIES</h3>
+            <div class="chart-header flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-[#808080]">QUERY CATEGORIES</h3>
+                <ExportButton on:click={() => exportCategories($categories)} />
+            </div>
             <DoughnutChart data={$categories} height="200px" />
         </div>
     </div>
@@ -102,7 +124,10 @@
     <div class="bottom-row grid grid-cols-1 lg:grid-cols-3 gap-6">
         <!-- Department Stats -->
         <div class="chart-panel panel p-4 lg:col-span-2">
-            <h3 class="text-sm font-semibold text-[#808080] mb-4">DEPARTMENT ACTIVITY</h3>
+            <div class="chart-header flex items-center justify-between mb-4">
+                <h3 class="text-sm font-semibold text-[#808080]">DEPARTMENT ACTIVITY</h3>
+                <ExportButton on:click={() => exportDepartments($departments)} />
+            </div>
             <BarChart
                 data={$departments}
                 labelKey="department"

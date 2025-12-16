@@ -257,6 +257,18 @@ function createAnalyticsStore() {
             store.loadAll();
         },
 
+        // Reload all data with a new time period
+        async reloadWithPeriod(hours: number) {
+            currentPeriodHours = hours;
+            update(s => ({ ...s, periodHours: hours }));
+            await Promise.all([
+                store.loadOverview(),
+                store.loadQueriesByHour(),
+                store.loadCategories(),
+                store.loadDepartments(),
+            ]);
+        },
+
         // =====================================================================
         // AUTO-REFRESH
         // =====================================================================
@@ -312,3 +324,5 @@ export const isLoading = derived(
     analyticsStore,
     $s => $s.overviewLoading || $s.queriesByHourLoading || $s.categoriesLoading
 );
+
+export const periodHours = derived(analyticsStore, $s => $s.periodHours);
