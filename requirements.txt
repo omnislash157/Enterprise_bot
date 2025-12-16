@@ -17,6 +17,7 @@ psycopg2-binary>=2.9.9
 # Document Processing
 python-docx>=1.1.0
 python-multipart>=0.0.6
+requests>=2.31.0
 
 # Config
 python-dotenv>=1.0.0
