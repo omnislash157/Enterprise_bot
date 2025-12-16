@@ -3,26 +3,19 @@
 	import { onMount } from 'svelte';
 	import { theme } from '$lib/stores/theme';
 	import { loadConfig, configLoading } from '$lib/stores/config';
-	import { auth, isAuthenticated, authLoading } from '$lib/stores/auth';
-	import Login from '$lib/components/Login.svelte';
 
 	onMount(async () => {
-		// Initialize auth first
-		await auth.init();
-
-		// Then load config (which may require auth in future)
+		// Load config
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 		loadConfig(apiBase).catch(console.warn);
 	});
 </script>
 
-{#if $authLoading || $configLoading}
+{#if $configLoading}
 	<div class="loading-screen">
 		<div class="spinner"></div>
 		<p>Loading...</p>
 	</div>
-{:else if !$isAuthenticated}
-	<Login />
 {:else}
 	<div class:normie-mode={$theme === 'normie'}>
 		<slot />
