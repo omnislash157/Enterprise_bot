@@ -1,8 +1,8 @@
 # Enterprise Bot - Source of Truth File Tree
 
-**Last Updated:** 2025-01-15
+**Last Updated:** 2024-12-16
 **Repo:** enterprise_bot
-**Deploy:** Railway (Supabase for auth, SQL Server for Driscoll data)
+**Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
 ---
 
@@ -13,102 +13,111 @@ enterprise_bot/
 ├── .claude/
 │   └── settings.local.json
 │
+├── .vscode/
+│   └── settings.json
+│
 ├── Config (Root)
 │   ├── .env
 │   ├── .gitignore
-│   ├── config.yaml
-│   ├── email_whitelist.json
-│   ├── pyproject.toml
-│   ├── requirements.txt
-│   ├── runtime.txt
-│   └── Procfile
+│   ├── config.yaml              # App config (tenant, features, model settings)
+│   ├── email_whitelist.json     # Allowed domains/emails
+│   ├── requirements.txt         # Python dependencies
+│   ├── runtime.txt              # Python version for Railway
+│   └── Procfile                 # Railway start command
 │
 ├── Docs
 │   ├── README.md
 │   ├── QUICKSTART.md
 │   ├── CHANGELOG.md
-│   └── RAILWAY_SPEC_SHEET.md
+│   ├── RAILWAY_SPEC_SHEET.md
+│   └── file_tree.md             # This file
 │
-├── Core Python (Root)
-│   ├── main.py
-│   ├── config.py
-│   ├── config_loader.py
-│   ├── schemas.py
-│   │
-│   ├── Document Processing
-│   │   ├── ingest.py
-│   │   ├── doc_loader.py
-│   │   ├── embedder.py
-│   │   ├── dedup.py
-│   │   └── llm_tagger.py
-│   │
-│   ├── Search & Retrieval
-│   │   ├── retrieval.py
-│   │   ├── scoring.py
-│   │   ├── hybrid_search.py
-│   │   ├── fast_filter.py
-│   │   └── heuristic_enricher.py
-│   │
-│   ├── Cognitive Systems
-│   │   ├── cognitive_profiler.py
-│   │   ├── cog_twin.py
-│   │   ├── enterprise_twin.py
-│   │   ├── metacognitive_mirror.py
-│   │   └── evolution_engine.py
-│   │
-│   ├── Auth & Tenancy  ← NEW
-│   │   ├── tenant_service_v2.py     ← 3-tier permission system
-│   │   ├── tenant_service.py        ← Legacy (pre-Supabase)
-│   │   └── enterprise_tenant.py.bak ← Archived
-│   │
-│   ├── Voice
-│   │   ├── venom_voice.py
-│   │   └── enterprise_voice.py
-│   │
-│   ├── Memory & Chat  ← Future hive mind infrastructure
-│   │   ├── chat_memory.py
-│   │   ├── chat_parser_agnostic.py
-│   │   ├── memory_pipeline.py
-│   │   ├── memory_grep.py
-│   │   ├── streaming_cluster.py
-│   │   ├── cluster_schema.py
-│   │   ├── reasoning_trace.py
-│   │   └── read_traces.py
-│   │
-│   ├── Utilities
-│   │   ├── model_adapter.py
-│   │   ├── squirrel.py
-│   │   └── init_sandbox.py
-│   │
-│   └── Testing
-│       ├── debug_pipeline.py
-│       ├── test_setup.py
-│       ├── test_integration_quick.py
-│       └── verify_chat_integration.py
+├── ============ ACTIVE BACKEND ============
 │
-├── backend/
-│   ├── requirements.txt
-│   └── app/
-│       ├── __init__.py
-│       ├── config.py
-│       ├── main.py              ← FastAPI app (needs auth integration)
-│       └── artifacts/
-│           ├── __init__.py
-│           ├── actions.py
-│           ├── chat.py
-│           ├── memory.py
-│           ├── parser.py
-│           ├── synthesis.py
-│           └── viz.py
+├── main.py                      # FastAPI app entry point
+├── config.py                    # Settings class
+├── config_loader.py             # YAML config loader, cfg() helper
+├── schemas.py                   # Pydantic models
 │
-├── db/  ← NEW
-│   ├── supabase_3tier_complete.sql   ← Run in Supabase SQL Editor
-│   └── supabase_auth_setup.sql       ← Earlier draft (reference only)
+├── Auth & Admin (Phase 2-3)
+│   ├── auth_schema.py           # DB schema setup for auth tables
+│   ├── auth_service.py          # User CRUD, permissions, audit logging
+│   ├── admin_routes.py          # FastAPI router for admin portal
+│   ├── tenant_service.py        # Department content loading
+│   └── enterprise_tenant.py     # TenantContext dataclass
+│
+├── Enterprise Twin (Chat Engine)
+│   ├── enterprise_twin.py       # Main chat engine, context stuffing
+│   ├── chat_parser_agnostic.py  # Response parsing
+│   └── model_adapter.py         # Model switching utility
+│
+├── Database Utils
+│   ├── db_setup.py              # Azure PostgreSQL connection
+│   └── db_diagnostic.py         # Connection testing/debug
+│
+├── Document Processing
+│   ├── doc_loader.py            # Document loading
+│   ├── upload_manuals.py        # Manual uploader (ACTIVE)
+│   ├── ingest.py                # Ingestion pipeline
+│   ├── dedup.py                 # Deduplication
+│   └── llm_tagger.py            # LLM tagging
+│
+├── ============ FUTURE: MEMORY SYSTEM ============
+│   (Planned for future sprint - hive mind architecture)
+│
+├── Memory Pipeline
+│   ├── chat_memory.py           # Memory management
+│   ├── memory_pipeline.py       # Embedding pipeline
+│   ├── memory_grep.py           # Memory search
+│   ├── reasoning_trace.py       # Trace logging
+│   ├── read_traces.py           # Trace reader
+│   └── streaming_cluster.py     # Cluster streaming
+│
+├── Search & Retrieval (for memory system)
+│   ├── retrieval.py             # Vector retrieval
+│   ├── scoring.py               # Relevance scoring
+│   ├── hybrid_search.py         # Hybrid vector+keyword
+│   ├── fast_filter.py           # Fast filtering
+│   ├── heuristic_enricher.py    # Result enrichment
+│   └── embedder.py              # Embedding generation
+│
+├── ============ INACTIVE / REVIEW ============
+│
+├── Voice (not currently used)
+│   ├── venom_voice.py           # Voice synthesis
+│   └── enterprise_voice.py      # Enterprise voice
+│
+├── Utilities (check usage)
+│   ├── squirrel.py              # Caching utility
+│   └── init_sandbox.py          # Sandbox init
+│
+├── Testing
+│   ├── debug_pipeline.py
+│   ├── test_setup.py
+│   ├── test_integration_quick.py
+│   └── verify_chat_integration.py
+│
+├── ============ DATA ============
 │
 ├── data/
 │   ├── memory_index.json
-│   ├── corpus/
-│   └── vectors/
+│   ├── corpus/                  # Document corpus
+│   └── vectors/                 # Vector embeddings
+│
+├── Manuals/
+│   └── Driscoll/
+│       ├── Purchasing/
+│       │   └── purchasing_manual_chunks.json
+│       └── Sales/
+│           ├── bid_management_chunks.json
+│           ├── sales_support_chunks.json
+│           └── telnet_sop_chunks.json
+│
+├── db/
+│   ├── supabase_3tier_complete.sql   # OLD - Reference only
+│   └── supabase_auth_setup.sql       # OLD - Reference only
+│
+├── ============ FRONTEND ============
 │
 └── frontend/
     ├── Config
@@ -116,104 +125,163 @@ enterprise_bot/
     │   ├── package-lock.json
     │   ├── tsconfig.json
     │   ├── vite.config.ts
-    │   ├── svelte.config.js
-    │   ├── postcss.config.js
-    │   └── tailwind.config.js
+    │   └── (svelte, postcss, tailwind configs)
     │
-    ├── src/
-    │   ├── app.html
-    │   ├── app.css
-    │   │
-    │   ├── lib/
-    │   │   ├── artifacts/
-    │   │   │   └── registry.ts
-    │   │   │
-    │   │   ├── components/
-    │   │   │   ├── ChatOverlay.svelte
-    │   │   │   ├── Login.svelte       ← NEW: Auth UI
-    │   │   │   └── archive/
-    │   │   │
-    │   │   ├── stores/
-    │   │   │   ├── index.ts
-    │   │   │   ├── auth.ts            ← NEW: Supabase auth store
-    │   │   │   ├── artifacts.ts
-    │   │   │   ├── config.ts
-    │   │   │   ├── panels.ts
-    │   │   │   ├── session.ts
-    │   │   │   ├── theme.ts
-    │   │   │   ├── websocket.ts
-    │   │   │   └── workspaces.ts
-    │   │   │
-    │   │   └── threlte/
-    │   │       ├── CoreBrain.svelte
-    │   │       ├── Scene.svelte
-    │   │       └── archive/
-    │   │
-    │   └── routes/
-    │       ├── +layout.svelte         ← Needs auth init (see integration)
-    │       ├── +page.svelte           ← Chat bot UI
-    │       └── credit/
-    │           └── +page.svelte
-    │
-    └── static/
+    └── src/
+        ├── app.html
+        ├── app.css
+        │
+        ├── lib/
+        │   ├── artifacts/
+        │   │   └── registry.ts
+        │   │
+        │   ├── components/
+        │   │   ├── ChatOverlay.svelte       # Main chat UI
+        │   │   ├── Login.svelte             # Auth login form
+        │   │   ├── DepartmentSelector.svelte # Dept picker
+        │   │   ├── CreditForm.svelte        # Credit request form
+        │   │   ├── DupeOverridemodel.svelte # Dupe handling modal
+        │   │   │
+        │   │   ├── admin/                   # Admin Portal (Phase 3)
+        │   │   │   ├── UserRow.svelte       # User list row
+        │   │   │   ├── AccessModal.svelte   # Grant/revoke modal
+        │   │   │   └── RoleModal.svelte     # Role change modal
+        │   │   │
+        │   │   └── archive/                 # Archived components
+        │   │       ├── AnalyticsDashboard.svelte
+        │   │       ├── ArtifactPane.svelte
+        │   │       ├── FloatingPanel.svelte
+        │   │       └── WorkspaceNav.svelte
+        │   │
+        │   ├── stores/
+        │   │   ├── index.ts                 # Store exports
+        │   │   ├── auth.ts                  # Auth state & API
+        │   │   ├── admin.ts                 # Admin portal state
+        │   │   ├── credit.ts                # Credit form state
+        │   │   ├── websocket.ts             # WS connection
+        │   │   ├── session.ts               # Chat session
+        │   │   ├── config.ts                # App config
+        │   │   ├── theme.ts                 # Dark mode
+        │   │   ├── artifacts.ts             # (check if used)
+        │   │   ├── panels.ts                # (check if used)
+        │   │   └── workspaces.ts            # (check if used)
+        │   │
+        │   ├── threlte/                     # 3D visualization
+        │   │   ├── CoreBrain.svelte
+        │   │   ├── Scene.svelte
+        │   │   └── archive/                 # Archived 3D components
+        │   │
+        │   └── CreditAmbientOrbs.svelte     # Credit page decoration
+        │
+        └── routes/
+            ├── +layout.svelte               # Root layout, auth gate
+            ├── +page.svelte                 # Main chat page
+            │
+            ├── admin/                       # Admin Portal (Phase 3)
+            │   ├── +layout.svelte           # Admin layout + sidebar
+            │   ├── +page.svelte             # Dashboard
+            │   ├── users/
+            │   │   └── +page.svelte         # User management
+            │   └── audit/
+            │       └── +page.svelte         # Audit log (super_user)
+            │
+            └── credit/
+                └── credit_page.svelte       # TODO: Rename to +page.svelte
 ```
 
 ---
 
 ## Auth System (3-Tier Permissions)
 
+### Current Architecture (Phase 2-3 Complete)
+- **Database:** Azure PostgreSQL (driscoll schema)
+- **Auth:** X-User-Email header (trusted proxy mode)
+- **No JWT yet** - planned for Phase 4
+
 ### Tiers
 | Tier | Role | Data Access | Admin Access |
 |------|------|-------------|--------------|
-| 1 | `user` | Filtered by employee_id (e.g., sales rep sees only their customers) | None |
-| 2 | `dept_head` | All data in their department | View users in dept |
-| 3 | `super_user` | Everything | Full admin |
+| 1 | `user` | Own department only | None |
+| 2 | `dept_head` | All data in their department(s) | Manage dept users |
+| 3 | `super_user` | Everything | Full admin + audit log |
 
-### Key Files
-- **Backend:** `tenant_service_v2.py` - JWT verification, UserContext, permission checks
-- **Frontend:** `auth.ts` - Supabase client, session management, tenant switching
-- **UI:** `Login.svelte` - Login/signup/magic link forms
-- **Schema:** `db/supabase_3tier_complete.sql` - Tables, RLS policies, seed data
-
-### Integration Status
-- [x] Auth files in place
-- [x] `+layout.svelte` - Auth init and login gate
-- [x] `backend/app/main.py` - Auth dependency + `/api/whoami` endpoint
-- [x] `stores/index.ts` - Auth exports
-- [ ] `frontend/package.json` - Add `@supabase/supabase-js`
-- [ ] Environment variables configured
-- [ ] SQL migration run in Supabase
+### Key Active Files
+- **Backend:** `auth_service.py` - User CRUD, permissions, audit
+- **Backend:** `admin_routes.py` - Admin API endpoints
+- **Frontend:** `auth.ts` - Auth store, login/logout
+- **Frontend:** `admin.ts` - Admin portal state
+- **UI:** `routes/admin/*` - Admin portal pages
 
 ---
 
-## Database Connections
+## Deleted Files (2024-12-16 Cleanup)
 
-### Supabase (Auth & Tenancy)
-```
-Tables: tenants, tenant_departments, user_tenants, department_content
-```
+### CogTwin Legacy (removed)
+- `cog_twin.py` - Full cognitive twin (65KB)
+- `cognitive_profiler.py` - Personality modeling (34KB)
+- `metacognitive_mirror.py` - Self-reflection system
+- `evolution_engine.py` - Learning/evolution
+- `cluster_schema.py` - Cluster data models
 
-### SQL Server - Driscoll (BID1)
-```
-Tables: InvoiceHeader, InvoiceDetail, CreditRequests, CreditRequestItems
-Views:  vw_UniqueCustomers, vw_CustomerInvoices, vw_InvoiceLineItems, vw_SalesmanLookup
-```
+### Backend Folder (removed - was duplicate)
+- `backend/app/main.py` - Stale Supabase version
+- `backend/app/admin_routes.py` - Duplicate
+- `backend/app/config.py` - Duplicate
+- `backend/app/artifacts/*` - Unused artifact system
 
 ---
 
-## Environment Variables Required
+## Future: Memory System Sprint
+
+The following files are retained for a future sprint to enable hive mind memory:
+
+### Memory Pipeline
+- `chat_memory.py` - Memory management core
+- `memory_pipeline.py` - Embedding pipeline
+- `memory_grep.py` - Memory search
+- `reasoning_trace.py` - Trace logging
+- `read_traces.py` - Trace reader
+- `streaming_cluster.py` - Cluster streaming
+
+### Search & Retrieval
+- `retrieval.py` - Vector retrieval
+- `scoring.py` - Relevance scoring
+- `hybrid_search.py` - Hybrid search
+- `fast_filter.py` - Fast filtering
+- `heuristic_enricher.py` - Result enrichment
+- `embedder.py` - Embedding generation
+
+### Planned Architecture
+- Parent/child vault architecture
+- Sales gets child vault, leadership gets parent vault
+- Uses existing memory infrastructure
+
+---
+
+## Known Issues
+
+1. **credit_page.svelte** needs rename to `+page.svelte` for SvelteKit routing
+2. **db/*.sql** files reference old Supabase setup (now using Azure PostgreSQL)
+
+---
+
+## Environment Variables
 
 ```env
-# Supabase Auth
-SUPABASE_URL=https://xxxxx.supabase.co
-SUPABASE_KEY=eyJ...                    # anon/public key
-SUPABASE_JWT_SECRET=your-jwt-secret
+# Azure PostgreSQL
+POSTGRES_HOST=...
+POSTGRES_DATABASE=...
+POSTGRES_USER=...
+POSTGRES_PASSWORD=...
+POSTGRES_PORT=5432
 
-# Frontend (Vite)
-VITE_SUPABASE_URL=https://xxxxx.supabase.co
-VITE_SUPABASE_ANON_KEY=eyJ...
+# OpenAI
+OPENAI_API_KEY=...
 
-# Driscoll SQL Server
+# Frontend
+VITE_API_URL=http://localhost:8000
+
+# Driscoll SQL Server (for credit system)
 DRISCOLL_SQL_SERVER=...
 DRISCOLL_SQL_DATABASE=...
 DRISCOLL_SQL_USERNAME=...
@@ -222,31 +290,12 @@ DRISCOLL_SQL_PASSWORD=...
 
 ---
 
-## Key Patterns
-
-- **Auth Flow:** Supabase JWT → `tenant_service_v2.get_user_context()` → `UserContext`
-- **Data Filtering:** `ctx.get_data_filter()` returns `{"sales_rep_id": "JA"}` for tier 1 users
-- **Context Stuffing:** `ctx.context_content` contains department manuals for AI prompt injection
-- **Frontend Routes:** SvelteKit file-based (`/routes/X/+page.svelte` = `/X`)
-- **Backend API:** FastAPI in `backend/app/main.py`
-
----
-
 ## Next Steps
 
-### Remaining Setup
-1. **Install Supabase client:** `cd frontend && npm install @supabase/supabase-js`
-2. **Run SQL migration** in Supabase SQL Editor (`db/supabase_3tier_complete.sql`)
-3. **Configure env vars** (see above)
-4. **Sign up** and run `SELECT admin_add_user_to_tenant(...)` to get super_user access
+### Immediate
+1. Rename `credit/credit_page.svelte` → `credit/+page.svelte`
 
-### TODO: Manual Loading Pipeline
-Wire `ctx.context_content` into chat endpoint and add JSON support to manual uploader:
-- Add `.json` file handling to `upload_manuals.py`
-- Verify chat endpoint uses `ctx.context_content` for prompt injection
-- Test with `/api/whoami` → should show `context_content_count > 0`
-
-### Future: Hive Mind Memory
-Parent/child vault architecture using existing memory infrastructure:
-- `chat_memory.py`, `memory_pipeline.py`, `reasoning_trace.py`
-- Sales gets child vault, leadership gets parent vault
+### Future Sprints
+- **Phase 4:** JWT authentication, user creation UI
+- **Memory Sprint:** Enable hive mind with retained memory files
+- **Voice Sprint:** Evaluate venom_voice.py / enterprise_voice.py

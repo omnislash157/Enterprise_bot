@@ -74,6 +74,14 @@ except ImportError as e:
     logger.warning(f"Tenant service not loaded: {e}")
     TENANT_SERVICE_LOADED = False
 
+# Admin routes import
+try:
+    from admin_routes import admin_router
+    ADMIN_ROUTES_LOADED = True
+except ImportError as e:
+    logger.warning(f"Admin routes not loaded: {e}")
+    ADMIN_ROUTES_LOADED = False
+
 # =============================================================================
 # AUTH DEPENDENCIES
 # =============================================================================
@@ -225,6 +233,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Include admin router
+if ADMIN_ROUTES_LOADED:
+    app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
+    logger.info("[STARTUP] Admin routes loaded at /api/admin")
 
 # Global engine instance
 engine: Optional[EnterpriseTwin] = None
