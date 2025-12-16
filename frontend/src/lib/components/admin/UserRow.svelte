@@ -8,6 +8,11 @@
     export let selectedUserDetail: UserDetail | null = null;
     export let isSuperUser = false;
 
+    // New CRUD callbacks
+    export let onEdit: ((user: AdminUser) => void) | undefined = undefined;
+    export let onDeactivate: ((user: AdminUser) => void) | undefined = undefined;
+    export let onReactivate: ((user: AdminUser) => void) | undefined = undefined;
+
     const dispatch = createEventDispatcher();
 
     // Role badge styling
@@ -45,6 +50,21 @@
         e.stopPropagation();
         dispatch('changeRole');
     }
+
+    function handleEdit(e: Event) {
+        e.stopPropagation();
+        onEdit?.(user);
+    }
+
+    function handleDeactivate(e: Event) {
+        e.stopPropagation();
+        onDeactivate?.(user);
+    }
+
+    function handleReactivate(e: Event) {
+        e.stopPropagation();
+        onReactivate?.(user);
+    }
 </script>
 
 <div class="user-row" class:expanded on:click={handleClick}>
@@ -75,6 +95,41 @@
         </div>
 
         <div class="col-actions">
+            {#if isSuperUser}
+                {#if user.active}
+                    <button
+                        class="action-btn edit-btn"
+                        title="Edit user"
+                        on:click={handleEdit}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                    </button>
+                    <button
+                        class="action-btn deactivate-btn"
+                        title="Deactivate user"
+                        on:click={handleDeactivate}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                    </button>
+                {:else}
+                    <button
+                        class="action-btn reactivate-btn"
+                        title="Reactivate user"
+                        on:click={handleReactivate}
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </button>
+                {/if}
+            {/if}
             <button
                 class="action-btn expand-btn"
                 title={expanded ? 'Collapse' : 'Expand'}
@@ -264,9 +319,24 @@
         cursor: pointer;
         padding: 0.25rem 0.5rem;
         transition: color 0.2s;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .action-btn:hover {
+        color: #00ff41;
+    }
+
+    .edit-btn:hover {
+        color: #00d4ff;
+    }
+
+    .deactivate-btn:hover {
+        color: #ff4444;
+    }
+
+    .reactivate-btn:hover {
         color: #00ff41;
     }
 

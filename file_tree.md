@@ -1,6 +1,6 @@
 # Enterprise Bot - Source of Truth File Tree
 
-**Last Updated:** 2024-12-16
+**Last Updated:** 2024-12-16 (Phase 1 User CRUD Complete)
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
@@ -39,10 +39,13 @@ enterprise_bot/
 ├── config_loader.py             # YAML config loader, cfg() helper
 ├── schemas.py                   # Pydantic models
 │
-├── Auth & Admin (Phase 2-3)
+├── Auth & Admin (Phase 2-3 + User CRUD)
 │   ├── auth_schema.py           # DB schema setup for auth tables
 │   ├── auth_service.py          # User CRUD, permissions, audit logging
+│   │                            # + create_user, update_user, deactivate_user,
+│   │                            #   reactivate_user, batch_create_users
 │   ├── admin_routes.py          # FastAPI router for admin portal
+│   │                            # + POST/PUT/DELETE /users endpoints
 │   ├── tenant_service.py        # Department content loading
 │   └── enterprise_tenant.py     # TenantContext dataclass
 │
@@ -142,10 +145,12 @@ enterprise_bot/
         │   │   ├── CreditForm.svelte        # Credit request form
         │   │   ├── DupeOverridemodel.svelte # Dupe handling modal
         │   │   │
-        │   │   ├── admin/                   # Admin Portal (Phase 3)
-        │   │   │   ├── UserRow.svelte       # User list row
+        │   │   ├── admin/                   # Admin Portal (Phase 3 + CRUD)
+        │   │   │   ├── UserRow.svelte       # User list row + edit/deactivate btns
         │   │   │   ├── AccessModal.svelte   # Grant/revoke modal
-        │   │   │   └── RoleModal.svelte     # Role change modal
+        │   │   │   ├── RoleModal.svelte     # Role change modal
+        │   │   │   ├── CreateUserModal.svelte  # NEW: Single user creation
+        │   │   │   └── BatchImportModal.svelte # NEW: Batch CSV import
         │   │   │
         │   │   └── archive/                 # Archived components
         │   │       ├── AnalyticsDashboard.svelte
@@ -156,7 +161,7 @@ enterprise_bot/
         │   ├── stores/
         │   │   ├── index.ts                 # Store exports
         │   │   ├── auth.ts                  # Auth state & API
-        │   │   ├── admin.ts                 # Admin portal state
+        │   │   ├── admin.ts                 # Admin portal state + CRUD methods
         │   │   ├── credit.ts                # Credit form state
         │   │   ├── websocket.ts             # WS connection
         │   │   ├── session.ts               # Chat session
@@ -177,11 +182,11 @@ enterprise_bot/
             ├── +layout.svelte               # Root layout, auth gate
             ├── +page.svelte                 # Main chat page
             │
-            ├── admin/                       # Admin Portal (Phase 3)
+            ├── admin/                       # Admin Portal (Phase 3 + CRUD)
             │   ├── +layout.svelte           # Admin layout + sidebar
             │   ├── +page.svelte             # Dashboard
             │   ├── users/
-            │   │   └── +page.svelte         # User management
+            │   │   └── +page.svelte         # User management + CRUD modals
             │   └── audit/
             │       └── +page.svelte         # Audit log (super_user)
             │
@@ -290,12 +295,42 @@ DRISCOLL_SQL_PASSWORD=...
 
 ---
 
+## Recent Changes (2024-12-16)
+
+### Phase 1: User Management CRUD - COMPLETE
+Added full CRUD operations to the admin portal:
+
+**Backend (`auth_service.py`):**
+- `create_user()` - Admin-driven user creation (no domain restriction)
+- `update_user()` - Update email, display_name, employee_id, primary_department
+- `deactivate_user()` - Soft delete (sets active=FALSE)
+- `reactivate_user()` - Restore deactivated user
+- `batch_create_users()` - Bulk create from list
+
+**Backend (`admin_routes.py`):**
+- `POST /api/admin/users` - Create single user
+- `POST /api/admin/users/batch` - Batch create users
+- `PUT /api/admin/users/{user_id}` - Update user
+- `DELETE /api/admin/users/{user_id}` - Deactivate user
+- `POST /api/admin/users/{user_id}/reactivate` - Reactivate user
+
+**Frontend:**
+- `CreateUserModal.svelte` - Single user creation form
+- `BatchImportModal.svelte` - CSV/textarea batch import
+- `UserRow.svelte` - Added edit/deactivate/reactivate action buttons
+- `admin.ts` - Added CRUD store methods
+- `users/+page.svelte` - Integrated all modals with "+ Add User" and "Batch Import" buttons
+
+---
+
 ## Next Steps
 
 ### Immediate
 1. Rename `credit/credit_page.svelte` → `credit/+page.svelte`
 
 ### Future Sprints
-- **Phase 4:** JWT authentication, user creation UI
+- **Phase 2:** Department Management CRUD (add/edit departments)
+- **Phase 3:** Dashboard Stats & Analytics
+- **Phase 4:** JWT authentication
 - **Memory Sprint:** Enable hive mind with retained memory files
 - **Voice Sprint:** Evaluate venom_voice.py / enterprise_voice.py

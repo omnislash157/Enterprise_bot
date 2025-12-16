@@ -9,20 +9,35 @@
         selectedUser,
         selectedUserLoading,
         filteredUsers,
+        type AdminUser,
     } from '$lib/stores/admin';
     import { isSuperUser } from '$lib/stores/auth';
     import UserRow from '$lib/components/admin/UserRow.svelte';
     import AccessModal from '$lib/components/admin/AccessModal.svelte';
     import RoleModal from '$lib/components/admin/RoleModal.svelte';
+    import CreateUserModal from '$lib/components/admin/CreateUserModal.svelte';
+    import BatchImportModal from '$lib/components/admin/BatchImportModal.svelte';
 
     // Local state
     let searchQuery = '';
     let departmentFilter = '';
     let showAccessModal = false;
     let showRoleModal = false;
+    let showCreateModal = false;
+    let showBatchModal = false;
+    let showEditModal = false;
     let accessModalMode: 'grant' | 'revoke' = 'grant';
     let selectedUserId: string | null = null;
     let selectedDeptSlug: string | null = null;
+    let editingUser: AdminUser | null = null;
+
+    // Edit form state
+    let editEmail = '';
+    let editDisplayName = '';
+    let editEmployeeId = '';
+    let editPrimaryDepartment = '';
+    let editLoading = false;
+    let editError = '';
 
     // Debounced search
     let searchTimeout: ReturnType<typeof setTimeout>;
@@ -133,6 +148,69 @@
             default: return 'badge-user';
         }
     }
+
+    // Edit user handlers
+    function openEditModal(user: AdminUser) {
+        editingUser = user;
+        editEmail = user.email;
+        editDisplayName = user.display_name || '';
+        editEmployeeId = user.employee_id || '';
+        editPrimaryDepartment = user.primary_department || '';
+        editError = '';
+        showEditModal = true;
+    }
+
+    function closeEditModal() {
+        showEditModal = false;
+        editingUser = null;
+        editError = '';
+    }
+
+    async function handleEditSubmit() {
+        if (!editingUser) return;
+
+        editLoading = true;
+        editError = '';
+
+        const result = await adminStore.updateUser(editingUser.id, {
+            email: editEmail !== editingUser.email ? editEmail : undefined,
+            display_name: editDisplayName,
+            employee_id: editEmployeeId,
+            primary_department: editPrimaryDepartment || undefined,
+        });
+
+        editLoading = false;
+
+        if (result.success) {
+            closeEditModal();
+            loadUsers();
+        } else {
+            editError = result.error || 'Failed to update user';
+        }
+    }
+
+    // Deactivate/Reactivate handlers
+    async function handleDeactivate(user: AdminUser) {
+        if (!confirm(`Deactivate user "${user.email}"? They will not be able to log in.`)) {
+            return;
+        }
+
+        const result = await adminStore.deactivateUser(user.id, 'Admin deactivation');
+        if (!result.success) {
+            alert(result.error || 'Failed to deactivate user');
+        }
+    }
+
+    async function handleReactivate(user: AdminUser) {
+        if (!confirm(`Reactivate user "${user.email}"?`)) {
+            return;
+        }
+
+        const result = await adminStore.reactivateUser(user.id, 'Admin reactivation');
+        if (!result.success) {
+            alert(result.error || 'Failed to reactivate user');
+        }
+    }
 </script>
 
 <svelte:head>
@@ -145,6 +223,16 @@
             <h1>User Management</h1>
             <p class="subtitle">View and manage user access</p>
         </div>
+        {#if $isSuperUser}
+            <div class="header-actions">
+                <button class="btn-secondary" on:click={() => showBatchModal = true}>
+                    Batch Import
+                </button>
+                <button class="btn-primary" on:click={() => showCreateModal = true}>
+                    + Add User
+                </button>
+            </div>
+        {/if}
     </header>
 
     <!-- Filters -->
@@ -215,6 +303,9 @@
                         on:revoke={(e) => openRevokeModal(user.id, e.detail)}
                         on:changeRole={() => openRoleModal(user.id)}
                         isSuperUser={$isSuperUser}
+                        onEdit={openEditModal}
+                        onDeactivate={handleDeactivate}
+                        onReactivate={handleReactivate}
                     />
                 {/each}
             </div>
@@ -245,6 +336,83 @@
     />
 {/if}
 
+<CreateUserModal
+    bind:open={showCreateModal}
+    on:created={() => loadUsers()}
+/>
+
+<BatchImportModal
+    bind:open={showBatchModal}
+    on:imported={() => loadUsers()}
+/>
+
+<!-- Edit User Modal -->
+{#if showEditModal && editingUser}
+<div class="modal-backdrop" on:click={closeEditModal} on:keypress={() => {}}>
+    <div class="modal-content" on:click|stopPropagation on:keypress|stopPropagation>
+        <div class="modal-header">
+            <h2>Edit User</h2>
+            <button class="close-btn" on:click={closeEditModal}>&times;</button>
+        </div>
+
+        <form on:submit|preventDefault={handleEditSubmit}>
+            <div class="form-group">
+                <label for="editEmail">Email</label>
+                <input
+                    type="email"
+                    id="editEmail"
+                    bind:value={editEmail}
+                    required
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="editDisplayName">Display Name</label>
+                <input
+                    type="text"
+                    id="editDisplayName"
+                    bind:value={editDisplayName}
+                    placeholder="John Doe"
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="editEmployeeId">Employee ID</label>
+                <input
+                    type="text"
+                    id="editEmployeeId"
+                    bind:value={editEmployeeId}
+                    placeholder="EMP-12345"
+                />
+            </div>
+
+            <div class="form-group">
+                <label for="editPrimaryDepartment">Primary Department</label>
+                <select id="editPrimaryDepartment" bind:value={editPrimaryDepartment}>
+                    <option value="">-- Select --</option>
+                    {#each $adminDepartments as dept}
+                        <option value={dept.slug}>{dept.name}</option>
+                    {/each}
+                </select>
+            </div>
+
+            {#if editError}
+                <div class="error-message">{editError}</div>
+            {/if}
+
+            <div class="modal-actions">
+                <button type="button" class="btn-secondary" on:click={closeEditModal}>
+                    Cancel
+                </button>
+                <button type="submit" class="btn-primary" disabled={editLoading}>
+                    {editLoading ? 'Saving...' : 'Save Changes'}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{/if}
+
 <style>
     .users-page {
         max-width: 1400px;
@@ -253,6 +421,11 @@
 
     .page-header {
         margin-bottom: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .page-header h1 {
@@ -265,6 +438,47 @@
     .subtitle {
         color: #666;
         margin: 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .btn-primary {
+        padding: 0.75rem 1.25rem;
+        background: #00ff41;
+        border: none;
+        border-radius: 8px;
+        color: #000;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-primary:hover {
+        background: #00cc33;
+    }
+
+    .btn-primary:disabled {
+        background: #004d00;
+        cursor: not-allowed;
+    }
+
+    .btn-secondary {
+        padding: 0.75rem 1.25rem;
+        background: transparent;
+        border: 1px solid rgba(0, 255, 65, 0.3);
+        border-radius: 8px;
+        color: #00ff41;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+        background: rgba(0, 255, 65, 0.1);
     }
 
     /* Filters */
@@ -443,5 +657,96 @@
         .filter-group select {
             flex: 1;
         }
+    }
+
+    /* Modal Styles */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: #1a1a1a;
+        border: 1px solid #00ff41;
+        border-radius: 8px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-header h2 {
+        color: #00ff41;
+        margin: 0;
+        font-size: 1.25rem;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: #666;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .close-btn:hover {
+        color: #ff4444;
+    }
+
+    .form-group {
+        margin-bottom: 16px;
+    }
+
+    .form-group label {
+        display: block;
+        color: #888;
+        margin-bottom: 4px;
+        font-size: 0.875rem;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px 12px;
+        background: #0a0a0a;
+        border: 1px solid #333;
+        border-radius: 4px;
+        color: #fff;
+        font-size: 0.875rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #00ff41;
+    }
+
+    .error-message {
+        color: #ff4444;
+        font-size: 0.875rem;
+        margin-bottom: 16px;
+        padding: 8px;
+        background: rgba(255, 68, 68, 0.1);
+        border-radius: 4px;
+    }
+
+    .modal-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
     }
 </style>

@@ -601,26 +601,26 @@ class AuthService:
     ) -> bool:
         """
         Change a user's global role.
-        
+
         Only super users can change roles.
         """
         if not actor.is_super_user:
             raise PermissionError("Only super users can change roles")
-        
+
         if new_role not in ("user", "dept_head", "super_user"):
             raise ValueError(f"Invalid role: {new_role}")
-        
+
         old_role = target_user.role
-        
+
         with get_db_connection() as conn:
             cur = conn.cursor()
-            
+
             cur.execute(f"""
-                UPDATE {SCHEMA}.users 
+                UPDATE {SCHEMA}.users
                 SET role = %s, updated_at = CURRENT_TIMESTAMP
                 WHERE id = %s
             """, (new_role, target_user.id))
-            
+
             # Audit log
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.access_audit_log
@@ -631,14 +631,415 @@ class AuthService:
                 actor.id, actor.email, target_user.id, target_user.email,
                 old_role, new_role, reason
             ))
-            
+
             conn.commit()
             cur.close()
-        
+
         # Clear cache
         self._clear_user_cache(target_user.email)
         return True
-    
+
+    # -------------------------------------------------------------------------
+    # User CRUD Operations (Admin)
+    # -------------------------------------------------------------------------
+
+    def create_user(
+        self,
+        actor: User,
+        email: str,
+        display_name: Optional[str] = None,
+        employee_id: Optional[str] = None,
+        role: str = "user",
+        primary_department_slug: Optional[str] = None,
+        department_access: Optional[List[str]] = None,
+        reason: Optional[str] = None
+    ) -> User:
+        """
+        Admin-driven user creation (no domain restriction).
+
+        Unlike get_or_create_user(), this:
+        - Allows any email domain
+        - Sets custom role/department
+        - Requires admin permissions
+
+        Args:
+            actor: Admin performing the action
+            email: User email address
+            display_name: Optional display name
+            employee_id: Optional employee ID
+            role: 'user', 'dept_head', or 'super_user'
+            primary_department_slug: Primary department slug
+            department_access: List of department slugs to grant access
+            reason: Audit log reason
+
+        Returns:
+            Created User object
+
+        Raises:
+            PermissionError: If actor lacks permission
+            ValueError: If email already exists or invalid data
+        """
+        # Permission check - only super_users can create users
+        if not actor.is_super_user:
+            raise PermissionError("Only super users can create users")
+
+        email_lower = email.lower().strip()
+
+        # Check if already exists
+        existing = self.get_user_by_email(email_lower)
+        if existing:
+            raise ValueError(f"User already exists: {email_lower}")
+
+        # Validate role
+        if role not in ("user", "dept_head", "super_user"):
+            raise ValueError(f"Invalid role: {role}")
+
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+
+            # Get tenant ID (default to driscoll)
+            cur.execute(f"""
+                SELECT id FROM {SCHEMA}.tenants WHERE slug = 'driscoll' AND active = TRUE
+            """)
+            tenant_row = cur.fetchone()
+            if not tenant_row:
+                raise ValueError("Default tenant not found")
+            tenant_id = tenant_row["id"]
+
+            # Get primary department ID if specified
+            primary_dept_id = None
+            if primary_department_slug:
+                cur.execute(f"""
+                    SELECT id FROM {SCHEMA}.departments
+                    WHERE slug = %s AND active = TRUE
+                """, (primary_department_slug,))
+                dept_row = cur.fetchone()
+                if not dept_row:
+                    raise ValueError(f"Department not found: {primary_department_slug}")
+                primary_dept_id = dept_row["id"]
+
+            # Create user
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.users
+                    (email, display_name, employee_id, tenant_id, role,
+                     primary_department_id, active)
+                VALUES (%s, %s, %s, %s, %s, %s, TRUE)
+                RETURNING id
+            """, (email_lower, display_name, employee_id, tenant_id, role, primary_dept_id))
+
+            user_id = cur.fetchone()["id"]
+
+            # Grant department access
+            depts_to_grant = department_access or []
+            if primary_department_slug and primary_department_slug not in depts_to_grant:
+                depts_to_grant.append(primary_department_slug)
+
+            for dept_slug in depts_to_grant:
+                cur.execute(f"""
+                    SELECT id FROM {SCHEMA}.departments
+                    WHERE slug = %s AND active = TRUE
+                """, (dept_slug,))
+                dept_row = cur.fetchone()
+                if dept_row:
+                    cur.execute(f"""
+                        INSERT INTO {SCHEMA}.user_department_access
+                            (user_id, department_id, access_level, is_dept_head, granted_by)
+                        VALUES (%s, %s, 'read', FALSE, %s)
+                        ON CONFLICT (user_id, department_id) DO NOTHING
+                    """, (user_id, dept_row["id"], actor.id))
+
+            # Audit log
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, actor_id, actor_email, target_user_id, target_email,
+                     department_slug, new_value, reason)
+                VALUES ('user_created', %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                actor.id, actor.email, user_id, email_lower,
+                primary_department_slug,
+                f"role={role}, admin_created=true",
+                reason
+            ))
+
+            conn.commit()
+            cur.close()
+
+        # Return the created user
+        return self.get_user_by_email(email_lower)
+
+    def update_user(
+        self,
+        actor: User,
+        target_user: User,
+        email: Optional[str] = None,
+        display_name: Optional[str] = None,
+        employee_id: Optional[str] = None,
+        primary_department_slug: Optional[str] = None,
+        reason: Optional[str] = None
+    ) -> User:
+        """
+        Update user details.
+
+        Only super_users can update users.
+        Pass None for fields that shouldn't change.
+        Pass empty string to clear a field.
+
+        Returns:
+            Updated User object
+        """
+        if not actor.is_super_user:
+            raise PermissionError("Only super users can update users")
+
+        updates = []
+        params = []
+        old_values = []
+        new_values = []
+
+        if email is not None:
+            new_email = email.lower().strip()
+            if new_email != target_user.email.lower():
+                # Check if new email already exists
+                existing = self.get_user_by_email(new_email)
+                if existing and existing.id != target_user.id:
+                    raise ValueError(f"Email already in use: {new_email}")
+                updates.append("email = %s")
+                params.append(new_email)
+                old_values.append(f"email={target_user.email}")
+                new_values.append(f"email={new_email}")
+
+        if display_name is not None:
+            updates.append("display_name = %s")
+            params.append(display_name if display_name else None)
+            old_values.append(f"display_name={target_user.display_name}")
+            new_values.append(f"display_name={display_name}")
+
+        if employee_id is not None:
+            updates.append("employee_id = %s")
+            params.append(employee_id if employee_id else None)
+            old_values.append(f"employee_id={target_user.employee_id}")
+            new_values.append(f"employee_id={employee_id}")
+
+        if primary_department_slug is not None:
+            with get_db_cursor() as cur:
+                if primary_department_slug:
+                    cur.execute(f"""
+                        SELECT id FROM {SCHEMA}.departments
+                        WHERE slug = %s AND active = TRUE
+                    """, (primary_department_slug,))
+                    dept_row = cur.fetchone()
+                    if not dept_row:
+                        raise ValueError(f"Department not found: {primary_department_slug}")
+                    updates.append("primary_department_id = %s")
+                    params.append(dept_row["id"])
+                else:
+                    updates.append("primary_department_id = NULL")
+                old_values.append(f"primary_dept={target_user.primary_department_slug}")
+                new_values.append(f"primary_dept={primary_department_slug}")
+
+        if not updates:
+            return target_user  # Nothing to update
+
+        updates.append("updated_at = CURRENT_TIMESTAMP")
+        params.append(target_user.id)
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET {', '.join(updates)}
+                WHERE id = %s
+            """, params)
+
+            # Audit log
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, actor_id, actor_email, target_user_id, target_email,
+                     old_value, new_value, reason)
+                VALUES ('user_updated', %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                actor.id, actor.email, target_user.id, target_user.email,
+                '; '.join(old_values), '; '.join(new_values), reason
+            ))
+
+            conn.commit()
+            cur.close()
+
+        # Clear cache and return fresh user
+        self._clear_user_cache(target_user.email)
+        if email:
+            self._clear_user_cache(email)
+
+        return self.get_user_by_id(target_user.id)
+
+    def deactivate_user(
+        self,
+        actor: User,
+        target_user: User,
+        reason: Optional[str] = None
+    ) -> bool:
+        """
+        Soft-delete a user (set active=FALSE).
+
+        User data is preserved but they cannot log in.
+        """
+        if not actor.is_super_user:
+            raise PermissionError("Only super users can deactivate users")
+
+        if target_user.id == actor.id:
+            raise ValueError("Cannot deactivate yourself")
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET active = FALSE, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """, (target_user.id,))
+
+            # Audit log
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, actor_id, actor_email, target_user_id, target_email,
+                     old_value, new_value, reason)
+                VALUES ('user_deactivated', %s, %s, %s, %s, 'active=true', 'active=false', %s)
+            """, (actor.id, actor.email, target_user.id, target_user.email, reason))
+
+            conn.commit()
+            cur.close()
+
+        self._clear_user_cache(target_user.email)
+        return True
+
+    def reactivate_user(
+        self,
+        actor: User,
+        user_id: str,
+        reason: Optional[str] = None
+    ) -> User:
+        """
+        Reactivate a previously deactivated user.
+
+        Returns the reactivated User object.
+        """
+        if not actor.is_super_user:
+            raise PermissionError("Only super users can reactivate users")
+
+        # Get user including inactive
+        with get_db_cursor() as cur:
+            cur.execute(f"""
+                SELECT id, email, display_name, employee_id, tenant_id, role,
+                       primary_department_id, active
+                FROM {SCHEMA}.users
+                WHERE id = %s
+            """, (user_id,))
+            row = cur.fetchone()
+
+        if not row:
+            raise ValueError("User not found")
+
+        if row["active"]:
+            raise ValueError("User is already active")
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET active = TRUE, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """, (user_id,))
+
+            # Audit log
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, actor_id, actor_email, target_user_id, target_email,
+                     old_value, new_value, reason)
+                VALUES ('user_reactivated', %s, %s, %s, %s, 'active=false', 'active=true', %s)
+            """, (actor.id, actor.email, user_id, row["email"], reason))
+
+            conn.commit()
+            cur.close()
+
+        return self.get_user_by_id(user_id)
+
+    def batch_create_users(
+        self,
+        actor: User,
+        user_data: List[Dict[str, str]],
+        default_department: str = "warehouse",
+        reason: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """
+        Batch create multiple users.
+
+        Args:
+            actor: Admin performing the action
+            user_data: List of dicts with keys: email, display_name (optional),
+                      department (optional)
+            default_department: Fallback department if not specified
+            reason: Audit log reason
+
+        Returns:
+            {
+                "created": [list of created emails],
+                "already_existed": [list of existing emails],
+                "failed": [{"email": str, "error": str}, ...]
+            }
+        """
+        if not actor.is_super_user:
+            raise PermissionError("Only super users can batch create users")
+
+        results = {
+            "created": [],
+            "already_existed": [],
+            "failed": []
+        }
+
+        for entry in user_data:
+            email = entry.get("email", "").lower().strip()
+            display_name = entry.get("display_name", "").strip() or None
+            department = entry.get("department", "").strip() or default_department
+
+            if not email:
+                continue
+
+            # Basic email validation
+            if "@" not in email:
+                results["failed"].append({
+                    "email": email,
+                    "error": "Invalid email format"
+                })
+                continue
+
+            try:
+                # Check if exists
+                existing = self.get_user_by_email(email)
+                if existing:
+                    results["already_existed"].append(email)
+                    continue
+
+                # Create user
+                self.create_user(
+                    actor=actor,
+                    email=email,
+                    display_name=display_name,
+                    role="user",
+                    primary_department_slug=department,
+                    department_access=[department],
+                    reason=reason or "batch_import"
+                )
+                results["created"].append(email)
+
+            except Exception as e:
+                results["failed"].append({
+                    "email": email,
+                    "error": str(e)
+                })
+
+        return results
+
     # -------------------------------------------------------------------------
     # Admin Queries
     # -------------------------------------------------------------------------

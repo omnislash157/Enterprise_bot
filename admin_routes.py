@@ -664,18 +664,18 @@ async def list_all_departments(
 ):
     """
     List all departments.
-    
+
     Used for dropdowns in admin UI.
     Super users see all, dept heads see only their departments.
     """
     actor = get_current_user(x_user_email)
     require_admin(actor)
-    
+
     auth = get_auth_service()
-    
+
     try:
         from auth_service import get_db_cursor, SCHEMA
-        
+
         if actor.is_super_user:
             with get_db_cursor() as cur:
                 cur.execute(f"""
@@ -697,7 +697,7 @@ async def list_all_departments(
                 for a in dept_access
                 if a.is_dept_head
             ]
-        
+
         return APIResponse(
             success=True,
             data={
@@ -705,7 +705,298 @@ async def list_all_departments(
                 "count": len(departments),
             }
         )
-    
+
     except Exception as e:
         logger.error(f"Error listing departments: {e}")
         raise HTTPException(500, f"Error listing departments: {str(e)}")
+
+
+# =============================================================================
+# USER CRUD ENDPOINTS
+# =============================================================================
+
+class CreateUserRequest(BaseModel):
+    """Request to create a single user."""
+    email: str
+    display_name: Optional[str] = None
+    employee_id: Optional[str] = None
+    role: str = "user"
+    primary_department: Optional[str] = None
+    department_access: Optional[List[str]] = None
+    reason: Optional[str] = None
+
+
+class UpdateUserRequest(BaseModel):
+    """Request to update user details."""
+    email: Optional[str] = None
+    display_name: Optional[str] = None
+    employee_id: Optional[str] = None
+    primary_department: Optional[str] = None
+    reason: Optional[str] = None
+
+
+class BatchUserEntry(BaseModel):
+    """Single entry in batch user creation."""
+    email: str
+    display_name: Optional[str] = None
+    department: Optional[str] = None
+
+
+class BatchCreateRequest(BaseModel):
+    """Request for batch user creation."""
+    users: List[BatchUserEntry]
+    default_department: str = "warehouse"
+    reason: Optional[str] = None
+
+
+class DeactivateRequest(BaseModel):
+    """Request to deactivate a user."""
+    reason: Optional[str] = None
+
+
+@admin_router.post("/users", response_model=APIResponse)
+async def create_user(
+    request: CreateUserRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Create a single user.
+
+    SUPER_USER only.
+    """
+    actor = get_current_user(x_user_email)
+    require_super_user(actor)
+
+    auth = get_auth_service()
+
+    try:
+        user = auth.create_user(
+            actor=actor,
+            email=request.email,
+            display_name=request.display_name,
+            employee_id=request.employee_id,
+            role=request.role,
+            primary_department_slug=request.primary_department,
+            department_access=request.department_access,
+            reason=request.reason,
+        )
+
+        return APIResponse(
+            success=True,
+            data={
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "display_name": user.display_name,
+                    "role": user.role,
+                    "primary_department": user.primary_department_slug,
+                },
+                "message": f"User created: {user.email}",
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.error(f"Error creating user: {e}")
+        raise HTTPException(500, f"Error creating user: {str(e)}")
+
+
+@admin_router.post("/users/batch", response_model=APIResponse)
+async def batch_create_users(
+    request: BatchCreateRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Batch create multiple users.
+
+    SUPER_USER only.
+
+    Accepts a list of users with email, optional display_name, and optional department.
+    Returns counts of created, already_existed, and failed entries.
+    """
+    actor = get_current_user(x_user_email)
+    require_super_user(actor)
+
+    auth = get_auth_service()
+
+    try:
+        # Convert Pydantic models to dicts
+        user_data = [
+            {
+                "email": u.email,
+                "display_name": u.display_name,
+                "department": u.department,
+            }
+            for u in request.users
+        ]
+
+        results = auth.batch_create_users(
+            actor=actor,
+            user_data=user_data,
+            default_department=request.default_department,
+            reason=request.reason,
+        )
+
+        return APIResponse(
+            success=True,
+            data={
+                "created": results["created"],
+                "created_count": len(results["created"]),
+                "already_existed": results["already_existed"],
+                "already_existed_count": len(results["already_existed"]),
+                "failed": results["failed"],
+                "failed_count": len(results["failed"]),
+                "message": f"Created {len(results['created'])} users, "
+                          f"{len(results['already_existed'])} already existed, "
+                          f"{len(results['failed'])} failed",
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except Exception as e:
+        logger.error(f"Error in batch create: {e}")
+        raise HTTPException(500, f"Error in batch create: {str(e)}")
+
+
+@admin_router.put("/users/{user_id}", response_model=APIResponse)
+async def update_user(
+    user_id: str,
+    request: UpdateUserRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Update user details.
+
+    SUPER_USER only.
+    """
+    actor = get_current_user(x_user_email)
+    require_super_user(actor)
+
+    auth = get_auth_service()
+
+    try:
+        target = auth.get_user_by_id(user_id)
+
+        if not target:
+            raise HTTPException(404, "User not found")
+
+        updated = auth.update_user(
+            actor=actor,
+            target_user=target,
+            email=request.email,
+            display_name=request.display_name,
+            employee_id=request.employee_id,
+            primary_department_slug=request.primary_department,
+            reason=request.reason,
+        )
+
+        return APIResponse(
+            success=True,
+            data={
+                "user": {
+                    "id": updated.id,
+                    "email": updated.email,
+                    "display_name": updated.display_name,
+                    "employee_id": updated.employee_id,
+                    "primary_department": updated.primary_department_slug,
+                },
+                "message": f"User updated: {updated.email}",
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.error(f"Error updating user: {e}")
+        raise HTTPException(500, f"Error updating user: {str(e)}")
+
+
+@admin_router.delete("/users/{user_id}", response_model=APIResponse)
+async def deactivate_user(
+    user_id: str,
+    request: DeactivateRequest = None,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Deactivate (soft delete) a user.
+
+    SUPER_USER only.
+    User data is preserved but they cannot log in.
+    """
+    actor = get_current_user(x_user_email)
+    require_super_user(actor)
+
+    auth = get_auth_service()
+
+    try:
+        target = auth.get_user_by_id(user_id)
+
+        if not target:
+            raise HTTPException(404, "User not found")
+
+        reason = request.reason if request else None
+        auth.deactivate_user(actor=actor, target_user=target, reason=reason)
+
+        return APIResponse(
+            success=True,
+            data={
+                "user_id": user_id,
+                "email": target.email,
+                "message": f"User deactivated: {target.email}",
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.error(f"Error deactivating user: {e}")
+        raise HTTPException(500, f"Error deactivating user: {str(e)}")
+
+
+@admin_router.post("/users/{user_id}/reactivate", response_model=APIResponse)
+async def reactivate_user(
+    user_id: str,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+    reason: Optional[str] = None,
+):
+    """
+    Reactivate a previously deactivated user.
+
+    SUPER_USER only.
+    """
+    actor = get_current_user(x_user_email)
+    require_super_user(actor)
+
+    auth = get_auth_service()
+
+    try:
+        user = auth.reactivate_user(actor=actor, user_id=user_id, reason=reason)
+
+        return APIResponse(
+            success=True,
+            data={
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "display_name": user.display_name,
+                    "active": user.active,
+                },
+                "message": f"User reactivated: {user.email}",
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        logger.error(f"Error reactivating user: {e}")
+        raise HTTPException(500, f"Error reactivating user: {str(e)}")

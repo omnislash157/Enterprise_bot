@@ -319,15 +319,157 @@ function createAdminStore() {
                     }),
                 }
             );
-            
+
             if (result.success) {
                 // Refresh user detail
                 await this.loadUserDetail(userId);
             }
-            
+
             return result;
         },
-        
+
+        // =====================================================================
+        // USER CRUD
+        // =====================================================================
+
+        async createUser(data: {
+            email: string;
+            display_name?: string;
+            employee_id?: string;
+            role?: string;
+            primary_department?: string;
+            department_access?: string[];
+            reason?: string;
+        }): Promise<{ success: boolean; data?: any; error?: string }> {
+            const result = await apiCall<{ user: AdminUser; message: string }>(
+                '/api/admin/users',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
+        async batchCreateUsers(data: {
+            users: Array<{ email: string; display_name?: string; department?: string }>;
+            default_department?: string;
+            reason?: string;
+        }): Promise<{
+            success: boolean;
+            data?: {
+                created: string[];
+                created_count: number;
+                already_existed: string[];
+                already_existed_count: number;
+                failed: Array<{ email: string; error: string }>;
+                failed_count: number;
+                message: string;
+            };
+            error?: string
+        }> {
+            const result = await apiCall<any>(
+                '/api/admin/users/batch',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(data),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
+        async updateUser(
+            userId: string,
+            data: {
+                email?: string;
+                display_name?: string;
+                employee_id?: string;
+                primary_department?: string;
+                reason?: string;
+            }
+        ): Promise<{ success: boolean; data?: any; error?: string }> {
+            const result = await apiCall<{ user: AdminUser; message: string }>(
+                `/api/admin/users/${userId}`,
+                {
+                    method: 'PUT',
+                    body: JSON.stringify(data),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list and detail
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+                if (state.selectedUser?.id === userId) {
+                    await this.loadUserDetail(userId);
+                }
+            }
+
+            return result;
+        },
+
+        async deactivateUser(
+            userId: string,
+            reason?: string
+        ): Promise<{ success: boolean; error?: string }> {
+            const result = await apiCall<{ message: string }>(
+                `/api/admin/users/${userId}`,
+                {
+                    method: 'DELETE',
+                    body: JSON.stringify({ reason }),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+
+                // Clear selected user if it was the deactivated one
+                if (state.selectedUser?.id === userId) {
+                    update(s => ({ ...s, selectedUser: null }));
+                }
+            }
+
+            return result;
+        },
+
+        async reactivateUser(
+            userId: string,
+            reason?: string
+        ): Promise<{ success: boolean; data?: any; error?: string }> {
+            const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+
+            const result = await apiCall<{ user: AdminUser; message: string }>(
+                `/api/admin/users/${userId}/reactivate${params}`,
+                {
+                    method: 'POST',
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
         // =====================================================================
         // DEPARTMENTS
         // =====================================================================
