@@ -128,44 +128,54 @@ async def handle_callback(request: CallbackRequest):
     Frontend catches the ?code=xxx from Microsoft redirect,
     then POST it here to exchange for tokens.
     """
-    if not is_configured():
-        raise HTTPException(503, "Azure AD not configured")
+    try:
+        if not is_configured():
+            raise HTTPException(503, "Azure AD not configured")
 
-    # TODO: Validate state parameter matches what we stored
-    # if request.state != stored_state:
-    #     raise HTTPException(400, "Invalid state parameter")
+        # TODO: Validate state parameter matches what we stored
+        # if request.state != stored_state:
+        #     raise HTTPException(400, "Invalid state parameter")
 
-    # Exchange code for tokens
-    result = exchange_code_for_tokens(request.code)
+        # Exchange code for tokens
+        logger.info("Exchanging code for tokens...")
+        result = exchange_code_for_tokens(request.code)
 
-    if not result.success:
-        logger.error(f"Auth callback failed: {result.error}")
-        raise HTTPException(401, result.error_description or result.error)
+        if not result.success:
+            logger.error(f"Auth callback failed: {result.error}")
+            raise HTTPException(401, result.error_description or result.error)
 
-    azure_user = result.user
+        azure_user = result.user
+        logger.info(f"Got Azure user: {azure_user.email}")
 
-    # Provision/update user in our database
-    user = await provision_user(azure_user)
+        # Provision/update user in our database
+        logger.info("Provisioning user...")
+        user = await provision_user(azure_user)
+        logger.info(f"User provisioned: {user.id}")
 
-    # Calculate expires_in from expires_at
-    from datetime import datetime
-    now = datetime.utcnow()
-    expires_in = int((azure_user.expires_at - now).total_seconds()) if azure_user.expires_at else 3600
+        # Calculate expires_in from expires_at
+        from datetime import datetime
+        now = datetime.utcnow()
+        expires_in = int((azure_user.expires_at - now).total_seconds()) if azure_user.expires_at else 3600
 
-    return TokenResponse(
-        access_token=azure_user.access_token,
-        refresh_token=azure_user.refresh_token,
-        expires_in=expires_in,
-        user={
-            "id": user.id,
-            "email": user.email,
-            "display_name": user.display_name,
-            "role": user.role,
-            "departments": [a.department_slug for a in user.access_list],
-            "is_super_user": user.is_super_user,
-            "can_manage_users": user.can_manage_users,
-        },
-    )
+        return TokenResponse(
+            access_token=azure_user.access_token,
+            refresh_token=azure_user.refresh_token,
+            expires_in=expires_in,
+            user={
+                "id": user.id,
+                "email": user.email,
+                "display_name": user.display_name,
+                "role": user.role,
+                "departments": [a.department_slug for a in user.access_list],
+                "is_super_user": user.is_super_user,
+                "can_manage_users": user.can_manage_users,
+            },
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.exception(f"Callback error: {e}")
+        raise HTTPException(500, f"Authentication failed: {str(e)}")
 
 
 @router.post("/refresh", response_model=TokenResponse)
