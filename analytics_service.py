@@ -23,12 +23,44 @@ import json
 
 import psycopg2
 from psycopg2.extras import RealDictCursor
+from psycopg2.pool import ThreadedConnectionPool
 from dotenv import load_dotenv
 import os
+import atexit
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# CONNECTION POOL (Module-level singleton)
+# =============================================================================
+
+_pool: Optional[ThreadedConnectionPool] = None
+
+
+def get_pool() -> ThreadedConnectionPool:
+    """Get or create the connection pool."""
+    global _pool
+    if _pool is None:
+        logger.info("[POOL] Creating connection pool (min=2, max=10)")
+        _pool = ThreadedConnectionPool(
+            minconn=2,
+            maxconn=10,
+            **DB_CONFIG
+        )
+        atexit.register(_close_pool)
+    return _pool
+
+
+def _close_pool():
+    """Close connection pool on shutdown."""
+    global _pool
+    if _pool:
+        logger.info("[POOL] Closing connection pool")
+        _pool.closeall()
+        _pool = None
 
 
 def timed(func):
@@ -157,28 +189,25 @@ class AnalyticsService:
 
     @contextmanager
     def _get_connection(self):
-        conn = psycopg2.connect(**DB_CONFIG)
+        """Get connection from pool instead of creating new one."""
+        pool = get_pool()
+        conn = pool.getconn()
+        conn.autocommit = True  # No explicit commit needed for reads
         try:
             yield conn
         finally:
-            conn.close()
+            pool.putconn(conn)
 
     @contextmanager
     def _get_cursor(self, conn=None):
+        """Get cursor, optionally reusing an existing connection."""
         if conn is None:
             with self._get_connection() as conn:
-                cur = conn.cursor(cursor_factory=RealDictCursor)
-                try:
+                with conn.cursor(cursor_factory=RealDictCursor) as cur:
                     yield cur
-                    conn.commit()
-                finally:
-                    cur.close()
         else:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-            try:
+            with conn.cursor(cursor_factory=RealDictCursor) as cur:
                 yield cur
-            finally:
-                cur.close()
 
     # -------------------------------------------------------------------------
     # CLASSIFICATION
@@ -542,6 +571,172 @@ class AnalyticsService:
                 ORDER BY last_activity DESC
             """)
 
+            return [{
+                "session_id": row['session_id'],
+                "user_email": row['user_email'],
+                "department": row['department'],
+                "query_count": row['query_count'],
+                "last_activity": str(row['last_activity'])
+            } for row in cur.fetchall()]
+
+    # -------------------------------------------------------------------------
+    # COMBINED DASHBOARD (Single connection for all queries)
+    # -------------------------------------------------------------------------
+
+    @timed
+    def get_dashboard_data(self, hours: int = 24, include_errors: bool = True, include_realtime: bool = True) -> Dict[str, Any]:
+        """
+        Get all dashboard data using a SINGLE connection.
+        This is the primary method for dashboard loads.
+        """
+        with self._get_connection() as conn:
+            result = {
+                "overview": self._get_overview_stats_with_conn(conn, hours),
+                "queries_by_hour": self._get_queries_by_hour_with_conn(conn, hours),
+                "categories": self._get_category_breakdown_with_conn(conn, hours),
+                "departments": self._get_department_stats_with_conn(conn, hours),
+                "period_hours": hours,
+            }
+
+            if include_errors:
+                result["errors"] = self._get_recent_errors_with_conn(conn, 20)
+
+            if include_realtime:
+                result["realtime"] = self._get_realtime_sessions_with_conn(conn)
+
+            return result
+
+    def _get_overview_stats_with_conn(self, conn, hours: int) -> Dict[str, Any]:
+        """Get overview stats using provided connection."""
+        with self._get_cursor(conn) as cur:
+            # Active users (queries in last hour)
+            cur.execute(f"""
+                SELECT COUNT(DISTINCT user_email) as active_users
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour'
+            """)
+            active_users = cur.fetchone()['active_users']
+
+            # Today's queries (parameterized)
+            cur.execute(f"""
+                SELECT COUNT(*) as total_queries
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+            """, (hours,))
+            total_queries = cur.fetchone()['total_queries']
+
+            # Average response time (parameterized)
+            cur.execute(f"""
+                SELECT AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+            """, (hours,))
+            avg_response = cur.fetchone()['avg_response_time'] or 0
+
+            # Error rate (parameterized)
+            cur.execute(f"""
+                SELECT
+                    COUNT(*) FILTER (WHERE event_type = 'error') as errors,
+                    COUNT(*) as total
+                FROM {SCHEMA}.analytics_events
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+            """, (hours,))
+            error_row = cur.fetchone()
+            error_rate = (error_row['errors'] / error_row['total'] * 100) if error_row['total'] > 0 else 0
+
+            return {
+                "active_users": active_users,
+                "total_queries": total_queries,
+                "avg_response_time_ms": round(avg_response, 0),
+                "error_rate_percent": round(error_rate, 2),
+                "period_hours": hours
+            }
+
+    def _get_queries_by_hour_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get hourly data using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    DATE_TRUNC('hour', created_at) as hour,
+                    COUNT(*) as count
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                GROUP BY DATE_TRUNC('hour', created_at)
+                ORDER BY hour
+            """, (hours,))
+            return [{"hour": str(row['hour']), "count": row['count']} for row in cur.fetchall()]
+
+    def _get_category_breakdown_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get category breakdown using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    query_category,
+                    COUNT(*) as count
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                GROUP BY query_category
+                ORDER BY count DESC
+            """, (hours,))
+            return [{"category": row['query_category'] or 'OTHER', "count": row['count']} for row in cur.fetchall()]
+
+    def _get_department_stats_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get department stats using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    department,
+                    COUNT(*) as query_count,
+                    COUNT(DISTINCT user_email) as unique_users,
+                    AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                GROUP BY department
+                ORDER BY query_count DESC
+            """, (hours,))
+            return [{
+                "department": row['department'],
+                "query_count": row['query_count'],
+                "unique_users": row['unique_users'],
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
+            } for row in cur.fetchall()]
+
+    def _get_recent_errors_with_conn(self, conn, limit: int) -> List[Dict[str, Any]]:
+        """Get recent errors using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    id, event_type, user_email, department,
+                    error_type, error_message, created_at
+                FROM {SCHEMA}.analytics_events
+                WHERE event_type = 'error'
+                ORDER BY created_at DESC
+                LIMIT %s
+            """, (limit,))
+            return [{
+                "id": str(row['id']),
+                "user_email": row['user_email'],
+                "department": row['department'],
+                "error_type": row['error_type'],
+                "error_message": row['error_message'],
+                "created_at": str(row['created_at'])
+            } for row in cur.fetchall()]
+
+    def _get_realtime_sessions_with_conn(self, conn) -> List[Dict[str, Any]]:
+        """Get realtime sessions using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    session_id,
+                    user_email,
+                    department,
+                    COUNT(*) as query_count,
+                    MAX(created_at) as last_activity
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '5 minutes'
+                GROUP BY session_id, user_email, department
+                ORDER BY last_activity DESC
+            """)
             return [{
                 "session_id": row['session_id'],
                 "user_email": row['user_email'],

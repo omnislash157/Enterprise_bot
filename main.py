@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 from datetime import datetime
 import asyncio
@@ -294,6 +295,9 @@ app.add_middleware(
     allow_headers=["*"],
     expose_headers=["X-Response-Time"],
 )
+
+# Gzip compression for responses > 500 bytes
+app.add_middleware(GZipMiddleware, minimum_size=500)
 
 
 @app.middleware("http")

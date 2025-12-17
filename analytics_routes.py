@@ -6,6 +6,7 @@ All endpoints require admin access (dept_head or super_user).
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from typing import Optional
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
@@ -159,3 +160,48 @@ def get_realtime_sessions():
     except Exception as e:
         logger.error(f"Error fetching realtime sessions: {e}")
         return {"sessions": [], "error": str(e)}
+
+
+@analytics_router.get("/dashboard")
+def get_full_dashboard(
+    hours: int = Query(24, ge=1, le=168),
+    include_errors: bool = Query(True),
+    include_realtime: bool = Query(True),
+):
+    """
+    Combined dashboard endpoint - all data in ONE request.
+
+    SYNC function - FastAPI runs in threadpool, doesn't block event loop.
+    Uses single DB connection for all queries via connection pool.
+    """
+    try:
+        from analytics_service import get_analytics_service
+        analytics = get_analytics_service()
+
+        data = analytics.get_dashboard_data(
+            hours=hours,
+            include_errors=include_errors,
+            include_realtime=include_realtime
+        )
+        data["timestamp"] = datetime.utcnow().isoformat()
+
+        return data
+    except Exception as e:
+        logger.error(f"Error fetching dashboard: {e}")
+        return {
+            "overview": {
+                "active_users": 0,
+                "total_queries": 0,
+                "avg_response_time_ms": 0,
+                "error_rate_percent": 0,
+                "period_hours": hours
+            },
+            "queries_by_hour": [],
+            "categories": [],
+            "departments": [],
+            "errors": [],
+            "realtime": [],
+            "period_hours": hours,
+            "timestamp": datetime.utcnow().isoformat(),
+            "error": str(e)
+        }
