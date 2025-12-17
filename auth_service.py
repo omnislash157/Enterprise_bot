@@ -1099,11 +1099,182 @@ class AuthService:
     # Cache Management
     # -------------------------------------------------------------------------
     
+    # -------------------------------------------------------------------------
+    # Azure AD Integration Methods
+    # -------------------------------------------------------------------------
+
+    def get_user_by_azure_oid(self, azure_oid: str) -> Optional[User]:
+        """Look up user by Azure Object ID."""
+        with get_db_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    u.id, u.email, u.display_name, u.employee_id,
+                    u.tenant_id, u.role, u.primary_department_id, u.active,
+                    d.slug as primary_department_slug
+                FROM {SCHEMA}.users u
+                LEFT JOIN {SCHEMA}.departments d ON u.primary_department_id = d.id
+                WHERE u.azure_oid = %s AND u.active = TRUE
+            """, (azure_oid,))
+            row = cur.fetchone()
+
+        if not row:
+            return None
+
+        return User(
+            id=str(row["id"]),
+            email=row["email"],
+            display_name=row["display_name"],
+            employee_id=row["employee_id"],
+            tenant_id=str(row["tenant_id"]),
+            role=row["role"],
+            primary_department_id=str(row["primary_department_id"]) if row["primary_department_id"] else None,
+            primary_department_slug=row["primary_department_slug"],
+            active=row["active"]
+        )
+
+    def create_user_from_azure(
+        self,
+        email: str,
+        display_name: str,
+        azure_oid: str,
+    ) -> User:
+        """
+        Create new user from Azure AD login.
+
+        Auto-provisions with 'user' role and no department.
+        Admin can upgrade later.
+        """
+        import uuid
+        user_id = str(uuid.uuid4())
+
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+
+            # Get tenant ID (default to driscoll)
+            cur.execute(f"""
+                SELECT id FROM {SCHEMA}.tenants WHERE slug = 'driscoll' AND active = TRUE
+            """)
+            tenant_row = cur.fetchone()
+            if not tenant_row:
+                raise ValueError("Default tenant not found")
+            tenant_id = tenant_row["id"]
+
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.users (
+                    id, email, display_name, azure_oid,
+                    tenant_id, role, active, created_at
+                )
+                VALUES (%s, %s, %s, %s, %s, 'user', TRUE, NOW())
+                RETURNING *
+            """, (user_id, email, display_name, azure_oid, tenant_id))
+
+            row = cur.fetchone()
+            conn.commit()
+
+            # Log the creation
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, target_user_id, target_email, new_value)
+                VALUES ('user_created_azure_sso', %s, %s, %s)
+            """, (user_id, email, f"azure_oid={azure_oid}"))
+
+            conn.commit()
+            cur.close()
+
+            return User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                employee_id=row["employee_id"],
+                tenant_id=str(row["tenant_id"]),
+                role=row["role"],
+                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
+                primary_department_slug=None,
+                active=row["active"]
+            )
+
+    def link_user_to_azure(self, user_id: str, azure_oid: str) -> User:
+        """Link existing user to Azure AD account."""
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET azure_oid = %s
+                WHERE id = %s
+                RETURNING *
+            """, (azure_oid, user_id))
+
+            row = cur.fetchone()
+
+            # Log the linking
+            cur.execute(f"""
+                INSERT INTO {SCHEMA}.access_audit_log
+                    (action, target_user_id, target_email, new_value)
+                VALUES ('user_linked_azure', %s, %s, %s)
+            """, (user_id, row["email"], f"azure_oid={azure_oid}"))
+
+            conn.commit()
+            cur.close()
+
+            return User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                employee_id=row["employee_id"],
+                tenant_id=str(row["tenant_id"]),
+                role=row["role"],
+                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
+                primary_department_slug=None,
+                active=row["active"]
+            )
+
+    def update_user_from_azure(
+        self,
+        user_id: str,
+        email: str,
+        display_name: str,
+        azure_oid: str,
+    ) -> User:
+        """Update user info from Azure AD on each login."""
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET email = %s, display_name = %s, azure_oid = %s, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+                RETURNING *
+            """, (email, display_name, azure_oid, user_id))
+
+            row = cur.fetchone()
+            conn.commit()
+            cur.close()
+
+            # Clear cache
+            self._clear_user_cache(email)
+
+            return User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                employee_id=row["employee_id"],
+                tenant_id=str(row["tenant_id"]),
+                role=row["role"],
+                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
+                primary_department_slug=None,
+                active=row["active"]
+            )
+
+    # -------------------------------------------------------------------------
+    # Cache Management
+    # -------------------------------------------------------------------------
+
     def _clear_user_cache(self, email: str):
         """Clear cache for a specific user."""
         email_lower = email.lower().strip()
         self._user_cache.pop(email_lower, None)
-        
+
         # Also clear access cache if we have the user ID
         for user in list(self._user_cache.values()):
             if user.email.lower() == email_lower:
