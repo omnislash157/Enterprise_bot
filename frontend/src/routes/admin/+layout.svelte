@@ -1,158 +1,275 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import { auth, isSuperUser } from '$lib/stores/auth';
-    import { adminStore, adminStats, adminStatsLoading } from '$lib/stores/admin';
+    import { goto } from '$app/navigation';
+    import { onMount } from 'svelte';
+    import { auth, currentUser, isSuperUser } from '$lib/stores/auth';
+    import { adminStore } from '$lib/stores/admin';
 
-    // Check admin access on mount
-    let hasAccess = false;
-    let checking = true;
+    // Check access based on user permissions
+    $: canAccess = $currentUser?.can_manage_users || $currentUser?.is_super_user;
+    $: isSuperRoute = $page.url.pathname === '/admin/audit';
+    $: needsSuperAccess = isSuperRoute && !$isSuperUser;
 
-    onMount(async () => {
-        // Check if user has admin permissions
-        const headers = auth.getAuthHeader();
-        if (Object.keys(headers).length === 0) {
-            goto('/');
-            return;
+    // Redirect unauthorized users
+    $: if ($currentUser && !canAccess) {
+        goto('/');
+    }
+
+    // Redirect non-super users from audit
+    $: if ($currentUser && needsSuperAccess) {
+        goto('/admin');
+    }
+
+    // Load admin data on mount
+    onMount(() => {
+        if (canAccess) {
+            adminStore.loadDepartments();
+            adminStore.loadStats();
         }
-
-        // Fetch whoami to verify permissions
-        try {
-            const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-            const res = await fetch(`${apiBase}/api/whoami`, {
-                headers
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                const user = data.user;
-                const canAdmin = user?.can_manage_users ||
-                                 user?.is_super_user ||
-                                 user?.tier === 'SUPER_USER' ||
-                                 user?.role === 'super_user' ||
-                                 user?.role === 'dept_head';
-
-                if (canAdmin) {
-                    hasAccess = true;
-                    // Load initial data
-                    adminStore.loadDepartments();
-                    adminStore.loadStats();
-                } else {
-                    goto('/');
-                }
-            } else {
-                goto('/');
-            }
-        } catch (e) {
-            console.error('[Admin] Auth check failed:', e);
-            goto('/');
-        }
-
-        checking = false;
     });
 
-    // Navigation items
-    const navItems = [
-        { path: '/admin', label: 'Nerve Center', icon: 'chart' },
-        { path: '/admin/analytics', label: 'Analytics', icon: 'analytics' },
-        { path: '/admin/users', label: 'Users', icon: 'users' },
-        { path: '/admin/audit', label: 'Audit Log', icon: 'shield', superOnly: true },
+    // Admin navigation sidebar items
+    const adminNav = [
+        {
+            href: '/admin',
+            label: 'Nerve Center',
+            icon: '🎛️',
+            description: 'System overview dashboard'
+        },
+        {
+            href: '/admin/analytics',
+            label: 'Analytics',
+            icon: '📊',
+            description: 'Usage and performance metrics'
+        },
+        {
+            href: '/admin/users',
+            label: 'Users',
+            icon: '👥',
+            description: 'Manage user access'
+        },
+        {
+            href: '/admin/audit',
+            label: 'Audit Log',
+            icon: '🔒',
+            superOnly: true,
+            description: 'Security and change history'
+        },
     ];
 
     $: currentPath = $page.url.pathname;
 </script>
 
-{#if checking}
-    <div class="loading-screen">
+{#if !$currentUser}
+    <!-- Loading state while auth resolves -->
+    <div class="admin-loading">
         <div class="spinner"></div>
         <p>Verifying access...</p>
     </div>
-{:else if hasAccess}
+{:else if !canAccess}
+    <!-- Redirect happening, show nothing -->
+    <div class="admin-loading">
+        <p>Access denied. Redirecting...</p>
+    </div>
+{:else}
     <div class="admin-layout">
-        <!-- Sidebar -->
-        <aside class="sidebar">
+        <!-- Sidebar Navigation -->
+        <aside class="admin-sidebar">
             <div class="sidebar-header">
-                <span class="logo-icon">&#9881;</span>
-                <h2>Admin Portal</h2>
+                <span class="header-icon">⚡</span>
+                <span class="header-text">Admin Portal</span>
             </div>
 
             <nav class="sidebar-nav">
-                {#each navItems as item}
+                {#each adminNav as item}
                     {#if !item.superOnly || $isSuperUser}
                         <a
-                            href={item.path}
+                            href={item.href}
                             class="nav-item"
-                            class:active={currentPath === item.path}
+                            class:active={currentPath === item.href}
                         >
-                            <span class="nav-icon">
-                                {#if item.icon === 'chart'}
-                                    &#128202;
-                                {:else if item.icon === 'users'}
-                                    &#128101;
-                                {:else if item.icon === 'analytics'}
-                                    &#128200;
-                                {:else if item.icon === 'shield'}
-                                    &#128737;
-                                {/if}
-                            </span>
-                            <span class="nav-label">{item.label}</span>
+                            <span class="nav-icon">{item.icon}</span>
+                            <div class="nav-content">
+                                <span class="nav-label">{item.label}</span>
+                                <span class="nav-desc">{item.description}</span>
+                            </div>
+                            {#if item.superOnly}
+                                <span class="super-badge">SUPER</span>
+                            {/if}
                         </a>
                     {/if}
                 {/each}
             </nav>
 
-            <!-- Quick Stats -->
-            {#if $adminStats && !$adminStatsLoading}
-                <div class="sidebar-stats">
-                    <div class="stat-item">
-                        <span class="stat-value">{$adminStats.total_users}</span>
-                        <span class="stat-label">Total Users</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-value">{$adminStats.recent_logins_7d}</span>
-                        <span class="stat-label">Logins (7d)</span>
-                    </div>
-                </div>
-            {/if}
-
-            <!-- Back to Chat -->
             <div class="sidebar-footer">
                 <a href="/" class="back-link">
-                    <span>&#8592;</span> Back to Chat
+                    ← Back to Chat
                 </a>
             </div>
         </aside>
 
-        <!-- Main Content -->
-        <main class="main-content">
+        <!-- Main Content Area -->
+        <main class="admin-main">
             <slot />
         </main>
-    </div>
-{:else}
-    <div class="access-denied">
-        <h1>Access Denied</h1>
-        <p>You don't have permission to access the admin portal.</p>
-        <a href="/">Return to Chat</a>
     </div>
 {/if}
 
 <style>
-    .loading-screen {
-        min-height: 100vh;
+    .admin-layout {
+        display: flex;
+        min-height: calc(100vh - 56px);
+        background: #0a0a0f;
+    }
+
+    .admin-sidebar {
+        width: 280px;
+        flex-shrink: 0;
+
+        display: flex;
+        flex-direction: column;
+
+        background: rgba(15, 15, 20, 0.95);
+        border-right: 1px solid rgba(255, 200, 0, 0.1);
+    }
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.5rem;
+
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .header-icon {
+        font-size: 1.25rem;
+    }
+
+    .header-text {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #ffc800;
+        letter-spacing: 0.5px;
+    }
+
+    .sidebar-nav {
+        flex: 1;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .nav-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        padding: 0.875rem 1rem;
+
+        background: transparent;
+        border: 1px solid transparent;
+        border-radius: 8px;
+
+        color: rgba(255, 255, 255, 0.7);
+        text-decoration: none;
+
+        transition: all 0.2s ease;
+    }
+
+    .nav-item:hover {
+        background: rgba(255, 200, 0, 0.05);
+        border-color: rgba(255, 200, 0, 0.1);
+        color: #fff;
+    }
+
+    .nav-item.active {
+        background: rgba(255, 200, 0, 0.1);
+        border-color: rgba(255, 200, 0, 0.3);
+        color: #ffc800;
+    }
+
+    .nav-icon {
+        font-size: 1.25rem;
+        width: 28px;
+        text-align: center;
+        flex-shrink: 0;
+    }
+
+    .nav-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .nav-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .nav-desc {
+        display: block;
+        font-size: 0.75rem;
+        color: rgba(255, 255, 255, 0.4);
+        margin-top: 2px;
+    }
+
+    .nav-item.active .nav-desc {
+        color: rgba(255, 200, 0, 0.6);
+    }
+
+    .super-badge {
+        align-self: center;
+        font-size: 0.55rem;
+        font-weight: 700;
+        padding: 2px 6px;
+        background: rgba(255, 0, 85, 0.2);
+        color: #ff0055;
+        border-radius: 3px;
+        letter-spacing: 0.5px;
+    }
+
+    .sidebar-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+
+        color: rgba(255, 255, 255, 0.5);
+        text-decoration: none;
+        font-size: 0.85rem;
+
+        transition: color 0.2s ease;
+    }
+
+    .back-link:hover {
+        color: #00ff41;
+    }
+
+    .admin-main {
+        flex: 1;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    .admin-loading {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-        color: #888;
+        min-height: calc(100vh - 56px);
+        color: rgba(255, 255, 255, 0.5);
     }
 
-    .loading-screen .spinner {
-        width: 40px;
-        height: 40px;
-        border: 3px solid rgba(255, 255, 255, 0.1);
-        border-top-color: #00ff88;
+    .spinner {
+        width: 32px;
+        height: 32px;
+        border: 3px solid rgba(255, 200, 0, 0.2);
+        border-top-color: #ffc800;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
         margin-bottom: 1rem;
@@ -162,192 +279,26 @@
         to { transform: rotate(360deg); }
     }
 
-    .admin-layout {
-        display: flex;
-        min-height: 100vh;
-        background: #0a0a0a;
-    }
-
-    /* Sidebar */
-    .sidebar {
-        width: 260px;
-        background: rgba(10, 10, 10, 0.95);
-        border-right: 1px solid rgba(0, 255, 65, 0.2);
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        top: 0;
-        left: 0;
-        height: 100vh;
-        z-index: 100;
-    }
-
-    .sidebar-header {
-        padding: 1.5rem;
-        border-bottom: 1px solid rgba(0, 255, 65, 0.1);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .logo-icon {
-        font-size: 1.5rem;
-        color: #00ff41;
-    }
-
-    .sidebar-header h2 {
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #e0e0e0;
-        margin: 0;
-    }
-
-    .sidebar-nav {
-        flex: 1;
-        padding: 1rem 0;
-    }
-
-    .nav-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        padding: 0.875rem 1.5rem;
-        color: #888;
-        text-decoration: none;
-        transition: all 0.2s;
-        border-left: 3px solid transparent;
-    }
-
-    .nav-item:hover {
-        color: #e0e0e0;
-        background: rgba(0, 255, 65, 0.05);
-    }
-
-    .nav-item.active {
-        color: #00ff41;
-        background: rgba(0, 255, 65, 0.1);
-        border-left-color: #00ff41;
-    }
-
-    .nav-icon {
-        font-size: 1.1rem;
-        width: 24px;
-        text-align: center;
-    }
-
-    .nav-label {
-        font-size: 0.95rem;
-    }
-
-    .sidebar-stats {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(0, 255, 65, 0.1);
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    .stat-item {
-        text-align: center;
-    }
-
-    .stat-value {
-        display: block;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #00ff41;
-    }
-
-    .stat-label {
-        font-size: 0.75rem;
-        color: #666;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .sidebar-footer {
-        padding: 1rem 1.5rem;
-        border-top: 1px solid rgba(0, 255, 65, 0.1);
-    }
-
-    .back-link {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #666;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: color 0.2s;
-    }
-
-    .back-link:hover {
-        color: #00ff41;
-    }
-
-    /* Main Content */
-    .main-content {
-        flex: 1;
-        margin-left: 260px;
-        padding: 2rem;
-        min-height: 100vh;
-    }
-
-    /* Access Denied */
-    .access-denied {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: #0a0a0a;
-        color: #e0e0e0;
-        text-align: center;
-    }
-
-    .access-denied h1 {
-        color: #ff4444;
-        margin-bottom: 1rem;
-    }
-
-    .access-denied p {
-        color: #888;
-        margin-bottom: 2rem;
-    }
-
-    .access-denied a {
-        color: #00ff41;
-        text-decoration: none;
-    }
-
-    .access-denied a:hover {
-        text-decoration: underline;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .sidebar {
-            width: 60px;
+    /* Mobile: Collapsible sidebar */
+    @media (max-width: 1024px) {
+        .admin-sidebar {
+            width: 72px;
         }
 
-        .sidebar-header h2,
-        .nav-label,
-        .sidebar-stats,
-        .sidebar-footer {
+        .sidebar-header .header-text,
+        .nav-content,
+        .super-badge,
+        .back-link {
             display: none;
-        }
-
-        .sidebar-header {
-            justify-content: center;
         }
 
         .nav-item {
             justify-content: center;
-            padding: 1rem;
+            padding: 0.75rem;
         }
 
-        .main-content {
-            margin-left: 60px;
-            padding: 1rem;
+        .nav-icon {
+            width: auto;
         }
     }
 </style>
