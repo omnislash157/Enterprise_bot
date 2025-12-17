@@ -11,8 +11,8 @@
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 		loadConfig(apiBase).catch(console.warn);
 
-		// Try to restore auth session
-		await auth.restore();
+		// Initialize auth (checks Azure AD config and restores session)
+		await auth.init();
 	});
 </script>
 

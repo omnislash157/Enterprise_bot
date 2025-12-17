@@ -1,10 +1,15 @@
 <script lang="ts">
-    import { auth, authLoading } from '$lib/stores/auth';
+    import { auth, authLoading, azureEnabled } from '$lib/stores/auth';
 
     let email = '';
     let error = '';
+    let showEmailLogin = false;
 
-    async function handleLogin() {
+    async function handleMicrosoftLogin() {
+        await auth.loginWithMicrosoft();
+    }
+
+    async function handleEmailLogin() {
         if (!email.includes('@')) {
             error = 'Please enter a valid email';
             return;
@@ -23,7 +28,7 @@
 
     function handleKeydown(e: KeyboardEvent) {
         if (e.key === 'Enter') {
-            handleLogin();
+            handleEmailLogin();
         }
     }
 </script>
@@ -35,31 +40,81 @@
             <h1>Driscoll Intelligence</h1>
         </div>
 
-        <p class="subtitle">Enter your company email to continue</p>
+        <p class="subtitle">Sign in to continue</p>
 
-        <form on:submit|preventDefault={handleLogin}>
-            <div class="input-group">
-                <input
-                    type="email"
-                    bind:value={email}
-                    placeholder="you@driscollfoods.com"
-                    disabled={$authLoading}
-                    on:keydown={handleKeydown}
-                    autocomplete="email"
-                />
+        {#if $azureEnabled}
+            <!-- Microsoft SSO Button -->
+            <button
+                class="microsoft-btn"
+                on:click={handleMicrosoftLogin}
+                disabled={$authLoading}
+            >
+                <svg viewBox="0 0 21 21" width="21" height="21">
+                    <rect x="1" y="1" width="9" height="9" fill="#f25022"/>
+                    <rect x="11" y="1" width="9" height="9" fill="#7fba00"/>
+                    <rect x="1" y="11" width="9" height="9" fill="#00a4ef"/>
+                    <rect x="11" y="11" width="9" height="9" fill="#ffb900"/>
+                </svg>
+                {$authLoading ? 'Signing in...' : 'Sign in with Microsoft'}
+            </button>
+
+            <!-- Divider -->
+            <div class="divider">
+                <span>or</span>
             </div>
 
-            <button type="submit" disabled={$authLoading || !email}>
-                {$authLoading ? 'Signing in...' : 'Sign In'}
-            </button>
-        </form>
+            <!-- Toggle for email login -->
+            {#if !showEmailLogin}
+                <button
+                    class="text-btn"
+                    on:click={() => showEmailLogin = true}
+                    type="button"
+                >
+                    Sign in with email instead
+                </button>
+            {/if}
+        {/if}
+
+        {#if !$azureEnabled || showEmailLogin}
+            <!-- Email Login Form -->
+            <form on:submit|preventDefault={handleEmailLogin}>
+                <div class="input-group">
+                    <input
+                        type="email"
+                        bind:value={email}
+                        placeholder="you@driscollfoods.com"
+                        disabled={$authLoading}
+                        on:keydown={handleKeydown}
+                        autocomplete="email"
+                    />
+                </div>
+
+                <button type="submit" disabled={$authLoading || !email} class="primary-btn">
+                    {$authLoading ? 'Signing in...' : 'Sign In'}
+                </button>
+            </form>
+
+            {#if $azureEnabled && showEmailLogin}
+                <button
+                    class="text-btn"
+                    on:click={() => { showEmailLogin = false; error = ''; }}
+                    type="button"
+                >
+                    Back to Microsoft login
+                </button>
+            {/if}
+        {/if}
 
         {#if error}
             <p class="error">{error}</p>
         {/if}
 
         <p class="hint">
-            Allowed domains: driscollfoods.com
+            {#if $azureEnabled}
+                Enterprise SSO enabled
+            {:else}
+                Allowed domains: driscollfoods.com
+            {/if}
         </p>
     </div>
 </div>
@@ -115,6 +170,65 @@
         font-size: 0.95rem;
     }
 
+    /* Microsoft Button */
+    .microsoft-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        padding: 0.875rem 1.5rem;
+        background: white;
+        border: 1px solid #8c8c8c;
+        border-radius: 10px;
+        color: #5e5e5e;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+
+    .microsoft-btn:hover:not(:disabled) {
+        background: #f3f3f3;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .microsoft-btn:active:not(:disabled) {
+        transform: translateY(1px);
+    }
+
+    .microsoft-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    /* Divider */
+    .divider {
+        margin: 1.5rem 0;
+        text-align: center;
+        position: relative;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(136, 136, 136, 0.3);
+    }
+
+    .divider span {
+        position: relative;
+        padding: 0 1rem;
+        background: rgba(10, 10, 10, 0.9);
+        color: #666;
+        font-size: 0.85rem;
+    }
+
+    /* Form */
     form {
         display: flex;
         flex-direction: column;
@@ -153,7 +267,8 @@
         cursor: not-allowed;
     }
 
-    button {
+    /* Primary Button (Email login) */
+    .primary-btn {
         width: 100%;
         padding: 1rem;
         background: #00ff41;
@@ -166,21 +281,39 @@
         transition: all 0.2s;
     }
 
-    button:hover:not(:disabled) {
+    .primary-btn:hover:not(:disabled) {
         box-shadow: 0 0 25px rgba(0, 255, 65, 0.5);
         transform: translateY(-1px);
     }
 
-    button:active:not(:disabled) {
+    .primary-btn:active:not(:disabled) {
         transform: translateY(0);
     }
 
-    button:disabled {
+    .primary-btn:disabled {
         background: #333;
         color: #666;
         cursor: not-allowed;
     }
 
+    /* Text Button (toggle) */
+    .text-btn {
+        background: none;
+        border: none;
+        color: #00ff41;
+        font-size: 0.9rem;
+        cursor: pointer;
+        padding: 0.5rem;
+        margin-top: 0.5rem;
+        transition: color 0.2s;
+    }
+
+    .text-btn:hover {
+        color: #00cc33;
+        text-decoration: underline;
+    }
+
+    /* Error */
     .error {
         color: #ff4444;
         margin-top: 1rem;
@@ -191,6 +324,7 @@
         border-radius: 8px;
     }
 
+    /* Hint */
     .hint {
         color: #555;
         font-size: 0.8rem;
