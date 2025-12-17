@@ -1,7 +1,10 @@
 /**
  * Analytics Store - Dashboard data and real-time stats
  *
- * Fetches from Phase 2 endpoints:
+ * Primary endpoint (combined, single request):
+ * - /api/admin/analytics/dashboard
+ *
+ * Legacy individual endpoints (still available):
  * - /api/admin/analytics/overview
  * - /api/admin/analytics/queries
  * - /api/admin/analytics/categories
@@ -57,6 +60,18 @@ export interface RealtimeSession {
     department: string;
     query_count: number;
     last_activity: string;
+}
+
+// Combined dashboard response from /api/admin/analytics/dashboard
+interface DashboardResponse {
+    overview: OverviewStats;
+    queries_by_hour: HourlyData[];
+    categories: CategoryData[];
+    departments: DepartmentStats[];
+    errors?: ErrorEntry[];
+    realtime?: RealtimeSession[];
+    period_hours: number;
+    timestamp: string;
 }
 
 interface AnalyticsState {
@@ -238,16 +253,64 @@ function createAnalyticsStore() {
             }));
         },
 
-        // Load all dashboard data
+        /**
+         * Load entire dashboard in ONE request.
+         * Replaces the 6 separate loadX() calls for initial load.
+         */
+        async loadDashboard(includeErrors = true, includeRealtime = true) {
+            update(s => ({
+                ...s,
+                overviewLoading: true,
+                queriesByHourLoading: true,
+                categoriesLoading: true,
+                departmentsLoading: true,
+                errorsLoading: includeErrors,
+                realtimeLoading: includeRealtime,
+            }));
+
+            const params = new URLSearchParams({
+                hours: String(currentPeriodHours),
+                include_errors: String(includeErrors),
+                include_realtime: String(includeRealtime),
+            });
+
+            const data = await fetchJson<DashboardResponse>(
+                `/api/admin/analytics/dashboard?${params}`
+            );
+
+            if (data) {
+                update(s => ({
+                    ...s,
+                    overview: data.overview,
+                    queriesByHour: data.queries_by_hour,
+                    categories: data.categories,
+                    departments: data.departments,
+                    errors: data.errors || s.errors,
+                    realtimeSessions: data.realtime || s.realtimeSessions,
+                    periodHours: data.period_hours,
+                    overviewLoading: false,
+                    queriesByHourLoading: false,
+                    categoriesLoading: false,
+                    departmentsLoading: false,
+                    errorsLoading: false,
+                    realtimeLoading: false,
+                }));
+            } else {
+                update(s => ({
+                    ...s,
+                    overviewLoading: false,
+                    queriesByHourLoading: false,
+                    categoriesLoading: false,
+                    departmentsLoading: false,
+                    errorsLoading: false,
+                    realtimeLoading: false,
+                }));
+            }
+        },
+
+        // Load all dashboard data (uses combined endpoint)
         async loadAll() {
-            await Promise.all([
-                store.loadOverview(),
-                store.loadQueriesByHour(),
-                store.loadCategories(),
-                store.loadDepartments(),
-                store.loadErrors(),
-                store.loadRealtime(),
-            ]);
+            await store.loadDashboard(true, true);
         },
 
         // =====================================================================
@@ -257,19 +320,14 @@ function createAnalyticsStore() {
         setPeriodHours(hours: number) {
             currentPeriodHours = hours;
             update(s => ({ ...s, periodHours: hours }));
-            store.loadAll();
+            store.loadDashboard(true, true);
         },
 
         // Reload all data with a new time period
         async reloadWithPeriod(hours: number) {
             currentPeriodHours = hours;
             update(s => ({ ...s, periodHours: hours }));
-            await Promise.all([
-                store.loadOverview(),
-                store.loadQueriesByHour(),
-                store.loadCategories(),
-                store.loadDepartments(),
-            ]);
+            await store.loadDashboard(false, false); // Skip errors/realtime for period changes
         },
 
         // =====================================================================
