@@ -39,8 +39,8 @@
         // Rotate phrase
         phraseInterval = setInterval(updatePhrase, rotationMs);
 
-        // Animate spinner (100ms per frame)
-        spinnerInterval = setInterval(updateSpinner, 100);
+        // Animate spinner (400ms per frame - smooth, not seizure-inducing)
+        spinnerInterval = setInterval(updateSpinner, 400);
     });
 
     onDestroy(() => {
