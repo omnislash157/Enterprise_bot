@@ -5,12 +5,42 @@
 	import { auth, currentUser } from '$lib/stores/auth';
 	import { marked } from 'marked';
 	import DepartmentSelector from './DepartmentSelector.svelte';
+	import CheekyLoader from './CheekyLoader.svelte';
+	import type { PhraseCategory } from '$lib/cheeky';
 
 	// Configure marked
 	marked.setOptions({
 		breaks: true,
 		gfm: true
 	});
+
+	// ========================================
+	// CHEEKY PHASE MAPPING
+	// ========================================
+	function mapPhaseToCategory(phase: string): PhraseCategory {
+		switch (phase) {
+			case 'searching':
+			case 'retrieval':
+			case 'memory':
+				return 'searching';
+			case 'thinking':
+			case 'reasoning':
+			case 'synthesis':
+				return 'thinking';
+			case 'generating':
+			case 'creating':
+			case 'writing':
+				return 'creating';
+			case 'executing':
+			case 'tool_use':
+				return 'executing';
+			default:
+				return 'searching';
+		}
+	}
+
+	// Reactive cheeky category based on cognitive state
+	$: cheekyCategory = mapPhaseToCategory($session.cognitiveState.phase);
 
 	// ========================================
 	// INPUT STATE
@@ -266,8 +296,12 @@
 								</div>
 							</div>
 						{/each}
-						
-						{#if $session.currentStream}
+
+					{#if $session.isStreaming && !$session.currentStream}
+						<div class="cheeky-thinking">
+							<CheekyLoader category={cheekyCategory} spinnerType="food" size="sm" />
+						</div>
+					{:else if $session.currentStream}
 							<div class="message assistant streaming">
 								<div class="message-content">
 									{@html marked.parse($session.currentStream)}
@@ -578,6 +612,12 @@
 
 	.message.assistant {
 		align-self: flex-start;
+	}
+
+	.cheeky-thinking {
+		align-self: flex-start;
+		max-width: 85%;
+		animation: message-in 0.3s ease-out;
 	}
 
 	.message-content {
