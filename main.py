@@ -355,6 +355,17 @@ async def startup_event():
     logger.info(f"  Context stuffing: {engine._context_stuffing_mode}")
     logger.info(f"  Model: {engine.model}")
 
+    # Warm up analytics connection pool and query plan cache
+    if ANALYTICS_LOADED:
+        logger.info("[STARTUP] Warming analytics connection pool...")
+        try:
+            analytics = get_analytics_service()
+            # Hit the dashboard query to warm pool + plans
+            analytics.get_dashboard_data(hours=24)
+            logger.info("[STARTUP] Analytics warm-up complete")
+        except Exception as e:
+            logger.warning(f"[STARTUP] Analytics warm-up failed: {e}")
+
 # =============================================================================
 # HEALTH + CONFIG ENDPOINTS
 # =============================================================================
