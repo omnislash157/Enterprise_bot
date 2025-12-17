@@ -11,6 +11,15 @@
         users: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
         shield: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z',
     };
+
+    // Mouse tracking for glow effect
+    function handleMouseMove(e: MouseEvent) {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        (e.currentTarget as HTMLElement).style.setProperty('--mouse-x', `${x}%`);
+        (e.currentTarget as HTMLElement).style.setProperty('--mouse-y', `${y}%`);
+    }
 </script>
 
 <a
@@ -18,6 +27,7 @@
     class="nav-link"
     class:active
     data-sveltekit-preload-data="hover"
+    on:mousemove={handleMouseMove}
 >
     <svg
         class="nav-icon"
@@ -45,6 +55,7 @@
         gap: 0.5rem;
         padding: 0.5rem 1rem;
         border-radius: 6px;
+        overflow: hidden;
 
         color: rgba(255, 255, 255, 0.7);
         text-decoration: none;
@@ -52,6 +63,25 @@
         font-weight: 500;
 
         transition: all 0.2s ease;
+    }
+
+    /* Mouse-following glow effect */
+    .nav-link::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(0, 255, 65, 0.15) 0%,
+            transparent 50%
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+    }
+
+    .nav-link:hover::before {
+        opacity: 1;
     }
 
     .nav-link:hover {
@@ -64,14 +94,26 @@
         background: rgba(0, 255, 65, 0.1);
     }
 
+    .nav-link.active::before {
+        background: radial-gradient(
+            circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(0, 255, 65, 0.25) 0%,
+            transparent 50%
+        );
+    }
+
     .nav-icon {
         width: 18px;
         height: 18px;
         flex-shrink: 0;
+        position: relative;
+        z-index: 1;
     }
 
     .nav-label {
         white-space: nowrap;
+        position: relative;
+        z-index: 1;
     }
 
     .active-indicator {
@@ -83,6 +125,7 @@
         height: 2px;
         background: linear-gradient(90deg, transparent, #00ff41, transparent);
         border-radius: 1px;
+        z-index: 1;
     }
 
     /* Mobile: icon only */

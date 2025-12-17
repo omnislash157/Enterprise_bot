@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { theme } from '$lib/stores/theme';
 	import { loadConfig, configLoading } from '$lib/stores/config';
@@ -10,6 +11,9 @@
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
+
+	// Track route changes for transitions
+	$: key = $page.url.pathname;
 
 	onMount(async () => {
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -37,9 +41,11 @@
 	<div class="app-shell" class:normie-mode={$theme === 'normie'}>
 		<IntelligenceRibbon />
 
-		<main class="main-content">
-			<slot />
-		</main>
+		{#key key}
+			<main class="main-content" in:fade={{ duration: 150, delay: 50 }} out:fade={{ duration: 100 }}>
+				<slot />
+			</main>
+		{/key}
 	</div>
 {/if}
 

@@ -22,6 +22,16 @@
     function close() {
         open = false;
     }
+
+    function handleKeydown(e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+            close();
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+        }
+    }
 </script>
 
 <div class="admin-dropdown" use:clickOutside={close}>
@@ -29,6 +39,8 @@
         class="admin-trigger"
         class:active={isAdminRoute}
         on:click={toggle}
+        on:keydown={handleKeydown}
+        aria-haspopup="true"
         aria-expanded={open}
     >
         <span class="trigger-icon">⚡</span>
