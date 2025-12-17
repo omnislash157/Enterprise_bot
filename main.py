@@ -9,7 +9,7 @@ Version: 1.0.0 (Enterprise Fork)
 """
 from __future__ import annotations
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from datetime import datetime
@@ -17,6 +17,7 @@ import asyncio
 import json
 import os
 import logging
+import time
 from pathlib import Path
 from typing import Optional
 
@@ -291,7 +292,18 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Response-Time"],
 )
+
+
+@app.middleware("http")
+async def add_timing_header(request: Request, call_next):
+    """Add X-Response-Time header to all responses for performance tracking."""
+    start = time.perf_counter()
+    response = await call_next(request)
+    elapsed_ms = (time.perf_counter() - start) * 1000
+    response.headers["X-Response-Time"] = f"{elapsed_ms:.1f}ms"
+    return response
 
 # Include admin router
 if ADMIN_ROUTES_LOADED:

@@ -17,7 +17,7 @@ analytics_router = APIRouter()
 # =============================================================================
 
 @analytics_router.get("/overview")
-async def get_analytics_overview(
+def get_analytics_overview(
     hours: int = Query(24, ge=1, le=168),  # 1 hour to 7 days
 ):
     """
@@ -41,7 +41,7 @@ async def get_analytics_overview(
 
 
 @analytics_router.get("/queries")
-async def get_queries_over_time(
+def get_queries_over_time(
     hours: int = Query(24, ge=1, le=168),
 ):
     """
@@ -61,7 +61,7 @@ async def get_queries_over_time(
 
 
 @analytics_router.get("/categories")
-async def get_category_breakdown(
+def get_category_breakdown(
     hours: int = Query(24, ge=1, le=168),
 ):
     """
@@ -81,7 +81,7 @@ async def get_category_breakdown(
 
 
 @analytics_router.get("/departments")
-async def get_department_stats(
+def get_department_stats(
     hours: int = Query(24, ge=1, le=168),
 ):
     """
@@ -101,7 +101,7 @@ async def get_department_stats(
 
 
 @analytics_router.get("/errors")
-async def get_recent_errors(
+def get_recent_errors(
     limit: int = Query(20, ge=1, le=100),
 ):
     """
@@ -121,7 +121,7 @@ async def get_recent_errors(
 
 
 @analytics_router.get("/users/{user_email}")
-async def get_user_activity(
+def get_user_activity(
     user_email: str,
     days: int = Query(7, ge=1, le=30),
 ):
@@ -147,7 +147,7 @@ async def get_user_activity(
 
 
 @analytics_router.get("/realtime")
-async def get_realtime_sessions():
+def get_realtime_sessions():
     """
     Get currently active sessions.
     For the "Active Now" widget.
