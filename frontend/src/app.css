@@ -15,6 +15,15 @@
 	--border-glow: rgba(0, 255, 65, 0.25);
 	--text-primary: #e0e0e0;
 	--text-muted: #808080;
+
+	/* Ribbon */
+	--ribbon-height: 56px;
+	--ribbon-bg: rgba(10, 10, 15, 0.85);
+	--ribbon-border: rgba(0, 255, 65, 0.15);
+
+	/* Mobile breakpoints */
+	--breakpoint-mobile: 768px;
+	--breakpoint-tablet: 1024px;
 }
 
 /* Normie mode overrides */
