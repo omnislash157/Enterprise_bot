@@ -1,10 +1,14 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { theme } from '$lib/stores/theme';
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
 	import Login from '$lib/components/Login.svelte';
+
+	// Allow callback page to render without auth
+	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
 
 	onMount(async () => {
 		// Load config
@@ -12,11 +16,20 @@
 		loadConfig(apiBase).catch(console.warn);
 
 		// Initialize auth (checks Azure AD config and restores session)
-		await auth.init();
+		// Skip restore if we're on the callback page (we're about to authenticate)
+		if (!isAuthCallback) {
+			await auth.init();
+		} else {
+			// Just check Azure config, don't try to restore session
+			auth.markInitialized();
+		}
 	});
 </script>
 
-{#if $configLoading || !$authInitialized}
+{#if isAuthCallback}
+	<!-- Auth callback pages bypass normal auth flow -->
+	<slot />
+{:else if $configLoading || !$authInitialized}
 	<div class="loading-screen">
 		<div class="spinner"></div>
 		<p>{$authLoading ? 'Authenticating...' : 'Loading...'}</p>
