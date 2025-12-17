@@ -6,7 +6,6 @@
 	import Scene from '$lib/threlte/Scene.svelte';
 	import CoreBrain from '$lib/threlte/CoreBrain.svelte';
 
-	// Generate session ID on mount
 	onMount(() => {
 		const sessionId = crypto.randomUUID();
 		session.init(sessionId);
@@ -18,11 +17,10 @@
 </script>
 
 <svelte:head>
-	<title>Driscoll Intelligence</title>
-	<meta name="description" content="Driscoll Intelligence - Your AI-powered assistant for company procedures and operations" />
+	<title>Chat - Driscoll Intelligence</title>
 </svelte:head>
 
-<div class="app-container">
+<div class="chat-page">
 	<!-- 3D Background Scene -->
 	<div class="scene-container">
 		<Canvas>
@@ -36,7 +34,7 @@
 	<div class="ambient-glow glow-2"></div>
 	<div class="ambient-glow glow-3"></div>
 
-	<!-- Scanlines overlay for that CRT feel -->
+	<!-- Scanlines overlay -->
 	<div class="scanlines"></div>
 
 	<!-- The Chat Interface -->
@@ -44,14 +42,17 @@
 </div>
 
 <style>
-	.app-container {
+	.chat-page {
+		/* Fill available space below ribbon */
 		position: fixed;
-		inset: 0;
+		top: 56px; /* ribbon height */
+		left: 0;
+		right: 0;
+		bottom: 0;
 		background: #050505;
 		overflow: hidden;
 	}
 
-	/* 3D Scene Background */
 	.scene-container {
 		position: absolute;
 		inset: 0;
@@ -114,7 +115,6 @@
 		50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
 	}
 
-	/* CRT Scanlines */
 	.scanlines {
 		position: absolute;
 		inset: 0;

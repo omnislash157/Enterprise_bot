@@ -6,28 +6,24 @@
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
 	import Login from '$lib/components/Login.svelte';
+	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
 
 	onMount(async () => {
-		// Load config
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 		loadConfig(apiBase).catch(console.warn);
 
-		// Initialize auth (checks Azure AD config and restores session)
-		// Skip restore if we're on the callback page (we're about to authenticate)
 		if (!isAuthCallback) {
 			await auth.init();
 		} else {
-			// Just check Azure config, don't try to restore session
 			auth.markInitialized();
 		}
 	});
 </script>
 
 {#if isAuthCallback}
-	<!-- Auth callback pages bypass normal auth flow -->
 	<slot />
 {:else if $configLoading || !$authInitialized}
 	<div class="loading-screen">
@@ -37,16 +33,28 @@
 {:else if !$isAuthenticated}
 	<Login />
 {:else}
-	<div class:normie-mode={$theme === 'normie'}>
-		<slot />
+	<!-- AUTHENTICATED: Show Ribbon + Content -->
+	<div class="app-shell" class:normie-mode={$theme === 'normie'}>
+		<IntelligenceRibbon />
+
+		<main class="main-content">
+			<slot />
+		</main>
 	</div>
 {/if}
 
 <style>
-	div {
+	.app-shell {
 		min-height: 100vh;
 	}
 
+	.main-content {
+		/* Account for fixed ribbon height */
+		padding-top: 56px;
+		min-height: 100vh;
+	}
+
+	/* Loading screen styles */
 	.loading-screen {
 		min-height: 100vh;
 		display: flex;
