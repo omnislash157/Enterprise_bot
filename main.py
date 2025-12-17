@@ -91,48 +91,98 @@ except ImportError as e:
     logger.warning(f"Analytics service not loaded: {e}")
     ANALYTICS_LOADED = False
 
+# SSO routes import
+try:
+    from sso_routes import router as sso_router
+    SSO_ROUTES_LOADED = True
+except ImportError as e:
+    logger.warning(f"SSO routes not loaded: {e}")
+    SSO_ROUTES_LOADED = False
+
+# Azure auth import
+try:
+    from azure_auth import validate_access_token, is_configured as azure_configured
+    AZURE_AUTH_LOADED = True
+except ImportError as e:
+    logger.warning(f"Azure auth not loaded: {e}")
+    AZURE_AUTH_LOADED = False
+
 # =============================================================================
 # AUTH DEPENDENCIES
 # =============================================================================
 
 async def get_current_user(
+    authorization: str = Header(None, alias="Authorization"),
     x_user_email: str = Header(None, alias="X-User-Email")
 ) -> Optional[dict]:
     """
-    FastAPI dependency to get current user from header.
+    FastAPI dependency to get current user from Azure AD token or email header.
     Returns None if no auth header (allows optional auth).
     Raises 401 if header present but user not found/allowed.
     """
-    if not x_user_email:
-        return None
+    # Try Azure AD token first (Bearer token)
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split(" ")[1]
 
-    if not AUTH_LOADED:
-        # Fallback to whitelist check only
-        if email_whitelist.verify(x_user_email):
-            return {"email": x_user_email, "role": "user", "fallback": True}
-        raise HTTPException(401, "Email not authorized")
+        if AZURE_AUTH_LOADED and azure_configured():
+            # Validate against Microsoft Graph
+            graph_user = validate_access_token(token)
 
-    auth = get_auth_service()
-    user = auth.get_or_create_user(x_user_email)
+            if graph_user:
+                # Look up in our DB
+                auth = get_auth_service()
+                user = auth.get_user_by_azure_oid(graph_user.get("id"))
 
-    if not user:
-        raise HTTPException(401, "Email domain not authorized")
+                if user:
+                    access_list = auth.get_user_department_access(user)
+                    return {
+                        "id": user.id,
+                        "email": user.email,
+                        "display_name": user.display_name,
+                        "role": user.role,
+                        "tier": user.tier.name,
+                        "employee_id": user.employee_id,
+                        "primary_department": user.primary_department_slug,
+                        "departments": [a.department_slug for a in access_list],
+                        "is_super_user": user.is_super_user,
+                        "can_manage_users": user.can_manage_users,
+                        "auth_method": "azure_ad",
+                    }
 
-    # Get department access
-    access_list = auth.get_user_department_access(user)
+        raise HTTPException(401, "Invalid or expired token")
 
-    return {
-        "id": user.id,
-        "email": user.email,
-        "display_name": user.display_name,
-        "role": user.role,
-        "tier": user.tier.name,
-        "employee_id": user.employee_id,
-        "primary_department": user.primary_department_slug,
-        "departments": [a.department_slug for a in access_list],
-        "is_super_user": user.is_super_user,
-        "can_manage_users": user.can_manage_users,
-    }
+    # Legacy email header fallback
+    if x_user_email:
+        if not AUTH_LOADED:
+            # Fallback to whitelist check only
+            if email_whitelist.verify(x_user_email):
+                return {"email": x_user_email, "role": "user", "fallback": True}
+            raise HTTPException(401, "Email not authorized")
+
+        auth = get_auth_service()
+        user = auth.get_or_create_user(x_user_email)
+
+        if not user:
+            raise HTTPException(401, "Email domain not authorized")
+
+        # Get department access
+        access_list = auth.get_user_department_access(user)
+
+        return {
+            "id": user.id,
+            "email": user.email,
+            "display_name": user.display_name,
+            "role": user.role,
+            "tier": user.tier.name,
+            "employee_id": user.employee_id,
+            "primary_department": user.primary_department_slug,
+            "departments": [a.department_slug for a in access_list],
+            "is_super_user": user.is_super_user,
+            "can_manage_users": user.can_manage_users,
+            "auth_method": "legacy_email",
+        }
+
+    return None
 
 
 async def require_auth(
@@ -252,6 +302,11 @@ if ADMIN_ROUTES_LOADED:
 if ANALYTICS_LOADED:
     app.include_router(analytics_router, prefix="/api/admin/analytics", tags=["analytics"])
     logger.info("[STARTUP] Analytics routes loaded at /api/admin/analytics")
+
+# Include SSO router
+if SSO_ROUTES_LOADED:
+    app.include_router(sso_router)
+    logger.info("[STARTUP] SSO routes loaded at /api/auth")
 
 # Global engine instance
 engine: Optional[EnterpriseTwin] = None
