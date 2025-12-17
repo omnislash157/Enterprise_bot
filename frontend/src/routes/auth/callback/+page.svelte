@@ -8,10 +8,14 @@
     let processing = true;
 
     onMount(async () => {
+        console.log('[Callback] Page mounted, URL:', $page.url.href);
+
         const code = $page.url.searchParams.get('code');
         const state = $page.url.searchParams.get('state');
         const errorParam = $page.url.searchParams.get('error');
         const errorDesc = $page.url.searchParams.get('error_description');
+
+        console.log('[Callback] Params:', { code: code?.substring(0, 20) + '...', state, errorParam });
 
         if (errorParam) {
             error = errorDesc || errorParam;
@@ -22,19 +26,26 @@
         if (!code || !state) {
             error = 'Missing authorization code or state parameter';
             processing = false;
+            console.error('[Callback] Missing code or state');
             return;
         }
 
+        console.log('[Callback] Calling handleCallback...');
         const success = await auth.handleCallback(code, state);
+        console.log('[Callback] handleCallback result:', success);
 
         if (success) {
             // Redirect to main app
+            console.log('[Callback] Success! Redirecting to /');
             goto('/');
         } else {
             processing = false;
             // Error is in auth store
             auth.subscribe(s => {
-                if (s.error) error = s.error;
+                if (s.error) {
+                    error = s.error;
+                    console.error('[Callback] Auth error:', s.error);
+                }
             })();
         }
     });
