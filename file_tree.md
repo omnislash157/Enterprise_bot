@@ -1,6 +1,6 @@
 # Enterprise Bot - File Tree
 
-**Last Updated:** 2024-12-17
+**Last Updated:** 2025-12-17
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
 
@@ -147,7 +147,11 @@ enterprise_bot/
         │   │   └── registry.ts
         │   │
         │   ├── utils/
-        │   │   └── csvExport.ts         # CSV export utility
+        │   │   ├── csvExport.ts         # CSV export utility
+        │   │   └── clickOutside.ts      # Click outside action for dropdowns
+        │   │
+        │   ├── transitions/
+        │   │   └── pageTransition.ts    # Page transition utilities
         │   │
         │   ├── components/
         │   │   ├── ChatOverlay.svelte       # Main chat UI
@@ -156,12 +160,20 @@ enterprise_bot/
         │   │   ├── CreditForm.svelte        # Credit request form
         │   │   ├── DupeOverrideModal.svelte # Dupe handling modal
         │   │   │
+        │   │   ├── ribbon/                    # Intelligence Ribbon (Nav)
+        │   │   │   ├── index.ts               # Barrel export
+        │   │   │   ├── IntelligenceRibbon.svelte  # Main nav ribbon
+        │   │   │   ├── NavLink.svelte         # Nav link with glow effect
+        │   │   │   ├── AdminDropdown.svelte   # Admin menu dropdown
+        │   │   │   └── UserMenu.svelte        # User profile dropdown
+        │   │   │
         │   │   ├── admin/                   # Admin Portal
         │   │   │   ├── UserRow.svelte       # User list row
         │   │   │   ├── AccessModal.svelte   # Grant/revoke modal
         │   │   │   ├── RoleModal.svelte     # Role change modal
         │   │   │   ├── CreateUserModal.svelte  # Single user creation
         │   │   │   ├── BatchImportModal.svelte # Batch CSV import
+        │   │   │   ├── LoadingSkeleton.svelte  # Shimmer loading component
         │   │   │   │
         │   │   │   ├── charts/              # Nerve Center Charts
         │   │   │   │   ├── chartTheme.ts    # Cyberpunk Chart.js config
