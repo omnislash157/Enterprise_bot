@@ -120,13 +120,15 @@ function createAuthStore() {
         async handleCallback(code: string, state: string): Promise<boolean> {
             update(s => ({ ...s, loading: true, error: null }));
 
-            // Validate state
-            const storedState = sessionStorage.getItem('oauth_state');
-            if (state !== storedState) {
+            // Validate state (if available - sessionStorage may not persist across redirects in some browsers)
+            const storedState = browser ? sessionStorage.getItem('oauth_state') : null;
+            if (storedState && state !== storedState) {
                 update(s => ({ ...s, loading: false, error: 'Invalid state parameter' }));
                 return false;
             }
-            sessionStorage.removeItem('oauth_state');
+            if (browser) {
+                sessionStorage.removeItem('oauth_state');
+            }
 
             try {
                 const apiBase = getApiBase();
