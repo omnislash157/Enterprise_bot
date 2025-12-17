@@ -607,48 +607,43 @@ class AnalyticsService:
             return result
 
     def _get_overview_stats_with_conn(self, conn, hours: int) -> Dict[str, Any]:
-        """Get overview stats using provided connection."""
+        """Optimized: Single CTE query instead of 4 separate queries."""
         with self._get_cursor(conn) as cur:
-            # Active users (queries in last hour)
             cur.execute(f"""
-                SELECT COUNT(DISTINCT user_email) as active_users
-                FROM {SCHEMA}.query_log
-                WHERE created_at > NOW() - INTERVAL '1 hour'
-            """)
-            active_users = cur.fetchone()['active_users']
-
-            # Today's queries (parameterized)
-            cur.execute(f"""
-                SELECT COUNT(*) as total_queries
-                FROM {SCHEMA}.query_log
-                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
-            """, (hours,))
-            total_queries = cur.fetchone()['total_queries']
-
-            # Average response time (parameterized)
-            cur.execute(f"""
-                SELECT AVG(response_time_ms) as avg_response_time
-                FROM {SCHEMA}.query_log
-                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
-            """, (hours,))
-            avg_response = cur.fetchone()['avg_response_time'] or 0
-
-            # Error rate (parameterized)
-            cur.execute(f"""
+                WITH query_stats AS (
+                    SELECT
+                        COUNT(*) AS total_queries,
+                        AVG(response_time_ms) AS avg_response_time,
+                        COUNT(DISTINCT user_email) FILTER (
+                            WHERE created_at > NOW() - INTERVAL '1 hour'
+                        ) AS active_users
+                    FROM {SCHEMA}.query_log
+                    WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                ),
+                event_stats AS (
+                    SELECT
+                        COUNT(*) FILTER (WHERE event_type = 'error') AS errors,
+                        COUNT(*) AS total_events
+                    FROM {SCHEMA}.analytics_events
+                    WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                )
                 SELECT
-                    COUNT(*) FILTER (WHERE event_type = 'error') as errors,
-                    COUNT(*) as total
-                FROM {SCHEMA}.analytics_events
-                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
-            """, (hours,))
-            error_row = cur.fetchone()
-            error_rate = (error_row['errors'] / error_row['total'] * 100) if error_row['total'] > 0 else 0
+                    qs.active_users,
+                    qs.total_queries,
+                    qs.avg_response_time,
+                    CASE WHEN es.total_events > 0
+                         THEN (es.errors::float / es.total_events * 100)
+                         ELSE 0
+                    END AS error_rate
+                FROM query_stats qs, event_stats es
+            """, (hours, hours))
 
+            row = cur.fetchone()
             return {
-                "active_users": active_users,
-                "total_queries": total_queries,
-                "avg_response_time_ms": round(avg_response, 0),
-                "error_rate_percent": round(error_rate, 2),
+                "active_users": row['active_users'] or 0,
+                "total_queries": row['total_queries'] or 0,
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0),
+                "error_rate_percent": round(row['error_rate'] or 0, 2),
                 "period_hours": hours
             }
 
@@ -744,6 +739,34 @@ class AnalyticsService:
                 "query_count": row['query_count'],
                 "last_activity": str(row['last_activity'])
             } for row in cur.fetchall()]
+
+    # -------------------------------------------------------------------------
+    # DEBUG HELPERS
+    # -------------------------------------------------------------------------
+
+    def explain_dashboard_queries(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """Debug helper: Show query plans to verify index usage."""
+        queries = [
+            (f"SELECT COUNT(*) FROM {SCHEMA}.query_log WHERE created_at > NOW() - INTERVAL '1 hour' * %s", (hours,)),
+            (f"SELECT COUNT(DISTINCT user_email) FROM {SCHEMA}.query_log WHERE created_at > NOW() - INTERVAL '1 hour'", None),
+            (f"SELECT * FROM {SCHEMA}.analytics_events WHERE event_type = 'error' ORDER BY created_at DESC LIMIT 20", None),
+            (f"SELECT department, COUNT(*) FROM {SCHEMA}.query_log WHERE created_at > NOW() - INTERVAL '1 hour' * %s GROUP BY department", (hours,)),
+        ]
+
+        results = []
+        with self._get_cursor() as cur:
+            for query, params in queries:
+                if params:
+                    cur.execute(f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {query}", params)
+                else:
+                    cur.execute(f"EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) {query}")
+                plan = cur.fetchone()
+                results.append({
+                    "query": query[:60] + "..." if len(query) > 60 else query,
+                    "plan": plan[0] if plan else None
+                })
+
+        return results
 
 
 # =============================================================================
