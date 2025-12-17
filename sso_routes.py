@@ -107,13 +107,17 @@ async def get_login_url(redirect_uri: Optional[str] = None):
     if not is_configured():
         raise HTTPException(503, "Azure AD not configured")
 
-    state = secrets.token_urlsafe(32)
-    auth_url = get_auth_url(state=state)
+    try:
+        state = secrets.token_urlsafe(32)
+        auth_url = get_auth_url(state=state)
 
-    return {
-        "url": auth_url,
-        "state": state,  # Frontend should store this and validate on callback
-    }
+        return {
+            "url": auth_url,
+            "state": state,  # Frontend should store this and validate on callback
+        }
+    except Exception as e:
+        logger.error(f"Failed to generate login URL: {e}")
+        raise HTTPException(500, f"Failed to generate login URL: {str(e)}")
 
 
 @router.post("/callback", response_model=TokenResponse)
