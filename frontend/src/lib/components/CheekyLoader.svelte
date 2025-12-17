@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { fade, fly } from 'svelte/transition';
+    import { fade } from 'svelte/transition';
+    import { cubicOut } from 'svelte/easing';
     import { cheeky, type PhraseCategory, SPINNERS } from '$lib/cheeky';
 
     // Props
@@ -8,44 +9,51 @@
     export let spinnerType: keyof typeof SPINNERS = 'food';
     export let showProgress: boolean = false;
     export let progress: number = 0;
-    export let rotationMs: number = 3000;
+    export let rotationMs: number = 5000; // Slower - 1-2 phrases per search
     export let size: 'sm' | 'md' | 'lg' = 'md';
 
     // State
     let phrase = '';
     let spinnerFrame = 0;
-    let phraseKey = 0; // For transition keying
+    let phraseKey = 0;
 
     // Get spinner frames
     $: spinner = SPINNERS[spinnerType] || SPINNERS.dots;
 
-    // Intervals
-    let phraseInterval: ReturnType<typeof setInterval>;
-    let spinnerInterval: ReturnType<typeof setInterval>;
+    // Single interval for synced updates
+    let rotationInterval: ReturnType<typeof setInterval>;
 
-    function updatePhrase() {
-        phrase = cheeky.get(category);
-        phraseKey++; // Trigger transition
+    // Custom transition: emerge from depth (not snot rocket)
+    function emerge(node: Element, { duration = 600, delay = 0 }) {
+        return {
+            duration,
+            delay,
+            css: (t: number) => {
+                const eased = cubicOut(t);
+                return `
+                    opacity: ${eased};
+                    transform: scale(${0.97 + 0.03 * eased});
+                    filter: blur(${(1 - eased) * 2}px);
+                `;
+            }
+        };
     }
 
-    function updateSpinner() {
+    function updateContent() {
+        // SYNC: phrase and emoji change together
+        phrase = cheeky.get(category);
         spinnerFrame = (spinnerFrame + 1) % spinner.length;
+        phraseKey++;
     }
 
     onMount(() => {
-        // Initial phrase
-        updatePhrase();
-
-        // Rotate phrase
-        phraseInterval = setInterval(updatePhrase, rotationMs);
-
-        // Animate spinner (400ms per frame - smooth, not seizure-inducing)
-        spinnerInterval = setInterval(updateSpinner, 400);
+        updateContent();
+        // Single interval for BOTH phrase and spinner
+        rotationInterval = setInterval(updateContent, rotationMs);
     });
 
     onDestroy(() => {
-        clearInterval(phraseInterval);
-        clearInterval(spinnerInterval);
+        clearInterval(rotationInterval);
     });
 
     // Size classes
@@ -65,8 +73,8 @@
         {#key phraseKey}
             <p
                 class="phrase"
-                in:fly={{ y: 10, duration: 200 }}
-                out:fade={{ duration: 100 }}
+                in:emerge={{ duration: 600, delay: 100 }}
+                out:fade={{ duration: 300 }}
             >
                 {phrase}
             </p>
