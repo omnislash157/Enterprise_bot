@@ -1,102 +1,178 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import { Canvas } from '@threlte/core';
     import { goto } from '$app/navigation';
     import CreditForm from '$lib/components/CreditForm.svelte';
-    import { credit } from '$lib/stores/credit';
     import CreditAmbientOrbs from '$lib/threlte/CreditAmbientOrbs.svelte';
-    import { Canvas } from '@threlte/core';
-    import { onMount } from 'svelte';
-  
-    let showForm = true;
-  
+    import { credit } from '$lib/stores/credit';
+
     onMount(() => {
-      // Initialize credit store if needed
-      credit.reset();
+        // Reset credit form state on mount
+        credit.reset();
     });
-  
+
     function handleClose() {
-      // Navigate back or close
-      goto('/');
+        goto('/');
     }
-  
-    function handleComplete(e: CustomEvent<{ requestId: string }>) {
-      const { requestId } = e.detail;
-      // Success handling - could show toast, navigate, etc.
-      console.log('Credit request submitted:', requestId);
-      goto(`/credit/success?id=${requestId}`);
+
+    function handleComplete(event: CustomEvent<{ requestId: string }>) {
+        // Show success state briefly, then redirect
+        setTimeout(() => {
+            goto('/');
+        }, 2000);
     }
-  </script>
-  
-  <svelte:head>
-    <title>Credit Request | Driscoll Intelligence</title>
-  </svelte:head>
-  
-  <div class="credit-page">
-    <!-- 3D Ambient Background -->
-    <div class="ambient-layer">
-      <Canvas>
-        <CreditAmbientOrbs />
-      </Canvas>
+</script>
+
+<svelte:head>
+    <title>Credit Request - Driscoll Intelligence</title>
+</svelte:head>
+
+<div class="credit-page">
+    <!-- Subtle 3D Background -->
+    <div class="scene-container">
+        <Canvas>
+            <CreditAmbientOrbs />
+        </Canvas>
     </div>
-  
-    <!-- Subtle CSS glow accents -->
-    <div class="glow-accent glow-top-left"></div>
-    <div class="glow-accent glow-bottom-right"></div>
-  
-    <!-- The Form -->
-    {#if showForm}
-      <CreditForm
-        on:close={handleClose}
-        on:complete={handleComplete}
-      />
-    {/if}
-  </div>
-  
-  <style>
+
+    <!-- Ambient Glows - softer than chat page -->
+    <div class="ambient-glow glow-cyan"></div>
+    <div class="ambient-glow glow-green"></div>
+
+    <!-- Page Header -->
+    <header class="page-header">
+        <div class="header-content">
+            <h1 class="page-title">
+                <span class="title-icon">📋</span>
+                Credit Request
+            </h1>
+            <p class="page-subtitle">
+                Submit customer credit requests for processing
+            </p>
+        </div>
+    </header>
+
+    <!-- Credit Form Container -->
+    <div class="form-container">
+        <CreditForm
+            standalone={true}
+            on:close={handleClose}
+            on:complete={handleComplete}
+        />
+    </div>
+</div>
+
+<style>
     .credit-page {
-      position: fixed;
-      inset: 0;
-      background: #050505;
-      overflow: hidden;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+
+        background: linear-gradient(135deg, #0a0a0f 0%, #0f1015 100%);
+        overflow-y: auto;
     }
-  
-    /* 3D orbs behind everything */
-    .ambient-layer {
-      position: absolute;
-      inset: 0;
-      z-index: 1;
-      opacity: 0.6;
-      pointer-events: none;
+
+    .scene-container {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        opacity: 0.4;
+        pointer-events: none;
     }
-  
-    /* CSS glow accents - cheap atmosphere */
-    .glow-accent {
-      position: absolute;
-      border-radius: 50%;
-      filter: blur(100px);
-      pointer-events: none;
-      z-index: 2;
+
+    .ambient-glow {
+        position: fixed;
+        border-radius: 50%;
+        filter: blur(100px);
+        pointer-events: none;
+        z-index: 1;
     }
-  
-    .glow-top-left {
-      width: 500px;
-      height: 500px;
-      background: radial-gradient(circle, rgba(0, 255, 65, 0.12) 0%, transparent 70%);
-      top: -150px;
-      left: -150px;
-      animation: drift 25s ease-in-out infinite;
+
+    .glow-cyan {
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(0, 200, 255, 0.12) 0%, transparent 70%);
+        top: 10%;
+        right: -100px;
+        animation: float-1 25s ease-in-out infinite;
     }
-  
-    .glow-bottom-right {
-      width: 400px;
-      height: 400px;
-      background: radial-gradient(circle, rgba(0, 255, 65, 0.08) 0%, transparent 70%);
-      bottom: -100px;
-      right: -100px;
-      animation: drift 20s ease-in-out infinite reverse;
+
+    .glow-green {
+        width: 400px;
+        height: 400px;
+        background: radial-gradient(circle, rgba(0, 255, 65, 0.1) 0%, transparent 70%);
+        bottom: 10%;
+        left: -100px;
+        animation: float-2 30s ease-in-out infinite;
     }
-  
-    @keyframes drift {
-      0%, 100% { transform: translate(0, 0); }
-      50% { transform: translate(30px, 20px); }
+
+    @keyframes float-1 {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(-30px, 20px); }
     }
-  </style>
+
+    @keyframes float-2 {
+        0%, 100% { transform: translate(0, 0); }
+        50% { transform: translate(20px, -30px); }
+    }
+
+    .page-header {
+        position: relative;
+        z-index: 10;
+        padding: 2rem 2rem 0;
+    }
+
+    .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .page-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+    }
+
+    .title-icon {
+        font-size: 1.5rem;
+    }
+
+    .page-subtitle {
+        margin: 0.5rem 0 0;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.95rem;
+    }
+
+    .form-container {
+        position: relative;
+        z-index: 10;
+        padding: 1.5rem 2rem 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        .page-header {
+            padding: 1.5rem 1rem 0;
+        }
+
+        .page-title {
+            font-size: 1.4rem;
+        }
+
+        .form-container {
+            padding: 1rem;
+        }
+    }
+</style>

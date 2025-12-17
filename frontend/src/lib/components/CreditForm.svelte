@@ -17,6 +17,9 @@
       close: void;
       complete: { requestId: string };
     }>();
+
+    // Standalone mode - renders inline without fixed overlay
+    export let standalone: boolean = false;
   
     // ========== Customer/Invoice Selection State ==========
     let customerInputFocused = false;
@@ -223,7 +226,7 @@
   
   <svelte:window on:click={handleClickOutside} />
   
-  <div class="credit-form-overlay">
+  <div class="credit-form-overlay" class:standalone>
     <div class="credit-form-panel">
       <!-- Header -->
       <header class="panel-header">
@@ -628,6 +631,20 @@
       background: rgba(0, 0, 0, 0.8);
       z-index: 1000;
       padding: 1rem;
+    }
+
+    /* Standalone mode - flows with page layout */
+    .credit-form-overlay.standalone {
+      position: relative;
+      inset: auto;
+      background: transparent;
+      padding: 0;
+      z-index: auto;
+    }
+
+    .credit-form-overlay.standalone .credit-form-panel {
+      max-height: none;
+      max-width: 100%;
     }
   
     .credit-form-panel {
