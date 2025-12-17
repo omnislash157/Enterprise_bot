@@ -37,11 +37,8 @@ AUTHORITY = f"https://login.microsoftonline.com/{AZURE_AD_TENANT_ID}"
 GRAPH_API = "https://graph.microsoft.com/v1.0"
 
 # Scopes we request
+# MSAL automatically adds openid, profile, offline_access - don't include them
 SCOPES = [
-    "openid",           # Required for OIDC
-    "profile",          # Get user profile info
-    "email",            # Get email address
-    "offline_access",   # Get refresh token
     "User.Read",        # Read user's own profile from Graph API
 ]
 
