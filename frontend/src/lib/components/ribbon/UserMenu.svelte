@@ -35,10 +35,20 @@
         close();
         await auth.logout();
     }
+
+    function handleKeydown(e: KeyboardEvent) {
+        if (e.key === 'Escape') {
+            close();
+        }
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            toggle();
+        }
+    }
 </script>
 
 <div class="user-menu" use:clickOutside={close}>
-    <button class="user-trigger" on:click={toggle} aria-expanded={open}>
+    <button class="user-trigger" on:click={toggle} on:keydown={handleKeydown} aria-haspopup="true" aria-expanded={open}>
         <div class="avatar">
             {initials}
         </div>
