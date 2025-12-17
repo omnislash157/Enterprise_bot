@@ -166,16 +166,22 @@ function createSessionStore() {
 			initMessageHandler();
 
 			// Send verify message with auth after connection
-			const email = auth.getEmail();
-			if (email) {
+			// Get auth info - works for both email and SSO auth
+			const authHeaders = auth.getAuthHeader();
+			const hasAuth = Object.keys(authHeaders).length > 0;
+
+			if (hasAuth) {
 				// Wait for connection to establish, then verify
 				const checkConnection = setInterval(() => {
 					const wsState = get(websocket as any);
 					if (wsState?.connected) {
 						clearInterval(checkConnection);
+						// Send auth headers as verify payload
+						// Backend will extract email from token or X-User-Email header
 						websocket.send({
 							type: 'verify',
-							email: email,
+							email: authHeaders['X-User-Email'] || undefined,
+							token: authHeaders['Authorization']?.replace('Bearer ', '') || undefined,
 							division: department,
 						});
 					}

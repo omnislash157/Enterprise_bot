@@ -11,8 +11,8 @@
 
     onMount(async () => {
         // Check if user has admin permissions
-        const email = auth.getEmail();
-        if (!email) {
+        const headers = auth.getAuthHeader();
+        if (Object.keys(headers).length === 0) {
             goto('/');
             return;
         }
@@ -21,7 +21,7 @@
         try {
             const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
             const res = await fetch(`${apiBase}/api/whoami`, {
-                headers: { 'X-User-Email': email }
+                headers
             });
 
             if (res.ok) {

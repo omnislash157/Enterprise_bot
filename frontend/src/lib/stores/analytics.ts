@@ -133,14 +133,11 @@ function createAnalyticsStore() {
     }
 
     function getHeaders(): Record<string, string> {
-        const email = auth.getEmail();
-        const headers: Record<string, string> = {
+        const authHeaders = auth.getAuthHeader();
+        return {
             'Content-Type': 'application/json',
+            ...authHeaders,
         };
-        if (email) {
-            headers['X-User-Email'] = email;
-        }
-        return headers;
     }
 
     async function fetchJson<T>(path: string): Promise<T | null> {
