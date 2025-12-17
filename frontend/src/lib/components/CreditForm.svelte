@@ -1,5 +1,7 @@
 <script lang="ts">
     import DupeOverrideModal from '$lib/components/DupeOverrideModal.svelte';
+    import { toast } from '$lib/components/ToastProvider.svelte';
+    import { cheekyStore } from '$lib/stores/cheeky';
     import type { Customer, Invoice, LineItem, LineItemCredit, OverrideResolution } from '$lib/stores/credit';
     import {
         canSubmit,
@@ -186,16 +188,34 @@
     }
   
     async function performSubmit() {
-      // Integrate item notes into line item credits before submission
-      itemNotes.forEach((notes, lineItemId) => {
-        if (notes.trim()) {
-          credit.updateLineItemCredit(lineItemId, { partialExplanation: notes });
+      cheekyStore.start('executing');
+
+      try {
+        // Integrate item notes into line item credits before submission
+        cheekyStore.phase('searching', 20);
+        itemNotes.forEach((notes, lineItemId) => {
+          if (notes.trim()) {
+            credit.updateLineItemCredit(lineItemId, { partialExplanation: notes });
+          }
+        });
+
+        cheekyStore.phase('creating', 50);
+        // Prepare and validate payload handled by credit store
+
+        cheekyStore.phase('executing', 75);
+        const requestId = await credit.submitCreditRequest();
+
+        if (requestId) {
+          cheekyStore.success();
+          toast.success('Credit request submitted!');
+          dispatch('complete', { requestId });
+        } else {
+          cheekyStore.error();
+          toast.error('Failed to submit credit request');
         }
-      });
-  
-      const requestId = await credit.submitCreditRequest();
-      if (requestId) {
-        dispatch('complete', { requestId });
+      } catch (error) {
+        cheekyStore.error();
+        toast.error('Failed to submit credit request');
       }
     }
   

@@ -8,6 +8,7 @@
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
 	import Login from '$lib/components/Login.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
+	import ToastProvider from '$lib/components/ToastProvider.svelte';
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
@@ -46,6 +47,9 @@
 				<slot />
 			</main>
 		{/key}
+
+		<!-- Global toast notifications -->
+		<ToastProvider />
 	</div>
 {/if}
 
