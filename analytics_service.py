@@ -13,6 +13,8 @@ Usage:
 
 import re
 import logging
+import time
+import functools
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from contextlib import contextmanager
@@ -27,6 +29,19 @@ import os
 load_dotenv()
 
 logger = logging.getLogger(__name__)
+
+
+def timed(func):
+    """Decorator to log execution time of analytics queries."""
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        elapsed_ms = (time.perf_counter() - start) * 1000
+        logger.info(f"[PERF] {func.__name__}: {elapsed_ms:.1f}ms")
+        return result
+    return wrapper
+
 
 # =============================================================================
 # DATABASE CONFIG
@@ -348,6 +363,7 @@ class AnalyticsService:
     # QUERIES FOR DASHBOARD
     # -------------------------------------------------------------------------
 
+    @timed
     def get_overview_stats(self, hours: int = 24) -> Dict[str, Any]:
         """Get overview stats for dashboard."""
         with self._get_cursor() as cur:
@@ -394,6 +410,7 @@ class AnalyticsService:
                 "period_hours": hours
             }
 
+    @timed
     def get_queries_by_hour(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get query counts grouped by hour."""
         with self._get_cursor() as cur:
@@ -409,6 +426,7 @@ class AnalyticsService:
 
             return [{"hour": str(row['hour']), "count": row['count']} for row in cur.fetchall()]
 
+    @timed
     def get_category_breakdown(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get query category breakdown."""
         with self._get_cursor() as cur:
@@ -424,6 +442,7 @@ class AnalyticsService:
 
             return [{"category": row['query_category'] or 'OTHER', "count": row['count']} for row in cur.fetchall()]
 
+    @timed
     def get_department_stats(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get per-department statistics."""
         with self._get_cursor() as cur:
@@ -446,6 +465,7 @@ class AnalyticsService:
                 "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
             } for row in cur.fetchall()]
 
+    @timed
     def get_recent_errors(self, limit: int = 20) -> List[Dict[str, Any]]:
         """Get recent error events."""
         with self._get_cursor() as cur:
@@ -505,6 +525,7 @@ class AnalyticsService:
                 "category_breakdown": categories
             }
 
+    @timed
     def get_realtime_sessions(self) -> List[Dict[str, Any]]:
         """Get currently active sessions (activity in last 5 minutes)."""
         with self._get_cursor() as cur:

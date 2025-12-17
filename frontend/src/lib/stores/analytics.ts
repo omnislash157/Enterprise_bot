@@ -141,10 +141,16 @@ function createAnalyticsStore() {
     }
 
     async function fetchJson<T>(path: string): Promise<T | null> {
+        const start = performance.now();
         try {
             const res = await fetch(`${getApiBase()}${path}`, {
                 headers: getHeaders(),
             });
+            const clientTime = performance.now() - start;
+            const serverTime = res.headers.get('X-Response-Time');
+
+            console.log(`[PERF] ${path}: client=${clientTime.toFixed(0)}ms, server=${serverTime}`);
+
             if (!res.ok) return null;
             return await res.json();
         } catch (e) {
