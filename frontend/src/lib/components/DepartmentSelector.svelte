@@ -21,9 +21,7 @@
     }
 
     onMount(async () => {
-        const email = auth.getEmail();
-        const headers: Record<string, string> = {};
-        if (email) headers['X-User-Email'] = email;
+        const headers = auth.getAuthHeader();
 
         try {
             const apiBase = getApiBase();
