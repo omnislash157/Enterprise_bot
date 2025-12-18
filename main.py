@@ -280,6 +280,11 @@ class VerifyEmailResponse(BaseModel):
     allowed: bool
     domain: Optional[str] = None
 
+class UploadChatRequest(BaseModel):
+    """Request model for chat upload endpoint."""
+    provider: str  # "anthropic", "openai", etc.
+    content: str   # JSON content of chat export
+
 # =============================================================================
 # FASTAPI APP
 # =============================================================================
@@ -429,6 +434,40 @@ async def verify_email(request: VerifyEmailRequest):
 async def get_whitelist_stats():
     """Get whitelist statistics (admin endpoint)."""
     return email_whitelist.get_stats()
+
+# =============================================================================
+# CHAT UPLOAD ENDPOINT (Phase 4: Extraction Toggle)
+# =============================================================================
+
+@app.post("/api/upload/chat")
+async def upload_chat(
+    request: UploadChatRequest,
+    user: dict = Depends(require_auth)
+):
+    """
+    Upload chat export for memory ingestion.
+
+    PHASE 4: This endpoint is gated by features.chat_import config.
+    Enterprise accounts cannot import external chat logs - memory builds
+    only from bot conversations.
+    """
+    # Phase 4: Guard with extraction_enabled config
+    if not cfg("features.chat_import", True):
+        raise HTTPException(
+            status_code=403,
+            detail="Chat import is disabled. Enterprise accounts build memory from bot conversations only."
+        )
+
+    # If we get here, chat import is enabled (personal SaaS mode)
+    # TODO: Implement actual ingestion logic
+    # For now, return success to indicate the feature is available
+    return {
+        "status": "accepted",
+        "message": "Chat import feature is enabled but ingestion not yet implemented",
+        "provider": request.provider,
+        "user": user.get("email"),
+        "note": "This endpoint will process chat exports when ingest pipeline is integrated"
+    }
 
 # =============================================================================
 # AUTH ENDPOINTS
