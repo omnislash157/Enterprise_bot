@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_night_shift_hi-lo_operating_manual",
+  "version": "1.0",
+  "description": "Warehouse night_shift_hilo processes and procedures",
+  "source_file": "Night Shift Hi-Lo Operating Manual.docx",
+  "file_hash": "8c21de74f3b33d733681e17069af9cd9b966a0de9a38d0fb77e0f68e4c7d9650",
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_hilo_introduction_0",
+      "category": "night_shift_hilo",
+      "section_title": "Introduction",
+      "keywords": [
+        "shift",
+        "night",
+        "products",
+        "pickers",
+        "operator",
+        "operators",
+        "warehouse",
+        "productivity",
+        "schedule",
+        "breaks"
+      ],
+      "content": "Night Shift Hi-Lo Operator Manual\n\nOverview\n\nThe Hi-Lo Operator plays a crucial role during the night shift by ensuring that products are accessible, replenished, and properly maintained for efficient picking and accurate inventory. Hi-Lo operators support the overall productivity of the warehouse and directly impact on the speed and success of the night operations.\n\nNight shift hi-lo operators typically begin at 4:00 PM or 5:00 PM and work until all necessary replenishment and retrieval tasks are completed, usually around 4:00 AM.\n\nShift Schedule and Breaks\n\nHi-Lo operators follow the standard night shift break schedule:\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nBreaks may not be taken in the machine room or on the warehouse floor.\n\nRole and Responsibilities\n\nAs a Hi-Lo Operator, you are responsible for replenishing products, retrieving cases or pallets that are out of reach, and supporting pickers so they can maintain their productivity and meet company goals.\n\nCore responsibilities include:\n\nOperating the Hi-Lo machine safely and efficiently throughout the warehouse.\n\nBringing products down from higher slots so pickers can access it.\n\nReplenishing products into empty or low slots to maintain stock availability.\n\nVisiting the clerks regularly to obtain short sheets—lists of items that pickers could not find or mark as missing.\n\nSearching for and retrieving these “short” items, which may be ghost pallets or misplaced cases.\n\nFinding and assigning proper substitutions in the system when required.\n\nScanning each slot and updating counts to keep the system’s inventory accurate.\n\nCommunicating with pickers, clerks, and supervisors to ensure smooth workflow.\n\nEfficiency and Teamwork\n\nThis position is essential for keeping the warehouse floor moving efficiently.\n\nPickers rely on Hi-Lo operators to bring down products promptly.\n\nThe speed and accuracy of a Hi-Lo operator affect not only their own productivity but also that of the picking team.\n\nBeing proactive and organized helps prevent delays and keeps the shift on schedule.",
+      "chunk_token_count": 494
+    },
+    {
+      "id": "warehouse_night_shift_hilo_introduction_1",
+      "category": "night_shift_hilo",
+      "section_title": "Introduction",
+      "keywords": [
+        "company",
+        "safety",
+        "operators",
+        "always",
+        "retrieved",
+        "customer",
+        "awareness",
+        "operation",
+        "warehouse",
+        "ensure"
+      ],
+      "content": "Always verify that the correct cases and quantities are retrieved accuracy prevents mispicks that could harm the company and its customer relationships.\n\nSafety and Awareness\n\nHi-Lo operation is one of the most safety-sensitive roles in the warehouse. Operators must always be alert and follow all safety protocols.\n\nMaintain awareness of pedestrians, jacks, and other Hi-Lo operators in your area.\n\nEnsure pallets are secure and stable before lifting or lowering.\n\nNever exceed capacity limits or lift with unbalanced loads.\n\nUse proper lighting and visibility checks when moving between aisles.\n\nWear steel toe shoes that are above the ankle given that is company policy\n\nImportance of the Role\n\nHi-Lo operators are the backbone of the warehouse operation at night. Their precision and timing keep the picking and loading teams on pace, prevent inventory shortages, and ensure the company’s data and customer orders remain accurate. Every case retrieved or replenished correctly keeps Driscoll Foods running efficiently and professionally through the night.",
+      "chunk_token_count": 257
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_upc_collecting_manual",
+  "version": "1.0",
+  "description": "Warehouse upc processes and procedures",
+  "source_file": "UPC Collecting Manual.docx",
+  "file_hash": "b05e19a2afeef427cea637fb721d0663d5b04bb44f358edcb6e6a259fa5e8aa1",
+  "chunks": [
+    {
+      "id": "warehouse_upc_introduction_0",
+      "category": "upc",
+      "section_title": "Introduction",
+      "keywords": [
+        "upc",
+        "product",
+        "system",
+        "process",
+        "warehouse",
+        "case",
+        "products",
+        "scan",
+        "collection",
+        "its"
+      ],
+      "content": "UPC Collecting Manual\n\nOverview\n\nUPC Collection is a critical process at Driscoll Foods because it provides visibility into every product within the warehouse. By tracking each case and piece through its Universal Product Code (UPC), the company ensures accuracy in identifying where products are, how they are labeled, and which slots they occupy. This visibility is essential for both internal operations and customer confidence.\n\nPurpose and Importance\n\nThe purpose of UPC Collection is to maintain an accurate and up-to-date connection between physical products and the warehouse management system. Every item that enters the facility should be scanned by its UPC, allowing Driscoll Foods to know exactly what product is associated with what label, vendor, and storage location. This process enables the company to provide precise product information to customers and supports various departments such as Purchasing, Sales, and Inventory Control.\n\nScanning Process\n\nUPC Collection requires the use of a scanning gun and attention to detail to ensure accuracy. The process generally follows these steps:\n\n1. Obtain a scan gun connected to the warehouse system.\n2. Go to the slot containing the product that needs to be verified.\n3. Scan the slot location to record where the product is stored.\n4. Scan the case of the product to capture its UPC and confirm that it matches the system’s record.\n5. Open the case (if applicable) and scan an individual piece, especially for products that are sold individually rather than by the entire case.\n6. Ensure the scanned UPC updates the system accurately so the correct product information is linked.\n\nCommon Issues and Resolutions\n\nAt times, products may not be scanned correctly or may have missing UPC data. This can cause confusion in the warehouse and discrepancies in the system. When such issues are identified, UPC collectors play a crucial role in resolving them by rescanning and updating the proper information.\n\nCommon issues include:",
+      "chunk_token_count": 490
+    },
+    {
+      "id": "warehouse_upc_introduction_1",
+      "category": "upc",
+      "section_title": "Introduction",
+      "keywords": [
+        "upc",
+        "product",
+        "system",
+        "data",
+        "collection",
+        "inventory",
+        "scanned",
+        "upcs",
+        "packaging",
+        "supports"
+      ],
+      "content": "Products not scanned during receiving or putaway.\n\nIncorrect or outdated UPCs associated with certain items.\n\nSystem showing mismatched item descriptions or missing product data\n\nBroken or unreadable UPC barcodes on packaging.\n\nSystem Integration and Departmental Impact\n\nUPC Collection supports nearly every operational department at Driscoll Foods. Accurate UPC data enables Purchasing to reorder correctly, Inventory Control to maintain integrity, and Sales to provide customers with correct product details. When UPCs are properly collected and recorded, the entire organization benefits from reliable product traceability and streamlined communication.\n\nWhat you do:\n\nAlways double-check that the UPC scanned matches the correct product description on the screen.\n\nHandle packaging carefully to avoid damaging UPC labels.\n\nFor split or mixed pallets, scan each unique UPC separately\n\nCommunicate with Inventory Control if you notice any recurring UPC mismatches.\n\nEnsure all scans are saved and confirmed in the system before moving to the next product.\n\nWhy UPC Collection matters:\n\nUPC Collection is a foundational process that strengthens data accuracy across the company. By carefully scanning slots, cases, and individual pieces, warehouse personnel ensure the system remains aligned with the physical inventory. This improves visibility, supports efficient operations, and maintains Driscoll Foods’ commitment to quality and reliability.",
+      "chunk_token_count": 349
+    }
+  ]
+}

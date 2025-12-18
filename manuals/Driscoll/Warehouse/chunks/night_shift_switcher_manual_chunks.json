@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_night_shift_switcher_manual",
+  "version": "1.0",
+  "description": "Warehouse night_shift_switcher processes and procedures",
+  "source_file": "Night Shift Switcher Manual.docx",
+  "file_hash": "1bdb29244a6556992b16f182fa6b31dc6efff95ff2516a1df46219c0fa5a8984",
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_switcher_introduction_0",
+      "category": "night_shift_switcher",
+      "section_title": "Introduction",
+      "keywords": [
+        "trucks",
+        "truck",
+        "shift",
+        "floor",
+        "switchers",
+        "moving",
+        "doors",
+        "night",
+        "warehouse",
+        "loading"
+      ],
+      "content": "Night Shift Switcher Manual\n\nOverview\n\nSwitchers are essential for maintaining efficient truck movement at the warehouse. They are responsible for moving trucks into dock doors for loading and out to the parking lot once loading is complete. Without switchers, the warehouse floor would become congested, slowing down pickers, loaders, and the entire night shift operation.\n\nNight shift switches work from 4:00 PM or 5:00 PM until all trucks are properly staged and organized, usually around 4:00 AM.\n\nShift Schedule and Breaks\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nBreaks must be coordinated to ensure trucks continue moving and doors remain clear.\n\nRoles and Responsibilities\n\nSwitchers are responsible for coordinating truck movements to maintain an efficient and safe workflow on the warehouse floor.\n\nCore responsibilities include:\n\nMoving trucks into dock doors for loading, following the schedule provided by the transportation department.\n\nMoving trucks out to the parking lot once the loading process is complete.\n\nPrioritizing even-numbered doors first, then handling odd-numbered doors, to keep the floor organized.\n\nMonitoring the door lights to know when a truck is fully loaded and ready to be moved.\n\nKeeping track of all truck locations to ensure drivers can quickly access their trucks in the morning.\n\nMemorizing which trucks are assigned to which routes, maintaining consistency for drivers who prefer the same truck daily.\n\nWorking continuously outside, regardless of weather conditions, to keep truck flow smooth and the warehouse floor manageable.\n\nEfficiency and Safety\n\nSwitchers must be constantly moving to prevent the floor from becoming congested.\n\nTrucks cannot be moved until they are fully loaded, and the door is closed.\n\nMaintaining awareness of personnel on the floor is essential to prevent accidents.\n\nEfficient truck movement keeps pickers and loaders on schedule, supporting overall shift productivity.\n\nImportance of the Role\n\nSwitchers are the heartbeat of dock operations during the night shift. Their performance ensures:",
+      "chunk_token_count": 497
+    },
+    {
+      "id": "warehouse_night_shift_switcher_introduction_1",
+      "category": "night_shift_switcher",
+      "section_title": "Introduction",
+      "keywords": [
+        "trucks",
+        "warehouse",
+        "drivers",
+        "assigned",
+        "dock",
+        "operations",
+        "smooth",
+        "door",
+        "numbered",
+        "doors"
+      ],
+      "content": "Trucks are available for loading on time\n\nThe warehouse floor remains organized and safe\n\nPickers and loaders can operate efficiently\n\nDrivers receive their assigned trucks quickly in the morning\n\nBy keeping the dock and parking operations smooth, switchers directly impact the efficiency and success of the entire night shift.\n\nBest Practices\n\nAlways follow the transportation department’s door and route sheets.\n\nPrioritize even-numbered doors first, then odd-numbered doors.\n\nMonitor dock door lights closely to know when trucks are ready to move.\n\nKeep track of truck locations and assigned routes.\n\nCommunicate with drivers and warehouse staff to maintain smooth operations.\n\nRemain vigilant, especially in adverse weather, to prevent accidents and delays.",
+      "chunk_token_count": 180
+    }
+  ]
+}

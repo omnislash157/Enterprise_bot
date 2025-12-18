@@ -1,0 +1,66 @@
+{
+  "knowledge_base": "driscoll_warehouse_john_cantelli_manual",
+  "version": "1.0",
+  "description": "Warehouse john_cantelli processes and procedures",
+  "source_file": "John Cantelli Manual.docx",
+  "file_hash": "198dc04390b5fe2335b787d10f4dfafbf3590156c36b13206e53d672b52dfe69",
+  "chunks": [
+    {
+      "id": "warehouse_john_cantelli_introduction_0",
+      "category": "john_cantelli",
+      "section_title": "Introduction",
+      "keywords": [
+        "driver",
+        "errors",
+        "hotline",
+        "sales",
+        "operations",
+        "inventory",
+        "control",
+        "customer",
+        "credit",
+        "credits"
+      ],
+      "content": "Driver Hotline & Internal Operations Manual\n\nFor Intern Training\n\nOverview\n\nThe Driver Hotline & Operations Support role acts as the central communication hub between:\n\nDrivers\n\nOperations\n\nInventory Control\n\nSales\n\nCustomer Service\n\nCredit Department\n\nThis position ensures:\n\nAccurate relay of critical information\n\nCorrect handling of operational errors\n\nProper adjustment of weights, invoices, and credits\n\nTimely preparation and distribution of daily VIP reports\n\nAccurate logging and approval of driver wait time payments\n\nRetrieval of picker information when needed\n\nThis job directly affects company financial accuracy, customer satisfaction, and operational efficiency.\n\nResponsibilities by Category\n\nDriver Hotline Email Management\n\nPurpose\n\nThe Driver Hotline email is the primary communication channel for reporting driver issues, customer issues, operational errors, delays, wait times, and credit requests.\n\nDaily Duties\n\nMonitor the inbox continuously throughout the day\n\nRead each message and determine:\n\nDoes it need to be forwarded to Sales?\n\nInventory Control?\n\nTransportation?\n\nCustomer Service?\n\nCredit Teams\n\nRespond when necessary with clear, professional communication\n\nLog information when required (weight changes, wait times, credits)\n\nForwarding Rules\n\nType of Issue | Who It Gets Sent To | Notes\nDelivery errors / missing items | Sales and Ops Errors | Always provide route, stop, and invoice #\nWeight discrepancies | Inventory Control (James Serrago) | These will be adjusted daily\nPickup-related credits | Credit Department | Include all documentation\nWait time issues | Transportation & HR (via spreadsheet) | Must exceed 15 minutes\n\nOps Errors (Operations Errors)\n\nPurpose\n\nTo communicate and document issues originating from picking, routing, warehouse processes, or loading that cause incorrect deliveries.\n\nSteps\n\nReceive error from driver hotline or sales.\n\nMake note of route, product, invoice #, and issue.\n\nForward details to Inventory Control (for product-related errors), Sales, and Ops leadership.\n\nFollow up if necessary to ensure corrections or credits are made.\n\nWeight Changes\n\nPurpose",
+      "chunk_token_count": 493
+    },
+    {
+      "id": "warehouse_john_cantelli_introduction_1",
+      "category": "john_cantelli",
+      "section_title": "Introduction",
+      "keywords": [
+        "weight",
+        "invoice",
+        "vip",
+        "telnet",
+        "customer",
+        "item",
+        "report",
+        "credits",
+        "customers",
+        "invoices"
+      ],
+      "content": "Adjust catch weight items so customers are billed correctly.\n\nProcess Owner:\n\nInventory Control – James Serrago generates the catch weight report.\nYou update invoices based on this report.\n\nSteps in Telnet\n\nA. Changing Weights (Invoice Adjustment)\n\n2, 3, Enter order # / invoice #, C Update the weight to the correct value\n\nB. Printing the Updated Invoice\n\n2, 25, M, order #, Enter through, printer #\n\nCredits Processing\n\nCredits come from drivers, salespeople, pickups, weight corrections, and Ops issues.\n\nSources\n\nDriver pickup sheets (created by Jhanfranco\n\nSales credit requests\n\nWeight-related adjustments\n\nOps errors\n\nCustomer service escalations\n\nGeneral Credit Entry\n\nTelnet:\n\n8, DRIS, 1, operator ID, customer #, invoice #\n\nWeight-Related Credits\n\nSteps:\n\nGo to: 2 → 1 → I → invoice #\n\nSearch for item via item #\n\nOn the right side, find the total cost\n\nOn the first screen, find the price per lb\n\nDivide total cost by price to determine weight\n\nEnter calculated weight\n\nDocument invoice # on sheet\n\nAlways starts with “X” for weight credits\n\nExpired Invoices (Over 15 Months Old)\n\nIf invoices are older than 15 months, it does not exist in the system\n\nIn the invoice field: type X\n\nFor item: use 444444 (miscellaneous non-splitable item code)\n\nAdd these to a spreadsheet\n\nSend spreadsheet to:\n\nPhil Carson\n\nSara\n\nCredit Team\n\nVIP Report\n\nPurpose\n\nEnsure important customers’ orders are prioritized for the night shift.\n\nResponsible Parties\n\nCustomer Service decides what is a VIP\n\nAll new customers are VIP for their first order\n\nDaily Timing\n\nCompleted every day at 5 PM\n\nHow to Generate the VIP Report\n\nIn Telnet:\n\n30, 21, tomorrow’s date\n\nCompiling the VIP Template\n\nCopy data from Telnet into the daily template\n\nRemove duplicates\n\nDouble-check each VIP customer’s orders are included\n\nSend final completed list to night clerks\n\nPicker Identification in Telnet\n\nPurpose\n\nFind which picker selected what items in case of errors, shortages, or disputes.\n\nSteps:\n\n27, 36, 4, date, route #, 1st word of customer name\n\nSystem displays picker information for each item.\n\nDriver Wait Time Logging\n\nPurpose",
+      "chunk_token_count": 471
+    },
+    {
+      "id": "warehouse_john_cantelli_introduction_2",
+      "category": "john_cantelli",
+      "section_title": "Introduction",
+      "keywords": [
+        "customer",
+        "wait",
+        "driver",
+        "time",
+        "verified",
+        "intellishift",
+        "send",
+        "cuesta",
+        "route",
+        "name"
+      ],
+      "content": "Drivers are eligible to be paid for wait times of 15 minutes or more, verified through Intellishift. You mark these down in an Excel which you will send to Samantha Cuesta.\n\nSteps:\n\nMonitor Driver Hotline for any wait time emails\n\nLog each instance into the wait time spreadsheet:\n\nRoute ID\n\nDriver name\n\nStop\n\nLength of wait time\n\nVerify using Intellishift data\n\nSend completed records to Sam Cuesta\n\nSam issues payment approvals\n\n8. Additional Operational Tasks\n\nCommunication Normalization\n\nAlways relay information factually, with:\n\nRoute #\n\nStop #\n\nCustomer name\n\nInvoice #\n\nIssue description\n\nAvoid emotional or speculative language.\n\nCustomer History Lookups\n\nIf asked about previous POs or customer history: 9, 30 or 9, 3 in Telnet\n\nImportance of This Role\n\nThis position ensures:\n\nAccurate customer billing\n\nPrevention of financial losse\n\nProper credit issuance\n\nReliable communication across departments\n\nSmooth night shift operations\n\nHistorical record accuracy\n\nReduced customer complaints\n\nVerified driver compensation\n\nThis role is critical to overall company performance.",
+      "chunk_token_count": 244
+    }
+  ]
+}
