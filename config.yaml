@@ -29,8 +29,8 @@ features:
   memory_pipelines: false       # No 5-lane retrieval
   session_memory: false         # Don't remember within session
 
-  # CONTEXT STUFFING (ON - this is the dumb bot)
-  context_stuffing: true        # Load docs into prompt
+  # CONTEXT STUFFING (DEPRECATED - RAG is now the only retrieval mode)
+  context_stuffing: false       # DEPRECATED - RAG replaced context stuffing
 
   # COGNITIVE FEATURES (ALL OFF)
   metacognitive_mirror: false   # No phase detection

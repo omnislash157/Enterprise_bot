@@ -129,8 +129,11 @@ def memory_enabled() -> bool:
 
 
 def context_stuffing_enabled() -> bool:
-    """Check if context stuffing is enabled."""
-    return cfg('features.context_stuffing', False)
+    """
+    DEPRECATED: Context stuffing replaced by RAG in CogTwin.
+    Retained for backwards compatibility but always returns False.
+    """
+    return False  # RAG is now the only retrieval mode
 
 
 def get_tier() -> str:
@@ -171,19 +174,19 @@ def get_division_voice(division: str) -> str:
 TIER_PRESETS = {
     'basic': {
         'features.memory_pipelines': False,
-        'features.context_stuffing': True,
+        'features.context_stuffing': False,  # DEPRECATED - RAG only
         'features.ui.swarm_loop': False,
         'features.ui.memory_space_3d': False,
     },
     'advanced': {
         'features.memory_pipelines': True,
-        'features.context_stuffing': False,
+        'features.context_stuffing': False,  # DEPRECATED - RAG only
         'features.ui.swarm_loop': False,
         'features.ui.memory_space_3d': False,
     },
     'full': {
         'features.memory_pipelines': True,
-        'features.context_stuffing': True,
+        'features.context_stuffing': False,  # DEPRECATED - was True, now RAG
         'features.ui.swarm_loop': True,
         'features.ui.memory_space_3d': True,
     },

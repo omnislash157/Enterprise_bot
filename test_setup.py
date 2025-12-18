@@ -14,7 +14,7 @@ try:
     print(f"   Tier: {cfg('deployment.tier')}")
     print(f"   Memory Enabled: {memory_enabled()}")
     print(f"   Enterprise Mode: {is_enterprise_mode()}")
-    print(f"   Context Stuffing: {cfg('features.context_stuffing')}")
+    print(f"   Context Stuffing: DEPRECATED (RAG only)")
     print("   [OK] Config loads correctly")
 except Exception as e:
     print(f"   [FAIL] {e}")
@@ -32,11 +32,11 @@ try:
 except Exception as e:
     print(f"   [FAIL] {e}")
 
-# 3. Test enterprise_twin import
-print("\n3. ENTERPRISE TWIN")
+# 3. Test CogTwin import (replaced EnterpriseTwin)
+print("\n3. COGTWIN")
 try:
-    from enterprise_twin import EnterpriseTwin
-    print("   [OK] EnterpriseTwin imports")
+    from cog_twin import CogTwin
+    print("   [OK] CogTwin imports")
 except Exception as e:
     print(f"   [FAIL] {e}")
 
@@ -45,7 +45,7 @@ print("\n4. DIRECTORY STRUCTURE")
 required = [
     "config.yaml",
     "config_loader.py",
-    "enterprise_twin.py",
+    "cog_twin.py",
     "doc_loader.py",
     "backend/app/main.py",
     "manuals/Driscoll/Warehouse",
