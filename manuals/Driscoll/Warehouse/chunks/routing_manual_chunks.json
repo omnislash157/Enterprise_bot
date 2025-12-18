@@ -1,0 +1,66 @@
+{
+  "knowledge_base": "driscoll_warehouse_routing_manual",
+  "version": "1.0",
+  "description": "Warehouse routing processes and procedures",
+  "source_file": "Routing Manual.docx",
+  "file_hash": "f835e2c149dd5ad2e3956d465170b2dce5a44be1f716842b02eed869b211dd62",
+  "chunks": [
+    {
+      "id": "warehouse_routing_introduction_0",
+      "category": "routing",
+      "section_title": "Introduction",
+      "keywords": [
+        "routing",
+        "routes",
+        "stops",
+        "rna",
+        "schools",
+        "day",
+        "customers",
+        "telnet",
+        "their",
+        "order"
+      ],
+      "content": "Routing Manual\n\nOverview\n\nRouting is one of the most crucial roles in Driscoll Foods operations. The Routing Department ensures that every customer receives their order accurately and on time each day. In simple terms, routing is the process of creating the delivery routes that our trucks drive daily, placing customers as stops along those routes in an efficient, logical order.\n\nRouting is primarily a desk-based position that uses two main systems: RNA (RoadNet Anywhere) and DispatchTrack. With approximately 2,000 customers per day, the routing team makes sure every product from the warehouse is delivered at the correct time and in the most efficient manner possible.\n\nRouting by Type\n\nRouting is divided into two major categories:\n- Schools\n- Street Customers\n\nEach type has its own timeline, rules, and system requirements\n\nRouting for Schools\n\nRouting for schools is always completed five days in advance because schools submit their orders earlier. The process begins in Telnet:\n\nGo to Telnet → 21, 1, date you are routing for (five days ahead)\n\nOnce the file is prepared, go to the desktop folder “Send Orders to RoadNet” and double-click it. It will “blink cast” to confirm the file is sent to RNA.\n\nIn Telnet, go to “Create Route” and drag the routing day into the designated box. This loads all your stops onto the map in RNA.\n\nNow you can begin creating your routes.\n\nBuilding Routes in RNA\n\nWhen routing, several key factors must be considered:\n- Total Stops\n- Distance Between Stops\n- Arrival and Departure Times\n- Total Weight and Case Cube\n\nFor straight trucks (used for school deliveries):\n- Maximum case cube: 600\n- Maximum stops per route: 10\n\nSteps to Build Routes:",
+      "chunk_token_count": 411
+    },
+    {
+      "id": "warehouse_routing_introduction_1",
+      "category": "routing",
+      "section_title": "Introduction",
+      "keywords": [
+        "routing",
+        "routes",
+        "route",
+        "orders",
+        "dispatchtrack",
+        "bronx",
+        "manhattan",
+        "street",
+        "customers",
+        "day"
+      ],
+      "content": "1. Click “Create New Route.”\n2. Label the route based on its zone (Bronx or Manhattan schools).\n3. Divide the total cube by 600 to estimate how many trucks/routes you’ll need.\n4. Drag the stops from the map into your created routes, arranging them in a horseshoe pattern.\n5. Review arrival/departure times and customer notes carefully.\n6. Assign drivers, ensuring each has the right route type and stop count.\n7. Check the helper box for all school routes.\n\nRouting for Streets\n\nStreet routing follows the same process but occurs daily around 5:15 PM, since customers can submit orders until 5:00 PM the day before.\n\nStreet routes differ in a few ways:\n\nUp to 12 stops allowed per route\n\nStricter delivery time windows\n\nCustomers are graded (A+, A, A-, B+, etc.) and higher-graded customers must be prioritized\n\nZones for street routing:\n01 – Long Island\n02 – Queens\n03 – Brooklyn\n04 – Bronx\n05 – Westchester\n06 – Dutchess\n10 – Jails\n(and more for Connecticut, Massachusetts, Maryland, etc.)\n\nRouting in DispatchTrack\n\nIf you routed Manhattan in RNA, you will route Bronx in DispatchTrack (and vice versa).\n\nSteps:\n\nIn Telnet, enter 35, 1, date you’re routing.\n\nDouble-click “Send to DispatchTrack.”\n\nA file will appear in the Commun folder named ORDERS.R.\n\nRename it to ORDERS1.CSV (or the next number available).\n\nOpen DispatchTrack → Orders → Import and verify orders in Telnet.\n\nUpload the Excel file and proceed to Routing.\n\nBuild routes as in RNA, focusing on compactness and time windows.\n\nName and save routes (e.g., D5M Manhattan Schools). DispatchTrack does not auto-save.\n\nPreparation and Timing\n\nThroughout the day, preparation is key. Take downloads through Telnet and start building routes every 45 minutes before 5 PM. This ensures a fast turnaround once all orders are finalized. Email sales reps during the day with any questions about delivery windows or customer notes.\n\nBy being proactive, routing can meet the 5:15 PM deadline so that night crews can begin loading trucks on time. If routing is delayed, the entire delivery chain suffers.",
+      "chunk_token_count": 500
+    },
+    {
+      "id": "warehouse_routing_introduction_2",
+      "category": "routing",
+      "section_title": "Introduction",
+      "keywords": [
+        "routing",
+        "backhauls",
+        "full",
+        "possible",
+        "chun",
+        "delivery",
+        "process",
+        "efficiency",
+        "truck",
+        "leave"
+      ],
+      "content": "Backhauls and Efficiency\n\nEvery truck should leave full and return full. Returning full is made possible through backhauls, managed by Chun. Chun schedules pickups for trucks to collect products on their way back. You can view backhauls in Telnet by entering 9, 3, PO#.\n\nWhy Routing is important:\n\nRouting is the backbone of the delivery process at Driscoll Foods. It ensures every customer’s order is planned, organized, and delivered efficiently. By using RNA and DispatchTrack correctly, paying attention to delivery windows, cubes, and notes, and communicating with drivers and sales, routing makes the entire distribution process possible.\n\nBeing precise, proactive, and on time are the keys to successful routing.",
+      "chunk_token_count": 177
+    }
+  ]
+}

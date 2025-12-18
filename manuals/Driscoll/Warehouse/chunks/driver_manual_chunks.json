@@ -1,0 +1,66 @@
+{
+  "knowledge_base": "driscoll_warehouse_driver_manual",
+  "version": "1.0",
+  "description": "Warehouse driver processes and procedures",
+  "source_file": "driver manual.docx",
+  "file_hash": "fc0e922ea4f5d05fb85ce853a39235f8f5ac9041785b1e1c2d317341c08d2582",
+  "chunks": [
+    {
+      "id": "warehouse_driver_introduction_0",
+      "category": "driver",
+      "section_title": "Introduction",
+      "keywords": [
+        "drivers",
+        "school",
+        "deliveries",
+        "street",
+        "products",
+        "nyc",
+        "schedules",
+        "loading",
+        "trailer",
+        "backhauls"
+      ],
+      "content": "Driver Manual (Night, Street, and School Drivers)\n\nOverview\nDrivers at Driscoll Foods are responsible for delivering products safely, efficiently, and accurately to our customers. Drivers serve as the face of the company and are essential to operations. Driscoll Foods employs:\n\nStreet Drivers – Handle customer deliveries in NYC and surrounding areas\n\nSchool Drivers – Deliver to schools with strict schedules and fines for errors\n\nHelper Drivers – Assist main drivers with loading/unloading and case management\n\nTractor-Trailer Drivers – Handle long-haul deliveries, transfers, and backhauls\n\nEvery driver must adhere to company safety policies, DOT regulations, and delivery schedules, ensuring products arrive in excellent condition and on time.\n\nShift Times & Flexibility\n\nStreet Drivers (NYC): Start times vary, typically 3:00 AM for Manhattan or 5:00 AM for other NYC routes\n\nSchool Drivers: Start earlier (around 2:30–3:00 AM) to ensure on-time delivery by school deadlines\n\nHelper Drivers: Follow assigned drivers’ schedules\n\nTractor-Trailer Drivers: Start times vary depending on routes, pickups, and backhauls\n\nEnd-of-Shift: Drivers finish when all deliveries, backhauls, and paperwork are complete, which varies daily\n\nDOT Compliance: All drivers must follow hours-of-service regulations, including mandatory rest breaks, driving limits, and accurate logging in electronic logging devices (ELDs)\n\nClock-In & Pre-Route Preparation\n\nClock in at the waiting area upon arrival\n\nObtain all necessary route documents from the dispatcher:\n\nLoading sheets\n\nCustomer invoices\n\nKeydrop forms and keys\n\nE-jack batteries (if applicable)\n\nReview the loading report:\n\nConfirms number of cases per stop\n\nDifferentiates refrigerated, frozen, and dry products\n\nIdentifies special instructions, such as keydrop deliveries or time-sensitive school deliveries\n\nVerify assigned truck/trailer and route ID in Omnitracs\n\nInspect vehicle and equipment:\n\nE-jacks, handtrucks, straps, blankets, pallets\n\nConfirm battery and vehicle readiness",
+      "chunk_token_count": 481
+    },
+    {
+      "id": "warehouse_driver_introduction_1",
+      "category": "driver",
+      "section_title": "Introduction",
+      "keywords": [
+        "deliveries",
+        "route",
+        "ensure",
+        "items",
+        "check",
+        "loading",
+        "truck",
+        "refrigerated",
+        "frozen",
+        "dry"
+      ],
+      "content": "Ensure DOT compliance: check hours available for driving, inspect vehicle for roadworthiness, and confirm all required safety equipment is onboard\n\nLoading & Route Setup\n\nOrganize truck according to route layout:\n\nLast stops go to the nose of the truck, first stops go to the tail\n\nRefrigerated, frozen, and dry sections are clearly separated\n\nPallets are secured, strapping taller pallets if necessary\n\nReview route-specific instructions:\n\nKeydrop instructions, arrival time windows, school delivery times\n\nAdjust loading to ensure quick unloading and minimal handling\n\nHelper coordination:\n\nAssign refrigerated/frozen items to the helper\n\nAssign dry items to the driver for maximum efficiency\n\nCheck route against invoices: ensure all pallets are present and match route requirements\n\nDelivery Procedures\nStreet Deliveries\n\nFollow loading sheet and invoices to deliver products to each stop\n\nCheck labels AND case product names to prevent mispicks\n\nUse handtrucks and e-jacks efficiently, placing items in correct customer locations\n\nKeydrop deliveries: ensure codes are followed, lock doors, and photograph deliveries for proof\n\nMark all delivered items on the front sheet of the invoice\n\nMaintain professional customer interactions; courteous, patient behavior is critical\n\nFollow time windows; do not arrive too early or late\n\nSchool Deliveries\n\nMust adhere to strict delivery schedules, often by 2:00 PM for NYC schools\n\nDeliveries include case counts, frozen, refrigerated, and dry products\n\nSchools are subject to fines for missing cases ($500 per case)\n\nBe patient and courteous with school staff; handle challenges calmly\n\nVerify deliveries by marking on invoices and obtaining staff confirmation\n\nTractor-Trailer Deliveries & Backhauls\n\nHandle long-haul deliveries to other Driscoll Foods locations or customer warehouses\n\nTransfers may require relinking trailers or picking up backhaul products\n\nMaintain correct routing for backhauls, ensuring trucks return full to maximize efficiency\n\nFollow all safety protocols, secure loads, and track truck positions accurately in Omnitracs",
+      "chunk_token_count": 497
+    },
+    {
+      "id": "warehouse_driver_introduction_2",
+      "category": "driver",
+      "section_title": "Introduction",
+      "keywords": [
+        "safety",
+        "drivers",
+        "driving",
+        "deliveries",
+        "dot",
+        "use",
+        "company",
+        "regulations",
+        "follow",
+        "handtrucks"
+      ],
+      "content": "Safety & Compliance\n\nAll drivers must adhere to DOT regulations, including:\n\nMaximum driving hours\n\nRequired rest breaks\n\nAccurate log entries in ELDs\n\nMaintain safe driving practices:\n\nNo hard braking, aggressive acceleration, or distracted driving\n\nUse seatbelts and follow traffic laws\n\nFollow company safety protocols:\n\nCheck pallets for stability\n\nUse handtrucks, e-jacks, and straps safely\n\nReport any accidents or near-misses immediately\n\nEnd-of-Shift Procedures\n\nReturn to warehouse after completing deliveries, transfers, and backhauls\n\nPark assigned truck/trailer at designated loading doors\n\nReturn equipment:\n\nHandtrucks\n\nE-jack batteries\n\nStraps and blankets\n\nComplete paperwork:\n\nUndelivered cases, damages, or mispicks\n\nRoute confirmations and backhaul updates\n\nClock out once all tasks are complete\n\nPerformance & Incentives\n\nDrivers are paid hourly plus potential incentives for productivity\n\nAccuracy and efficiency are critical; mispicks or delayed deliveries impact bonuses\n\nNetradyne cameras monitor driving behavior and contribute to driver scores\n\nFollowing DOT and company procedures ensures safety, reliability, and full incentive eligibility\n\nKey Takeaways\n\nDrivers must balance speed, efficiency, and accuracy\n\nProper route preparation and equipment use are critical to completing deliveries safely\n\nCustomer interaction is vital; drivers represent Driscoll Foods professionally\n\nAll activities must comply with DOT regulations and company safety policies\n\nFlexibility is essential; shift end depends on completion of all deliveries and paperwork",
+      "chunk_token_count": 363
+    }
+  ]
+}
