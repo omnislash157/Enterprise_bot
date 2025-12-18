@@ -57,7 +57,7 @@ class ThoughtType(Enum):
 class CognitiveOutput:
     """
     A single unit of agent cognition that becomes memory.
-    
+
     This is the recursive hook - every output becomes input.
     The model literally remembers everything it ever said.
     """
@@ -66,20 +66,24 @@ class CognitiveOutput:
     thought_type: ThoughtType
     content: str
     reasoning: Optional[str] = None
-    
+
     # Provenance - what memories led to this thought
     source_memory_ids: List[str] = field(default_factory=list)
-    
+
     # Cognitive state at time of generation
     cognitive_phase: Optional[str] = None
     confidence: float = 0.8
     gap_severity: Optional[float] = None
-    
+
     # Clustering (filled by pipeline)
     cluster_id: Optional[int] = None
     cluster_confidence: Optional[float] = None
     is_new_cluster: bool = False
-    
+
+    # Auth scoping (Phase 3)
+    user_id: Optional[str] = None
+    tenant_id: Optional[str] = None
+
     # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
     
@@ -92,13 +96,15 @@ class CognitiveOutput:
         source_memory_ids: Optional[List[str]] = None,
         cognitive_phase: Optional[str] = None,
         confidence: float = 0.8,
+        user_id: Optional[str] = None,
+        tenant_id: Optional[str] = None,
         **metadata
     ) -> "CognitiveOutput":
         """Factory method with auto-generated ID and timestamp."""
         thought_id = hashlib.sha256(
             f"{time.time()}_{content[:50]}".encode()
         ).hexdigest()[:16]
-        
+
         return cls(
             id=thought_id,
             timestamp=datetime.now(),
@@ -108,6 +114,8 @@ class CognitiveOutput:
             source_memory_ids=source_memory_ids or [],
             cognitive_phase=cognitive_phase,
             confidence=confidence,
+            user_id=user_id,
+            tenant_id=tenant_id,
             metadata=metadata
         )
     
@@ -135,6 +143,8 @@ class CognitiveOutput:
             created_at=self.timestamp,
             human_content=" | ".join(human_parts),
             assistant_content=self.content,
+            user_id=self.user_id,  # Phase 3: Auth scoping
+            tenant_id=self.tenant_id,  # Phase 3: Auth scoping
             cluster_id=self.cluster_id,
             cluster_confidence=self.cluster_confidence or 0.0,
             tags={
@@ -157,6 +167,8 @@ class CognitiveOutput:
             "cognitive_phase": self.cognitive_phase,
             "confidence": self.confidence,
             "gap_severity": self.gap_severity,
+            "user_id": self.user_id,
+            "tenant_id": self.tenant_id,
             "cluster_id": self.cluster_id,
             "cluster_confidence": self.cluster_confidence,
             "is_new_cluster": self.is_new_cluster,
@@ -459,7 +471,9 @@ def create_response_output(
     content: str,
     source_memory_ids: List[str],
     cognitive_phase: str,
-    confidence: float = 0.8
+    confidence: float = 0.8,
+    user_id: Optional[str] = None,
+    tenant_id: Optional[str] = None,
 ) -> CognitiveOutput:
     """Create a standard response output."""
     return CognitiveOutput.create(
@@ -467,7 +481,9 @@ def create_response_output(
         content=content,
         source_memory_ids=source_memory_ids,
         cognitive_phase=cognitive_phase,
-        confidence=confidence
+        confidence=confidence,
+        user_id=user_id,
+        tenant_id=tenant_id,
     )
 
 

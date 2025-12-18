@@ -101,6 +101,10 @@ class MemoryNode:
     source: Source                   # Provider
     created_at: datetime             # When this exchange happened
 
+    # ─── Auth Scoping (Phase 3) ───────────────────────────────────────
+    user_id: Optional[str] = None    # For personal SaaS (user isolation)
+    tenant_id: Optional[str] = None  # For enterprise (tenant isolation)
+
     # ─── Embedding ────────────────────────────────────────────────────
     embedding: Optional[List[float]] = None  # BGE-M3 1024-dim vector
 
@@ -160,6 +164,8 @@ class MemoryNode:
             "assistant_content": self.assistant_content,
             "source": self.source.value,
             "created_at": self.created_at.isoformat(),
+            "user_id": self.user_id,
+            "tenant_id": self.tenant_id,
             "intent_type": self.intent_type.value,
             "complexity": self.complexity.value,
             "technical_depth": self.technical_depth,
@@ -189,6 +195,9 @@ class MemoryNode:
         data["conversation_mode"] = ConversationMode(data["conversation_mode"])
         if data.get("last_accessed"):
             data["last_accessed"] = datetime.fromisoformat(data["last_accessed"])
+        # Backwards compatibility: set defaults if auth fields missing
+        data.setdefault("user_id", None)
+        data.setdefault("tenant_id", None)
         # Don't load embedding from dict - loaded separately from numpy
         data.pop("embedding", None)
         return cls(**data)

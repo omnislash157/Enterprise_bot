@@ -106,6 +106,8 @@ class ProcessMemoryRetriever:
         top_k: int = 10,
         relevance_threshold: float = 0.5,
         cluster_boost: float = 0.1,
+        user_id: str = None,
+        tenant_id: str = None,
     ) -> Tuple[List[MemoryNode], List[float]]:
         """
         Retrieve relevant memory nodes.
@@ -115,16 +117,47 @@ class ProcessMemoryRetriever:
             top_k: Max results to return
             relevance_threshold: Minimum similarity score
             cluster_boost: Bonus for nodes in high-similarity clusters
+            user_id: Filter by user_id (personal SaaS)
+            tenant_id: Filter by tenant_id (enterprise)
 
         Returns:
             Tuple of (nodes, scores)
         """
+        # ===== PHASE 3: AUTH SCOPING - FAIL SECURE =====
+        # Filter nodes BEFORE similarity search to prevent cross-user/tenant leakage
+        filtered_indices = []
+
+        if tenant_id:
+            # Enterprise mode: filter by tenant_id
+            for idx in self.valid_indices:
+                node_tenant = getattr(self.nodes[idx], 'tenant_id', None)
+                if node_tenant == tenant_id:
+                    filtered_indices.append(idx)
+        elif user_id:
+            # Personal mode: filter by user_id
+            for idx in self.valid_indices:
+                node_user = getattr(self.nodes[idx], 'user_id', None)
+                if node_user == user_id:
+                    filtered_indices.append(idx)
+        else:
+            # No auth context = no results (FAIL SECURE)
+            logger.warning("No auth context provided (user_id or tenant_id) - returning empty results")
+            return [], []
+
+        # If no nodes match the scope, return empty
+        if not filtered_indices:
+            logger.info(f"No memories found for scope: user_id={user_id}, tenant_id={tenant_id}")
+            return [], []
+
+        # Use filtered indices for retrieval
+        scoped_indices = filtered_indices
+
         # Normalize query
         query_norm = query_embedding / (np.linalg.norm(query_embedding) + 1e-8)
 
-        # Compute similarities to all valid nodes
-        valid_embeddings = self.normalized[self.valid_indices]
-        similarities = valid_embeddings @ query_norm
+        # Compute similarities to scoped nodes only
+        scoped_embeddings = self.normalized[scoped_indices]
+        similarities = scoped_embeddings @ query_norm
 
         # Cluster boosting: if query is similar to cluster centroid,
         # boost all members of that cluster
@@ -135,8 +168,8 @@ class ProcessMemoryRetriever:
             }
 
             # Boost nodes in relevant clusters
-            boosts = np.zeros(len(self.valid_indices))
-            for i, idx in enumerate(self.valid_indices):
+            boosts = np.zeros(len(scoped_indices))
+            for i, idx in enumerate(scoped_indices):
                 cluster_id = self.nodes[idx].cluster_id
                 if cluster_id in cluster_sims and cluster_sims[cluster_id] > relevance_threshold:
                     boosts[i] = cluster_boost * cluster_sims[cluster_id]
@@ -154,7 +187,7 @@ class ProcessMemoryRetriever:
             if similarities[i] < relevance_threshold:
                 break
 
-            node_idx = self.valid_indices[i]
+            node_idx = scoped_indices[i]
             results.append(self.nodes[node_idx])
             scores.append(float(similarities[i]))
 
@@ -615,6 +648,8 @@ class DualRetriever:
         episodic_top_k: int = 20,  # High limit, let threshold do the work
         process_threshold: float = 0.5,  # Relevance threshold - scatter brain friendly
         episodic_threshold: float = 0.5,  # Relevance threshold
+        user_id: str = None,
+        tenant_id: str = None,
     ) -> RetrievalResult:
         """
         Retrieve from both memory systems.
@@ -625,6 +660,8 @@ class DualRetriever:
             episodic_top_k: Max episodic memories to return
             process_threshold: Min relevance for process memories
             episodic_threshold: Min relevance for episodic memories
+            user_id: Filter by user_id (personal SaaS)
+            tenant_id: Filter by tenant_id (enterprise)
 
         Returns:
             RetrievalResult with both memory types
@@ -636,12 +673,17 @@ class DualRetriever:
         query_embedding = await self.embedder.embed_single(query)
 
         # Retrieve from both systems in parallel (they're sync but fast)
+        # PHASE 3: Pass auth context for scoped retrieval
         process_results, process_scores = self.process.retrieve(
             query_embedding,
             top_k=process_top_k,
             relevance_threshold=process_threshold,
+            user_id=user_id,
+            tenant_id=tenant_id,
         )
 
+        # Note: Episodic retriever filtering can be added later if needed
+        # For now, process memory filtering is the primary concern
         episodic_results, episodic_scores = self.episodic.retrieve(
             query,
             query_embedding,

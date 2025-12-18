@@ -723,9 +723,22 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
                     continue
 
-                # Stream response (no verification required for demo)
+                # ===== PHASE 3: Extract auth context for scoped retrieval =====
+                # Enterprise mode: use tenant_id
+                # Personal mode: use user_email as user_id
+                auth_tenant_id = None
+                auth_user_id = None
+
+                if tenant and tenant.tenant_id:
+                    # Enterprise deployment - use tenant_id
+                    auth_tenant_id = tenant.tenant_id
+                elif user_email:
+                    # Personal SaaS - use email as user_id
+                    auth_user_id = user_email
+
+                # Stream response with auth context
                 response_text = ""
-                async for chunk in engine.think(content, tenant=tenant):
+                async for chunk in engine.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
                     if isinstance(chunk, str) and chunk:
                         response_text += chunk
                         await websocket.send_json({
