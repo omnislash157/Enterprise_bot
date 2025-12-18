@@ -34,9 +34,39 @@ except ImportError:
     except ImportError:
         READLINE_AVAILABLE = False
 
+import select
+
+def input_with_timeout(prompt: str, timeout: float = 60.0) -> str | None:
+    """Non-blocking input with timeout. Returns None on timeout."""
+    print(prompt, end='', flush=True)
+    if sys.platform == 'win32':
+        # Windows fallback - no select on stdin, use threading
+        import threading
+        result = [None]
+        def get_input():
+            try:
+                result[0] = sys.stdin.readline().rstrip('\n')
+            except:
+                pass
+        thread = threading.Thread(target=get_input, daemon=True)
+        thread.start()
+        thread.join(timeout)
+        if thread.is_alive():
+            print(f"\n{Colors.YELLOW}[Timeout after {timeout}s - continuing]{Colors.RESET}")
+            return None
+        return result[0]
+    else:
+        # Unix - use select
+        ready, _, _ = select.select([sys.stdin], [], [], timeout)
+        if ready:
+            return sys.stdin.readline().rstrip('\n')
+        print(f"\n{Colors.YELLOW}[Timeout after {timeout}s - continuing]{Colors.RESET}")
+        return None
+
+
 try:
     from claude_agent_sdk import (
-        ClaudeSDKClient, 
+        ClaudeSDKClient,
         ClaudeAgentOptions,
         AssistantMessage,
         ResultMessage,
@@ -48,6 +78,13 @@ try:
 except ImportError:
     SDK_AVAILABLE = False
     print("Warning: claude_agent_sdk not installed. Running in simulation mode.")
+
+# Database tools
+try:
+    from db_tools import DatabaseTool, get_db
+    DB_TOOLS_AVAILABLE = True
+except ImportError:
+    DB_TOOLS_AVAILABLE = False
     print("Install with: pip install claude-agent-sdk")
 
 
@@ -75,6 +112,34 @@ ALL_TOOLS = [
     "Task", "Skill"
 ]
 
+# Skills system - lazy-loaded documentation
+SKILLS_DIR = Path(__file__).parent / "skills"
+SKILLS_INDEX = """# Available Skills
+| Skill | Description |
+|-------|-------------|
+| db | PostgreSQL queries, schema, CSV export |
+| etl | ETL pipeline generation |
+| excel | Excel/XLSX export with formatting |
+| powerbi | Power BI dataset push, DAX |
+| schema | Schema design, migrations |
+| profile | Data profiling, quality checks |
+
+Use /skill <name> to load skill docs into context."""
+
+def load_skill(skill_name: str) -> str | None:
+    """Load a skill's documentation file."""
+    skill_file = SKILLS_DIR / f"{skill_name}.skill.md"
+    if skill_file.exists():
+        return skill_file.read_text()
+    return None
+
+def get_available_skills() -> list[str]:
+    """Get list of available skill names."""
+    if not SKILLS_DIR.exists():
+        return []
+    return [f.stem.replace(".skill", "") for f in SKILLS_DIR.glob("*.skill.md")]
+
+
 # Preset prompts for common tasks
 PROMPTS = {
     "nerve0": """Create src/lib/components/nervecenter/StateMonitor.svelte - a debug panel showing live state. First read src/lib/stores/session.ts to understand the store. Track isStreaming, currentStream.length, phase. Log state changes with timestamps. Cyberpunk styling with #00ff41 green accents. Add to Nerve Center page.""",
@@ -98,7 +163,10 @@ class ClaudeCLI:
         self.client = None
         self.session_active = False
         self.history_file = Path.home() / ".claude_chat_history"
-        
+        self.input_timeout = 60.0  # Default 60s timeout, None to disable
+        self.db = None  # Database tool instance
+        self.loaded_skills = set()  # Track which skills are loaded
+
         # Setup readline history (if available)
         if READLINE_AVAILABLE:
             if self.history_file.exists():
@@ -126,9 +194,19 @@ Type /help for commands, /quit to exit{Colors.RESET}
   {Colors.CYAN}/tools add <t>{Colors.RESET}    Add tool (e.g., /tools add WebSearch)
   {Colors.CYAN}/tools rm <t>{Colors.RESET}     Remove tool
   {Colors.CYAN}/clear{Colors.RESET}            Start fresh session (clears context)
+  {Colors.CYAN}/timeout <s>{Colors.RESET}      Set input timeout (seconds), 'off' to disable
   {Colors.CYAN}/status{Colors.RESET}           Show current config
   {Colors.CYAN}/load <file>{Colors.RESET}      Load prompt from file and execute
   {Colors.CYAN}/prompt <name>{Colors.RESET}    Run predefined prompt (nerve0, nerve1, phase5wire, cleanup)
+  {Colors.CYAN}/db{Colors.RESET}               Connect to database
+  {Colors.CYAN}/db tables{Colors.RESET}        List all tables
+  {Colors.CYAN}/db describe <t>{Colors.RESET}  Show table structure
+  {Colors.CYAN}/db query <sql>{Colors.RESET}   Run SQL query
+  {Colors.CYAN}/db csv <t> <f>{Colors.RESET}   Export table/query to CSV file
+  {Colors.CYAN}/skill{Colors.RESET}            List available skills
+  {Colors.CYAN}/skill <name>{Colors.RESET}     Load skill docs into context
+  {Colors.CYAN}/paste{Colors.RESET}            Multi-line paste mode (end with empty line)
+  {Colors.CYAN}/batch <file>{Colors.RESET}     Run commands from file
   {Colors.CYAN}/quit{Colors.RESET}             Exit
 
 {Colors.BOLD}Tips:{Colors.RESET}
@@ -197,6 +275,22 @@ Type /help for commands, /quit to exit{Colors.RESET}
                 else:
                     print(f"{Colors.RED}Not enabled: {tool}{Colors.RESET}")
                     
+        elif command == "/timeout":
+            if len(parts) < 2:
+                timeout_str = f"{self.input_timeout}s" if self.input_timeout else "disabled"
+                print(f"{Colors.DIM}Input timeout: {timeout_str}{Colors.RESET}")
+            else:
+                val = parts[1].lower()
+                if val in ["off", "none", "0"]:
+                    self.input_timeout = None
+                    print(f"{Colors.GREEN}Input timeout disabled{Colors.RESET}")
+                else:
+                    try:
+                        self.input_timeout = float(val)
+                        print(f"{Colors.GREEN}Input timeout: {self.input_timeout}s{Colors.RESET}")
+                    except ValueError:
+                        print(f"{Colors.RED}Invalid timeout. Use number or 'off'{Colors.RESET}")
+
         elif command == "/clear":
             self.session_active = False
             self.client = None
@@ -235,6 +329,141 @@ Type /help for commands, /quit to exit{Colors.RESET}
                     return ("execute", prompt)
                 else:
                     print(f"{Colors.RED}Unknown preset: {name}. Available: {', '.join(PROMPTS.keys())}{Colors.RESET}")
+
+        elif command == "/db":
+            if not DB_TOOLS_AVAILABLE:
+                print(f"{Colors.RED}Database tools not available. Install: pip install psycopg2-binary tabulate{Colors.RESET}")
+            elif len(parts) == 1:
+                # Just /db - connect to database
+                if self.db is None:
+                    self.db = DatabaseTool()
+                if self.db.connect():
+                    print(f"{Colors.DIM}Use /db tables, /db describe <table>, /db query <sql>{Colors.RESET}")
+            elif parts[1] == "tables":
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                self.db.tables()
+            elif parts[1] == "schemas":
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                self.db.schemas()
+            elif parts[1] == "describe" and len(parts) > 2:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                self.db.describe(parts[2])
+            elif parts[1] == "indexes" and len(parts) > 2:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                self.db.indexes(parts[2])
+            elif parts[1] == "query" and len(parts) > 2:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                # Rejoin the SQL query parts
+                sql = cmd.split(maxsplit=2)[2] if len(cmd.split(maxsplit=2)) > 2 else ""
+                self.db.query(sql)
+            elif parts[1] == "csv" and len(parts) > 3:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                table_or_sql = parts[2]
+                filepath = parts[3]
+                self.db.to_csv(table_or_sql, filepath)
+            elif parts[1] == "sample" and len(parts) > 2:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                table = parts[2]
+                n = int(parts[3]) if len(parts) > 3 else 10
+                self.db.sample(table, n)
+            elif parts[1] == "count" and len(parts) > 2:
+                if self.db is None:
+                    self.db = DatabaseTool()
+                    self.db.connect()
+                self.db.count(parts[2])
+            elif parts[1] == "disconnect":
+                if self.db:
+                    self.db.disconnect()
+                    self.db = None
+            else:
+                print(f"""{Colors.CYAN}Database commands:{Colors.RESET}
+  /db              Connect to database
+  /db tables       List all tables
+  /db schemas      List all schemas
+  /db describe <t> Show table structure
+  /db indexes <t>  Show table indexes
+  /db query <sql>  Run SQL query
+  /db sample <t> [n] Get n random rows (default 10)
+  /db count <t>    Count rows in table
+  /db csv <t> <f>  Export table to CSV file
+  /db disconnect   Close connection""")
+
+        elif command == "/skill":
+            available = get_available_skills()
+            if len(parts) == 1:
+                # List skills
+                print(f"\n{Colors.CYAN}Available Skills:{Colors.RESET}")
+                print(SKILLS_INDEX)
+                if self.loaded_skills:
+                    print(f"\n{Colors.GREEN}Loaded:{Colors.RESET} {', '.join(self.loaded_skills)}")
+            else:
+                skill_name = parts[1].lower()
+                if skill_name in available:
+                    skill_doc = load_skill(skill_name)
+                    if skill_doc:
+                        self.loaded_skills.add(skill_name)
+                        print(f"{Colors.GREEN}Loaded skill: {skill_name}{Colors.RESET}")
+                        print(f"{Colors.DIM}({len(skill_doc)} chars added to context){Colors.RESET}")
+                        # Return the skill doc to be injected into the next prompt
+                        return ("skill_loaded", skill_name, skill_doc)
+                    else:
+                        print(f"{Colors.RED}Could not load skill: {skill_name}{Colors.RESET}")
+                else:
+                    print(f"{Colors.RED}Unknown skill: {skill_name}{Colors.RESET}")
+                    print(f"{Colors.DIM}Available: {', '.join(available)}{Colors.RESET}")
+
+        elif command == "/skills":
+            # Alias for /skill
+            print(f"\n{Colors.CYAN}Available Skills:{Colors.RESET}")
+            print(SKILLS_INDEX)
+            if self.loaded_skills:
+                print(f"\n{Colors.GREEN}Loaded:{Colors.RESET} {', '.join(self.loaded_skills)}")
+
+        elif command == "/paste":
+            # Multi-line paste mode - read until empty line or EOF
+            print(f"{Colors.DIM}Paste mode: Enter commands/text, end with empty line or Ctrl+D{Colors.RESET}")
+            lines = []
+            while True:
+                try:
+                    line = input(f"{Colors.DIM}...{Colors.RESET} ")
+                    if not line.strip():  # Empty line ends paste
+                        break
+                    lines.append(line)
+                except EOFError:
+                    break
+            if lines:
+                combined = '\n'.join(lines)
+                print(f"{Colors.GREEN}Captured {len(lines)} lines ({len(combined)} chars){Colors.RESET}")
+                return ("execute", combined)
+
+        elif command == "/batch":
+            # Execute multiple commands from a file
+            if len(parts) < 2:
+                print(f"{Colors.RED}Usage: /batch <filepath>{Colors.RESET}")
+            else:
+                filepath = Path(parts[1]).expanduser()
+                if filepath.exists():
+                    commands = filepath.read_text().strip().split('\n')
+                    commands = [c.strip() for c in commands if c.strip() and not c.startswith('#')]
+                    print(f"{Colors.GREEN}Loaded {len(commands)} commands from {filepath}{Colors.RESET}")
+                    # Return batch for processing
+                    return ("batch", commands)
+                else:
+                    print(f"{Colors.RED}File not found: {filepath}{Colors.RESET}")
 
         else:
             print(f"{Colors.RED}Unknown command: {command}. Type /help for commands.{Colors.RESET}")
@@ -317,14 +546,26 @@ Type /help for commands, /quit to exit{Colors.RESET}
             
         print()  # Blank line after response
 
-    def get_multiline_input(self, prompt: str) -> str:
-        """Get input that may span multiple lines (ending with \\)."""
+    def get_multiline_input(self, prompt: str, timeout: float = None) -> str:
+        """Get input that may span multiple lines (ending with \\).
+
+        Args:
+            prompt: The prompt to display
+            timeout: Optional timeout in seconds. None = wait forever (default behavior)
+        """
         lines = []
         current_prompt = prompt
-        
+
         while True:
             try:
-                line = input(current_prompt)
+                if timeout is not None:
+                    line = input_with_timeout(current_prompt, timeout)
+                    if line is None:
+                        # Timeout - return what we have or None
+                        return '\n'.join(lines) if lines else None
+                else:
+                    line = input(current_prompt)
+
                 if line.endswith('\\'):
                     lines.append(line[:-1])  # Remove trailing backslash
                     current_prompt = f"{Colors.DIM}...{Colors.RESET} "
@@ -333,7 +574,7 @@ Type /help for commands, /quit to exit{Colors.RESET}
                     break
             except EOFError:
                 return None
-                
+
         return '\n'.join(lines)
 
     async def run(self):
@@ -343,7 +584,7 @@ Type /help for commands, /quit to exit{Colors.RESET}
         while True:
             try:
                 # Get input
-                user_input = self.get_multiline_input(f"{Colors.CYAN}You:{Colors.RESET} ")
+                user_input = self.get_multiline_input(f"{Colors.CYAN}You:{Colors.RESET} ", self.input_timeout)
                 
                 if user_input is None:
                     break
@@ -363,13 +604,39 @@ Type /help for commands, /quit to exit{Colors.RESET}
                     result = self.handle_command(user_input)
                     if result is None:  # /quit
                         break
-                    if isinstance(result, tuple) and result[0] == "execute":
-                        # Execute loaded prompt
-                        await self.send_message(result[1])
+                    if isinstance(result, tuple):
+                        if result[0] == "execute":
+                            # Execute loaded prompt
+                            await self.send_message(result[1])
+                        elif result[0] == "skill_loaded":
+                            # Skill loaded - store for next message context
+                            skill_name, skill_doc = result[1], result[2]
+                            # Inject skill context into system prompt temporarily
+                            print(f"{Colors.DIM}Skill '{skill_name}' ready. Your next message will include this context.{Colors.RESET}")
+                            # Store pending skill context
+                            if not hasattr(self, '_pending_skill_context'):
+                                self._pending_skill_context = ""
+                            self._pending_skill_context += f"\n\n---\n# Skill: {skill_name}\n{skill_doc}"
+                        elif result[0] == "batch":
+                            # Execute batch commands sequentially
+                            for i, batch_cmd in enumerate(result[1], 1):
+                                print(f"{Colors.DIM}[{i}/{len(result[1])}] {batch_cmd[:50]}...{Colors.RESET}")
+                                if batch_cmd.startswith('/'):
+                                    batch_result = self.handle_command(batch_cmd)
+                                    if isinstance(batch_result, tuple) and batch_result[0] == "execute":
+                                        await self.send_message(batch_result[1])
+                                else:
+                                    await self.send_message(batch_cmd)
                     continue
-                
+
+                # Check for pending skill context and prepend to message
+                skill_prefix = ""
+                if hasattr(self, '_pending_skill_context') and self._pending_skill_context:
+                    skill_prefix = f"[SKILL CONTEXT]{self._pending_skill_context}\n[END SKILL CONTEXT]\n\n"
+                    self._pending_skill_context = ""  # Clear after use
+
                 # Send to Claude
-                await self.send_message(user_input)
+                await self.send_message(skill_prefix + user_input)
                 
             except KeyboardInterrupt:
                 print(f"\n{Colors.DIM}(Use /quit to exit){Colors.RESET}")
