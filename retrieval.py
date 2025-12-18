@@ -498,13 +498,16 @@ class DualRetriever:
                 logger.warning(f"Failed to load cluster schema: {e}")
 
         # Build grep engine for exact keyword search
-        grep_engine = MemoryGrep(nodes)
-        logger.info(f"MemoryGrep: indexed {len(nodes)} nodes, {len(grep_engine.inverted_index)} unique terms")
+        grep_engine = MemoryGrep(nodes) if nodes else None
+        if grep_engine:
+            logger.info(f"MemoryGrep: indexed {len(nodes)} nodes, {len(grep_engine.inverted_index)} unique terms")
+        else:
+            logger.info("MemoryGrep: no nodes to index, grep engine disabled")
 
         # Build hybrid search engine (semantic + keyword)
         # Uses FAISS index for semantic search, BM25 for keyword
         hybrid_engine = None
-        if faiss_index is not None:
+        if faiss_index is not None and nodes:
             hybrid_engine = create_hybrid_search(
                 nodes=nodes,
                 embeddings=node_embeddings,
@@ -514,7 +517,10 @@ class DualRetriever:
             )
             logger.info("HybridSearch: semantic + keyword search enabled")
         else:
-            logger.warning("HybridSearch: FAISS not available, falling back to BM25 only")
+            if not nodes:
+                logger.info("HybridSearch: no nodes available, hybrid search disabled")
+            else:
+                logger.warning("HybridSearch: FAISS not available, falling back to BM25 only")
 
         return cls(process_retriever, episodic_retriever, embedder, cluster_schema, grep_engine, hybrid_engine)
 

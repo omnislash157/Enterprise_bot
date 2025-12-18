@@ -1,11 +1,10 @@
 """
 Enterprise Bot Backend - Driscoll Foods
-Clean fork with CogTwin dependencies removed.
+Full RAG with CogTwin engine.
 
-This is a "dumb bot" that stuffs manuals into context window.
-No memory pipelines, no FAISS, no embeddings.
+CogTwin provides memory pipelines, vector retrieval, and hybrid search.
 
-Version: 1.0.0 (Enterprise Fork)
+Version: 2.0.0 (CogTwin RAG)
 """
 from __future__ import annotations
 
@@ -42,7 +41,7 @@ class Settings:
 settings = Settings()
 
 # =============================================================================
-# ENTERPRISE IMPORTS - No CogTwin!
+# ENTERPRISE IMPORTS - CogTwin RAG Engine
 # =============================================================================
 
 try:
@@ -53,7 +52,7 @@ try:
         is_enterprise_mode,
         get_ui_features,
     )
-    from enterprise_twin import EnterpriseTwin
+    from cog_twin import CogTwin
     from enterprise_tenant import TenantContext
     CONFIG_LOADED = True
 except ImportError as e:
@@ -325,7 +324,7 @@ if SSO_ROUTES_LOADED:
     logger.info("[STARTUP] SSO routes loaded at /api/auth")
 
 # Global engine instance
-engine: Optional[EnterpriseTwin] = None
+engine: Optional[CogTwin] = None
 
 # =============================================================================
 # STARTUP
@@ -345,14 +344,13 @@ async def startup_event():
     # Load email whitelist
     email_whitelist.load()
 
-    # Initialize enterprise twin (always enterprise mode in this fork)
-    logger.info("[STARTUP] Initializing EnterpriseTwin...")
-    engine = EnterpriseTwin()
+    # Initialize CogTwin (full RAG engine)
+    logger.info("[STARTUP] Initializing CogTwin...")
+    engine = CogTwin()
     await engine.start()
 
-    logger.info(f"[STARTUP] EnterpriseTwin ready")
-    logger.info(f"  Memory mode: {engine._memory_mode}")
-    logger.info(f"  Context stuffing: {engine._context_stuffing_mode}")
+    logger.info(f"[STARTUP] CogTwin ready")
+    logger.info(f"  Memory count: {engine.memory_count}")
     logger.info(f"  Model: {engine.model}")
 
     # Warm up analytics connection pool and query plan cache
