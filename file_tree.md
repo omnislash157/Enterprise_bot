@@ -159,6 +159,10 @@ enterprise_bot/
         │   │   ├── DepartmentSelector.svelte # Dept picker
         │   │   ├── CreditForm.svelte        # Credit request form
         │   │   ├── DupeOverrideModal.svelte # Dupe handling modal
+        │   │   ├── CheekyLoader.svelte      # Personality loading with emerge transition
+        │   │   ├── CheekyInline.svelte      # Minimal inline loader
+        │   │   ├── CheekyToast.svelte       # Standalone toast component
+        │   │   ├── ToastProvider.svelte     # Global toast with context module
         │   │   │
         │   │   ├── ribbon/                    # Intelligence Ribbon (Nav)
         │   │   │   ├── index.ts               # Barrel export
@@ -198,12 +202,18 @@ enterprise_bot/
         │   │       ├── FloatingPanel.svelte
         │   │       └── WorkspaceNav.svelte
         │   │
+        │   ├── cheeky/                       # CheekyLoader Engine
+        │   │   ├── index.ts                 # Barrel export
+        │   │   ├── CheekyStatus.ts          # Phrase rotation, seasonal, config
+        │   │   └── phrases.ts               # 200+ personality phrases + spinners
+        │   │
         │   ├── stores/
         │   │   ├── index.ts                 # Store exports
         │   │   ├── auth.ts                  # Auth state & API
         │   │   ├── admin.ts                 # Admin portal state + CRUD
         │   │   ├── analytics.ts             # Dashboard data store
         │   │   ├── credit.ts                # Credit form state
+        │   │   ├── cheeky.ts                # Cheeky loading state management
         │   │   ├── websocket.ts             # WS connection
         │   │   ├── session.ts               # Chat session
         │   │   ├── config.ts                # App config
