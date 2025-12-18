@@ -120,6 +120,20 @@ memory_pipeline:
   max_batch_size: 10
 
 # =============================================================================
+# MEMORY BACKEND (Phase 5)
+# =============================================================================
+memory:
+  backend: file                 # "file" or "postgres"
+
+  # PostgreSQL configuration (only needed if backend = "postgres")
+  postgres:
+    host: localhost
+    port: 5432
+    database: enterprise_bot
+    user: postgres
+    password: ${POSTGRES_PASSWORD}  # Use env var for secrets
+
+# =============================================================================
 # LOGGING
 # =============================================================================
 logging:
