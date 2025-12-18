@@ -371,6 +371,8 @@ class CogTwin:
         self,
         user_input: str,
         stream: bool = True,
+        user_id: str = None,
+        tenant_id: str = None,
     ) -> AsyncIterator[str]:
         """
         Process user input and generate response.
@@ -420,6 +422,8 @@ class CogTwin:
             user_input,
             process_top_k=cfg("retrieval.process_top_k", 10),
             episodic_top_k=cfg("retrieval.episodic_top_k", 5),
+            user_id=user_id,
+            tenant_id=tenant_id,
         )
 
         retrieval_time = (time.time() - retrieval_start) * 1000
@@ -932,7 +936,9 @@ class CogTwin:
             content=full_response,
             source_memory_ids=[m.id for m in retrieval_result.process_memories[:5]],
             cognitive_phase=cognitive_phase.value,
-            confidence=initial_confidence
+            confidence=initial_confidence,
+            user_id=user_id,
+            tenant_id=tenant_id,
         )
         await self.memory_pipeline.ingest(cognitive_output)
 
