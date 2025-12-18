@@ -3,7 +3,7 @@ Memory Backend Abstraction Layer - Phase 5
 
 Provides pluggable backend support for memory storage:
 - FileBackend: Current JSON file-based storage (default)
-- PostgresBackend: Future SQL-based storage for enterprise scale
+- PostgresBackend: SQL-based storage with pgvector (see postgres_backend.py)
 
 This abstraction layer enables seamless switching between storage backends
 via config.yaml without changing retrieval code.
@@ -31,6 +31,7 @@ Version: 1.0.0 (Phase 5)
 
 import json
 import logging
+import os
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import List, Optional, Tuple, Any, Dict
@@ -38,6 +39,13 @@ from typing import List, Optional, Tuple, Any, Dict
 import numpy as np
 
 from schemas import MemoryNode
+
+# Import real PostgresBackend from postgres_backend.py
+try:
+    from postgres_backend import PostgresBackend as AsyncPostgresBackend
+    POSTGRES_BACKEND_AVAILABLE = True
+except ImportError:
+    POSTGRES_BACKEND_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
@@ -421,134 +429,6 @@ class FileBackend(MemoryBackend):
 
 
 # =============================================================================
-# POSTGRES BACKEND (Future Implementation Stub)
-# =============================================================================
-
-class PostgresBackend(MemoryBackend):
-    """
-    PostgreSQL-based storage backend with pgvector for similarity search.
-
-    Future implementation for Phase 5 that provides:
-    - SQL-based filtering and queries
-    - pgvector extension for efficient similarity search
-    - Better scalability for large deployments
-    - Transaction support and ACID guarantees
-
-    Schema:
-        memory_nodes:
-            id TEXT PRIMARY KEY
-            conversation_id TEXT
-            user_id TEXT
-            tenant_id TEXT
-            human_content TEXT
-            assistant_content TEXT
-            source TEXT
-            created_at TIMESTAMP
-            cluster_id INTEGER
-            metadata JSONB
-
-        memory_embeddings:
-            node_id TEXT REFERENCES memory_nodes(id)
-            embedding VECTOR(1024)
-
-        CREATE INDEX ON memory_nodes(user_id)
-        CREATE INDEX ON memory_nodes(tenant_id)
-        CREATE INDEX ON memory_embeddings USING ivfflat(embedding vector_cosine_ops)
-    """
-
-    def __init__(self, config: Dict[str, Any]):
-        """
-        Initialize PostgreSQL backend.
-
-        Args:
-            config: Database configuration with keys:
-                - host: Database host
-                - port: Database port
-                - database: Database name
-                - user: Database user
-                - password: Database password
-        """
-        self.config = config
-        self.connection = None
-
-        # TODO: Initialize connection pool
-        # import psycopg2
-        # from psycopg2 import pool
-        # self.pool = pool.ThreadedConnectionPool(...)
-
-        logger.warning("PostgresBackend is a stub implementation - not yet functional")
-        raise NotImplementedError("PostgresBackend will be implemented in Phase 5")
-
-    def get_nodes(
-        self,
-        user_id: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-        limit: Optional[int] = None,
-        offset: int = 0,
-    ) -> List[MemoryNode]:
-        """
-        SQL implementation:
-            SELECT * FROM memory_nodes
-            WHERE (user_id = %s OR tenant_id = %s)
-            ORDER BY created_at DESC
-            LIMIT %s OFFSET %s
-        """
-        raise NotImplementedError("PostgresBackend not yet implemented")
-
-    def vector_search(
-        self,
-        query_embedding: np.ndarray,
-        user_id: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-        top_k: int = 10,
-        min_score: float = 0.0,
-    ) -> Tuple[List[MemoryNode], List[float]]:
-        """
-        SQL implementation with pgvector:
-            SELECT n.*, 1 - (e.embedding <=> %s) AS similarity
-            FROM memory_nodes n
-            JOIN memory_embeddings e ON n.id = e.node_id
-            WHERE (n.user_id = %s OR n.tenant_id = %s)
-                AND (1 - (e.embedding <=> %s)) >= %s
-            ORDER BY similarity DESC
-            LIMIT %s
-        """
-        raise NotImplementedError("PostgresBackend not yet implemented")
-
-    def insert_node(self, node: MemoryNode) -> None:
-        """
-        SQL implementation:
-            INSERT INTO memory_nodes (id, conversation_id, ...)
-            VALUES (%s, %s, ...)
-        """
-        raise NotImplementedError("PostgresBackend not yet implemented")
-
-    def get_embeddings(
-        self,
-        user_id: Optional[str] = None,
-        tenant_id: Optional[str] = None,
-    ) -> np.ndarray:
-        """
-        SQL implementation:
-            SELECT e.embedding
-            FROM memory_embeddings e
-            JOIN memory_nodes n ON e.node_id = n.id
-            WHERE (n.user_id = %s OR n.tenant_id = %s)
-        """
-        raise NotImplementedError("PostgresBackend not yet implemented")
-
-    def get_cluster_info(self) -> Dict[int, List[int]]:
-        """
-        SQL implementation:
-            SELECT cluster_id, array_agg(id ORDER BY created_at)
-            FROM memory_nodes
-            WHERE cluster_id IS NOT NULL
-            GROUP BY cluster_id
-        """
-        raise NotImplementedError("PostgresBackend not yet implemented")
-
-
-# =============================================================================
 # FACTORY FUNCTION
 # =============================================================================
 
@@ -597,14 +477,44 @@ def get_backend(config: Dict[str, Any]) -> MemoryBackend:
         return FileBackend(data_dir.resolve())
 
     elif backend_type == "postgres":
-        # Get postgres config
+        # NOTE: AsyncPostgresBackend requires await backend.connect() before use
+        # and all operations are async. CogTwin integration needs async handling.
+
+        if not POSTGRES_BACKEND_AVAILABLE:
+            raise ImportError(
+                "PostgresBackend requested but postgres_backend.py not available. "
+                "Ensure asyncpg and pgvector are installed."
+            )
+
+        # Build connection string from config OR use env var
         pg_config = memory_config.get("postgres", {})
 
-        if not pg_config:
-            raise ValueError("PostgreSQL backend requested but no postgres config provided")
+        # Check for direct connection string first
+        conn_string = pg_config.get("connection_string") or os.getenv("AZURE_PG_CONNECTION_STRING")
 
-        logger.info("Initializing PostgresBackend")
-        return PostgresBackend(pg_config)
+        if not conn_string and pg_config:
+            # Build from components
+            host = pg_config.get("host", "localhost")
+            port = pg_config.get("port", 5432)
+            database = pg_config.get("database", "cogtwin")
+            user = pg_config.get("user", "postgres")
+            password = pg_config.get("password", "")
+
+            # Handle env var substitution in password
+            if password.startswith("${") and password.endswith("}"):
+                env_var = password[2:-1]
+                password = os.getenv(env_var, "")
+
+            conn_string = f"postgresql://{user}:{password}@{host}:{port}/{database}"
+
+        if not conn_string:
+            raise ValueError(
+                "PostgreSQL backend requested but no connection info provided. "
+                "Set memory.postgres config or AZURE_PG_CONNECTION_STRING env var."
+            )
+
+        logger.info("Initializing AsyncPostgresBackend")
+        return AsyncPostgresBackend(conn_string)
 
     else:
         raise ValueError(f"Unknown backend type: {backend_type}. Must be 'file' or 'postgres'")
