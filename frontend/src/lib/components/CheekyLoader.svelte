@@ -76,7 +76,7 @@
                 in:emerge={{ duration: 600, delay: 100 }}
                 out:fade={{ duration: 300 }}
             >
-                {phrase}
+                {phrase}...
             </p>
         {/key}
 
@@ -97,20 +97,9 @@
 <style>
     .cheeky-loader {
         display: flex;
-        align-items: flex-start;
-        gap: 1rem;
-        padding: 1rem 1.25rem;
-
-        background: rgba(0, 255, 65, 0.05);
-        border: 1px solid rgba(0, 255, 65, 0.15);
-        border-radius: 12px;
-
-        animation: pulse-border 2s ease-in-out infinite;
-    }
-
-    @keyframes pulse-border {
-        0%, 100% { border-color: rgba(0, 255, 65, 0.15); }
-        50% { border-color: rgba(0, 255, 65, 0.3); }
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
     }
 
     .spinner-container {
@@ -121,9 +110,8 @@
     }
 
     .spinner {
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         line-height: 1;
-        filter: drop-shadow(0 0 8px rgba(0, 255, 65, 0.5));
     }
 
     .content {
@@ -131,14 +119,13 @@
         min-width: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .phrase {
         margin: 0;
-        color: rgba(255, 255, 255, 0.7);
+        color: #ffffff;
         font-size: 0.9rem;
-        font-style: italic;
         line-height: 1.4;
         min-height: 1.4em;
     }
@@ -176,12 +163,11 @@
 
     /* Size variants */
     .loader-sm {
-        padding: 0.75rem 1rem;
-        gap: 0.75rem;
+        gap: 0.5rem;
     }
 
     .loader-sm .spinner {
-        font-size: 1.25rem;
+        font-size: 1rem;
     }
 
     .loader-sm .phrase {
@@ -189,12 +175,11 @@
     }
 
     .loader-lg {
-        padding: 1.5rem 2rem;
-        gap: 1.25rem;
+        gap: 1rem;
     }
 
     .loader-lg .spinner {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 
     .loader-lg .phrase {
