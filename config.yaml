@@ -75,6 +75,7 @@ docs:
 # VOICE (Professional, not Venom)
 # =============================================================================
 voice:
+  engine: venom                 # venom | enterprise
   style: corporate              # corporate | helpful | troll
   company_name: "Driscoll Foods"
   sign_off: false               # No "- Your AI Assistant" stuff

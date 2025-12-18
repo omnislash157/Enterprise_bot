@@ -53,6 +53,15 @@ class MemoryGrep:
         self.nodes = nodes
         self.node_map = {n.id: n for n in nodes}
 
+        # Handle empty nodes list
+        if not nodes:
+            self.bm25 = None
+            self.corpus = []
+            self.tokenized_corpus = []
+            self.inverted_index: Dict[str, List[Dict]] = defaultdict(list)
+            self.stopwords = set()
+            return
+
         # Build corpus
         self.corpus = [self._get_content(n) for n in nodes]
         self.tokenized_corpus = [self._tokenize(doc) for doc in self.corpus]
@@ -185,6 +194,17 @@ class MemoryGrep:
         Returns:
             GrepResult with hits, frequencies, temporal distribution
         """
+        # Handle empty corpus
+        if self.bm25 is None:
+            return GrepResult(
+                term=term,
+                total_occurrences=0,
+                unique_memories=0,
+                hits=[],
+                temporal_distribution={},
+                co_occurring_terms=[],
+            )
+
         term_lower = term.lower()
         term_tokens = self._tokenize(term_lower)
 
@@ -304,6 +324,9 @@ class MemoryGrep:
         Returns:
             List of (memory_id, score) tuples
         """
+        if self.bm25 is None:
+            return []
+
         tokens = self._tokenize(query)
         scores = self.bm25.get_scores(tokens)
 
@@ -320,6 +343,19 @@ class MemoryGrep:
         """
         Full frequency analysis for a term.
         """
+        # Handle empty corpus
+        if self.bm25 is None:
+            return {
+                "term": term,
+                "total_mentions": 0,
+                "unique_memories": 0,
+                "peak_month": None,
+                "peak_count": 0,
+                "temporal_distribution": {},
+                "co_occurring_terms": [],
+                "top_contexts": [],
+            }
+
         result = self.grep(term)
 
         peak_month = None

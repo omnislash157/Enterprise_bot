@@ -130,13 +130,14 @@ BUILTIN_VOICES = {
 class EnterpriseVoice:
     """
     Voice configuration for enterprise deployment.
-    
+
     Handles voice template selection and system prompt building.
     """
     division: str = "default"
     voice_name: str = "corporate"
     config: Optional[Dict[str, Any]] = None
-    
+    memory_count: int = 0  # Add memory_count for cog_twin compatibility
+
     def __post_init__(self):
         """Load voice based on config or defaults."""
         if self.config:
@@ -168,6 +169,8 @@ class EnterpriseVoice:
     
     def build_system_prompt(
         self,
+        context=None,
+        retrieval_mode: str = "inject",
         memory_count: int = 0,
         user_zone: Optional[str] = None,
         user_role: Optional[str] = None,
@@ -175,25 +178,35 @@ class EnterpriseVoice:
     ) -> str:
         """
         Build complete system prompt with voice injection.
-        
+
+        Compatible with both VoiceContext (from cog_twin.py) and legacy parameters.
+
         Args:
-            memory_count: Number of memories available
+            context: VoiceContext object (if called from cog_twin.py)
+            retrieval_mode: Retrieval mode (ignored for enterprise)
+            memory_count: Number of memories available (or from context)
             user_zone: User's zone assignment
             user_role: User's role
             doc_context: Optional stuffed document context
-            
+
         Returns:
             Complete system prompt string
         """
+        # Extract memory_count from context if provided
+        if context is not None:
+            # VoiceContext doesn't have memory_count, use class attribute
+            if hasattr(self, 'memory_count'):
+                memory_count = self.memory_count
+
         prompt = self.injection_block
-        
+
         # Add doc context if provided (stuffed documents)
         if doc_context:
             prompt = prompt.replace(
                 "RESPOND:",
                 f"\n\n{doc_context}\n\nRESPOND:"
             )
-        
+
         # Add context footer
         context_lines = []
         if memory_count > 0:
@@ -204,13 +217,13 @@ class EnterpriseVoice:
             context_lines.append("ACCESS LEVEL: Manager (can see team activity)")
         elif user_role == "admin":
             context_lines.append("ACCESS LEVEL: Admin (full visibility)")
-        
+
         if context_lines:
             prompt = prompt.replace(
                 "RESPOND:",
                 "\n" + "\n".join(context_lines) + "\n\nRESPOND:"
             )
-        
+
         return prompt
 
 
