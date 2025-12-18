@@ -20,6 +20,7 @@ import logging
 import time
 from pathlib import Path
 from typing import Optional
+from enterprise_tenant import TenantContext
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
