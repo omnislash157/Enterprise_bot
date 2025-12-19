@@ -3,7 +3,28 @@
 **Last Updated:** 2025-12-18
 **Repo:** enterprise_bot
 **Deploy:** Railway (Azure PostgreSQL for auth, SQL Server for Driscoll data)
-**Status:** CogTwin Merge Complete - Phases 1-5 ✅
+**Status:** DOCX Chunking + Schema Enhancement + RLS Complete ✅ (60% of Master Execution Plan)
+
+---
+
+## Recent Changes (Master Execution Plan)
+
+### ✅ Phase 2.5: DOCX Chunking Pipeline (Commit: `a4bb32d`)
+- `ingestion/docx_to_json_chunks.py` - Core chunker with heading-based sections
+- `ingestion/batch_convert_warehouse_docx.py` - Parallel batch conversion (4 workers)
+- **21 Warehouse DOCX → 21 JSON chunk files** (169 total chunks)
+
+### ✅ Phase 1: Schema Enhancement (Commit: `6c54b23`)
+- `db/migrations/002_enhance_department_content.sql` - Full schema for vector RAG
+- `db/run_migration_002.py` - Migration runner with verification
+- `db/install_pgvector.py` - pgvector extension installer
+
+### ✅ Phase 2: RLS Policies (Commit: `d24c959`)
+- `db/migrations/003_enable_rls_policies.sql` - Row Level Security implementation
+
+### ⏳ Phase 3: Ingestion Pipeline (NEXT)
+### ⏳ Phase 4: CogTwin Integration (PENDING)
+### ⏳ Phase 5: Schema Lock Docs (PENDING)
 
 ---
 
@@ -22,12 +43,15 @@ enterprise_bot/
 ├── Config (Root)
 │   ├── .env
 │   ├── .env.azure-template
+│   ├── .env.example
 │   ├── .gitignore
-│   ├── config.yaml              # App config (tenant, features, model settings, voice toggle)
-│   ├── email_whitelist.json     # Allowed domains/emails (legacy)
-│   ├── requirements.txt         # Python dependencies (updated with pgvector)
+│   ├── config.yaml              # App config (tier=basic, features OFF, model=grok)
+│   ├── email_whitelist.json     # Allowed domains/emails
+│   ├── requirements.txt         # Python dependencies
 │   ├── runtime.txt              # Python version for Railway
-│   └── Procfile                 # Railway start command
+│   ├── Procfile                 # Railway start command
+│   ├── pyproject.toml           # Python project metadata (v0.1.0)
+│   └── activate.ps1             # PowerShell activation script
 │
 ├── ============ DOCUMENTATION ============
 │
@@ -45,33 +69,96 @@ enterprise_bot/
 │   │
 │   ├── Phase 5 - PostgreSQL Migration
 │   │   ├── PHASE_5_SUMMARY.md             # PostgreSQL migration overview
-│   │   ├── PHASE_5_MEMORY_BACKEND_SUMMARY.md  # Backend implementation details
-│   │   ├── MEMORY_BACKEND_INTEGRATION.md  # Backend integration guide
-│   │   ├── MEMORY_BACKEND_QUICKSTART.md   # Quick start for developers
-│   │   ├── MIGRATION_GUIDE.md             # Complete migration guide
-│   │   └── QUICK_START_MIGRATION.md       # 5-minute quick start
+│   │   ├── PHASE_5_MEMORY_BACKEND_SUMMARY.md
+│   │   ├── MEMORY_BACKEND_INTEGRATION.md
+│   │   ├── MEMORY_BACKEND_QUICKSTART.md
+│   │   ├── MIGRATION_GUIDE.md
+│   │   └── QUICK_START_MIGRATION.md
+│   │
+│   ├── Master Execution Plan (NEW)
+│   │   ├── MASTER_EXECUTION_PLAN.md       # Full execution roadmap
+│   │   ├── PHASE_1_EXECUTION.md           # Schema enhancement log
+│   │   ├── PHASE_2_EXECUTION.md           # RLS policies log
+│   │   ├── PHASE_2_5_EXECUTION.md         # DOCX chunking log
+│   │   ├── PHASES_2.5_1_2_COMPLETE.md     # Completion summary
+│   │   └── PROCESS_MANUAL_SCHEMA_LOCK_PLAN.md  # Schema lock strategy
 │   │
 │   ├── Architecture
 │   │   ├── WIRING_MAP.md                  # Complete system architecture
 │   │   └── CLAUDE_CHAT_PROMPTS.md         # Claude chat system prompts
 │   │
-│   └── README.md (in root)                # Main project README
+│   └── README.md (in root)
 │
-├── Root Files
-│   ├── README.md                          # Main project README (stays in root)
+├── ============ SDK AGENT CLI ============
+│
+├── SDK Agent Tools (NEW)
+│   ├── claude_chat.py               # Interactive REPL for Claude SDK
+│   │   ├── /db commands             # PostgreSQL query/export
+│   │   ├── /skill commands          # Lazy-load skill docs
+│   │   ├── /paste, /batch           # Bulk input modes
+│   │   └── /timeout                 # Input timeout control
+│   ├── claude_run.py                # One-shot prompt executor
+│   └── db_tools.py                  # PostgreSQL tools (query, describe, CSV)
+│
+├── skills/                          # Lazy-loaded skill documentation
+│   ├── SKILLS_INDEX.md              # Skills master index (~50 tokens)
+│   ├── db.skill.md                  # Database operations skill
+│   ├── etl.skill.md                 # ETL pipeline skill
+│   ├── excel.skill.md               # Excel export skill
+│   ├── powerbi.skill.md             # Power BI integration skill
+│   ├── profile.skill.md             # Data profiling skill
+│   └── schema.skill.md              # Schema navigation skill
+│
+├── ============ INGESTION PIPELINE (NEW) ============
+│
+├── ingestion/                       # Document ingestion pipeline
+│   ├── __init__.py
+│   ├── docx_to_json_chunks.py       # DOCX → JSON chunker (370 lines)
+│   │   ├── Heading-based section splitting
+│   │   ├── 500 token limit per chunk
+│   │   ├── Automatic keyword extraction
+│   │   └── SHA256 file hashing for dedup
+│   └── batch_convert_warehouse_docx.py  # Parallel batch (4 workers)
+│
+├── ============ DATABASE MIGRATIONS ============
+│
+├── db/
+│   ├── migrations/
+│   │   ├── 001_memory_tables.sql              # Session/episodic memory
+│   │   ├── 002_enhance_department_content.sql # Vector RAG schema (380 lines)
+│   │   │   ├── 14 new columns (tenant_id, embedding, chunk hierarchy)
+│   │   │   ├── 15 indexes (IVFFlat for vector search)
+│   │   │   ├── 5 validation constraints
+│   │   │   └── 3 utility functions
+│   │   └── 003_enable_rls_policies.sql        # Row Level Security (540 lines)
+│   │       ├── SELECT: tenant + dept scoped
+│   │       ├── INSERT: super users + dept heads
+│   │       ├── UPDATE: super users + write access
+│   │       ├── DELETE: super users ONLY
+│   │       └── Helper functions: set/clear/get_user_context()
+│   │
+│   ├── run_migration_002.py         # Migration runner with verification
+│   ├── install_pgvector.py          # pgvector extension installer
+│   ├── supabase_3tier_complete.sql  # OLD - Reference only
+│   └── supabase_auth_setup.sql      # OLD - Reference only
+│
+├── migrations/                      # Legacy migrations folder
+│   ├── add_analytics_indexes.sql
+│   ├── add_azure_oid.sql
+│   └── verify_azure_oid.sql
 │
 ├── ============ ACTIVE BACKEND ============
 │
 ├── Core Backend
-│   ├── main.py                      # FastAPI app entry point
-│   ├── config.py                    # Settings class (legacy)
+│   ├── main.py                      # FastAPI app entry point (WebSocket streaming)
+│   ├── config.py                    # Settings class
 │   ├── config_loader.py             # YAML config loader, cfg() helper
 │   ├── schemas.py                   # Pydantic models (MemoryNode, EpisodicMemory)
 │   ├── model_adapter.py             # LLM client factory (Grok/Claude)
 │   └── enterprise_tenant.py         # TenantContext dataclass
 │
 ├── Auth & Admin
-│   ├── auth_schema.py               # DB schema setup for auth + analytics tables
+│   ├── auth_schema.py               # DB schema setup for auth tables
 │   ├── auth_service.py              # User CRUD, permissions, audit logging
 │   ├── admin_routes.py              # FastAPI router for admin portal
 │   ├── azure_auth.py                # Azure AD SSO token validation
@@ -79,109 +166,132 @@ enterprise_bot/
 │   └── tenant_service.py            # Department content loading
 │
 ├── Analytics Engine
-│   ├── analytics_service.py         # Query logging, classification, aggregation
-│   └── analytics_routes.py          # Dashboard API endpoints at /api/admin/analytics
+│   ├── analytics_service.py         # Query logging, classification
+│   └── analytics_routes.py          # Dashboard API endpoints
 │
-├── ============ UNIFIED ENGINE (CogTwin) ============
+├── ============ COGTWIN ENGINE ============
 │
-├── CogTwin Core (Phases 1-2 Complete)
-│   ├── cog_twin.py                  # Main cognitive engine (NOW ACTIVE!)
-│   ├── venom_voice.py               # Venom personality system prompt builder
-│   └── enterprise_voice.py          # Enterprise personality (compatible interface)
+├── CogTwin Core
+│   ├── cog_twin.py                  # Main cognitive engine (vector/hybrid search)
+│   ├── venom_voice.py               # Venom personality system prompt
+│   └── enterprise_voice.py          # Enterprise personality
 │
-├── Enterprise Mode (Legacy - Context Stuffing)
-│   ├── enterprise_twin.py           # Simplified chat engine (pre-merge)
+├── Enterprise Mode (Legacy)
 │   ├── chat_parser_agnostic.py      # Response parsing
-│   └── doc_loader.py                # Document loading (JSON, CSV, Excel, MD, TXT, DOCX)
+│   └── doc_loader.py                # Document loading (DOCX caching)
 │
-├── ============ MEMORY SYSTEM (Phase 3-5 Complete) ============
+├── ============ MEMORY SYSTEM ============
 │
-├── Memory Backend Abstraction (Phase 5.1)
-│   ├── memory_backend.py            # Abstract base class + FileBackend
+├── Memory Backend Abstraction
+│   ├── memory_backend.py            # Abstract base + FileBackend
 │   ├── postgres_backend.py          # PostgreSQL + pgvector backend
-│   └── migrate_to_postgres.py       # Migration script (file → PostgreSQL)
+│   └── migrate_to_postgres.py       # Migration script
 │
-├── Memory Pipeline (Phase 3 - Auth Scoping Complete)
+├── Memory Pipeline
 │   ├── chat_memory.py               # Memory management
-│   ├── memory_pipeline.py           # Embedding pipeline (Phase 3: now stamps user_id/tenant_id)
+│   ├── memory_pipeline.py           # Embedding pipeline (DORMANT in basic tier)
 │   ├── memory_grep.py               # Memory search
-│   ├── reasoning_trace.py           # Trace logging
+│   ├── reasoning_trace.py           # Trace logging (OFF)
 │   ├── read_traces.py               # Trace reader
 │   └── streaming_cluster.py         # Cluster streaming
 │
-├── Search & Retrieval (Phase 3 - Auth Filtering Complete)
-│   ├── retrieval.py                 # Vector retrieval (Phase 3: filters by user_id/tenant_id)
+├── Search & Retrieval
+│   ├── retrieval.py                 # Vector retrieval with auth filtering
 │   ├── scoring.py                   # Relevance scoring
 │   ├── hybrid_search.py             # Hybrid vector+keyword
 │   ├── fast_filter.py               # Fast filtering
 │   ├── heuristic_enricher.py        # Result enrichment
-│   └── embedder.py                  # Embedding generation
+│   ├── embedder.py                  # Embedding generation
+│   └── embedding_model.py           # BGE-M3 model wrapper
 │
-├── Metacognitive System
+├── Metacognitive System (ALL OFF in basic tier)
 │   ├── metacognitive_mirror.py      # Cognitive state monitoring
 │   ├── evolution_engine.py          # Learning and adaptation
+│   ├── llm_tagger.py                # Auto-tagging
 │   └── cluster_schema.py            # Cluster profiling
-│
-├── ============ DATABASE ============
-│
-├── Database (PostgreSQL + pgvector - Phase 5 Complete)
-│   ├── db_setup.py                  # Azure PostgreSQL connection
-│   ├── db_diagnostic.py             # Connection testing/debug
-│   ├── run_migration.py             # Database migrations
-│   └── generate_test_user.py        # Helper script for test user/tenant SQL
-│
-├── db/
-│   ├── migrations/
-│   │   └── 001_memory_tables.sql    # Phase 5: PostgreSQL schema (tenants, users, memory_nodes)
-│   ├── supabase_3tier_complete.sql  # OLD - Reference only
-│   └── supabase_auth_setup.sql      # OLD - Reference only
 │
 ├── ============ DOCUMENT PROCESSING ============
 │
 ├── Document Processing
-│   ├── ingest.py                    # Ingestion pipeline
-│   ├── dedup.py                     # Deduplication
-│   ├── llm_tagger.py                # LLM tagging
+│   ├── ingest.py                    # Ingestion orchestrator
+│   ├── dedup.py                     # Deduplication logic
 │   └── upload_manuals.py            # Manual uploader
 │
 ├── ============ DATA ============
 │
 ├── data/
-│   ├── memory_index.json            # Memory index
+│   ├── memory_index.json
+│   ├── manifest.json
 │   ├── corpus/
-│   │   ├── nodes.json               # Memory nodes (Phase 3: now includes user_id/tenant_id)
+│   │   ├── nodes.json               # Memory nodes
 │   │   ├── episodes.json            # Episodic memories
-│   │   └── dedup_index.json         # Deduplication index
+│   │   └── dedup_index.json
 │   ├── vectors/
 │   │   ├── nodes.npy                # Node embeddings (1024-dim BGE-M3)
-│   │   └── episodes.npy             # Episode embeddings
+│   │   └── episodes.npy
 │   └── indexes/
-│       └── clusters.json            # Cluster assignments
+│       └── clusters.json
 │
-├── Manuals/
-│   └── Driscoll/
-│       ├── Purchasing/
-│       │   └── purchasing_manual_chunks.json
-│       └── Sales/
-│           ├── bid_management_chunks.json
-│           ├── sales_support_chunks.json
-│           └── telnet_sop_chunks.json
+├── ============ MANUALS (Driscoll) ============
+│
+├── Manuals/Driscoll/
+│   ├── Warehouse/
+│   │   ├── chunks/                          # JSON chunk files (21 files)
+│   │   │   ├── dispatching_manual_chunks.json
+│   │   │   ├── driver_check-in_manual_chunks.json
+│   │   │   ├── driver_manual_chunks.json
+│   │   │   ├── hr_manual_chunks.json
+│   │   │   ├── inventory_control_manual_chunks.json
+│   │   │   ├── invoice_cleaning_department_manual_chunks.json
+│   │   │   ├── john_cantelli_manual_chunks.json
+│   │   │   ├── night_shift_checking_manual_chunks.json
+│   │   │   ├── night_shift_clerk_manual_chunks.json
+│   │   │   ├── night_shift_hi-lo_operating_manual_chunks.json
+│   │   │   ├── night_shift_loading_manual_chunks.json
+│   │   │   ├── night_shift_picking_manual_chunks.json
+│   │   │   ├── night_shift_supervisor_manual_chunks.json
+│   │   │   ├── night_shift_switcher_manual_chunks.json
+│   │   │   ├── ops_admin_manual_(made_by_matt_fava)_chunks.json
+│   │   │   ├── putaway_manual_chunks.json
+│   │   │   ├── receiving_manual_chunks.json
+│   │   │   ├── replen_manual_chunks.json
+│   │   │   ├── routing_manual_chunks.json
+│   │   │   ├── transportation_manual_chunks.json
+│   │   │   └── upc_collecting_manual_chunks.json
+│   │   │
+│   │   └── (23 original DOCX files)
+│   │
+│   ├── Sales/
+│   │   ├── bid_management_chunks.json
+│   │   ├── sales_support_chunks.json
+│   │   └── telnet_sop_chunks.json
+│   │
+│   └── Purchasing/
+│       └── purchasing_manual_chunks.json
+│
+│   TOTAL: 25 JSON chunk files, 169 chunks across 3 departments
 │
 ├── ============ TESTING & UTILITIES ============
 │
 ├── Testing
-│   ├── debug_pipeline.py            # Memory pipeline debugging
-│   ├── test_setup.py                # Database setup test
-│   ├── test_integration_quick.py    # Quick integration test
-│   ├── verify_chat_integration.py   # Chat memory verification
-│   └── init_empty_data.py           # Bootstrap empty data structure (Phase 1)
+│   ├── debug_pipeline.py
+│   ├── test_setup.py
+│   ├── test_integration_quick.py
+│   ├── verify_chat_integration.py
+│   ├── test_azure_sso.sh
+│   └── init_empty_data.py
 │
 ├── Utilities
 │   ├── squirrel.py                  # Temporal recall tool
-│   ├── init_sandbox.py              # Sandbox init
-│   ├── claude_chat.py               # Claude SDK agent chat
-│   ├── claude_run.py                # Claude agent runner
-│   └── sdk_recon.py                 # SDK reconnaissance tool
+│   ├── init_sandbox.py
+│   ├── sdk_recon.py
+│   ├── generate_test_user.py
+│   └── db_diagnostic.py
+│
+├── ============ ARCHIVE ============
+│
+├── archive/deprecated/
+│   └── enterprise_twin.py.bak       # Old enterprise twin
 │
 ├── ============ FRONTEND ============
 │
@@ -204,275 +314,193 @@ enterprise_bot/
         │   │   └── registry.ts
         │   │
         │   ├── utils/
-        │   │   ├── csvExport.ts         # CSV export utility
-        │   │   └── clickOutside.ts      # Click outside action for dropdowns
+        │   │   ├── csvExport.ts
+        │   │   └── clickOutside.ts
         │   │
         │   ├── transitions/
-        │   │   └── pageTransition.ts    # Page transition utilities
+        │   │   └── pageTransition.ts
         │   │
         │   ├── components/
-        │   │   ├── ChatOverlay.svelte       # Main chat UI
-        │   │   ├── Login.svelte             # Auth login form
-        │   │   ├── DepartmentSelector.svelte # Dept picker
-        │   │   ├── CreditForm.svelte        # Credit request form
-        │   │   ├── DupeOverrideModal.svelte # Dupe handling modal
-        │   │   ├── CheekyLoader.svelte      # Personality loading with emerge transition
-        │   │   ├── CheekyInline.svelte      # Minimal inline loader
-        │   │   ├── CheekyToast.svelte       # Standalone toast component
-        │   │   ├── ToastProvider.svelte     # Global toast with context module
+        │   │   ├── ChatOverlay.svelte
+        │   │   ├── Login.svelte
+        │   │   ├── DepartmentSelector.svelte
+        │   │   ├── CreditForm.svelte
+        │   │   ├── DupeOverrideModal.svelte
+        │   │   ├── CheekyLoader.svelte
+        │   │   ├── CheekyInline.svelte
+        │   │   ├── CheekyToast.svelte
+        │   │   ├── ToastProvider.svelte
         │   │   │
-        │   │   ├── ribbon/                  # Intelligence Ribbon (Nav)
-        │   │   │   ├── index.ts             # Barrel export
-        │   │   │   ├── IntelligenceRibbon.svelte  # Main nav ribbon
-        │   │   │   ├── NavLink.svelte       # Nav link with glow effect
-        │   │   │   ├── AdminDropdown.svelte # Admin menu dropdown
-        │   │   │   └── UserMenu.svelte      # User profile dropdown
+        │   │   ├── ribbon/
+        │   │   │   ├── index.ts
+        │   │   │   ├── IntelligenceRibbon.svelte
+        │   │   │   ├── NavLink.svelte
+        │   │   │   ├── AdminDropdown.svelte
+        │   │   │   └── UserMenu.svelte
         │   │   │
-        │   │   ├── admin/                   # Admin Portal
-        │   │   │   ├── UserRow.svelte       # User list row
-        │   │   │   ├── AccessModal.svelte   # Grant/revoke modal
-        │   │   │   ├── RoleModal.svelte     # Role change modal
-        │   │   │   ├── CreateUserModal.svelte  # Single user creation
-        │   │   │   ├── BatchImportModal.svelte # Batch CSV import
-        │   │   │   ├── LoadingSkeleton.svelte  # Shimmer loading component
+        │   │   ├── admin/
+        │   │   │   ├── UserRow.svelte
+        │   │   │   ├── AccessModal.svelte
+        │   │   │   ├── RoleModal.svelte
+        │   │   │   ├── CreateUserModal.svelte
+        │   │   │   ├── BatchImportModal.svelte
+        │   │   │   ├── LoadingSkeleton.svelte
         │   │   │   │
-        │   │   │   ├── charts/              # Nerve Center Charts
-        │   │   │   │   ├── chartTheme.ts    # Cyberpunk Chart.js config
-        │   │   │   │   ├── StatCard.svelte  # Metric display widget
-        │   │   │   │   ├── LineChart.svelte # Time series
-        │   │   │   │   ├── DoughnutChart.svelte # Category breakdown
-        │   │   │   │   ├── BarChart.svelte  # Department comparison
-        │   │   │   │   ├── RealtimeSessions.svelte # Live sessions
-        │   │   │   │   ├── NerveCenterWidget.svelte # 3D viz wrapper
-        │   │   │   │   ├── DateRangePicker.svelte   # Date filtering
-        │   │   │   │   └── ExportButton.svelte      # CSV export button
+        │   │   │   ├── charts/
+        │   │   │   │   ├── chartTheme.ts
+        │   │   │   │   ├── StatCard.svelte
+        │   │   │   │   ├── LineChart.svelte
+        │   │   │   │   ├── DoughnutChart.svelte
+        │   │   │   │   ├── BarChart.svelte
+        │   │   │   │   ├── RealtimeSessions.svelte
+        │   │   │   │   ├── NerveCenterWidget.svelte
+        │   │   │   │   ├── DateRangePicker.svelte
+        │   │   │   │   └── ExportButton.svelte
         │   │   │   │
-        │   │   │   └── threlte/             # 3D Neural Network
-        │   │   │       ├── NeuralNode.svelte     # Glowing category node
-        │   │   │       ├── DataSynapse.svelte    # Curved lines + packets
-        │   │   │       ├── NeuralNetwork.svelte  # Category nodes + synapses
-        │   │   │       └── NerveCenterScene.svelte # Full scene + particles
+        │   │   │   └── threlte/
+        │   │   │       ├── NeuralNode.svelte
+        │   │   │       ├── DataSynapse.svelte
+        │   │   │       ├── NeuralNetwork.svelte
+        │   │   │       └── NerveCenterScene.svelte
         │   │   │
-        │   │   └── archive/                 # Archived components
+        │   │   ├── nervecenter/
+        │   │   │   └── StateMonitor.svelte      # Debug panel (Phase 0)
+        │   │   │
+        │   │   └── archive/
         │   │       ├── AnalyticsDashboard.svelte
         │   │       ├── ArtifactPane.svelte
         │   │       ├── FloatingPanel.svelte
         │   │       └── WorkspaceNav.svelte
         │   │
-        │   ├── cheeky/                       # CheekyLoader Engine
-        │   │   ├── index.ts                 # Barrel export
-        │   │   ├── CheekyStatus.ts          # Phrase rotation, seasonal, config
-        │   │   └── phrases.ts               # 200+ personality phrases + spinners
+        │   ├── cheeky/
+        │   │   ├── index.ts
+        │   │   ├── CheekyStatus.ts
+        │   │   └── phrases.ts
         │   │
         │   ├── stores/
-        │   │   ├── index.ts                 # Store exports
-        │   │   ├── auth.ts                  # Auth state & API
-        │   │   ├── admin.ts                 # Admin portal state + CRUD
-        │   │   ├── analytics.ts             # Dashboard data store
-        │   │   ├── credit.ts                # Credit form state
-        │   │   ├── cheeky.ts                # Cheeky loading state management
-        │   │   ├── websocket.ts             # WS connection
-        │   │   ├── session.ts               # Chat session
-        │   │   ├── config.ts                # App config
-        │   │   ├── theme.ts                 # Dark mode
+        │   │   ├── index.ts
+        │   │   ├── auth.ts
+        │   │   ├── admin.ts
+        │   │   ├── analytics.ts
+        │   │   ├── credit.ts
+        │   │   ├── cheeky.ts
+        │   │   ├── websocket.ts
+        │   │   ├── session.ts
+        │   │   ├── config.ts
+        │   │   ├── theme.ts
         │   │   ├── artifacts.ts
         │   │   ├── panels.ts
         │   │   └── workspaces.ts
         │   │
-        │   └── threlte/                     # 3D visualization
+        │   └── threlte/
         │       ├── CoreBrain.svelte
         │       ├── Scene.svelte
-        │       ├── CreditAmbientOrbs.svelte # Credit page decoration
-        │       └── archive/                 # Archived 3D components
+        │       ├── CreditAmbientOrbs.svelte
+        │       └── archive/
         │           ├── AgentNode.svelte
         │           ├── ConnectionLines.svelte
         │           ├── MemoryNode.svelte
         │           └── MemorySpace.svelte
         │
         └── routes/
-            ├── +layout.svelte               # Root layout, auth gate
-            ├── +page.svelte                 # Main chat page
+            ├── +layout.svelte
+            ├── +page.svelte
             │
             ├── auth/
             │   └── callback/
-            │       └── +page.svelte         # Azure AD SSO callback
+            │       └── +page.svelte
             │
-            ├── admin/                       # Admin Portal
-            │   ├── +layout.svelte           # Admin layout + sidebar
-            │   ├── +page.svelte             # Nerve Center dashboard
+            ├── admin/
+            │   ├── +layout.svelte
+            │   ├── +page.svelte
             │   ├── analytics/
-            │   │   └── +page.svelte         # Analytics deep dive
+            │   │   └── +page.svelte
             │   ├── users/
-            │   │   └── +page.svelte         # User management + CRUD
+            │   │   └── +page.svelte
             │   └── audit/
-            │       └── +page.svelte         # Audit log (super_user)
+            │       └── +page.svelte
             │
             └── credit/
-                └── +page.svelte             # Credit request page
+                └── +page.svelte
 ```
-
----
-
-## Key Files by Function
-
-### Entry Points
-- **main.py** - FastAPI application, WebSocket endpoint, HTTP routes
-- **frontend/src/routes/+page.svelte** - Main chat interface
-
-### Configuration
-- **config.yaml** - All application configuration (NEW: voice toggle, memory backend)
-- **config_loader.py** - Config helper functions
-- **.env** - Environment variables (secrets)
-
-### Core Engine (Post-Merge)
-- **cog_twin.py** - Unified cognitive engine (Phases 1-2: NOW ACTIVE)
-- **venom_voice.py** - Venom personality voice (toggled via config)
-- **enterprise_voice.py** - Enterprise voice (toggled via config)
-
-### Memory System (Phase 3-5)
-- **memory_backend.py** - Backend abstraction (file/postgres)
-- **postgres_backend.py** - PostgreSQL + pgvector implementation
-- **retrieval.py** - Auth-scoped retrieval (user_id/tenant_id filtering)
-- **memory_pipeline.py** - Stamps memories with auth context
-- **schemas.py** - MemoryNode with user_id/tenant_id fields
-
-### Database
-- **db/migrations/001_memory_tables.sql** - PostgreSQL schema with pgvector
-- **db_setup.py** - Connection management
-- **migrate_to_postgres.py** - Data migration tool
-
-### Auth & Permissions
-- **auth_service.py** - User management, department access
-- **azure_auth.py** - Azure AD integration
-- **tenant_service.py** - Tenant/department logic
-
-### Analytics
-- **analytics_service.py** - Query logging and metrics
-- **analytics_routes.py** - Analytics API
-
-### Document Processing
-- **doc_loader.py** - Multi-format document loader
-- **ingest.py** - Document ingestion pipeline
-
----
-
-## Merge Status Summary
-
-### ✅ Phase 1: CogTwin Activated
-- `main.py` uses CogTwin instead of EnterpriseTwin
-- Empty data handling implemented
-- `init_empty_data.py` created for bootstrap
-
-### ✅ Phase 2: Voice Toggle
-- Config flag: `voice.engine: venom | enterprise`
-- Conditional voice import in cog_twin.py
-- Both voices share same interface
-
-### ✅ Phase 3: Auth Scoping
-- MemoryNode has `user_id` and `tenant_id` fields
-- Retrieval filters by scope BEFORE similarity search
-- Fail-secure: no auth = no results
-- WebSocket passes auth context to engine
-
-### ✅ Phase 4: Extraction Toggle
-- Config flag: `features.chat_import: true/false`
-- Upload endpoint returns 403 when disabled
-- Enterprise mode blocks external log imports
-
-### ✅ Phase 5: PostgreSQL + pgvector
-- Database schema with pgvector extension
-- Migration script (file → PostgreSQL)
-- Backend abstraction layer (FileBackend + PostgresBackend)
-- IVFFlat indexes for fast similarity search
-- Auth scoping enforced at database level
-
----
-
-## Configuration Flags (config.yaml)
-
-```yaml
-voice:
-  engine: venom              # Toggle: venom | enterprise
-
-deployment:
-  mode: personal             # Toggle: personal | enterprise
-  tier: full
-
-features:
-  memory_pipelines: true
-  context_stuffing: false    # Deprecated - replaced by RAG
-  chat_import: false         # Phase 4: disable for enterprise
-  extraction_enabled: false  # Phase 4: disable for enterprise
-
-memory:
-  backend: file              # Phase 5: Toggle: file | postgres
-
-  postgres:                  # Phase 5: PostgreSQL configuration
-    host: localhost
-    port: 5432
-    database: enterprise_bot
-    user: postgres
-    password: ${POSTGRES_PASSWORD}
-```
-
----
-
-## Documentation Organization ✅
-
-All documentation is now organized in the `docs/` folder:
-
-**Setup & Deployment:**
-- `docs/AZURE_SSO_README.md` - Azure AD SSO configuration
-- `docs/RAILWAY_SPEC_SHEET.md` - Railway deployment guide
-
-**Merge Documentation:**
-- `docs/SDK_MERGE_HANDOFF.md` - Phases 1-2 handoff
-- `docs/MERGE_HANDOFF_PHASES_3_4_5.md` - Phases 3-5 handoff
-- `docs/PHASES_3_4_5_COMPLETE.md` - Complete implementation summary
-
-**Phase 5 - PostgreSQL Migration:**
-- `docs/PHASE_5_SUMMARY.md` - Migration overview
-- `docs/PHASE_5_MEMORY_BACKEND_SUMMARY.md` - Backend details
-- `docs/MEMORY_BACKEND_INTEGRATION.md` - Integration guide
-- `docs/MEMORY_BACKEND_QUICKSTART.md` - Developer quick start
-- `docs/MIGRATION_GUIDE.md` - Complete migration walkthrough
-- `docs/QUICK_START_MIGRATION.md` - 5-minute quick start
-
-**Architecture Documentation:**
-- `docs/WIRING_MAP.md` - Complete system architecture (52KB)
-- `docs/CLAUDE_CHAT_PROMPTS.md` - Chat system prompts
-- `docs/file_tree.md` - This file (project structure)
-
-**Root Files:**
-- `README.md` - Main project README (kept in root for GitHub)
 
 ---
 
 ## File Counts
 
-- **Total Python Files:** 56
-- **Active Backend Files:** ~25
-- **Memory System Files:** ~15
-- **Frontend Files:** ~100+ (components, routes, stores)
-- **Documentation Files:** 13+ (need to organize)
+| Category | Count |
+|----------|-------|
+| Python Files | 60+ |
+| Frontend Components | 40+ |
+| Svelte Routes | 8 |
+| Stores | 12 |
+| Documentation Files | 20+ |
+| Skill Files | 6 |
+| JSON Chunk Files | 25 |
+| SQL Migrations | 3 |
 
 ---
 
-## Next Steps
+## Key Entry Points
 
-1. **Move documentation to docs/ folder** for better organization
-2. **Update README.md** to reflect CogTwin merge completion
-3. **Create deployment checklist** for PostgreSQL migration
-4. **Archive legacy files** (enterprise_twin.py, old context stuffing)
-5. **Update Railway deployment** with new env vars for PostgreSQL
+| File | Purpose |
+|------|---------|
+| `main.py` | FastAPI app, WebSocket endpoint |
+| `claude_chat.py` | Interactive SDK agent REPL |
+| `claude_run.py` | One-shot prompt executor |
+| `frontend/src/routes/+page.svelte` | Main chat interface |
 
 ---
 
-**Last Session Accomplishments:**
-- Phases 3, 4, 5 completed
-- 19 files created/modified
-- 4,172 lines of production code
-- 62 KB of documentation
-- PostgreSQL + pgvector infrastructure complete
-- Auth scoping implemented
-- Ready for production! 🚀
+## Configuration Summary (config.yaml)
+
+```yaml
+tier: basic                    # Dumb chatbot mode
+model: grok-4-1-fast-reasoning
+
+voice:
+  engine: venom
+
+features:
+  memory_pipelines: false      # All OFF in basic tier
+  context_stuffing: true       # Loads from Manuals/Driscoll/
+  chat_import: false
+  extraction_enabled: false
+
+memory:
+  backend: file                # Toggle: file | postgres
+```
+
+---
+
+## Current Progress
+
+**Master Execution Plan:** 60% Complete (3 of 5 phases)
+
+| Phase | Status | Commit |
+|-------|--------|--------|
+| 2.5: DOCX Chunking | ✅ COMPLETE | `a4bb32d` |
+| 1: Schema Enhancement | ✅ COMPLETE | `6c54b23` |
+| 2: RLS Policies | ✅ COMPLETE | `d24c959` |
+| 3: Ingestion Pipeline | ⏳ NEXT | - |
+| 4: CogTwin Integration | ⏳ PENDING | - |
+| 5: Schema Lock Docs | ⏳ PENDING | - |
+
+---
+
+## Git Commits (Recent)
+
+```
+b601f3b docs: Progress report - Phases 2.5, 1, 2 complete
+d24c959 feat(db): Phase 2 - implement RLS policies
+6c54b23 feat(db): Phase 1 - enhance department_content schema
+a4bb32d feat(ingest): Phase 2.5 - DOCX to JSON chunking pipeline
+01d2b2a SDK Agent CLI: Add database tools, skills system, batch mode
+eea8f3b Phase 0: Add StateMonitor debug panel for Nerve Center
+```
+
+---
+
+**Total New Code:** ~5,000 lines across 25+ new files
+**Documentation:** ~3,000 lines across 12 new docs
+**Chunks Created:** 169 chunks from 25 manual files
