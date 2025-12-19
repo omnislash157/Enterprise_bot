@@ -173,9 +173,9 @@ async def list_users(
                 users = auth.list_all_users(user)
         else:
             # Dept head - list their department's users
-            dept_access = auth.get_user_department_access(user)
-            head_depts = [a.department_slug for a in dept_access if a.is_dept_head]
-            
+            dept_slugs = auth.get_user_department_access(user)
+            head_depts = [d for d in dept_slugs if auth.is_dept_head_for(user, d)]
+
             if department:
                 if department not in head_depts:
                     raise HTTPException(403, f"Not authorized for department: {department}")
@@ -249,17 +249,26 @@ async def get_user_detail(
                 raise HTTPException(403, "Cannot view this user")
         
         # Get department access
-        dept_access = auth.get_user_department_access(target)
-        departments = [
-            {
-                "slug": a.department_slug,
-                "name": a.department_name,
-                "access_level": a.access_level,
-                "is_dept_head": a.is_dept_head,
-                "granted_at": a.granted_at.isoformat() if a.granted_at else None,
-            }
-            for a in dept_access
-        ]
+        dept_slugs = auth.get_user_department_access(target)
+        
+        # Build department info from slugs
+        from auth_service import get_db_cursor, SCHEMA
+        departments = []
+        with get_db_cursor() as cur:
+            for slug in dept_slugs:
+                cur.execute(f"""
+                    SELECT d.slug, d.name, ac.created_at as granted_at
+                    FROM {SCHEMA}.departments d
+                    LEFT JOIN enterprise.access_config ac ON d.slug = ac.department AND ac.user_id = %s
+                    WHERE d.slug = %s
+                """, (target.id, slug))
+                row = cur.fetchone()
+                if row:
+                    departments.append({
+                        "slug": row["slug"],
+                        "name": row["name"],
+                        "granted_at": row["granted_at"].isoformat() if row.get("granted_at") else None,
+                    })
         
         return APIResponse(
             success=True,
@@ -611,12 +620,11 @@ async def get_admin_stats(
             
             # Users by department
             cur.execute(f"""
-                SELECT d.slug, d.name, COUNT(uda.user_id) as user_count
+                SELECT d.slug, d.name, COUNT(ac.user_id) as user_count
                 FROM {SCHEMA}.departments d
-                LEFT JOIN {SCHEMA}.user_department_access uda ON d.id = uda.department_id
+                LEFT JOIN enterprise.access_config ac ON d.slug = ac.department
                 WHERE d.active = TRUE
-                GROUP BY d.id, d.slug, d.name
-                ORDER BY d.name
+                GROUP BY d.slug, d.name
             """)
             by_department = [dict(row) for row in cur.fetchall()]
             
@@ -687,16 +695,20 @@ async def list_all_departments(
                 departments = [dict(row) for row in cur.fetchall()]
         else:
             # Dept heads see only their departments
-            dept_access = auth.get_user_department_access(actor)
-            departments = [
-                {
-                    "id": a.department_id,
-                    "slug": a.department_slug,
-                    "name": a.department_name,
-                }
-                for a in dept_access
-                if a.is_dept_head
-            ]
+            dept_slugs = auth.get_user_department_access(actor)
+            head_depts = [d for d in dept_slugs if auth.is_dept_head_for(actor, d)]
+
+            departments = []
+            if head_depts:
+                with get_db_cursor() as cur:
+                    placeholders = ','.join(['%s'] * len(head_depts))
+                    cur.execute(f"""
+                        SELECT id, slug, name, description
+                        FROM {SCHEMA}.departments
+                        WHERE slug IN ({placeholders}) AND active = TRUE
+                        ORDER BY name
+                    """, head_depts)
+                    departments = [dict(row) for row in cur.fetchall()]
 
         return APIResponse(
             success=True,

@@ -1,10 +1,7 @@
 /**
  * Analytics Store - Dashboard data and real-time stats
  *
- * Primary endpoint (combined, single request):
- * - /api/admin/analytics/dashboard
- *
- * Legacy individual endpoints (still available):
+ * Fetches from Phase 2 endpoints:
  * - /api/admin/analytics/overview
  * - /api/admin/analytics/queries
  * - /api/admin/analytics/categories
@@ -60,18 +57,6 @@ export interface RealtimeSession {
     department: string;
     query_count: number;
     last_activity: string;
-}
-
-// Combined dashboard response from /api/admin/analytics/dashboard
-interface DashboardResponse {
-    overview: OverviewStats;
-    queries_by_hour: HourlyData[];
-    categories: CategoryData[];
-    departments: DepartmentStats[];
-    errors?: ErrorEntry[];
-    realtime?: RealtimeSession[];
-    period_hours: number;
-    timestamp: string;
 }
 
 interface AnalyticsState {
@@ -148,24 +133,21 @@ function createAnalyticsStore() {
     }
 
     function getHeaders(): Record<string, string> {
-        const authHeaders = auth.getAuthHeader();
-        return {
+        const email = auth.getEmail();
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...authHeaders,
         };
+        if (email) {
+            headers['X-User-Email'] = email;
+        }
+        return headers;
     }
 
     async function fetchJson<T>(path: string): Promise<T | null> {
-        const start = performance.now();
         try {
             const res = await fetch(`${getApiBase()}${path}`, {
                 headers: getHeaders(),
             });
-            const clientTime = performance.now() - start;
-            const serverTime = res.headers.get('X-Response-Time');
-
-            console.log(`[PERF] ${path}: client=${clientTime.toFixed(0)}ms, server=${serverTime}`);
-
             if (!res.ok) return null;
             return await res.json();
         } catch (e) {
@@ -253,64 +235,16 @@ function createAnalyticsStore() {
             }));
         },
 
-        /**
-         * Load entire dashboard in ONE request.
-         * Replaces the 6 separate loadX() calls for initial load.
-         */
-        async loadDashboard(includeErrors = true, includeRealtime = true) {
-            update(s => ({
-                ...s,
-                overviewLoading: true,
-                queriesByHourLoading: true,
-                categoriesLoading: true,
-                departmentsLoading: true,
-                errorsLoading: includeErrors,
-                realtimeLoading: includeRealtime,
-            }));
-
-            const params = new URLSearchParams({
-                hours: String(currentPeriodHours),
-                include_errors: String(includeErrors),
-                include_realtime: String(includeRealtime),
-            });
-
-            const data = await fetchJson<DashboardResponse>(
-                `/api/admin/analytics/dashboard?${params}`
-            );
-
-            if (data) {
-                update(s => ({
-                    ...s,
-                    overview: data.overview,
-                    queriesByHour: data.queries_by_hour,
-                    categories: data.categories,
-                    departments: data.departments,
-                    errors: data.errors || s.errors,
-                    realtimeSessions: data.realtime || s.realtimeSessions,
-                    periodHours: data.period_hours,
-                    overviewLoading: false,
-                    queriesByHourLoading: false,
-                    categoriesLoading: false,
-                    departmentsLoading: false,
-                    errorsLoading: false,
-                    realtimeLoading: false,
-                }));
-            } else {
-                update(s => ({
-                    ...s,
-                    overviewLoading: false,
-                    queriesByHourLoading: false,
-                    categoriesLoading: false,
-                    departmentsLoading: false,
-                    errorsLoading: false,
-                    realtimeLoading: false,
-                }));
-            }
-        },
-
-        // Load all dashboard data (uses combined endpoint)
+        // Load all dashboard data
         async loadAll() {
-            await store.loadDashboard(true, true);
+            await Promise.all([
+                store.loadOverview(),
+                store.loadQueriesByHour(),
+                store.loadCategories(),
+                store.loadDepartments(),
+                store.loadErrors(),
+                store.loadRealtime(),
+            ]);
         },
 
         // =====================================================================
@@ -320,14 +254,19 @@ function createAnalyticsStore() {
         setPeriodHours(hours: number) {
             currentPeriodHours = hours;
             update(s => ({ ...s, periodHours: hours }));
-            store.loadDashboard(true, true);
+            store.loadAll();
         },
 
         // Reload all data with a new time period
         async reloadWithPeriod(hours: number) {
             currentPeriodHours = hours;
             update(s => ({ ...s, periodHours: hours }));
-            await store.loadDashboard(false, false); // Skip errors/realtime for period changes
+            await Promise.all([
+                store.loadOverview(),
+                store.loadQueriesByHour(),
+                store.loadCategories(),
+                store.loadDepartments(),
+            ]);
         },
 
         // =====================================================================

@@ -188,7 +188,7 @@ async def get_current_user(
                 user = auth.get_user_by_azure_oid(graph_user.get("id"))
 
                 if user:
-                    access_list = auth.get_user_department_access(user)
+                    dept_slugs = auth.get_user_department_access(user)
                     return {
                         "id": user.id,
                         "email": user.email,
@@ -197,7 +197,7 @@ async def get_current_user(
                         "tier": user.tier.name,
                         "employee_id": user.employee_id,
                         "primary_department": user.primary_department_slug,
-                        "departments": [a.department_slug for a in access_list],
+                        "departments": dept_slugs,
                         "is_super_user": user.is_super_user,
                         "can_manage_users": user.can_manage_users,
                         "auth_method": "azure_ad",
@@ -220,7 +220,7 @@ async def get_current_user(
             raise HTTPException(401, "Email domain not authorized")
 
         # Get department access
-        access_list = auth.get_user_department_access(user)
+        dept_slugs = auth.get_user_department_access(user)
 
         return {
             "id": user.id,
@@ -230,7 +230,7 @@ async def get_current_user(
             "tier": user.tier.name,
             "employee_id": user.employee_id,
             "primary_department": user.primary_department_slug,
-            "departments": [a.department_slug for a in access_list],
+            "departments": dept_slugs,
             "is_super_user": user.is_super_user,
             "can_manage_users": user.can_manage_users,
             "auth_method": "legacy_email",
@@ -747,8 +747,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         auth_method = client_auth_method  # Update auth method for twin routing
 
                         # Get user's departments
-                        access_list = auth.get_user_department_access(user)
-                        dept_slugs = [a.department_slug for a in access_list]
+                        dept_slugs = auth.get_user_department_access(user)
 
                         # Use requested division if user has access, else primary
                         requested_division = data.get("division", user.primary_department_slug or "warehouse")

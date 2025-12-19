@@ -4,7 +4,6 @@
  */
 
 import { writable, derived } from 'svelte/store';
-import { browser } from '$app/environment';
 
 interface User {
     id: string;
@@ -57,7 +56,7 @@ function createAuthStore() {
         authMethod: null,
     });
 
-    let refreshToken: string | null = browser ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
+    let refreshToken: string | null = localStorage.getItem(REFRESH_TOKEN_KEY);
     let refreshTimeout: number | null = null;
 
     function scheduleRefresh(expiresIn: number) {
@@ -120,15 +119,13 @@ function createAuthStore() {
         async handleCallback(code: string, state: string): Promise<boolean> {
             update(s => ({ ...s, loading: true, error: null }));
 
-            // Validate state (if available - sessionStorage may not persist across redirects in some browsers)
-            const storedState = browser ? sessionStorage.getItem('oauth_state') : null;
-            if (storedState && state !== storedState) {
+            // Validate state
+            const storedState = sessionStorage.getItem('oauth_state');
+            if (state !== storedState) {
                 update(s => ({ ...s, loading: false, error: 'Invalid state parameter' }));
                 return false;
             }
-            if (browser) {
-                sessionStorage.removeItem('oauth_state');
-            }
+            sessionStorage.removeItem('oauth_state');
 
             try {
                 const apiBase = getApiBase();
@@ -148,11 +145,9 @@ function createAuthStore() {
 
                 // Store tokens
                 refreshToken = tokens.refresh_token;
-                if (browser) {
-                    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-                    localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access_token);
-                    localStorage.setItem(AUTH_METHOD_KEY, 'azure_ad');
-                }
+                localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+                localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access_token);
+                localStorage.setItem(AUTH_METHOD_KEY, 'azure_ad');
 
                 // Schedule refresh
                 scheduleRefresh(tokens.expires_in);
@@ -199,10 +194,8 @@ function createAuthStore() {
                 const tokens: TokenResponse = await res.json();
 
                 refreshToken = tokens.refresh_token;
-                if (browser) {
-                    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
-                    localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access_token);
-                }
+                localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+                localStorage.setItem(ACCESS_TOKEN_KEY, tokens.access_token);
 
                 scheduleRefresh(tokens.expires_in);
 
@@ -249,10 +242,8 @@ function createAuthStore() {
                         authMethod: 'email',
                     }));
                     // Store email for future requests
-                    if (browser) {
-                        localStorage.setItem(EMAIL_KEY, email);
-                        localStorage.setItem(AUTH_METHOD_KEY, 'email');
-                    }
+                    localStorage.setItem(EMAIL_KEY, email);
+                    localStorage.setItem(AUTH_METHOD_KEY, 'email');
                     return true;
                 } else {
                     update(s => ({ ...s, loading: false, error: data.message || 'Not authenticated', initialized: true }));
@@ -270,16 +261,14 @@ function createAuthStore() {
         async logout() {
             if (refreshTimeout) clearTimeout(refreshTimeout);
 
-            const authMethod = browser ? localStorage.getItem(AUTH_METHOD_KEY) : null;
+            const authMethod = localStorage.getItem(AUTH_METHOD_KEY);
 
             // Clear all auth data
             refreshToken = null;
-            if (browser) {
-                localStorage.removeItem(REFRESH_TOKEN_KEY);
-                localStorage.removeItem(ACCESS_TOKEN_KEY);
-                localStorage.removeItem(EMAIL_KEY);
-                localStorage.removeItem(AUTH_METHOD_KEY);
-            }
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            localStorage.removeItem(ACCESS_TOKEN_KEY);
+            localStorage.removeItem(EMAIL_KEY);
+            localStorage.removeItem(AUTH_METHOD_KEY);
 
             update(s => ({
                 user: null,
@@ -302,17 +291,17 @@ function createAuthStore() {
          * Restore session from stored tokens
          */
         async restore(): Promise<boolean> {
-            const authMethod = browser ? localStorage.getItem(AUTH_METHOD_KEY) as 'azure_ad' | 'email' | null : null;
+            const authMethod = localStorage.getItem(AUTH_METHOD_KEY) as 'azure_ad' | 'email' | null;
 
             if (authMethod === 'azure_ad') {
                 // Try to use existing access token, will refresh if needed
-                const storedAccessToken = browser ? localStorage.getItem(ACCESS_TOKEN_KEY) : null;
+                const storedAccessToken = localStorage.getItem(ACCESS_TOKEN_KEY);
                 if (storedAccessToken && refreshToken) {
                     return this.refresh();
                 }
             } else if (authMethod === 'email') {
                 // Restore email-based session
-                const email = browser ? localStorage.getItem(EMAIL_KEY) : null;
+                const email = localStorage.getItem(EMAIL_KEY);
                 if (email) {
                     return this.login(email);
                 }
@@ -335,15 +324,13 @@ function createAuthStore() {
          * Get email for API calls (legacy)
          */
         getEmail(): string | null {
-            return browser ? localStorage.getItem(EMAIL_KEY) : null;
+            return localStorage.getItem(EMAIL_KEY);
         },
 
         /**
          * Get auth header for API calls
          */
         getAuthHeader(): Record<string, string> {
-            if (!browser) return {};
-
             const authMethod = localStorage.getItem(AUTH_METHOD_KEY);
 
             if (authMethod === 'azure_ad') {
