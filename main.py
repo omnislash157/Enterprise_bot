@@ -69,16 +69,48 @@ except ImportError as e:
 
 def get_twin():
     """Router: select orchestrator based on deployment mode."""
+    from config_loader import get_config
     mode = cfg('deployment.mode', 'personal')
 
     if mode == 'enterprise':
         from enterprise_twin import EnterpriseTwin
         logger.info("[STARTUP] Initializing EnterpriseTwin (enterprise mode)...")
-        return EnterpriseTwin()
+        return EnterpriseTwin(get_config())  # Pass config
     else:
         from cog_twin import CogTwin
         logger.info("[STARTUP] Initializing CogTwin (personal mode)...")
         return CogTwin()
+
+
+def get_twin_for_auth(auth_method: str, user_email: str = None):
+    """
+    Route to correct twin based on auth provider.
+
+    This allows per-request twin selection based on how the user authenticated:
+    - Azure AD / Entra ID -> EnterpriseTwin (corporate context)
+    - Google / Email / Other -> CogTwin (personal context)
+
+    Args:
+        auth_method: Authentication method ('azure_ad', 'legacy_email', 'email', etc.)
+        user_email: User's email (for logging)
+
+    Returns:
+        Twin instance (EnterpriseTwin or CogTwin)
+    """
+    from config_loader import get_config
+
+    # Enterprise providers route to EnterpriseTwin
+    enterprise_providers = ['azure_ad', 'azuread', 'entra_id', 'microsoft']
+
+    if auth_method in enterprise_providers:
+        from enterprise_twin import EnterpriseTwin
+        logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → EnterpriseTwin")
+        return EnterpriseTwin(get_config())
+    else:
+        from cog_twin import CogTwin
+        logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → CogTwin")
+        return CogTwin()
+
 
 # Auth imports
 try:
@@ -677,6 +709,9 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     # If verify message comes, we use that email
     # If not, we use default tenant (warehouse division)
     user_email = "demo@driscollfoods.com"  # Default for unverified sessions
+    auth_method = "default"  # Track auth method for twin routing
+    request_twin = None  # Will be set based on auth method
+
     tenant = TenantContext(
         tenant_id="driscoll",
         division=cfg("tenant.default_division", "warehouse") if CONFIG_LOADED else "warehouse",
@@ -701,6 +736,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
             elif msg_type == "verify":
                 email = data.get("email", "")
+                # Capture auth_method from client (set by frontend during SSO or email login)
+                client_auth_method = data.get("auth_method", "email")
 
                 if AUTH_LOADED and email:
                     auth = get_auth_service()
@@ -708,6 +745,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                     if user:
                         user_email = email
+                        auth_method = client_auth_method  # Update auth method for twin routing
+
                         # Get user's departments
                         access_list = auth.get_user_department_access(user)
                         dept_slugs = [a.department_slug for a in access_list]
@@ -724,6 +763,9 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             role=user.role,
                             email=email,
                         )
+
+                        # Get appropriate twin based on auth method
+                        request_twin = get_twin_for_auth(auth_method, user_email)
 
                         auth.record_login(user)  # Track login
 
@@ -782,7 +824,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             elif msg_type == "message":
                 content = data.get("content", "")
 
-                if engine is None:
+                # Use request_twin if available (auth-based routing), otherwise use global engine
+                active_twin = request_twin if request_twin else engine
+
+                if active_twin is None:
                     await websocket.send_json({
                         "type": "error",
                         "message": "Engine not initialized",
@@ -791,11 +836,12 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                 # ===== TWIN-SPECIFIC HANDLING =====
                 # EnterpriseTwin and CogTwin have different signatures
-                mode = cfg('deployment.mode', 'personal')
+                # Check twin type by class name
+                twin_type = type(active_twin).__name__
 
-                if mode == 'enterprise':
+                if twin_type == 'EnterpriseTwin':
                     # EnterpriseTwin: returns EnterpriseResponse (non-streaming)
-                    response = await engine.think(
+                    response = await active_twin.think(
                         user_input=content,
                         user_email=user_email,
                         department=tenant.division,
@@ -835,7 +881,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                     # Stream response with auth context
                     response_text = ""
-                    async for chunk in engine.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
+                    async for chunk in active_twin.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
                         if isinstance(chunk, str) and chunk:
                             response_text += chunk
                             await websocket.send_json({
@@ -852,7 +898,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
 
                     # Send session stats
-                    stats = engine.get_session_stats()
+                    stats = active_twin.get_session_stats()
                     await websocket.send_json({
                         "type": "cognitive_state",
                         "phase": "ready",
