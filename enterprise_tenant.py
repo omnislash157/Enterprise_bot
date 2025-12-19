@@ -1,127 +1,199 @@
 """
-Enterprise Tenant - Simplified for context-stuffing mode.
+Enterprise Tenant Context - Lightweight request context for enterprise mode.
 
-No SQL, no filesystem vaults - just tenant context for division-aware docs.
+This is a simple dataclass that carries tenant/department/user context
+through the request lifecycle. It does NOT manage auth or access control -
+that's handled by Entra ID + the admin portal + RLS policies.
 
 Usage:
     from enterprise_tenant import TenantContext
     
+    # From authenticated request
     tenant = TenantContext(
         tenant_id="driscoll",
-        division="warehouse",
-        zone="night_shift",
-        role="user",
+        department="warehouse",
+        user_email="alice@driscollfoods.com",
+        user_id="uuid-here",
+    )
+    
+    # Pass to EnterpriseTwin
+    response = await twin.think(
+        user_input=message,
+        user_email=tenant.user_email,
+        department=tenant.department,
+        session_id=session_id,
     )
 
-Version: 1.0.0 (enterprise-lite)
+Version: 2.0.0 (post-merge, Entra ID auth)
+
+DEPRECATED:
+- SimpleTenantManager - replaced by Entra ID + admin portal
+- Division detection from email - use database user_department_access
+- Domain whitelist - use Entra ID tenant restrictions
 """
 
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
+from dataclasses import dataclass, field
+from typing import Optional, Dict, Any, List
+from datetime import datetime
 
 
 @dataclass
 class TenantContext:
     """
-    Lightweight tenant context for enterprise mode.
+    Request context for enterprise mode.
     
-    Used to scope doc loading and voice selection.
-    No SQL dependency in basic tier.
+    Carries tenant/department/user info through the request lifecycle.
+    Created from authenticated request, passed to EnterpriseTwin.
+    
+    Auth and access control are NOT handled here - that's:
+    - Entra ID for authentication
+    - RLS policies for data access
+    - Admin portal for user management
     """
-    tenant_id: str          # Company ID (e.g., "driscoll")
-    division: str           # User's division (e.g., "warehouse", "hr")
-    zone: Optional[str] = None      # Shift/region (e.g., "night_shift", "west_region")
-    role: str = "user"      # user | manager | admin
-    email: Optional[str] = None     # User's email (for logging)
+    # Required
+    tenant_id: str                          # Company ID (e.g., "driscoll")
+    department: str                         # User's primary department
+    
+    # User info (from auth)
+    user_email: Optional[str] = None
+    user_id: Optional[str] = None           # UUID from users table
+    display_name: Optional[str] = None
+    
+    # Access info (from database)
+    role: str = "user"                      # user | dept_head | admin | super_user
+    departments: List[str] = field(default_factory=list)  # All accessible depts
+    
+    # Session
+    session_id: Optional[str] = None
+    created_at: datetime = field(default_factory=datetime.now)
     
     def to_dict(self) -> Dict[str, Any]:
+        """Serialize for logging/debugging."""
         return {
             "tenant_id": self.tenant_id,
-            "division": self.division,
-            "zone": self.zone,
+            "department": self.department,
+            "user_email": self.user_email,
+            "user_id": self.user_id,
             "role": self.role,
-            "email": self.email,
+            "departments": self.departments,
+            "session_id": self.session_id,
         }
     
-    @classmethod
-    def from_email(cls, email: str, tenant_id: str = "driscoll", default_division: str = "warehouse") -> "TenantContext":
-        """Create tenant context from email with division detection."""
-        email_lower = email.lower()
-        
-        # Simple division detection from email
-        if "transport" in email_lower or "driver" in email_lower or "dispatch" in email_lower:
-            division = "transportation"
-        elif "hr" in email_lower or "human" in email_lower:
-            division = "hr"
-        elif "sales" in email_lower or "account" in email_lower:
-            division = "sales"
-        elif "ops" in email_lower or "warehouse" in email_lower or "inventory" in email_lower:
-            division = "warehouse"
-        else:
-            division = default_division
-        
-        return cls(
-            tenant_id=tenant_id,
-            division=division,
-            email=email,
-        )
+    @property
+    def is_admin(self) -> bool:
+        """Check if user has admin privileges."""
+        return self.role in ("admin", "super_user")
+    
+    @property
+    def is_dept_head(self) -> bool:
+        """Check if user is a department head."""
+        return self.role in ("dept_head", "admin", "super_user")
+    
+    def can_access_department(self, dept: str) -> bool:
+        """Check if user can access a specific department."""
+        if self.is_admin:
+            return True
+        return dept in self.departments or dept == self.department
 
 
-# For backward compatibility with SQL version
-class SimpleTenantManager:
+@dataclass
+class DataConnection:
     """
-    Simple in-memory tenant management for basic tier.
+    Connection info for external data sources.
     
-    No SQL required - just domain validation.
+    Separate from RAG - this is for querying Driscoll's business data
+    (credits, inventory, etc.) not for process manual retrieval.
     """
+    tenant_id: str
+    source_type: str                        # "direct_sql" | "etl" | "api"
     
-    def __init__(self, allowed_domains: list = None):
-        self.allowed_domains = set(d.lower() for d in (allowed_domains or []))
-        self._tenants: Dict[str, TenantContext] = {}
+    # For direct_sql (Driscoll SQL Server)
+    sql_server: Optional[str] = None
+    sql_database: Optional[str] = None
+    sql_username: Optional[str] = None
+    sql_password: Optional[str] = None
     
-    def is_allowed(self, email: str) -> bool:
-        """Check if email domain is allowed."""
-        if not self.allowed_domains:
-            return True  # No restrictions
-        
-        email_lower = email.lower().strip()
-        if "@" not in email_lower:
-            return False
-        
-        domain = email_lower.split("@")[1]
-        return domain in self.allowed_domains
+    # For etl (data replicated to our PostgreSQL)
+    pg_schema: Optional[str] = None
     
-    def get_or_create(self, email: str, tenant_id: str = "driscoll") -> TenantContext:
-        """Get or create tenant context for email."""
-        email_lower = email.lower().strip()
-        
-        if email_lower not in self._tenants:
-            self._tenants[email_lower] = TenantContext.from_email(
-                email=email_lower,
-                tenant_id=tenant_id,
-            )
-        
-        return self._tenants[email_lower]
+    # For api (external API access)
+    api_endpoint: Optional[str] = None
+    api_key: Optional[str] = None
+
+
+def create_tenant_context_from_auth(
+    auth_payload: Dict[str, Any],
+    db_user: Optional[Dict[str, Any]] = None,
+    tenant_id: str = "driscoll",
+) -> TenantContext:
+    """
+    Create TenantContext from Entra ID auth payload + database user record.
     
-    def get_stats(self) -> Dict[str, Any]:
-        """Get simple stats."""
-        divisions = {}
-        for tenant in self._tenants.values():
-            divisions[tenant.division] = divisions.get(tenant.division, 0) + 1
+    Args:
+        auth_payload: Decoded JWT from Entra ID
+        db_user: User record from enterprise.users table
+        tenant_id: Tenant ID (default driscoll)
         
-        return {
-            "total_tenants": len(self._tenants),
-            "by_division": divisions,
-            "allowed_domains": list(self.allowed_domains),
-        }
+    Returns:
+        TenantContext ready for use
+    """
+    # Extract from Entra ID token
+    email = auth_payload.get("preferred_username") or auth_payload.get("email", "")
+    display_name = auth_payload.get("name", "")
+    
+    # Extract from database user record
+    if db_user:
+        user_id = db_user.get("id")
+        role = "super_user" if db_user.get("is_super_user") else "user"
+        primary_dept = db_user.get("primary_department", "default")
+        departments = db_user.get("departments", [primary_dept])
+        
+        # Check for dept head status
+        if db_user.get("is_dept_head"):
+            role = "dept_head"
+    else:
+        user_id = None
+        role = "user"
+        primary_dept = "default"
+        departments = [primary_dept]
+    
+    return TenantContext(
+        tenant_id=tenant_id,
+        department=primary_dept,
+        user_email=email,
+        user_id=user_id,
+        display_name=display_name,
+        role=role,
+        departments=departments,
+    )
+
+
+# =============================================================================
+# DEPRECATED - Kept for reference, do not use
+# =============================================================================
+
+# SimpleTenantManager - DEPRECATED
+# Auth is now via Entra ID + admin portal
+# Domain whitelist is legacy fallback only
+
+# TenantContext.from_email() - DEPRECATED  
+# Division detection should use database user_department_access table
+# Not email pattern matching
 
 
 if __name__ == "__main__":
     # Quick test
-    tenant = TenantContext.from_email("warehouse_ops@driscollfoods.com")
-    print(f"Tenant: {tenant}")
-    print(f"Division detected: {tenant.division}")
+    ctx = TenantContext(
+        tenant_id="driscoll",
+        department="warehouse",
+        user_email="alice@driscollfoods.com",
+        role="user",
+        departments=["warehouse", "shipping"],
+    )
     
-    manager = SimpleTenantManager(allowed_domains=["driscollfoods.com", "gmail.com"])
-    print(f"alice@driscollfoods.com allowed: {manager.is_allowed('alice@driscollfoods.com')}")
-    print(f"bob@random.com allowed: {manager.is_allowed('bob@random.com')}")
+    print(f"Context: {ctx.to_dict()}")
+    print(f"Is admin: {ctx.is_admin}")
+    print(f"Can access sales: {ctx.can_access_department('sales')}")
+    print(f"Can access warehouse: {ctx.can_access_department('warehouse')}")
+    
+    print("\n[OK] Enterprise tenant context working")
