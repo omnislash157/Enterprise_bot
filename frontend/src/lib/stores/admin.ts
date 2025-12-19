@@ -141,11 +141,14 @@ function createAdminStore() {
     }
     
     function getHeaders(): Record<string, string> {
-        const authHeaders = auth.getAuthHeader();
-        return {
+        const email = auth.getEmail();
+        const headers: Record<string, string> = {
             'Content-Type': 'application/json',
-            ...authHeaders,
         };
+        if (email) {
+            headers['X-User-Email'] = email;
+        }
+        return headers;
     }
     
     async function apiCall<T>(

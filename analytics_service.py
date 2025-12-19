@@ -291,6 +291,7 @@ class AnalyticsService:
         Log a query with classification.
         Returns the query_log ID.
         """
+        return None  # Analytics tables disabled
         # Classify
         category, keywords = self.classify_query(query_text)
         frustration = self.detect_frustration(query_text)
@@ -361,6 +362,7 @@ class AnalyticsService:
         Log a non-query event (login, logout, dept_switch, error, etc.)
         Returns the event ID.
         """
+        return None  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.analytics_events (
@@ -395,6 +397,7 @@ class AnalyticsService:
     @timed
     def get_overview_stats(self, hours: int = 24) -> Dict[str, Any]:
         """Get overview stats for dashboard."""
+        return {}  # Analytics tables disabled
         with self._get_cursor() as cur:
             # Active users (queries in last hour)
             cur.execute(f"""
@@ -442,6 +445,7 @@ class AnalyticsService:
     @timed
     def get_queries_by_hour(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get query counts grouped by hour."""
+        return []  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -458,6 +462,7 @@ class AnalyticsService:
     @timed
     def get_category_breakdown(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get query category breakdown."""
+        return []  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -474,6 +479,7 @@ class AnalyticsService:
     @timed
     def get_department_stats(self, hours: int = 24) -> List[Dict[str, Any]]:
         """Get per-department statistics."""
+        return []  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -497,6 +503,7 @@ class AnalyticsService:
     @timed
     def get_recent_errors(self, limit: int = 20) -> List[Dict[str, Any]]:
         """Get recent error events."""
+        return []  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -519,6 +526,7 @@ class AnalyticsService:
 
     def get_user_activity(self, user_email: str, days: int = 7) -> Dict[str, Any]:
         """Get activity stats for a specific user."""
+        return {}  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -557,6 +565,7 @@ class AnalyticsService:
     @timed
     def get_realtime_sessions(self) -> List[Dict[str, Any]]:
         """Get currently active sessions (activity in last 5 minutes)."""
+        return []  # Analytics tables disabled
         with self._get_cursor() as cur:
             cur.execute(f"""
                 SELECT
@@ -589,6 +598,7 @@ class AnalyticsService:
         Get all dashboard data using a SINGLE connection.
         This is the primary method for dashboard loads.
         """
+        return {}  # Analytics tables disabled
         with self._get_connection() as conn:
             result = {
                 "overview": self._get_overview_stats_with_conn(conn, hours),

@@ -14,6 +14,3 @@ export type { AppConfig } from './config';
 export { user, isAuthenticated, signIn, signOut } from './auth';
 // Analytics
 export * from './analytics';
-
-// Cheeky status
-export { cheekyStore, isCheekyLoading, cheekyCategory, cheekyProgress } from './cheeky';

@@ -166,7 +166,7 @@ async def handle_callback(request: CallbackRequest):
                 "email": user.email,
                 "display_name": user.display_name,
                 "role": user.role,
-                "departments": [a.department_slug for a in user.access_list],
+                "departments": user.dept_slugs,
                 "is_super_user": user.is_super_user,
                 "can_manage_users": user.can_manage_users,
             },
@@ -200,7 +200,7 @@ async def handle_refresh(request: RefreshRequest):
     if not user:
         raise HTTPException(401, "User not found")
 
-    access_list = auth.get_user_department_access(user)
+    dept_slugs = auth.get_user_department_access(user)
 
     from datetime import datetime
     now = datetime.utcnow()
@@ -215,7 +215,7 @@ async def handle_refresh(request: RefreshRequest):
             "email": user.email,
             "display_name": user.display_name,
             "role": user.role,
-            "departments": [a.department_slug for a in access_list],
+            "departments": dept_slugs,
             "is_super_user": user.is_super_user,
             "can_manage_users": user.can_manage_users,
         },
@@ -283,7 +283,7 @@ async def provision_user(azure_user: AzureUser):
             )
 
     # Get department access
-    access_list = auth.get_user_department_access(user)
-    user.access_list = access_list
+    dept_slugs = auth.get_user_department_access(user)
+    user.dept_slugs = dept_slugs
 
     return user
