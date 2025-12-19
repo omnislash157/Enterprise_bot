@@ -349,20 +349,20 @@ class TenantService:
     # -------------------------------------------------------------------------
     
     def get_department_content(
-        self, 
+        self,
         department_id: str,
         content_type: Optional[str] = None,
         active_only: bool = True
     ) -> List[Dict[str, Any]]:
         """
         Get all content for a department (manuals, procedures, etc.)
-        
+
         Returns list of dicts with: id, title, content, content_type, version
         """
         with get_db_cursor() as cur:
             query = f"""
                 SELECT id, title, content, content_type, version, updated_at
-                FROM {SCHEMA}.department_content 
+                FROM {SCHEMA}.documents
                 WHERE department_id = %s
             """
             params = [department_id]
@@ -397,7 +397,7 @@ class TenantService:
             if department_slug:
                 cur.execute(f"""
                     SELECT d.name as dept_name, dc.title, dc.content
-                    FROM {SCHEMA}.department_content dc
+                    FROM {SCHEMA}.documents dc
                     JOIN {SCHEMA}.departments d ON dc.department_id = d.id
                     WHERE d.slug = %s AND dc.active = TRUE AND d.active = TRUE
                     ORDER BY d.name, dc.title
@@ -405,7 +405,7 @@ class TenantService:
             else:
                 cur.execute(f"""
                     SELECT d.name as dept_name, dc.title, dc.content
-                    FROM {SCHEMA}.department_content dc
+                    FROM {SCHEMA}.documents dc
                     JOIN {SCHEMA}.departments d ON dc.department_id = d.id
                     WHERE dc.active = TRUE AND d.active = TRUE
                     ORDER BY d.name, dc.title
