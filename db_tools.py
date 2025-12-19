@@ -81,10 +81,10 @@ class DatabaseTool:
             AZURE_PG_HOST, AZURE_PG_PORT, AZURE_PG_DATABASE,
             AZURE_PG_USER, AZURE_PG_PASSWORD
         """
-        self.host = host or os.getenv("AZURE_PG_HOST", "enterprisebot.postgres.database.azure.com")
+        self.host = host or os.getenv("AZURE_PG_HOST", "cogtwin.postgres.database.azure.com")
         self.port = port or int(os.getenv("AZURE_PG_PORT", "5432"))
-        self.database = database or os.getenv("AZURE_PG_DATABASE", "enterprise_bot")
-        self.user = user or os.getenv("AZURE_PG_USER", "Mhartigan")
+        self.database = database or os.getenv("AZURE_PG_DATABASE", "postgres")
+        self.user = user or os.getenv("AZURE_PG_USER", "mhartigan")
         self.password = password or os.getenv("AZURE_PG_PASSWORD", "Lalamoney3!")
         self.sslmode = sslmode
 

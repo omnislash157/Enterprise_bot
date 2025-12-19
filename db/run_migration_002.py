@@ -17,9 +17,9 @@ load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 DB_CONFIG = {
-    "user": os.getenv("AZURE_PG_USER", "Mhartigan"),
-    "password": os.getenv("AZURE_PG_PASSWORD"),
-    "host": os.getenv("AZURE_PG_HOST", "enterprisebot.postgres.database.azure.com"),
+    "user": os.getenv("AZURE_PG_USER", "mhartigan"),
+    "password": os.getenv("AZURE_PG_PASSWORD", "Lalamoney3!"),
+    "host": os.getenv("AZURE_PG_HOST", "cogtwin.postgres.database.azure.com"),
     "port": int(os.getenv("AZURE_PG_PORT", "5432")),
     "database": os.getenv("AZURE_PG_DATABASE", "postgres"),
     "sslmode": "require"
