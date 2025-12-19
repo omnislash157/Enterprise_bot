@@ -1,7 +1,7 @@
 """
 Enterprise RAG Retriever - Process Manual Search
 
-Retrieves relevant chunks from department_content table using:
+Retrieves relevant chunks from documents table using:
 1. BGE-M3 dense vectors (semantic similarity)
 2. Keyword matching (fallback when embeddings are NULL)
 3. RLS enforcement via tenant/department context
@@ -136,7 +136,7 @@ class EnterpriseRAGRetriever:
         
         # RAG config
         rag_config = config.get("features", {}).get("enterprise_rag", {})
-        self.table_name = rag_config.get("table", "enterprise.department_content")
+        self.table_name = rag_config.get("table", "enterprise.documents")
         self.default_top_k = rag_config.get("top_k", 5)
         self.default_threshold = rag_config.get("threshold", 0.6)
         
@@ -469,7 +469,7 @@ if __name__ == "__main__":
         },
         "features": {
             "enterprise_rag": {
-                "table": "enterprise.department_content",
+                "table": "enterprise.documents",
                 "top_k": 5,
                 "threshold": 0.6,
             }
