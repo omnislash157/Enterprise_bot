@@ -2,7 +2,7 @@
 Auth Service - User Lookup and Permission Checking
 
 AUTHENTICATION: Microsoft Entra ID (Azure AD) via SSO
-AUTHORIZATION: Database (user_department_access table)
+AUTHORIZATION: Database (access_config table)
 
 This service handles:
 - User lookup (by email, Azure OID, or user ID)
@@ -13,7 +13,7 @@ The flow is simple:
 1. User logs in via Microsoft SSO → token validated by azure_auth.py
 2. User looked up or created here → NO automatic department access
 3. Super user / dept head grants access via admin portal
-4. user_department_access table is the source of truth
+4. access_config table is the source of truth
 
 Usage:
     from auth_service import AuthService, get_auth_service
@@ -25,7 +25,7 @@ Usage:
 
     # Check department access (database-driven)
     if auth.can_access_department(user, "purchasing"):
-        # User has explicit grant in user_department_access table
+        # User has explicit grant in access_config table
         ...
 
     # Admin operations (requires super_user or dept_head role)
@@ -67,7 +67,7 @@ SCHEMA = "enterprise"
 # AUTH NOTES
 # =============================================================================
 # Authentication: Microsoft Entra ID (Azure AD) validates users via SSO
-# Authorization: Database (user_department_access table) controls access
+# Authorization: Database (access_config table) controls access
 # Admin Portal: Super users and dept heads manage access grants
 #
 # NO domain whitelists or email pattern detection needed - if they have
@@ -316,94 +316,62 @@ class AuthService:
     # Department Access
     # -------------------------------------------------------------------------
     
-    def get_user_department_access(self, user: User) -> List[DepartmentAccess]:
-        """Get all departments a user can access."""
+    def get_user_department_access(self, user: User) -> List[str]:
+        """Get all departments a user can access. Returns list of department slugs."""
         cache_key = user.id
-        
+
         if cache_key in self._access_cache:
             return self._access_cache[cache_key]
-        
+
         # Super users see everything
         if user.is_super_user:
             with get_db_cursor() as cur:
                 cur.execute(f"""
-                    SELECT id, slug, name FROM {SCHEMA}.departments WHERE active = TRUE
+                    SELECT slug FROM {SCHEMA}.departments WHERE active = TRUE
                 """)
                 rows = cur.fetchall()
-            
-            access_list = [
-                DepartmentAccess(
-                    department_id=str(row["id"]),
-                    department_slug=row["slug"],
-                    department_name=row["name"],
-                    access_level="admin",
-                    is_dept_head=False,
-                    granted_at=datetime.now()
-                )
-                for row in rows
-            ]
-            self._access_cache[cache_key] = access_list
-            return access_list
-        
+
+            dept_slugs = [row["slug"] for row in rows]
+            self._access_cache[cache_key] = dept_slugs
+            return dept_slugs
+
         # Regular users - check explicit grants
         with get_db_cursor() as cur:
             cur.execute(f"""
-                SELECT 
-                    d.id as department_id,
-                    d.slug as department_slug,
-                    d.name as department_name,
-                    uda.access_level,
-                    uda.is_dept_head,
-                    uda.granted_at,
-                    uda.expires_at
-                FROM {SCHEMA}.user_department_access uda
-                JOIN {SCHEMA}.departments d ON uda.department_id = d.id
-                WHERE uda.user_id = %s 
+                SELECT
+                    d.slug as department_slug
+                FROM enterprise.access_config ac
+                JOIN {SCHEMA}.departments d ON ac.department = d.slug
+                WHERE ac.user_id = %s
                   AND d.active = TRUE
-                  AND (uda.expires_at IS NULL OR uda.expires_at > CURRENT_TIMESTAMP)
                 ORDER BY d.name
             """, (user.id,))
             rows = cur.fetchall()
-        
-        access_list = [
-            DepartmentAccess(
-                department_id=str(row["department_id"]),
-                department_slug=row["department_slug"],
-                department_name=row["department_name"],
-                access_level=row["access_level"],
-                is_dept_head=row["is_dept_head"],
-                granted_at=row["granted_at"],
-                expires_at=row["expires_at"]
-            )
-            for row in rows
-        ]
-        
-        self._access_cache[cache_key] = access_list
-        return access_list
+
+        dept_slugs = [row["department_slug"] for row in rows]
+
+        self._access_cache[cache_key] = dept_slugs
+        return dept_slugs
     
     def can_access_department(self, user: User, department_slug: str) -> bool:
         """Check if user can access a specific department."""
         if user.is_super_user:
             return True
-        
-        access_list = self.get_user_department_access(user)
-        return any(a.department_slug == department_slug for a in access_list)
+
+        dept_slugs = self.get_user_department_access(user)
+        return department_slug in dept_slugs
     
     def get_accessible_department_slugs(self, user: User) -> List[str]:
         """Get list of department slugs user can access."""
-        access_list = self.get_user_department_access(user)
-        return [a.department_slug for a in access_list]
+        return self.get_user_department_access(user)
     
     def is_dept_head_for(self, user: User, department_slug: str) -> bool:
         """Check if user is department head for a specific department."""
         if user.is_super_user:
             return True
-        
-        access_list = self.get_user_department_access(user)
-        return any(
-            a.department_slug == department_slug and a.is_dept_head 
-            for a in access_list
-        )
+
+        # With new schema, use role field instead
+        return user.role == "dept_head" and department_slug in self.get_user_department_access(user)
     
     # -------------------------------------------------------------------------
     # Admin Operations
@@ -442,40 +410,35 @@ class AuthService:
         
         with get_db_connection() as conn:
             cur = conn.cursor(cursor_factory=RealDictCursor)
-            
-            # Get department ID
+
+            # Verify department exists
             cur.execute(f"""
-                SELECT id FROM {SCHEMA}.departments WHERE slug = %s AND active = TRUE
+                SELECT slug FROM {SCHEMA}.departments WHERE slug = %s AND active = TRUE
             """, (department_slug,))
-            dept_row = cur.fetchone()
-            if not dept_row:
+            if not cur.fetchone():
                 raise ValueError(f"Department not found: {department_slug}")
-            dept_id = dept_row["id"]
-            
-            # Grant access
+
+            # Grant access (new schema: department is a string slug, no access_level/is_dept_head columns)
             cur.execute(f"""
-                INSERT INTO {SCHEMA}.user_department_access
-                    (user_id, department_id, access_level, is_dept_head, granted_by)
-                VALUES (%s, %s, %s, %s, %s)
-                ON CONFLICT (user_id, department_id) DO UPDATE SET
-                    access_level = EXCLUDED.access_level,
-                    is_dept_head = EXCLUDED.is_dept_head,
-                    granted_by = EXCLUDED.granted_by
-            """, (target_user.id, dept_id, access_level, make_dept_head, actor.id))
-            
+                INSERT INTO enterprise.access_config
+                    (user_id, department)
+                VALUES (%s, %s)
+                ON CONFLICT (user_id, department) DO NOTHING
+            """, (target_user.id, department_slug))
+
             # Audit log
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.access_audit_log
                     (action, actor_id, actor_email, target_user_id, target_email,
-                     department_id, department_slug, new_value, reason)
-                VALUES ('grant', %s, %s, %s, %s, %s, %s, %s, %s)
+                     department_slug, new_value, reason)
+                VALUES ('grant', %s, %s, %s, %s, %s, %s, %s)
             """, (
                 actor.id, actor.email, target_user.id, target_user.email,
-                dept_id, department_slug,
-                f"access_level={access_level}, dept_head={make_dept_head}",
+                department_slug,
+                f"access granted (deprecated params: access_level={access_level}, dept_head={make_dept_head})",
                 reason
             ))
-            
+
             conn.commit()
             cur.close()
         
@@ -504,46 +467,44 @@ class AuthService:
         
         with get_db_connection() as conn:
             cur = conn.cursor(cursor_factory=RealDictCursor)
-            
-            # Get department ID
+
+            # Verify department exists
             cur.execute(f"""
-                SELECT id FROM {SCHEMA}.departments WHERE slug = %s
+                SELECT slug FROM {SCHEMA}.departments WHERE slug = %s
             """, (department_slug,))
-            dept_row = cur.fetchone()
-            if not dept_row:
+            if not cur.fetchone():
                 raise ValueError(f"Department not found: {department_slug}")
-            dept_id = dept_row["id"]
-            
-            # Get current access for audit
+
+            # Check if user has access
             cur.execute(f"""
-                SELECT access_level, is_dept_head 
-                FROM {SCHEMA}.user_department_access
-                WHERE user_id = %s AND department_id = %s
-            """, (target_user.id, dept_id))
+                SELECT department
+                FROM enterprise.access_config
+                WHERE user_id = %s AND department = %s
+            """, (target_user.id, department_slug))
             old_access = cur.fetchone()
-            
+
             if not old_access:
                 return False  # Nothing to revoke
-            
+
             # Delete access
             cur.execute(f"""
-                DELETE FROM {SCHEMA}.user_department_access
-                WHERE user_id = %s AND department_id = %s
-            """, (target_user.id, dept_id))
-            
+                DELETE FROM enterprise.access_config
+                WHERE user_id = %s AND department = %s
+            """, (target_user.id, department_slug))
+
             # Audit log
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.access_audit_log
                     (action, actor_id, actor_email, target_user_id, target_email,
-                     department_id, department_slug, old_value, reason)
-                VALUES ('revoke', %s, %s, %s, %s, %s, %s, %s, %s)
+                     department_slug, old_value, reason)
+                VALUES ('revoke', %s, %s, %s, %s, %s, %s, %s)
             """, (
                 actor.id, actor.email, target_user.id, target_user.email,
-                dept_id, department_slug,
-                f"access_level={old_access['access_level']}, dept_head={old_access['is_dept_head']}",
+                department_slug,
+                f"access revoked",
                 reason
             ))
-            
+
             conn.commit()
             cur.close()
         
@@ -695,17 +656,17 @@ class AuthService:
 
             for dept_slug in depts_to_grant:
                 cur.execute(f"""
-                    SELECT id FROM {SCHEMA}.departments
+                    SELECT slug FROM {SCHEMA}.departments
                     WHERE slug = %s AND active = TRUE
                 """, (dept_slug,))
                 dept_row = cur.fetchone()
                 if dept_row:
                     cur.execute(f"""
-                        INSERT INTO {SCHEMA}.user_department_access
-                            (user_id, department_id, access_level, is_dept_head, granted_by)
-                        VALUES (%s, %s, 'read', FALSE, %s)
-                        ON CONFLICT (user_id, department_id) DO NOTHING
-                    """, (user_id, dept_row["id"], actor.id))
+                        INSERT INTO enterprise.access_config
+                            (user_id, department)
+                        VALUES (%s, %s)
+                        ON CONFLICT (user_id, department) DO NOTHING
+                    """, (user_id, dept_slug))
 
             # Audit log
             cur.execute(f"""
@@ -1020,17 +981,16 @@ class AuthService:
         
         with get_db_cursor() as cur:
             cur.execute(f"""
-                SELECT 
+                SELECT
                     u.id, u.email, u.display_name, u.employee_id, u.role,
-                    uda.access_level, uda.is_dept_head, uda.granted_at
+                    ac.created_at as granted_at
                 FROM {SCHEMA}.users u
-                JOIN {SCHEMA}.user_department_access uda ON u.id = uda.user_id
-                JOIN {SCHEMA}.departments d ON uda.department_id = d.id
-                WHERE d.slug = %s AND u.active = TRUE
-                ORDER BY uda.is_dept_head DESC, u.display_name
+                JOIN enterprise.access_config ac ON u.id = ac.user_id
+                WHERE ac.department = %s AND u.active = TRUE
+                ORDER BY u.role DESC, u.display_name
             """, (department_slug,))
             rows = cur.fetchall()
-        
+
         return [dict(row) for row in rows]
     
     def list_all_users(self, actor: User) -> List[Dict[str, Any]]:
