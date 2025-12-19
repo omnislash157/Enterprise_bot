@@ -52,13 +52,33 @@ try:
         memory_enabled,
         is_enterprise_mode,
         get_ui_features,
+        get_config,
     )
     from cog_twin import CogTwin
+    from enterprise_twin import EnterpriseTwin
     from enterprise_tenant import TenantContext
     CONFIG_LOADED = True
 except ImportError as e:
     logger.error(f"Failed to import enterprise modules: {e}")
     CONFIG_LOADED = False
+
+
+# =============================================================================
+# TWIN ROUTER
+# =============================================================================
+
+def get_twin():
+    """Router: select orchestrator based on deployment mode."""
+    mode = cfg('deployment.mode', 'personal')
+
+    if mode == 'enterprise':
+        from enterprise_twin import EnterpriseTwin
+        logger.info("[STARTUP] Initializing EnterpriseTwin (enterprise mode)...")
+        return EnterpriseTwin()
+    else:
+        from cog_twin import CogTwin
+        logger.info("[STARTUP] Initializing CogTwin (personal mode)...")
+        return CogTwin()
 
 # Auth imports
 try:
@@ -346,18 +366,24 @@ async def startup_event():
 
     # Load config
     load_config()
+    config = get_config()
 
     # Load email whitelist
     email_whitelist.load()
 
-    # Initialize CogTwin (full RAG engine)
-    logger.info("[STARTUP] Initializing CogTwin...")
-    engine = CogTwin()
-    await engine.start()
+    # Initialize appropriate twin based on mode
+    engine = get_twin()
 
-    logger.info(f"[STARTUP] CogTwin ready")
-    logger.info(f"  Memory count: {engine.memory_count}")
-    logger.info(f"  Model: {engine.model}")
+    # Start async components if needed
+    if hasattr(engine, 'start'):
+        await engine.start()
+
+    # Log twin info
+    logger.info(f"[STARTUP] Twin ready: {type(engine).__name__}")
+    if hasattr(engine, 'memory_count'):
+        logger.info(f"  Memory count: {engine.memory_count}")
+    if hasattr(engine, 'model'):
+        logger.info(f"  Model: {engine.model}")
 
     # Warm up analytics connection pool and query plan cache
     if ANALYTICS_LOADED:
@@ -763,45 +789,76 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
                     continue
 
-                # ===== PHASE 3: Extract auth context for scoped retrieval =====
-                # Enterprise mode: use tenant_id
-                # Personal mode: use user_email as user_id
-                auth_tenant_id = None
-                auth_user_id = None
+                # ===== TWIN-SPECIFIC HANDLING =====
+                # EnterpriseTwin and CogTwin have different signatures
+                mode = cfg('deployment.mode', 'personal')
 
-                if tenant and tenant.tenant_id:
-                    # Enterprise deployment - use tenant_id
-                    auth_tenant_id = tenant.tenant_id
-                elif user_email:
-                    # Personal SaaS - use email as user_id
-                    auth_user_id = user_email
+                if mode == 'enterprise':
+                    # EnterpriseTwin: returns EnterpriseResponse (non-streaming)
+                    response = await engine.think(
+                        user_input=content,
+                        user_email=user_email,
+                        department=tenant.division,
+                        session_id=session_id,
+                        stream=False,
+                    )
 
-                # Stream response with auth context
-                response_text = ""
-                async for chunk in engine.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
-                    if isinstance(chunk, str) and chunk:
-                        response_text += chunk
-                        await websocket.send_json({
-                            "type": "stream_chunk",
-                            "content": chunk,
-                            "done": False,
-                        })
+                    # Send full response at once
+                    response_text = response.content
+                    await websocket.send_json({
+                        "type": "stream_chunk",
+                        "content": response_text,
+                        "done": True,
+                    })
 
-                # Send done signal
-                await websocket.send_json({
-                    "type": "stream_chunk",
-                    "content": "",
-                    "done": True,
-                })
+                    # Send context metadata
+                    await websocket.send_json({
+                        "type": "cognitive_state",
+                        "phase": "ready",
+                        "temperature": 0.5,
+                        "query_type": response.context.query_type,
+                        "tools_fired": response.context.tools_fired,
+                        "retrieval_time_ms": response.context.retrieval_time_ms,
+                        "total_time_ms": response.total_time_ms,
+                    })
 
-                # Send session stats (compatible with frontend's cognitive_state)
-                stats = engine.get_session_stats()
-                await websocket.send_json({
-                    "type": "cognitive_state",
-                    "phase": "ready",
-                    "temperature": 0.5,
-                    **stats,
-                })
+                else:
+                    # CogTwin: streams AsyncIterator[str]
+                    # Extract auth context for scoped retrieval
+                    auth_tenant_id = None
+                    auth_user_id = None
+
+                    if tenant and tenant.tenant_id:
+                        auth_tenant_id = tenant.tenant_id
+                    elif user_email:
+                        auth_user_id = user_email
+
+                    # Stream response with auth context
+                    response_text = ""
+                    async for chunk in engine.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
+                        if isinstance(chunk, str) and chunk:
+                            response_text += chunk
+                            await websocket.send_json({
+                                "type": "stream_chunk",
+                                "content": chunk,
+                                "done": False,
+                            })
+
+                    # Send done signal
+                    await websocket.send_json({
+                        "type": "stream_chunk",
+                        "content": "",
+                        "done": True,
+                    })
+
+                    # Send session stats
+                    stats = engine.get_session_stats()
+                    await websocket.send_json({
+                        "type": "cognitive_state",
+                        "phase": "ready",
+                        "temperature": 0.5,
+                        **stats,
+                    })
 
             elif msg_type == "set_division":
                 # Allow changing division mid-session
