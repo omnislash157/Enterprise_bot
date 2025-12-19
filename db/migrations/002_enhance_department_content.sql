@@ -155,24 +155,44 @@ ON enterprise.department_content USING GIN (keywords);
 -- ═══════════════════════════════════════════════════════════════════════════
 
 -- Ensure chunk_token_count is positive
-ALTER TABLE enterprise.department_content
-ADD CONSTRAINT IF NOT EXISTS chk_dept_content_token_count
-CHECK (chunk_token_count IS NULL OR chunk_token_count > 0);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_dept_content_token_count') THEN
+        ALTER TABLE enterprise.department_content
+        ADD CONSTRAINT chk_dept_content_token_count
+        CHECK (chunk_token_count IS NULL OR chunk_token_count > 0);
+    END IF;
+END $$;
 
 -- Ensure chunk_index is non-negative
-ALTER TABLE enterprise.department_content
-ADD CONSTRAINT IF NOT EXISTS chk_dept_content_chunk_index
-CHECK (chunk_index >= 0);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_dept_content_chunk_index') THEN
+        ALTER TABLE enterprise.department_content
+        ADD CONSTRAINT chk_dept_content_chunk_index
+        CHECK (chunk_index >= 0);
+    END IF;
+END $$;
 
 -- Ensure file_hash is valid SHA256 format (64 hex chars)
-ALTER TABLE enterprise.department_content
-ADD CONSTRAINT IF NOT EXISTS chk_dept_content_file_hash
-CHECK (file_hash IS NULL OR file_hash ~ '^[a-f0-9]{64}$');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_dept_content_file_hash') THEN
+        ALTER TABLE enterprise.department_content
+        ADD CONSTRAINT chk_dept_content_file_hash
+        CHECK (file_hash IS NULL OR file_hash ~ '^[a-f0-9]{64}$');
+    END IF;
+END $$;
 
 -- Ensure embedding model is specified when embedding exists
-ALTER TABLE enterprise.department_content
-ADD CONSTRAINT IF NOT EXISTS chk_dept_content_embedding_model
-CHECK (embedding IS NULL OR embedding_model IS NOT NULL);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_dept_content_embedding_model') THEN
+        ALTER TABLE enterprise.department_content
+        ADD CONSTRAINT chk_dept_content_embedding_model
+        CHECK (embedding IS NULL OR embedding_model IS NOT NULL);
+    END IF;
+END $$;
 
 -- ═══════════════════════════════════════════════════════════════════════════
 -- STEP 7: Add Composite Indexes for Common Query Patterns
