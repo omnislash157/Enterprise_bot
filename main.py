@@ -714,8 +714,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
     tenant = TenantContext(
         tenant_id="driscoll",
-        division=cfg("tenant.default_division", "warehouse") if CONFIG_LOADED else "warehouse",
-        zone=None,
+        department=cfg("tenant.default_department", "warehouse") if CONFIG_LOADED else "warehouse",
         role="user",
     )
 
@@ -758,10 +757,9 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                         tenant = TenantContext(
                             tenant_id="driscoll",
-                            division=requested_division,
-                            zone=None,
+                            department=requested_division,
                             role=user.role,
-                            email=email,
+                            user_email=email,
                         )
 
                         # Get appropriate twin based on auth method
@@ -776,7 +774,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 analytics.log_event(
                                     event_type="login",
                                     user_email=email,
-                                    department=tenant.division,
+                                    department=tenant.department,
                                     session_id=session_id,
                                     user_id=str(user.id) if hasattr(user, 'id') else None
                                 )
@@ -786,7 +784,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         await websocket.send_json({
                             "type": "verified",
                             "email": email,
-                            "division": tenant.division,
+                            "division": tenant.department,
                             "role": user.role,
                             "departments": dept_slugs,
                         })
@@ -802,22 +800,21 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         user_email = email
                         tenant = TenantContext(
                             tenant_id="driscoll",
-                            division=data.get("division", tenant.division),
-                            zone=None,
+                            department=data.get("division", tenant.department),
                             role="user",
-                            email=email,
+                            user_email=email,
                         )
                         await websocket.send_json({
                             "type": "verified",
                             "email": email,
-                            "division": tenant.division,
+                            "division": tenant.department,
                         })
                     else:
                         logger.warning(f"Email not in whitelist: {email}")
                         await websocket.send_json({
                             "type": "verified",
                             "email": email,
-                            "division": tenant.division,
+                            "division": tenant.department,
                             "warning": "Email not in whitelist, using demo mode",
                         })
 
@@ -844,7 +841,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     response = await active_twin.think(
                         user_input=content,
                         user_email=user_email,
-                        department=tenant.division,
+                        department=tenant.department,
                         session_id=session_id,
                         stream=False,
                     )
@@ -909,14 +906,13 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             elif msg_type == "set_division":
                 # Allow changing division mid-session
                 new_division = data.get("division", "warehouse")
-                old_division = tenant.division  # Capture before change
+                old_division = tenant.department  # Capture before change
 
                 tenant = TenantContext(
                     tenant_id=tenant.tenant_id,
-                    division=new_division,
-                    zone=tenant.zone,
+                    department=new_division,
                     role=tenant.role,
-                    email=tenant.email,
+                    user_email=tenant.user_email,
                 )
 
                 # Log department switch event

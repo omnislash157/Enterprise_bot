@@ -1,29 +1,34 @@
 """
 Auth Service - User Lookup and Permission Checking
 
-Works alongside tenant_service.py to handle:
-- User lookup by email (SSO or whitelist)
-- Department access verification
-- Permission checks for gated departments
-- Admin operations (grant/revoke access)
+AUTHENTICATION: Microsoft Entra ID (Azure AD) via SSO
+AUTHORIZATION: Database (user_department_access table)
 
-This is the bridge between SSO/email auth and the UserContext system.
+This service handles:
+- User lookup (by email, Azure OID, or user ID)
+- Department access verification (from database)
+- Admin operations (grant/revoke access via admin portal)
+
+The flow is simple:
+1. User logs in via Microsoft SSO → token validated by azure_auth.py
+2. User looked up or created here → NO automatic department access
+3. Super user / dept head grants access via admin portal
+4. user_department_access table is the source of truth
 
 Usage:
     from auth_service import AuthService, get_auth_service
-    
+
     auth = get_auth_service()
-    
-    # Look up user and build context
-    user = auth.get_user_by_email("jafflerbach@driscollfoods.com")
-    ctx = auth.build_user_context(user)
-    
-    # Check department access
+
+    # Look up user (returns None if not found)
+    user = auth.get_user_by_email("alice@driscollfoods.com")
+
+    # Check department access (database-driven)
     if auth.can_access_department(user, "purchasing"):
-        # User has explicit access to gated department
+        # User has explicit grant in user_department_access table
         ...
-    
-    # Admin operations
+
+    # Admin operations (requires super_user or dept_head role)
     auth.grant_department_access(
         actor=admin_user,
         target_user=new_user,
@@ -59,17 +64,15 @@ DB_CONFIG = {
 SCHEMA = "enterprise"
 
 # =============================================================================
-# GATED DEPARTMENTS
+# AUTH NOTES
 # =============================================================================
-
-# These require explicit access grant - no auto-join
-GATED_DEPARTMENTS = {"purchasing", "executive", "hr"}
-
-# Open departments - domain-verified users can auto-join
-OPEN_DEPARTMENTS = {"warehouse", "sales", "credit", "transportation"}
-
-# Allowed email domains for auto-provisioning
-ALLOWED_DOMAINS = {"driscollfoods.com"}
+# Authentication: Microsoft Entra ID (Azure AD) validates users via SSO
+# Authorization: Database (user_department_access table) controls access
+# Admin Portal: Super users and dept heads manage access grants
+#
+# NO domain whitelists or email pattern detection needed - if they have
+# a valid Microsoft token, they're authenticated. Access is granted
+# explicitly by admins via the portal.
 
 
 # =============================================================================
@@ -251,41 +254,32 @@ class AuthService:
         email: str,
         display_name: Optional[str] = None,
         tenant_slug: str = "driscoll",
-        default_department: str = "warehouse"
     ) -> Optional[User]:
         """
-        Get existing user or create new one if email domain is allowed.
-        
-        For OPEN departments, auto-assigns based on email patterns.
-        For GATED departments, user gets no access until admin grants it.
-        
-        Returns None if email domain is not allowed.
+        Get existing user or create new one.
+
+        Authentication is handled by Microsoft SSO - if we get here, the user
+        has a valid token. New users are created with NO department access;
+        admins must explicitly grant access via the admin portal.
+
+        Returns User object (existing or newly created).
         """
         email_lower = email.lower().strip()
-        
+
         # Check existing
         existing = self.get_user_by_email(email_lower)
         if existing:
             return existing
-        
-        # Validate domain
+
+        # Basic validation
         if "@" not in email_lower:
             return None
-        
-        domain = email_lower.split("@")[1]
-        if domain not in ALLOWED_DOMAINS:
-            return None
-        
-        # Determine department from email patterns
-        detected_dept = self._detect_department_from_email(email_lower, default_department)
-        
-        # Only auto-assign to OPEN departments
-        if detected_dept in GATED_DEPARTMENTS:
-            detected_dept = default_department  # Fall back to open dept
-        
+
+        # Create user with NO department access
+        # Admin must grant access via admin portal
         with get_db_connection() as conn:
             cur = conn.cursor(cursor_factory=RealDictCursor)
-            
+
             # Get tenant ID
             cur.execute(f"""
                 SELECT id FROM {SCHEMA}.tenants WHERE slug = %s AND active = TRUE
@@ -294,64 +288,29 @@ class AuthService:
             if not tenant_row:
                 return None
             tenant_id = tenant_row["id"]
-            
-            # Get department ID
+
+            # Create user with no department
             cur.execute(f"""
-                SELECT id FROM {SCHEMA}.departments WHERE slug = %s AND active = TRUE
-            """, (detected_dept,))
-            dept_row = cur.fetchone()
-            dept_id = dept_row["id"] if dept_row else None
-            
-            # Create user
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.users 
+                INSERT INTO {SCHEMA}.users
                     (email, display_name, tenant_id, role, primary_department_id, active)
-                VALUES (%s, %s, %s, 'user', %s, TRUE)
+                VALUES (%s, %s, %s, 'user', NULL, TRUE)
                 RETURNING id
-            """, (email_lower, display_name, tenant_id, dept_id))
-            
+            """, (email_lower, display_name, tenant_id))
+
             user_id = cur.fetchone()["id"]
-            
-            # Grant access to primary department
-            if dept_id:
-                cur.execute(f"""
-                    INSERT INTO {SCHEMA}.user_department_access
-                        (user_id, department_id, access_level, is_dept_head)
-                    VALUES (%s, %s, 'read', FALSE)
-                    ON CONFLICT (user_id, department_id) DO NOTHING
-                """, (user_id, dept_id))
-            
-            # Log the creation
+
+            # Log the creation - no department access granted
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.access_audit_log
-                    (action, target_user_id, target_email, department_slug, new_value)
-                VALUES ('user_created', %s, %s, %s, 'auto-provisioned')
-            """, (user_id, email_lower, detected_dept))
-            
+                    (action, target_user_id, target_email, new_value)
+                VALUES ('user_created', %s, %s, 'sso-provisioned, awaiting admin access grant')
+            """, (user_id, email_lower))
+
             conn.commit()
             cur.close()
-        
+
         # Return fresh lookup
         return self.get_user_by_email(email_lower)
-    
-    def _detect_department_from_email(self, email: str, default: str) -> str:
-        """Detect department from email address patterns."""
-        email_lower = email.lower()
-        
-        if "transport" in email_lower or "driver" in email_lower or "dispatch" in email_lower:
-            return "transportation"
-        elif "sales" in email_lower or "account" in email_lower:
-            return "sales"
-        elif "credit" in email_lower or "ar" in email_lower:
-            return "credit"
-        elif "warehouse" in email_lower or "ops" in email_lower or "inventory" in email_lower:
-            return "warehouse"
-        elif "purchasing" in email_lower or "procurement" in email_lower:
-            return "purchasing"  # Will be blocked if gated
-        elif "exec" in email_lower or "ceo" in email_lower or "cfo" in email_lower:
-            return "executive"  # Will be blocked if gated
-        
-        return default
     
     # -------------------------------------------------------------------------
     # Department Access
@@ -1141,8 +1100,12 @@ class AuthService:
         """
         Create new user from Azure AD login.
 
-        Auto-provisions with 'user' role and no department.
-        Admin can upgrade later.
+        User is created with:
+        - role: 'user'
+        - NO department access (admin must grant via portal)
+
+        This is the correct flow: Microsoft validates identity,
+        our database controls authorization (what they can access).
         """
         import uuid
         user_id = str(uuid.uuid4())
@@ -1159,24 +1122,24 @@ class AuthService:
                 raise ValueError("Default tenant not found")
             tenant_id = tenant_row["id"]
 
+            # Create user with NO department - admin grants access later
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.users (
                     id, email, display_name, azure_oid,
-                    tenant_id, role, active, created_at
+                    tenant_id, role, primary_department_id, active, created_at
                 )
-                VALUES (%s, %s, %s, %s, %s, 'user', TRUE, NOW())
+                VALUES (%s, %s, %s, %s, %s, 'user', NULL, TRUE, NOW())
                 RETURNING *
             """, (user_id, email, display_name, azure_oid, tenant_id))
 
             row = cur.fetchone()
-            conn.commit()
 
-            # Log the creation
+            # Log the creation - explicitly note no access granted
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.access_audit_log
                     (action, target_user_id, target_email, new_value)
                 VALUES ('user_created_azure_sso', %s, %s, %s)
-            """, (user_id, email, f"azure_oid={azure_oid}"))
+            """, (user_id, email, f"azure_oid={azure_oid}, awaiting admin access grant"))
 
             conn.commit()
             cur.close()
@@ -1185,10 +1148,10 @@ class AuthService:
                 id=str(row["id"]),
                 email=row["email"],
                 display_name=row["display_name"],
-                employee_id=row["employee_id"],
+                employee_id=row.get("employee_id"),
                 tenant_id=str(row["tenant_id"]),
                 role=row["role"],
-                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
+                primary_department_id=None,
                 primary_department_slug=None,
                 active=row["active"]
             )
@@ -1334,13 +1297,16 @@ def get_auth_service() -> AuthService:
 
 def authenticate_user(email: str, auto_create: bool = True) -> Optional[User]:
     """
-    Authenticate a user by email.
-    
-    If auto_create=True, creates new user for allowed domains.
-    Returns None if authentication fails.
+    Look up user by email, optionally creating if not found.
+
+    Note: This doesn't actually authenticate - Microsoft SSO does that.
+    This just looks up the user record in our database.
+
+    If auto_create=True and user doesn't exist, creates with NO department access.
+    Admin must grant access via portal.
     """
     auth = get_auth_service()
-    
+
     if auto_create:
         return auth.get_or_create_user(email)
     else:
