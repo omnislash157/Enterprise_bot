@@ -5,7 +5,7 @@
 
 import { writable, derived } from 'svelte/store';
 import { browser } from '$app/environment';
-export const azureEnabled = writable(true);
+
 interface User {
     id: string;
     email: string;
