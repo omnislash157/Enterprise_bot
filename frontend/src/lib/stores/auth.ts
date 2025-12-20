@@ -4,7 +4,8 @@
  */
 
 import { writable, derived } from 'svelte/store';
-
+import { browser } from '$app/environment';
+export const azureEnabled = writable(true);
 interface User {
     id: string;
     email: string;
@@ -56,7 +57,7 @@ function createAuthStore() {
         authMethod: null,
     });
 
-    let refreshToken: string | null = localStorage.getItem(REFRESH_TOKEN_KEY);
+    let refreshToken: string | null = browser ? localStorage.getItem(REFRESH_TOKEN_KEY) : null;
     let refreshTimeout: number | null = null;
 
     function scheduleRefresh(expiresIn: number) {
