@@ -25,7 +25,6 @@ from auth.auth_service import get_auth_service, authenticate_user
 from auth.tenant_service import get_tenant_service
 from auth.admin_routes import admin_router
 from auth.analytics_engine.analytics_routes import analytics_router
-from auth.analytics_engine.analytics_routes import analytics_router
 from auth.sso_routes import router as sso_router
 from auth.azure_auth import validate_access_token, is_configured as azure_configured
 
@@ -53,7 +52,7 @@ settings = Settings()
 # =============================================================================
 
 try:
-    from config_loader import (
+    from .config_loader import (
         load_config,
         cfg,
         memory_enabled,
@@ -61,9 +60,9 @@ try:
         get_ui_features,
         get_config,
     )
-    from cog_twin import CogTwin
-    from enterprise_twin import EnterpriseTwin
-    from enterprise_tenant import TenantContext
+    from .cog_twin import CogTwin
+    from .enterprise_twin import EnterpriseTwin
+    from .enterprise_tenant import TenantContext
     CONFIG_LOADED = True
 except ImportError as e:
     logger.error(f"Failed to import enterprise modules: {e}")
@@ -76,15 +75,15 @@ except ImportError as e:
 
 def get_twin():
     """Router: select orchestrator based on deployment mode."""
-    from config_loader import get_config
+    from .config_loader import get_config
     mode = cfg('deployment.mode', 'personal')
 
     if mode == 'enterprise':
-        from enterprise_twin import EnterpriseTwin
+        from .enterprise_twin import EnterpriseTwin
         logger.info("[STARTUP] Initializing EnterpriseTwin (enterprise mode)...")
         return EnterpriseTwin(get_config())  # Pass config
     else:
-        from cog_twin import CogTwin
+        from .cog_twin import CogTwin
         logger.info("[STARTUP] Initializing CogTwin (personal mode)...")
         return CogTwin()
 
@@ -104,24 +103,24 @@ def get_twin_for_auth(auth_method: str, user_email: str = None):
     Returns:
         Twin instance (EnterpriseTwin or CogTwin)
     """
-    from config_loader import get_config
+    from .config_loader import get_config
 
     # Enterprise providers route to EnterpriseTwin
     enterprise_providers = ['azure_ad', 'azuread', 'entra_id', 'microsoft']
 
     if auth_method in enterprise_providers:
-        from enterprise_twin import EnterpriseTwin
+        from .enterprise_twin import EnterpriseTwin
         logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → EnterpriseTwin")
         return EnterpriseTwin(get_config())
     else:
-        from cog_twin import CogTwin
+        from .cog_twin import CogTwin
         logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → CogTwin")
         return CogTwin()
 
 
 # Auth imports
 try:
-    from auth_service import get_auth_service, authenticate_user
+    from auth.auth_service import get_auth_service, authenticate_user
     AUTH_LOADED = True
 except ImportError as e:
     logger.warning(f"Auth service not loaded: {e}")
@@ -129,7 +128,7 @@ except ImportError as e:
 
 # Tenant service import
 try:
-    from tenant_service import get_tenant_service
+    from auth.tenant_service import get_tenant_service
     TENANT_SERVICE_LOADED = True
 except ImportError as e:
     logger.warning(f"Tenant service not loaded: {e}")
@@ -137,7 +136,7 @@ except ImportError as e:
 
 # Admin routes import
 try:
-    from admin_routes import admin_router
+    from auth.admin_routes import admin_router
     ADMIN_ROUTES_LOADED = True
 except ImportError as e:
     logger.warning(f"Admin routes not loaded: {e}")
@@ -145,8 +144,8 @@ except ImportError as e:
 
 # Analytics service import
 try:
-    from analytics_service import get_analytics_service
-    from analytics_routes import analytics_router
+    from auth.analytics_engine.analytics_service import get_analytics_service
+    from auth.analytics_engine.analytics_routes import analytics_router
     ANALYTICS_LOADED = True
 except ImportError as e:
     logger.warning(f"Analytics service not loaded: {e}")
@@ -154,7 +153,7 @@ except ImportError as e:
 
 # SSO routes import
 try:
-    from sso_routes import router as sso_router
+    from auth.sso_routes import router as sso_router
     SSO_ROUTES_LOADED = True
 except ImportError as e:
     logger.warning(f"SSO routes not loaded: {e}")
@@ -162,7 +161,7 @@ except ImportError as e:
 
 # Azure auth import
 try:
-    from azure_auth import validate_access_token, is_configured as azure_configured
+    from auth.azure_auth import validate_access_token, is_configured as azure_configured
     AZURE_AUTH_LOADED = True
 except ImportError as e:
     logger.warning(f"Azure auth not loaded: {e}")
