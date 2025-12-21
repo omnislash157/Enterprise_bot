@@ -26,7 +26,7 @@ def get_analytics_overview(
     Returns: active_users, total_queries, avg_response_time, error_rate
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return analytics.get_overview_stats(hours=hours)
     except Exception as e:
@@ -50,7 +50,7 @@ def get_queries_over_time(
     For the "Queries by Hour" chart.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return {
             "period_hours": hours,
@@ -70,7 +70,7 @@ def get_category_breakdown(
     For the "Query Categories" pie/bar chart.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return {
             "period_hours": hours,
@@ -90,7 +90,7 @@ def get_department_stats(
     For the department heatmap/breakdown.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return {
             "period_hours": hours,
@@ -110,7 +110,7 @@ def get_recent_errors(
     For the error log panel.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return {
             "limit": limit,
@@ -131,7 +131,7 @@ def get_user_activity(
     For the user detail panel.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return analytics.get_user_activity(user_email=user_email, days=days)
     except Exception as e:
@@ -154,7 +154,7 @@ def get_realtime_sessions():
     For the "Active Now" widget.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
         return {"sessions": analytics.get_realtime_sessions()}
     except Exception as e:
@@ -175,7 +175,7 @@ def get_full_dashboard(
     Uses single DB connection for all queries via connection pool.
     """
     try:
-        from analytics_service import get_analytics_service
+        from .analytics_service import get_analytics_service
         analytics = get_analytics_service()
 
         data = analytics.get_dashboard_data(
