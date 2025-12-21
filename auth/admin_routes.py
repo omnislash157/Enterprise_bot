@@ -20,7 +20,7 @@ from typing import Optional, List
 from datetime import datetime
 import logging
 
-from auth_service import (
+from .auth_service import (
     get_auth_service,
     User,
     PermissionTier,
@@ -252,7 +252,7 @@ async def get_user_detail(
         dept_slugs = auth.get_user_department_access(target)
         
         # Build department info from slugs
-        from auth_service import get_db_cursor, SCHEMA
+        from .auth_service import get_db_cursor, SCHEMA
         departments = []
         with get_db_cursor() as cur:
             for slug in dept_slugs:
@@ -602,8 +602,8 @@ async def get_admin_stats(
     auth = get_auth_service()
     
     try:
-        from auth_service import get_db_cursor, SCHEMA
-        
+        from .auth_service import get_db_cursor, SCHEMA
+
         with get_db_cursor() as cur:
             # Total users
             cur.execute(f"SELECT COUNT(*) as count FROM {SCHEMA}.users WHERE active = TRUE")
@@ -682,7 +682,7 @@ async def list_all_departments(
     auth = get_auth_service()
 
     try:
-        from auth_service import get_db_cursor, SCHEMA
+        from .auth_service import get_db_cursor, SCHEMA
 
         if actor.is_super_user:
             with get_db_cursor() as cur:

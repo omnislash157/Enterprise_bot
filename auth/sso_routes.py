@@ -16,14 +16,14 @@ from typing import Optional
 import secrets
 import logging
 
-from azure_auth import (
+from .azure_auth import (
     is_configured,
     get_auth_url,
     exchange_code_for_tokens,
     refresh_tokens,
     AzureUser,
 )
-from auth_service import get_auth_service
+from .auth_service import get_auth_service
 import uuid
 
 logger = logging.getLogger(__name__)
