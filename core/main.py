@@ -24,7 +24,7 @@ from .enterprise_tenant import TenantContext
 from auth.auth_service import get_auth_service, authenticate_user
 from auth.tenant_service import get_tenant_service
 from auth.admin_routes import admin_router
-from analytics_routes import analytics_router
+from auth.analytics_engine.analytics_routes import analytics_router
 from auth.analytics_engine.analytics_routes import analytics_router
 from auth.sso_routes import router as sso_router
 from auth.azure_auth import validate_access_token, is_configured as azure_configured
