@@ -1,0 +1,178 @@
+{
+  "session_id": "691ac8e7",
+  "created_at": "2025-12-21T09:03:18.664483",
+  "project_root": "C:\\Users\\mthar\\projects\\enterprise_bot\\claude_sdk_toolkit",
+  "handoff_file": "HANDOFF_FULL_RESTRUCTURE.md",
+  "allowed_files": [
+    "ingestion/json_chunk_loader.py",
+    "core/schemas.py",
+    "docs/FILE_TREE.md",
+    "core/protocols.py",
+    "memory/ingest/doc_loader.py",
+    "core/config.py",
+    "memory/ingest/batch_convert_warehouse.py",
+    "core/main.py",
+    "memory/ingest/__init__.py",
+    "ingestion/doc_loader.py",
+    "core/enterprise_twin.py",
+    "memory/ingest/json_chunk_loader.py",
+    "ingestion/embedder.py",
+    "docs/RESTRUCTURE_COMPLETE.md",
+    "ingestion/ingest.py",
+    "core/venom_voice.py",
+    "memory/ingest/chat_parser.py",
+    "memory/ingest/docx_to_json_chunks.py",
+    "memory/__init__.py",
+    "memory/embedder.py",
+    "ingestion/ingest_to_postgres.py",
+    "ingestion/batch_convert_warehouse_docx.py",
+    "core/config_loader.py",
+    "core/cog_twin.py",
+    "memory/ingest/pipeline.py",
+    "ingestion/docx_to_json_chunks.py",
+    "memory/ingest/ingest_to_postgres.py",
+    "memory/memory_pipeline.py",
+    "memory/retrieval.py",
+    "ingestion/chat_parser_agnostic.py"
+  ],
+  "changelog": [
+    {
+      "timestamp": "2025-12-21T09:03:18.669986",
+      "action": "query",
+      "target": "Execute the tasks in this handoff document:\n\n# HANDOFF: Memory Architecture Consolidation + Protocol...",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:33.627293",
+      "action": "command",
+      "target": "mkdir -p memory/ingest",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:36.525544",
+      "action": "command",
+      "target": "ls -la ingestion/ 2>/dev/null || echo \"ingestion directory not found\"",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:36.527354",
+      "action": "command",
+      "target": "ls -la memory/ 2>/dev/null || echo \"memory directory structure\"",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:46.165462",
+      "action": "command",
+      "target": "find . -maxdepth 2 -type d -name \"*ingest*\" 2>/dev/null",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:53.628804",
+      "action": "command",
+      "target": "ls -la",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:03:53.628804",
+      "action": "command",
+      "target": "find . -maxdepth 3 -name \"*.py\" -path \"*/memory/*\" | head -20",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:02.012209",
+      "action": "command",
+      "target": "find . -name \"embedder.py\" -o -name \"ingest.py\" -o -name \"chat_parser_agnostic.py\" 2>/dev/null",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:02.029290",
+      "action": "command",
+      "target": "ls -la src/ 2>/dev/null | head -30",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:10.229053",
+      "action": "command",
+      "target": "find . -maxdepth 2 -type d | grep -E \"(core|auth|ingestion|memory)\" | sort",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:10.229053",
+      "action": "command",
+      "target": "ls -la src/claude_sdk_toolkit/",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:19.010376",
+      "action": "file_read",
+      "target": "./README.md",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:04:30.082094",
+      "action": "command",
+      "target": "find . -name \"FILE_TREE.md\" -o -name \"protocols.py\" -o -name \"cog_twin.py\" 2>/dev/null",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:05:21.579249",
+      "action": "file_write",
+      "target": "./docs/RESTRUCTURE_COMPLETE.md",
+      "details": "Diff saved: C:\\Users\\mthar\\projects\\enterprise_bot\\claude_sdk_toolkit\\.claude\\diffs\\691ac8e7\\20251221_090521_write_._docs_RESTRUCTURE_COMPLETE.md.diff",
+      "diff_file": "C:\\Users\\mthar\\projects\\enterprise_bot\\claude_sdk_toolkit\\.claude\\diffs\\691ac8e7\\20251221_090521_write_._docs_RESTRUCTURE_COMPLETE.md.diff",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    },
+    {
+      "timestamp": "2025-12-21T09:05:25.994035",
+      "action": "command",
+      "target": "mkdir -p docs",
+      "details": "",
+      "diff_file": "",
+      "tokens_used": 0,
+      "cost_usd": 0.0
+    }
+  ],
+  "total_tokens": 0,
+  "total_cost_usd": 0.0,
+  "status": "completed"
+}
