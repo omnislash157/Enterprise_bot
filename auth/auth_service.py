@@ -2,18 +2,24 @@
 Auth Service - User Lookup and Permission Checking
 
 AUTHENTICATION: Microsoft Entra ID (Azure AD) via SSO
-AUTHORIZATION: Database (access_config table)
+AUTHORIZATION: Database (enterprise.users table, department_access array)
 
 This service handles:
-- User lookup (by email, Azure OID, or user ID)
-- Department access verification (from database)
+- User lookup (by email, Azure OID)
+- Department access verification (from department_access array)
 - Admin operations (grant/revoke access via admin portal)
+
+SCHEMA (2 tables only):
+1. enterprise.tenants: id, slug, name, domain
+2. enterprise.users: id, tenant_id, email, display_name, azure_oid,
+   department_access[], dept_head_for[], is_super_user, is_active,
+   created_at, last_login_at
 
 The flow is simple:
 1. User logs in via Microsoft SSO → token validated by azure_auth.py
 2. User looked up or created here → NO automatic department access
 3. Super user / dept head grants access via admin portal
-4. access_config table is the source of truth
+4. department_access array is the source of truth
 
 Usage:
     from auth_service import AuthService, get_auth_service
@@ -23,25 +29,24 @@ Usage:
     # Look up user (returns None if not found)
     user = auth.get_user_by_email("alice@driscollfoods.com")
 
-    # Check department access (database-driven)
-    if auth.can_access_department(user, "purchasing"):
-        # User has explicit grant in access_config table
+    # Check department access (simple array check)
+    if user.can_access("purchasing"):
+        # User has "purchasing" in their department_access array
         ...
 
-    # Admin operations (requires super_user or dept_head role)
+    # Admin operations (requires is_super_user or dept in dept_head_for)
     auth.grant_department_access(
-        actor=admin_user,
-        target_user=new_user,
-        department_slug="warehouse"
+        granter=admin_user,
+        target_email="newuser@driscollfoods.com",
+        department="warehouse"
     )
 """
 
 import os
-from dataclasses import dataclass, field
-from typing import Optional, List, Dict, Any
+from dataclasses import dataclass
+from typing import Optional, List, Dict
 from datetime import datetime
 from contextlib import contextmanager
-from enum import Enum
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
@@ -49,7 +54,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # =============================================================================
-# DATABASE CONFIG (same as tenant_service.py)
+# DATABASE CONFIG
 # =============================================================================
 
 DB_CONFIG = {
@@ -67,7 +72,7 @@ SCHEMA = "enterprise"
 # AUTH NOTES
 # =============================================================================
 # Authentication: Microsoft Entra ID (Azure AD) validates users via SSO
-# Authorization: Database (access_config table) controls access
+# Authorization: Database (department_access array) controls access
 # Admin Portal: Super users and dept heads manage access grants
 #
 # NO domain whitelists or email pattern detection needed - if they have
@@ -79,52 +84,33 @@ SCHEMA = "enterprise"
 # DATA CLASSES
 # =============================================================================
 
-class PermissionTier(Enum):
-    USER = 1
-    DEPT_HEAD = 2
-    SUPER_USER = 3
-
-
 @dataclass
 class User:
     """User record from enterprise.users"""
     id: str
     email: str
     display_name: Optional[str]
-    employee_id: Optional[str]
     tenant_id: str
-    role: str  # 'user', 'dept_head', 'super_user'
-    primary_department_id: Optional[str]
-    primary_department_slug: Optional[str] = None
-    active: bool = True
-    
-    @property
-    def tier(self) -> PermissionTier:
-        if self.role == "super_user":
-            return PermissionTier.SUPER_USER
-        elif self.role == "dept_head":
-            return PermissionTier.DEPT_HEAD
-        return PermissionTier.USER
-    
-    @property
-    def is_super_user(self) -> bool:
-        return self.role == "super_user"
-    
-    @property
-    def can_manage_users(self) -> bool:
-        return self.tier.value >= PermissionTier.DEPT_HEAD.value
+    azure_oid: Optional[str]
+    department_access: List[str]      # ['sales', 'purchasing']
+    dept_head_for: List[str]          # ['sales']
+    is_super_user: bool
+    is_active: bool
+    created_at: datetime
+    last_login_at: Optional[datetime]
 
+    def can_access(self, department: str) -> bool:
+        """Check if user can access a department."""
+        return self.is_super_user or department in self.department_access
 
-@dataclass
-class DepartmentAccess:
-    """User's access to a specific department"""
-    department_id: str
-    department_slug: str
-    department_name: str
-    access_level: str  # 'read', 'write', 'admin'
-    is_dept_head: bool
-    granted_at: datetime
-    expires_at: Optional[datetime] = None
+    def can_grant_access(self, department: str) -> bool:
+        """Check if user can grant access to a department."""
+        return self.is_super_user or department in self.dept_head_for
+
+    @property
+    def active(self) -> bool:
+        """Alias for backwards compatibility"""
+        return self.is_active
 
 
 # =============================================================================
@@ -167,93 +153,104 @@ def get_db_cursor(conn=None, dict_cursor=True):
 class AuthService:
     """
     Handles user authentication, lookup, and permission checking.
+
+    Uses ONLY 2 tables:
+    - enterprise.tenants
+    - enterprise.users
     """
-    
+
     def __init__(self):
         self._user_cache: Dict[str, User] = {}
-        self._access_cache: Dict[str, List[DepartmentAccess]] = {}
-    
+
     # -------------------------------------------------------------------------
     # User Lookup
     # -------------------------------------------------------------------------
-    
+
     def get_user_by_email(self, email: str) -> Optional[User]:
         """
         Look up user by email address.
-        
+
         Returns None if user doesn't exist.
         Use get_or_create_user() for auto-provisioning.
         """
         email_lower = email.lower().strip()
-        
+
         # Check cache
         if email_lower in self._user_cache:
             return self._user_cache[email_lower]
-        
+
         with get_db_cursor() as cur:
             cur.execute(f"""
-                SELECT 
-                    u.id, u.email, u.display_name, u.employee_id,
-                    u.tenant_id, u.role, u.primary_department_id, u.active,
-                    d.slug as primary_department_slug
-                FROM {SCHEMA}.users u
-                LEFT JOIN {SCHEMA}.departments d ON u.primary_department_id = d.id
-                WHERE LOWER(u.email) = %s AND u.active = TRUE
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE LOWER(email) = %s AND is_active = TRUE
             """, (email_lower,))
             row = cur.fetchone()
-        
+
         if not row:
             return None
-        
+
         user = User(
             id=str(row["id"]),
             email=row["email"],
             display_name=row["display_name"],
-            employee_id=row["employee_id"],
             tenant_id=str(row["tenant_id"]),
-            role=row["role"],
-            primary_department_id=str(row["primary_department_id"]) if row["primary_department_id"] else None,
-            primary_department_slug=row["primary_department_slug"],
-            active=row["active"]
+            azure_oid=row["azure_oid"],
+            department_access=row["department_access"] or [],
+            dept_head_for=row["dept_head_for"] or [],
+            is_super_user=row["is_super_user"] or False,
+            is_active=row["is_active"] or True,
+            created_at=row["created_at"],
+            last_login_at=row["last_login_at"]
         )
-        
+
         self._user_cache[email_lower] = user
         return user
-    
-    def get_user_by_id(self, user_id: str) -> Optional[User]:
-        """Look up user by UUID."""
+
+    def get_user_by_azure_oid(self, azure_oid: str) -> Optional[User]:
+        """Look up user by Azure Object ID."""
         with get_db_cursor() as cur:
             cur.execute(f"""
-                SELECT 
-                    u.id, u.email, u.display_name, u.employee_id,
-                    u.tenant_id, u.role, u.primary_department_id, u.active,
-                    d.slug as primary_department_slug
-                FROM {SCHEMA}.users u
-                LEFT JOIN {SCHEMA}.departments d ON u.primary_department_id = d.id
-                WHERE u.id = %s AND u.active = TRUE
-            """, (user_id,))
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE azure_oid = %s AND is_active = TRUE
+            """, (azure_oid,))
             row = cur.fetchone()
-        
+
         if not row:
             return None
-        
-        return User(
+
+        user = User(
             id=str(row["id"]),
             email=row["email"],
             display_name=row["display_name"],
-            employee_id=row["employee_id"],
             tenant_id=str(row["tenant_id"]),
-            role=row["role"],
-            primary_department_id=str(row["primary_department_id"]) if row["primary_department_id"] else None,
-            primary_department_slug=row["primary_department_slug"],
-            active=row["active"]
+            azure_oid=row["azure_oid"],
+            department_access=row["department_access"] or [],
+            dept_head_for=row["dept_head_for"] or [],
+            is_super_user=row["is_super_user"] or False,
+            is_active=row["is_active"] or True,
+            created_at=row["created_at"],
+            last_login_at=row["last_login_at"]
         )
-    
+
+        # Cache by email
+        email_lower = user.email.lower()
+        self._user_cache[email_lower] = user
+
+        return user
+
     def get_or_create_user(
         self,
         email: str,
         display_name: Optional[str] = None,
-        tenant_slug: str = "driscoll",
+        azure_oid: Optional[str] = None
     ) -> Optional[User]:
         """
         Get existing user or create new one.
@@ -275,919 +272,169 @@ class AuthService:
         if "@" not in email_lower:
             return None
 
+        # Extract domain from email
+        domain = email_lower.split("@")[1]
+
         # Create user with NO department access
         # Admin must grant access via admin portal
         with get_db_connection() as conn:
             cur = conn.cursor(cursor_factory=RealDictCursor)
 
-            # Get tenant ID
+            # Get tenant ID by domain
             cur.execute(f"""
-                SELECT id FROM {SCHEMA}.tenants WHERE slug = %s AND active = TRUE
-            """, (tenant_slug,))
+                SELECT id FROM {SCHEMA}.tenants WHERE domain = %s
+            """, (domain,))
             tenant_row = cur.fetchone()
             if not tenant_row:
                 return None
             tenant_id = tenant_row["id"]
 
-            # Create user with no department
+            # Create user with no department access
             cur.execute(f"""
                 INSERT INTO {SCHEMA}.users
-                    (email, display_name, tenant_id, role, primary_department_id, active)
-                VALUES (%s, %s, %s, 'user', NULL, TRUE)
-                RETURNING id
-            """, (email_lower, display_name, tenant_id))
+                    (tenant_id, email, display_name, azure_oid,
+                     department_access, dept_head_for, is_super_user, is_active)
+                VALUES (%s, %s, %s, %s, '{{}}', '{{}}', FALSE, TRUE)
+                RETURNING id, email, display_name, tenant_id, azure_oid,
+                          department_access, dept_head_for, is_super_user, is_active,
+                          created_at, last_login_at
+            """, (tenant_id, email_lower, display_name, azure_oid))
 
-            user_id = cur.fetchone()["id"]
-
-            # Log the creation - no department access granted
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, target_user_id, target_email, new_value)
-                VALUES ('user_created', %s, %s, 'sso-provisioned, awaiting admin access grant')
-            """, (user_id, email_lower))
-
-            conn.commit()
-            cur.close()
-
-        # Return fresh lookup
-        return self.get_user_by_email(email_lower)
-    
-    # -------------------------------------------------------------------------
-    # Department Access
-    # -------------------------------------------------------------------------
-    
-    def get_user_department_access(self, user: User) -> List[str]:
-        """Get all departments a user can access. Returns list of department slugs."""
-        cache_key = user.id
-
-        if cache_key in self._access_cache:
-            return self._access_cache[cache_key]
-
-        # Super users see everything
-        if user.is_super_user:
-            with get_db_cursor() as cur:
-                cur.execute(f"""
-                    SELECT slug FROM {SCHEMA}.departments WHERE active = TRUE
-                """)
-                rows = cur.fetchall()
-
-            dept_slugs = [row["slug"] for row in rows]
-            self._access_cache[cache_key] = dept_slugs
-            return dept_slugs
-
-        # Regular users - check explicit grants
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT
-                    d.slug as department_slug
-                FROM enterprise.access_config ac
-                JOIN {SCHEMA}.departments d ON ac.department = d.slug
-                WHERE ac.user_id = %s
-                  AND d.active = TRUE
-                ORDER BY d.name
-            """, (user.id,))
-            rows = cur.fetchall()
-
-        dept_slugs = [row["department_slug"] for row in rows]
-
-        self._access_cache[cache_key] = dept_slugs
-        return dept_slugs
-    
-    def can_access_department(self, user: User, department_slug: str) -> bool:
-        """Check if user can access a specific department."""
-        if user.is_super_user:
-            return True
-
-        dept_slugs = self.get_user_department_access(user)
-        return department_slug in dept_slugs
-    
-    def get_accessible_department_slugs(self, user: User) -> List[str]:
-        """Get list of department slugs user can access."""
-        return self.get_user_department_access(user)
-    
-    def is_dept_head_for(self, user: User, department_slug: str) -> bool:
-        """Check if user is department head for a specific department."""
-        if user.is_super_user:
-            return True
-
-        # With new schema, use role field instead
-        return user.role == "dept_head" and department_slug in self.get_user_department_access(user)
-    
-    # -------------------------------------------------------------------------
-    # Admin Operations
-    # -------------------------------------------------------------------------
-    
-    def grant_department_access(
-        self,
-        actor: User,
-        target_user: User,
-        department_slug: str,
-        access_level: str = "read",
-        make_dept_head: bool = False,
-        reason: Optional[str] = None
-    ) -> bool:
-        """
-        Grant department access to a user.
-        
-        Permission checks:
-        - Super users can grant anything
-        - Dept heads can grant access to their department
-        - Regular users cannot grant access
-        
-        Returns True if successful, raises exception on permission error.
-        """
-        # Permission check
-        if not actor.is_super_user:
-            if not self.is_dept_head_for(actor, department_slug):
-                raise PermissionError(
-                    f"User {actor.email} cannot grant access to {department_slug}"
-                )
-            # Dept heads can't make other dept heads
-            if make_dept_head:
-                raise PermissionError(
-                    "Only super users can assign department head role"
-                )
-        
-        with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-
-            # Verify department exists
-            cur.execute(f"""
-                SELECT slug FROM {SCHEMA}.departments WHERE slug = %s AND active = TRUE
-            """, (department_slug,))
-            if not cur.fetchone():
-                raise ValueError(f"Department not found: {department_slug}")
-
-            # Grant access (new schema: department is a string slug, no access_level/is_dept_head columns)
-            cur.execute(f"""
-                INSERT INTO enterprise.access_config
-                    (user_id, department)
-                VALUES (%s, %s)
-                ON CONFLICT (user_id, department) DO NOTHING
-            """, (target_user.id, department_slug))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     department_slug, new_value, reason)
-                VALUES ('grant', %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                actor.id, actor.email, target_user.id, target_user.email,
-                department_slug,
-                f"access granted (deprecated params: access_level={access_level}, dept_head={make_dept_head})",
-                reason
-            ))
-
-            conn.commit()
-            cur.close()
-        
-        # Clear cache
-        self._clear_user_cache(target_user.email)
-        return True
-    
-    def revoke_department_access(
-        self,
-        actor: User,
-        target_user: User,
-        department_slug: str,
-        reason: Optional[str] = None
-    ) -> bool:
-        """
-        Revoke department access from a user.
-        
-        Returns True if successful.
-        """
-        # Permission check
-        if not actor.is_super_user:
-            if not self.is_dept_head_for(actor, department_slug):
-                raise PermissionError(
-                    f"User {actor.email} cannot revoke access to {department_slug}"
-                )
-        
-        with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-
-            # Verify department exists
-            cur.execute(f"""
-                SELECT slug FROM {SCHEMA}.departments WHERE slug = %s
-            """, (department_slug,))
-            if not cur.fetchone():
-                raise ValueError(f"Department not found: {department_slug}")
-
-            # Check if user has access
-            cur.execute(f"""
-                SELECT department
-                FROM enterprise.access_config
-                WHERE user_id = %s AND department = %s
-            """, (target_user.id, department_slug))
-            old_access = cur.fetchone()
-
-            if not old_access:
-                return False  # Nothing to revoke
-
-            # Delete access
-            cur.execute(f"""
-                DELETE FROM enterprise.access_config
-                WHERE user_id = %s AND department = %s
-            """, (target_user.id, department_slug))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     department_slug, old_value, reason)
-                VALUES ('revoke', %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                actor.id, actor.email, target_user.id, target_user.email,
-                department_slug,
-                f"access revoked",
-                reason
-            ))
-
-            conn.commit()
-            cur.close()
-        
-        # Clear cache
-        self._clear_user_cache(target_user.email)
-        return True
-    
-    def change_user_role(
-        self,
-        actor: User,
-        target_user: User,
-        new_role: str,
-        reason: Optional[str] = None
-    ) -> bool:
-        """
-        Change a user's global role.
-
-        Only super users can change roles.
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can change roles")
-
-        if new_role not in ("user", "dept_head", "super_user"):
-            raise ValueError(f"Invalid role: {new_role}")
-
-        old_role = target_user.role
-
-        with get_db_connection() as conn:
-            cur = conn.cursor()
-
-            cur.execute(f"""
-                UPDATE {SCHEMA}.users
-                SET role = %s, updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s
-            """, (new_role, target_user.id))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     old_value, new_value, reason)
-                VALUES ('role_change', %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                actor.id, actor.email, target_user.id, target_user.email,
-                old_role, new_role, reason
-            ))
-
-            conn.commit()
-            cur.close()
-
-        # Clear cache
-        self._clear_user_cache(target_user.email)
-        return True
-
-    # -------------------------------------------------------------------------
-    # User CRUD Operations (Admin)
-    # -------------------------------------------------------------------------
-
-    def create_user(
-        self,
-        actor: User,
-        email: str,
-        display_name: Optional[str] = None,
-        employee_id: Optional[str] = None,
-        role: str = "user",
-        primary_department_slug: Optional[str] = None,
-        department_access: Optional[List[str]] = None,
-        reason: Optional[str] = None
-    ) -> User:
-        """
-        Admin-driven user creation (no domain restriction).
-
-        Unlike get_or_create_user(), this:
-        - Allows any email domain
-        - Sets custom role/department
-        - Requires admin permissions
-
-        Args:
-            actor: Admin performing the action
-            email: User email address
-            display_name: Optional display name
-            employee_id: Optional employee ID
-            role: 'user', 'dept_head', or 'super_user'
-            primary_department_slug: Primary department slug
-            department_access: List of department slugs to grant access
-            reason: Audit log reason
-
-        Returns:
-            Created User object
-
-        Raises:
-            PermissionError: If actor lacks permission
-            ValueError: If email already exists or invalid data
-        """
-        # Permission check - only super_users can create users
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can create users")
-
-        email_lower = email.lower().strip()
-
-        # Check if already exists
-        existing = self.get_user_by_email(email_lower)
-        if existing:
-            raise ValueError(f"User already exists: {email_lower}")
-
-        # Validate role
-        if role not in ("user", "dept_head", "super_user"):
-            raise ValueError(f"Invalid role: {role}")
-
-        with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-
-            # Get tenant ID (default to driscoll)
-            cur.execute(f"""
-                SELECT id FROM {SCHEMA}.tenants WHERE slug = 'driscoll' AND active = TRUE
-            """)
-            tenant_row = cur.fetchone()
-            if not tenant_row:
-                raise ValueError("Default tenant not found")
-            tenant_id = tenant_row["id"]
-
-            # Get primary department ID if specified
-            primary_dept_id = None
-            if primary_department_slug:
-                cur.execute(f"""
-                    SELECT id FROM {SCHEMA}.departments
-                    WHERE slug = %s AND active = TRUE
-                """, (primary_department_slug,))
-                dept_row = cur.fetchone()
-                if not dept_row:
-                    raise ValueError(f"Department not found: {primary_department_slug}")
-                primary_dept_id = dept_row["id"]
-
-            # Create user
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.users
-                    (email, display_name, employee_id, tenant_id, role,
-                     primary_department_id, active)
-                VALUES (%s, %s, %s, %s, %s, %s, TRUE)
-                RETURNING id
-            """, (email_lower, display_name, employee_id, tenant_id, role, primary_dept_id))
-
-            user_id = cur.fetchone()["id"]
-
-            # Grant department access
-            depts_to_grant = department_access or []
-            if primary_department_slug and primary_department_slug not in depts_to_grant:
-                depts_to_grant.append(primary_department_slug)
-
-            for dept_slug in depts_to_grant:
-                cur.execute(f"""
-                    SELECT slug FROM {SCHEMA}.departments
-                    WHERE slug = %s AND active = TRUE
-                """, (dept_slug,))
-                dept_row = cur.fetchone()
-                if dept_row:
-                    cur.execute(f"""
-                        INSERT INTO enterprise.access_config
-                            (user_id, department)
-                        VALUES (%s, %s)
-                        ON CONFLICT (user_id, department) DO NOTHING
-                    """, (user_id, dept_slug))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     department_slug, new_value, reason)
-                VALUES ('user_created', %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                actor.id, actor.email, user_id, email_lower,
-                primary_department_slug,
-                f"role={role}, admin_created=true",
-                reason
-            ))
-
-            conn.commit()
-            cur.close()
-
-        # Return the created user
-        return self.get_user_by_email(email_lower)
-
-    def update_user(
-        self,
-        actor: User,
-        target_user: User,
-        email: Optional[str] = None,
-        display_name: Optional[str] = None,
-        employee_id: Optional[str] = None,
-        primary_department_slug: Optional[str] = None,
-        reason: Optional[str] = None
-    ) -> User:
-        """
-        Update user details.
-
-        Only super_users can update users.
-        Pass None for fields that shouldn't change.
-        Pass empty string to clear a field.
-
-        Returns:
-            Updated User object
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can update users")
-
-        updates = []
-        params = []
-        old_values = []
-        new_values = []
-
-        if email is not None:
-            new_email = email.lower().strip()
-            if new_email != target_user.email.lower():
-                # Check if new email already exists
-                existing = self.get_user_by_email(new_email)
-                if existing and existing.id != target_user.id:
-                    raise ValueError(f"Email already in use: {new_email}")
-                updates.append("email = %s")
-                params.append(new_email)
-                old_values.append(f"email={target_user.email}")
-                new_values.append(f"email={new_email}")
-
-        if display_name is not None:
-            updates.append("display_name = %s")
-            params.append(display_name if display_name else None)
-            old_values.append(f"display_name={target_user.display_name}")
-            new_values.append(f"display_name={display_name}")
-
-        if employee_id is not None:
-            updates.append("employee_id = %s")
-            params.append(employee_id if employee_id else None)
-            old_values.append(f"employee_id={target_user.employee_id}")
-            new_values.append(f"employee_id={employee_id}")
-
-        if primary_department_slug is not None:
-            with get_db_cursor() as cur:
-                if primary_department_slug:
-                    cur.execute(f"""
-                        SELECT id FROM {SCHEMA}.departments
-                        WHERE slug = %s AND active = TRUE
-                    """, (primary_department_slug,))
-                    dept_row = cur.fetchone()
-                    if not dept_row:
-                        raise ValueError(f"Department not found: {primary_department_slug}")
-                    updates.append("primary_department_id = %s")
-                    params.append(dept_row["id"])
-                else:
-                    updates.append("primary_department_id = NULL")
-                old_values.append(f"primary_dept={target_user.primary_department_slug}")
-                new_values.append(f"primary_dept={primary_department_slug}")
-
-        if not updates:
-            return target_user  # Nothing to update
-
-        updates.append("updated_at = CURRENT_TIMESTAMP")
-        params.append(target_user.id)
-
-        with get_db_connection() as conn:
-            cur = conn.cursor()
-
-            cur.execute(f"""
-                UPDATE {SCHEMA}.users
-                SET {', '.join(updates)}
-                WHERE id = %s
-            """, params)
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     old_value, new_value, reason)
-                VALUES ('user_updated', %s, %s, %s, %s, %s, %s, %s)
-            """, (
-                actor.id, actor.email, target_user.id, target_user.email,
-                '; '.join(old_values), '; '.join(new_values), reason
-            ))
-
-            conn.commit()
-            cur.close()
-
-        # Clear cache and return fresh user
-        self._clear_user_cache(target_user.email)
-        if email:
-            self._clear_user_cache(email)
-
-        return self.get_user_by_id(target_user.id)
-
-    def deactivate_user(
-        self,
-        actor: User,
-        target_user: User,
-        reason: Optional[str] = None
-    ) -> bool:
-        """
-        Soft-delete a user (set active=FALSE).
-
-        User data is preserved but they cannot log in.
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can deactivate users")
-
-        if target_user.id == actor.id:
-            raise ValueError("Cannot deactivate yourself")
-
-        with get_db_connection() as conn:
-            cur = conn.cursor()
-
-            cur.execute(f"""
-                UPDATE {SCHEMA}.users
-                SET active = FALSE, updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s
-            """, (target_user.id,))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     old_value, new_value, reason)
-                VALUES ('user_deactivated', %s, %s, %s, %s, 'active=true', 'active=false', %s)
-            """, (actor.id, actor.email, target_user.id, target_user.email, reason))
-
-            conn.commit()
-            cur.close()
-
-        self._clear_user_cache(target_user.email)
-        return True
-
-    def reactivate_user(
-        self,
-        actor: User,
-        user_id: str,
-        reason: Optional[str] = None
-    ) -> User:
-        """
-        Reactivate a previously deactivated user.
-
-        Returns the reactivated User object.
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can reactivate users")
-
-        # Get user including inactive
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT id, email, display_name, employee_id, tenant_id, role,
-                       primary_department_id, active
-                FROM {SCHEMA}.users
-                WHERE id = %s
-            """, (user_id,))
             row = cur.fetchone()
-
-        if not row:
-            raise ValueError("User not found")
-
-        if row["active"]:
-            raise ValueError("User is already active")
-
-        with get_db_connection() as conn:
-            cur = conn.cursor()
-
-            cur.execute(f"""
-                UPDATE {SCHEMA}.users
-                SET active = TRUE, updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s
-            """, (user_id,))
-
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, actor_id, actor_email, target_user_id, target_email,
-                     old_value, new_value, reason)
-                VALUES ('user_reactivated', %s, %s, %s, %s, 'active=false', 'active=true', %s)
-            """, (actor.id, actor.email, user_id, row["email"], reason))
-
             conn.commit()
             cur.close()
 
-        return self.get_user_by_id(user_id)
-
-    def batch_create_users(
-        self,
-        actor: User,
-        user_data: List[Dict[str, str]],
-        default_department: str = "warehouse",
-        reason: Optional[str] = None
-    ) -> Dict[str, Any]:
-        """
-        Batch create multiple users.
-
-        Args:
-            actor: Admin performing the action
-            user_data: List of dicts with keys: email, display_name (optional),
-                      department (optional)
-            default_department: Fallback department if not specified
-            reason: Audit log reason
-
-        Returns:
-            {
-                "created": [list of created emails],
-                "already_existed": [list of existing emails],
-                "failed": [{"email": str, "error": str}, ...]
-            }
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can batch create users")
-
-        results = {
-            "created": [],
-            "already_existed": [],
-            "failed": []
-        }
-
-        for entry in user_data:
-            email = entry.get("email", "").lower().strip()
-            display_name = entry.get("display_name", "").strip() or None
-            department = entry.get("department", "").strip() or default_department
-
-            if not email:
-                continue
-
-            # Basic email validation
-            if "@" not in email:
-                results["failed"].append({
-                    "email": email,
-                    "error": "Invalid email format"
-                })
-                continue
-
-            try:
-                # Check if exists
-                existing = self.get_user_by_email(email)
-                if existing:
-                    results["already_existed"].append(email)
-                    continue
-
-                # Create user
-                self.create_user(
-                    actor=actor,
-                    email=email,
-                    display_name=display_name,
-                    role="user",
-                    primary_department_slug=department,
-                    department_access=[department],
-                    reason=reason or "batch_import"
-                )
-                results["created"].append(email)
-
-            except Exception as e:
-                results["failed"].append({
-                    "email": email,
-                    "error": str(e)
-                })
-
-        return results
-
-    # -------------------------------------------------------------------------
-    # Admin Queries
-    # -------------------------------------------------------------------------
-    
-    def list_users_in_department(
-        self,
-        actor: User,
-        department_slug: str
-    ) -> List[Dict[str, Any]]:
-        """
-        List all users with access to a department.
-        
-        Dept heads can see their department, super users see all.
-        """
-        if not actor.is_super_user and not self.is_dept_head_for(actor, department_slug):
-            raise PermissionError(
-                f"User {actor.email} cannot view users in {department_slug}"
-            )
-        
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT
-                    u.id, u.email, u.display_name, u.employee_id, u.role,
-                    ac.created_at as granted_at
-                FROM {SCHEMA}.users u
-                JOIN enterprise.access_config ac ON u.id = ac.user_id
-                WHERE ac.department = %s AND u.active = TRUE
-                ORDER BY u.role DESC, u.display_name
-            """, (department_slug,))
-            rows = cur.fetchall()
-
-        return [dict(row) for row in rows]
-    
-    def list_all_users(self, actor: User) -> List[Dict[str, Any]]:
-        """
-        List all users (super user only).
-        """
-        if not actor.is_super_user:
-            raise PermissionError("Only super users can list all users")
-        
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT 
-                    u.id, u.email, u.display_name, u.employee_id, u.role,
-                    u.active, u.last_login_at,
-                    d.name as primary_department
-                FROM {SCHEMA}.users u
-                LEFT JOIN {SCHEMA}.departments d ON u.primary_department_id = d.id
-                ORDER BY u.role DESC, u.email
-            """)
-            rows = cur.fetchall()
-        
-        return [dict(row) for row in rows]
-    
-    # -------------------------------------------------------------------------
-    # Cache Management
-    # -------------------------------------------------------------------------
-    
-    # -------------------------------------------------------------------------
-    # Azure AD Integration Methods
-    # -------------------------------------------------------------------------
-
-    def get_user_by_azure_oid(self, azure_oid: str) -> Optional[User]:
-        """Look up user by Azure Object ID."""
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT
-                    u.id, u.email, u.display_name, u.employee_id,
-                    u.tenant_id, u.role, u.primary_department_id, u.active,
-                    d.slug as primary_department_slug
-                FROM {SCHEMA}.users u
-                LEFT JOIN {SCHEMA}.departments d ON u.primary_department_id = d.id
-                WHERE u.azure_oid = %s AND u.active = TRUE
-            """, (azure_oid,))
-            row = cur.fetchone()
-
-        if not row:
-            return None
-
-        return User(
+        # Return fresh user object
+        user = User(
             id=str(row["id"]),
             email=row["email"],
             display_name=row["display_name"],
-            employee_id=row["employee_id"],
             tenant_id=str(row["tenant_id"]),
-            role=row["role"],
-            primary_department_id=str(row["primary_department_id"]) if row["primary_department_id"] else None,
-            primary_department_slug=row["primary_department_slug"],
-            active=row["active"]
+            azure_oid=row["azure_oid"],
+            department_access=row["department_access"] or [],
+            dept_head_for=row["dept_head_for"] or [],
+            is_super_user=row["is_super_user"] or False,
+            is_active=row["is_active"] or True,
+            created_at=row["created_at"],
+            last_login_at=row["last_login_at"]
         )
 
-    def create_user_from_azure(
-        self,
-        email: str,
-        display_name: str,
-        azure_oid: str,
-    ) -> User:
-        """
-        Create new user from Azure AD login.
+        # Cache it
+        self._user_cache[email_lower] = user
+        return user
 
-        User is created with:
-        - role: 'user'
-        - NO department access (admin must grant via portal)
+    # -------------------------------------------------------------------------
+    # Session/Login Tracking
+    # -------------------------------------------------------------------------
 
-        This is the correct flow: Microsoft validates identity,
-        our database controls authorization (what they can access).
-        """
-        import uuid
-        user_id = str(uuid.uuid4())
-
+    def update_last_login(self, user_id: str) -> None:
+        """Update the last_login_at timestamp for a user."""
         with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-
-            # Get tenant ID (default to driscoll)
-            cur.execute(f"""
-                SELECT id FROM {SCHEMA}.tenants WHERE slug = 'driscoll' AND active = TRUE
-            """)
-            tenant_row = cur.fetchone()
-            if not tenant_row:
-                raise ValueError("Default tenant not found")
-            tenant_id = tenant_row["id"]
-
-            # Create user with NO department - admin grants access later
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.users (
-                    id, email, display_name, azure_oid,
-                    tenant_id, role, primary_department_id, active, created_at
-                )
-                VALUES (%s, %s, %s, %s, %s, 'user', NULL, TRUE, NOW())
-                RETURNING *
-            """, (user_id, email, display_name, azure_oid, tenant_id))
-
-            row = cur.fetchone()
-
-            # Log the creation - explicitly note no access granted
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, target_user_id, target_email, new_value)
-                VALUES ('user_created_azure_sso', %s, %s, %s)
-            """, (user_id, email, f"azure_oid={azure_oid}, awaiting admin access grant"))
-
-            conn.commit()
-            cur.close()
-
-            return User(
-                id=str(row["id"]),
-                email=row["email"],
-                display_name=row["display_name"],
-                employee_id=row.get("employee_id"),
-                tenant_id=str(row["tenant_id"]),
-                role=row["role"],
-                primary_department_id=None,
-                primary_department_slug=None,
-                active=row["active"]
-            )
-
-    def link_user_to_azure(self, user_id: str, azure_oid: str) -> User:
-        """Link existing user to Azure AD account."""
-        with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-
+            cur = conn.cursor()
             cur.execute(f"""
                 UPDATE {SCHEMA}.users
-                SET azure_oid = %s
+                SET last_login_at = now()
                 WHERE id = %s
-                RETURNING *
-            """, (azure_oid, user_id))
-
-            row = cur.fetchone()
-
-            # Log the linking
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, target_user_id, target_email, new_value)
-                VALUES ('user_linked_azure', %s, %s, %s)
-            """, (user_id, row["email"], f"azure_oid={azure_oid}"))
-
+            """, (user_id,))
             conn.commit()
             cur.close()
 
-            return User(
-                id=str(row["id"]),
-                email=row["email"],
-                display_name=row["display_name"],
-                employee_id=row["employee_id"],
-                tenant_id=str(row["tenant_id"]),
-                role=row["role"],
-                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
-                primary_department_slug=None,
-                active=row["active"]
+    # -------------------------------------------------------------------------
+    # Department Access Checks (Simple!)
+    # -------------------------------------------------------------------------
+
+    def can_access_department(self, user: User, department: str) -> bool:
+        """Check if user can access a specific department."""
+        return user.can_access(department)
+
+    def can_grant_access_to(self, user: User, department: str) -> bool:
+        """Check if user can grant access to a specific department."""
+        return user.can_grant_access(department)
+
+    # -------------------------------------------------------------------------
+    # Admin Operations
+    # -------------------------------------------------------------------------
+
+    def grant_department_access(
+        self,
+        granter: User,
+        target_email: str,
+        department: str
+    ) -> bool:
+        """
+        Grant department access to a user.
+
+        Permission checks:
+        - Super users can grant anything
+        - Dept heads can grant access to departments they head
+        - Regular users cannot grant access
+
+        Returns True if successful, raises exception on permission error.
+        """
+        # Permission check
+        if not granter.can_grant_access(department):
+            raise PermissionError(
+                f"User {granter.email} cannot grant access to {department}"
             )
 
-    def update_user_from_azure(
-        self,
-        user_id: str,
-        email: str,
-        display_name: str,
-        azure_oid: str,
-    ) -> User:
-        """Update user info from Azure AD on each login."""
-        with get_db_connection() as conn:
-            cur = conn.cursor(cursor_factory=RealDictCursor)
+        target_email_lower = target_email.lower().strip()
 
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            # Grant access (array append, skip if already exists)
             cur.execute(f"""
                 UPDATE {SCHEMA}.users
-                SET email = %s, display_name = %s, azure_oid = %s, updated_at = CURRENT_TIMESTAMP
-                WHERE id = %s
-                RETURNING *
-            """, (email, display_name, azure_oid, user_id))
+                SET department_access = array_append(department_access, %s)
+                WHERE LOWER(email) = %s AND NOT (%s = ANY(department_access))
+            """, (department, target_email_lower, department))
 
-            row = cur.fetchone()
+            rows_affected = cur.rowcount
             conn.commit()
             cur.close()
 
-            # Clear cache
-            self._clear_user_cache(email)
+        # Clear cache
+        self._clear_user_cache(target_email_lower)
 
-            return User(
-                id=str(row["id"]),
-                email=row["email"],
-                display_name=row["display_name"],
-                employee_id=row["employee_id"],
-                tenant_id=str(row["tenant_id"]),
-                role=row["role"],
-                primary_department_id=str(row["primary_department_id"]) if row.get("primary_department_id") else None,
-                primary_department_slug=None,
-                active=row["active"]
+        return rows_affected > 0
+
+    def revoke_department_access(
+        self,
+        revoker: User,
+        target_email: str,
+        department: str
+    ) -> bool:
+        """
+        Revoke department access from a user.
+
+        Returns True if successful.
+        """
+        # Permission check
+        if not revoker.can_grant_access(department):
+            raise PermissionError(
+                f"User {revoker.email} cannot revoke access to {department}"
             )
+
+        target_email_lower = target_email.lower().strip()
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            # Revoke access (array remove)
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET department_access = array_remove(department_access, %s)
+                WHERE LOWER(email) = %s
+            """, (department, target_email_lower))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        # Clear cache
+        self._clear_user_cache(target_email_lower)
+
+        return rows_affected > 0
 
     # -------------------------------------------------------------------------
     # Cache Management
@@ -1198,42 +445,9 @@ class AuthService:
         email_lower = email.lower().strip()
         self._user_cache.pop(email_lower, None)
 
-        # Also clear access cache if we have the user ID
-        for user in list(self._user_cache.values()):
-            if user.email.lower() == email_lower:
-                self._access_cache.pop(user.id, None)
-                break
-    
     def clear_cache(self):
         """Clear all caches."""
         self._user_cache.clear()
-        self._access_cache.clear()
-    
-    # -------------------------------------------------------------------------
-    # Session/Login Tracking
-    # -------------------------------------------------------------------------
-    
-    def record_login(self, user: User, ip_address: Optional[str] = None):
-        """Record a user login event."""
-        with get_db_connection() as conn:
-            cur = conn.cursor()
-            
-            # Update last login
-            cur.execute(f"""
-                UPDATE {SCHEMA}.users 
-                SET last_login_at = CURRENT_TIMESTAMP
-                WHERE id = %s
-            """, (user.id,))
-            
-            # Audit log
-            cur.execute(f"""
-                INSERT INTO {SCHEMA}.access_audit_log
-                    (action, target_user_id, target_email, ip_address)
-                VALUES ('login', %s, %s, %s)
-            """, (user.id, user.email, ip_address))
-            
-            conn.commit()
-            cur.close()
 
 
 # =============================================================================
@@ -1273,19 +487,19 @@ def authenticate_user(email: str, auto_create: bool = True) -> Optional[User]:
         return auth.get_user_by_email(email)
 
 
-def check_department_access(email: str, department_slug: str) -> bool:
+def check_department_access(email: str, department: str) -> bool:
     """
     Quick check if a user can access a department.
-    
+
     Returns False if user doesn't exist.
     """
     auth = get_auth_service()
     user = auth.get_user_by_email(email)
-    
+
     if not user:
         return False
-    
-    return auth.can_access_department(user, department_slug)
+
+    return user.can_access(department)
 
 
 # =============================================================================
@@ -1294,42 +508,38 @@ def check_department_access(email: str, department_slug: str) -> bool:
 
 if __name__ == "__main__":
     import sys
-    
+
     print("Auth Service - User Lookup & Permission Checking")
     print("=" * 60)
-    
+
     auth = get_auth_service()
-    
+
     # Test user lookup
     test_email = sys.argv[1] if len(sys.argv) > 1 else "mhartigan@driscollfoods.com"
-    
+
     print(f"\n[TEST] Looking up user: {test_email}")
     user = auth.get_user_by_email(test_email)
-    
+
     if user:
         print(f"  Found: {user.display_name or user.email}")
-        print(f"  Role: {user.role}")
-        print(f"  Tier: {user.tier.name}")
-        print(f"  Primary dept: {user.primary_department_slug or 'None'}")
-        
-        print(f"\n[TEST] Department access:")
-        access_list = auth.get_user_department_access(user)
-        for acc in access_list:
-            head_marker = " (DEPT HEAD)" if acc.is_dept_head else ""
-            print(f"  - {acc.department_name}: {acc.access_level}{head_marker}")
-        
-        print(f"\n[TEST] Can access purchasing: {auth.can_access_department(user, 'purchasing')}")
-        print(f"[TEST] Can access warehouse: {auth.can_access_department(user, 'warehouse')}")
+        print(f"  Super User: {user.is_super_user}")
+        print(f"  Department Access: {user.department_access}")
+        print(f"  Dept Head For: {user.dept_head_for}")
+
+        print(f"\n[TEST] Can access purchasing: {user.can_access('purchasing')}")
+        print(f"[TEST] Can access warehouse: {user.can_access('warehouse')}")
+        print(f"[TEST] Can grant access to sales: {user.can_grant_access('sales')}")
     else:
         print("  User not found")
-        
+
         # Try auto-create
         print(f"\n[TEST] Auto-creating user...")
         user = auth.get_or_create_user(test_email)
         if user:
-            print(f"  Created: {user.email} in {user.primary_department_slug}")
+            print(f"  Created: {user.email}")
+            print(f"  Department Access: {user.department_access} (empty - admin must grant)")
         else:
             print("  Domain not allowed")
-    
+
     print("\n" + "=" * 60)
     print("Tests complete!")

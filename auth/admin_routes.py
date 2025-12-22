@@ -23,7 +23,6 @@ import logging
 from .auth_service import (
     get_auth_service,
     User,
-    PermissionTier,
 )
 
 logger = logging.getLogger(__name__)
@@ -131,8 +130,8 @@ def get_current_user(x_user_email: str = Header(None, alias="X-User-Email")) -> 
 
 
 def require_admin(user: User) -> User:
-    """Require at least DEPT_HEAD tier."""
-    if user.tier.value < PermissionTier.DEPT_HEAD.value:
+    """Require at least dept_head or super_user."""
+    if not user.is_super_user and not user.dept_head_for:
         raise HTTPException(403, "Admin access required")
     return user
 
@@ -156,66 +155,19 @@ async def list_users(
 ):
     """
     List users visible to the current admin.
-    
-    - DEPT_HEAD: sees users in their departments only
-    - SUPER_USER: sees all users, can filter by department
-    """
-    user = get_current_user(x_user_email)
-    require_admin(user)
-    
-    auth = get_auth_service()
-    
-    try:
-        if user.is_super_user:
-            if department:
-                users = auth.list_users_in_department(user, department)
-            else:
-                users = auth.list_all_users(user)
-        else:
-            # Dept head - list their department's users
-            dept_slugs = auth.get_user_department_access(user)
-            head_depts = [d for d in dept_slugs if auth.is_dept_head_for(user, d)]
 
-            if department:
-                if department not in head_depts:
-                    raise HTTPException(403, f"Not authorized for department: {department}")
-                users = auth.list_users_in_department(user, department)
-            elif head_depts:
-                # Get users from all their departments
-                users = []
-                for dept_slug in head_depts:
-                    dept_users = auth.list_users_in_department(user, dept_slug)
-                    users.extend(dept_users)
-                # Dedupe by user ID
-                seen = set()
-                users = [u for u in users if not (u['id'] in seen or seen.add(u['id']))]
-            else:
-                users = []
-        
-        # Apply search filter if provided
-        if search:
-            search_lower = search.lower()
-            users = [
-                u for u in users
-                if search_lower in u.get('email', '').lower()
-                or search_lower in (u.get('display_name') or '').lower()
-            ]
-        
-        return APIResponse(
-            success=True,
-            data={
-                "users": users,
-                "count": len(users),
-                "filtered_by": department,
-                "search": search,
-            }
-        )
-    
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except Exception as e:
-        logger.error(f"Error listing users: {e}")
-        raise HTTPException(500, f"Error listing users: {str(e)}")
+    TODO: Rewrite for 2-table schema (no more access_config table).
+    This endpoint relied on list_users_in_department() and list_all_users()
+    which were removed during schema migration.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    """
+    raise HTTPException(
+        501,
+        "Admin portal pending redesign for 2-table schema. "
+        "Use grant/revoke endpoints for now. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.get("/users/{user_id}", response_model=APIResponse)
@@ -225,73 +177,18 @@ async def get_user_detail(
 ):
     """
     Get detailed info for a specific user.
-    
-    Includes their department access list.
+
+    TODO: Rewrite for 2-table schema (no more access_config, departments tables).
+    This endpoint relied on SQL joins to deleted tables.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        target = auth.get_user_by_id(user_id)
-        
-        if not target:
-            raise HTTPException(404, "User not found")
-        
-        # Permission check - can actor see this user?
-        if not actor.is_super_user:
-            # Dept head can only see users in their departments
-            actor_depts = set(auth.get_accessible_department_slugs(actor))
-            target_depts = set(auth.get_accessible_department_slugs(target))
-            
-            if not actor_depts.intersection(target_depts):
-                raise HTTPException(403, "Cannot view this user")
-        
-        # Get department access
-        dept_slugs = auth.get_user_department_access(target)
-        
-        # Build department info from slugs
-        from .auth_service import get_db_cursor, SCHEMA
-        departments = []
-        with get_db_cursor() as cur:
-            for slug in dept_slugs:
-                cur.execute(f"""
-                    SELECT d.slug, d.name, ac.created_at as granted_at
-                    FROM {SCHEMA}.departments d
-                    LEFT JOIN enterprise.access_config ac ON d.slug = ac.department AND ac.user_id = %s
-                    WHERE d.slug = %s
-                """, (target.id, slug))
-                row = cur.fetchone()
-                if row:
-                    departments.append({
-                        "slug": row["slug"],
-                        "name": row["name"],
-                        "granted_at": row["granted_at"].isoformat() if row.get("granted_at") else None,
-                    })
-        
-        return APIResponse(
-            success=True,
-            data={
-                "user": {
-                    "id": target.id,
-                    "email": target.email,
-                    "display_name": target.display_name,
-                    "employee_id": target.employee_id,
-                    "role": target.role,
-                    "tier": target.tier.name,
-                    "primary_department": target.primary_department_slug,
-                    "active": target.active,
-                    "departments": departments,
-                }
-            }
-        )
-    
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Error getting user detail: {e}")
-        raise HTTPException(500, f"Error getting user: {str(e)}")
+    raise HTTPException(
+        501,
+        "Admin portal pending redesign for 2-table schema. "
+        "Use grant/revoke endpoints for now. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.put("/users/{user_id}/role", response_model=APIResponse)
@@ -301,51 +198,21 @@ async def change_user_role(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    Change a user's global role.
-    
-    SUPER_USER only.
+    Change a user's global role - DEPRECATED.
+
+    TODO: The 2-table schema has no roles. Permissions are:
+    - is_super_user (boolean flag)
+    - dept_head_for (array of departments)
+
+    STUB: Returns 501 Not Implemented. Use grant_department_access with
+    make_dept_head=True instead.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        target = auth.get_user_by_id(user_id)
-        
-        if not target:
-            raise HTTPException(404, "User not found")
-        
-        # Prevent self-demotion
-        if target.id == actor.id and request.new_role != "super_user":
-            raise HTTPException(400, "Cannot demote yourself")
-        
-        old_role = target.role
-        
-        auth.change_user_role(
-            actor=actor,
-            target_user=target,
-            new_role=request.new_role,
-            reason=request.reason,
-        )
-        
-        return APIResponse(
-            success=True,
-            data={
-                "user_id": user_id,
-                "old_role": old_role,
-                "new_role": request.new_role,
-                "message": f"Role changed from {old_role} to {request.new_role}",
-            }
-        )
-    
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error changing role: {e}")
-        raise HTTPException(500, f"Error changing role: {str(e)}")
+    raise HTTPException(
+        501,
+        "Role changes deprecated in 2-table schema. "
+        "Use grant_department_access(make_dept_head=True) to grant admin rights. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -359,32 +226,17 @@ async def list_department_users(
 ):
     """
     List all users with access to a specific department.
-    
-    - DEPT_HEAD: must be head of this department
-    - SUPER_USER: can view any department
+
+    TODO: Rewrite for 2-table schema. Need to query users table and filter
+    by department_access array contains slug.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        users = auth.list_users_in_department(actor, slug)
-        
-        return APIResponse(
-            success=True,
-            data={
-                "department": slug,
-                "users": users,
-                "count": len(users),
-            }
-        )
-    
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except Exception as e:
-        logger.error(f"Error listing department users: {e}")
-        raise HTTPException(500, f"Error listing users: {str(e)}")
+    raise HTTPException(
+        501,
+        "Admin portal pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -398,48 +250,18 @@ async def grant_access(
 ):
     """
     Grant department access to a user.
-    
-    - DEPT_HEAD: can grant access to their department (not dept_head role)
-    - SUPER_USER: can grant any access including dept_head
+
+    TODO: This endpoint needs get_user_by_id() which doesn't exist in new schema.
+    The new grant_department_access() signature is also different.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        target = auth.get_user_by_id(request.user_id)
-        
-        if not target:
-            raise HTTPException(404, "Target user not found")
-        
-        auth.grant_department_access(
-            actor=actor,
-            target_user=target,
-            department_slug=request.department_slug,
-            access_level=request.access_level,
-            make_dept_head=request.make_dept_head,
-            reason=request.reason,
-        )
-        
-        return APIResponse(
-            success=True,
-            data={
-                "user_id": request.user_id,
-                "department": request.department_slug,
-                "access_level": request.access_level,
-                "is_dept_head": request.make_dept_head,
-                "message": f"Access granted to {request.department_slug}",
-            }
-        )
-    
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error granting access: {e}")
-        raise HTTPException(500, f"Error granting access: {str(e)}")
+    raise HTTPException(
+        501,
+        "Admin portal pending redesign for 2-table schema. "
+        "Use direct SQL or auth_service updates. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.post("/access/revoke", response_model=APIResponse)
@@ -449,50 +271,18 @@ async def revoke_access(
 ):
     """
     Revoke department access from a user.
-    
-    - DEPT_HEAD: can revoke access from their department
-    - SUPER_USER: can revoke any access
+
+    TODO: This endpoint needs get_user_by_id() which doesn't exist in new schema.
+    The new revoke_department_access() signature is also different.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        target = auth.get_user_by_id(request.user_id)
-        
-        if not target:
-            raise HTTPException(404, "Target user not found")
-        
-        success = auth.revoke_department_access(
-            actor=actor,
-            target_user=target,
-            department_slug=request.department_slug,
-            reason=request.reason,
-        )
-        
-        if not success:
-            return APIResponse(
-                success=False,
-                error="User did not have access to this department",
-            )
-        
-        return APIResponse(
-            success=True,
-            data={
-                "user_id": request.user_id,
-                "department": request.department_slug,
-                "message": f"Access revoked from {request.department_slug}",
-            }
-        )
-    
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error revoking access: {e}")
-        raise HTTPException(500, f"Error revoking access: {str(e)}")
+    raise HTTPException(
+        501,
+        "Admin portal pending redesign for 2-table schema. "
+        "Use direct SQL or auth_service updates. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -510,77 +300,17 @@ async def get_audit_log(
 ):
     """
     View audit log entries.
-    
-    SUPER_USER only.
-    
-    Returns most recent entries first.
+
+    TODO: The access_audit_log table was deleted during schema migration.
+    Need to decide if we still need audit logging and recreate if needed.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        # Build query for audit log
-        from auth_service import get_db_cursor, SCHEMA
-        
-        with get_db_cursor() as cur:
-            # Build WHERE clauses
-            conditions = []
-            params = []
-            
-            if action:
-                conditions.append("action = %s")
-                params.append(action)
-            
-            if target_email:
-                conditions.append("target_email ILIKE %s")
-                params.append(f"%{target_email}%")
-            
-            if department:
-                conditions.append("department_slug = %s")
-                params.append(department)
-            
-            where_clause = ""
-            if conditions:
-                where_clause = "WHERE " + " AND ".join(conditions)
-            
-            # Get total count
-            cur.execute(f"""
-                SELECT COUNT(*) as total
-                FROM {SCHEMA}.access_audit_log
-                {where_clause}
-            """, params)
-            total = cur.fetchone()["total"]
-            
-            # Get entries
-            cur.execute(f"""
-                SELECT 
-                    id, action, actor_email, target_email,
-                    department_slug, old_value, new_value, reason,
-                    created_at, ip_address::text
-                FROM {SCHEMA}.access_audit_log
-                {where_clause}
-                ORDER BY created_at DESC
-                LIMIT %s OFFSET %s
-            """, params + [limit, offset])
-            
-            entries = [dict(row) for row in cur.fetchall()]
-        
-        return APIResponse(
-            success=True,
-            data={
-                "entries": entries,
-                "total": total,
-                "limit": limit,
-                "offset": offset,
-                "has_more": offset + len(entries) < total,
-            }
-        )
-    
-    except Exception as e:
-        logger.error(f"Error getting audit log: {e}")
-        raise HTTPException(500, f"Error getting audit log: {str(e)}")
+    raise HTTPException(
+        501,
+        "Audit log table deleted during schema migration. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -593,73 +323,17 @@ async def get_admin_stats(
 ):
     """
     Get admin dashboard statistics.
-    
-    Returns user counts, department counts, recent activity.
-    """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-    
-    auth = get_auth_service()
-    
-    try:
-        from .auth_service import get_db_cursor, SCHEMA
 
-        with get_db_cursor() as cur:
-            # Total users
-            cur.execute(f"SELECT COUNT(*) as count FROM {SCHEMA}.users WHERE active = TRUE")
-            total_users = cur.fetchone()["count"]
-            
-            # Users by role
-            cur.execute(f"""
-                SELECT role, COUNT(*) as count 
-                FROM {SCHEMA}.users 
-                WHERE active = TRUE 
-                GROUP BY role
-            """)
-            by_role = {row["role"]: row["count"] for row in cur.fetchall()}
-            
-            # Users by department
-            cur.execute(f"""
-                SELECT d.slug, d.name, COUNT(ac.user_id) as user_count
-                FROM {SCHEMA}.departments d
-                LEFT JOIN enterprise.access_config ac ON d.slug = ac.department
-                WHERE d.active = TRUE
-                GROUP BY d.slug, d.name
-            """)
-            by_department = [dict(row) for row in cur.fetchall()]
-            
-            # Recent logins (last 7 days)
-            cur.execute(f"""
-                SELECT COUNT(*) as count
-                FROM {SCHEMA}.access_audit_log
-                WHERE action = 'login'
-                AND created_at > NOW() - INTERVAL '7 days'
-            """)
-            recent_logins = cur.fetchone()["count"]
-            
-            # Recent access changes (last 7 days)
-            cur.execute(f"""
-                SELECT COUNT(*) as count
-                FROM {SCHEMA}.access_audit_log
-                WHERE action IN ('grant', 'revoke', 'role_change')
-                AND created_at > NOW() - INTERVAL '7 days'
-            """)
-            recent_changes = cur.fetchone()["count"]
-        
-        return APIResponse(
-            success=True,
-            data={
-                "total_users": total_users,
-                "users_by_role": by_role,
-                "users_by_department": by_department,
-                "recent_logins_7d": recent_logins,
-                "recent_access_changes_7d": recent_changes,
-            }
-        )
-    
-    except Exception as e:
-        logger.error(f"Error getting stats: {e}")
-        raise HTTPException(500, f"Error getting stats: {str(e)}")
+    TODO: This endpoint queries deleted tables (departments, access_config, access_audit_log).
+    Need to rewrite for 2-table schema (just enterprise.users table).
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    """
+    raise HTTPException(
+        501,
+        "Admin stats pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -673,54 +347,18 @@ async def list_all_departments(
     """
     List all departments.
 
-    Used for dropdowns in admin UI.
-    Super users see all, dept heads see only their departments.
+    TODO: The departments table was deleted during schema migration.
+    Department slugs are now just strings in user.department_access arrays.
+    Need to use tenant_service or hardcode department list.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_admin(actor)
-
-    auth = get_auth_service()
-
-    try:
-        from .auth_service import get_db_cursor, SCHEMA
-
-        if actor.is_super_user:
-            with get_db_cursor() as cur:
-                cur.execute(f"""
-                    SELECT id, slug, name, description
-                    FROM {SCHEMA}.departments
-                    WHERE active = TRUE
-                    ORDER BY name
-                """)
-                departments = [dict(row) for row in cur.fetchall()]
-        else:
-            # Dept heads see only their departments
-            dept_slugs = auth.get_user_department_access(actor)
-            head_depts = [d for d in dept_slugs if auth.is_dept_head_for(actor, d)]
-
-            departments = []
-            if head_depts:
-                with get_db_cursor() as cur:
-                    placeholders = ','.join(['%s'] * len(head_depts))
-                    cur.execute(f"""
-                        SELECT id, slug, name, description
-                        FROM {SCHEMA}.departments
-                        WHERE slug IN ({placeholders}) AND active = TRUE
-                        ORDER BY name
-                    """, head_depts)
-                    departments = [dict(row) for row in cur.fetchall()]
-
-        return APIResponse(
-            success=True,
-            data={
-                "departments": departments,
-                "count": len(departments),
-            }
-        )
-
-    except Exception as e:
-        logger.error(f"Error listing departments: {e}")
-        raise HTTPException(500, f"Error listing departments: {str(e)}")
+    raise HTTPException(
+        501,
+        "Departments table deleted during schema migration. "
+        "Use tenant_service.list_departments() instead. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 # =============================================================================
@@ -774,46 +412,18 @@ async def create_user(
     """
     Create a single user.
 
-    SUPER_USER only.
+    TODO: The auth.create_user() method signature changed.
+    No more employee_id, role, primary_department_slug fields.
+    Use auth.get_or_create_user() then grant_department_access().
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-
-    auth = get_auth_service()
-
-    try:
-        user = auth.create_user(
-            actor=actor,
-            email=request.email,
-            display_name=request.display_name,
-            employee_id=request.employee_id,
-            role=request.role,
-            primary_department_slug=request.primary_department,
-            department_access=request.department_access,
-            reason=request.reason,
-        )
-
-        return APIResponse(
-            success=True,
-            data={
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "display_name": user.display_name,
-                    "role": user.role,
-                    "primary_department": user.primary_department_slug,
-                },
-                "message": f"User created: {user.email}",
-            }
-        )
-
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error creating user: {e}")
-        raise HTTPException(500, f"Error creating user: {str(e)}")
+    raise HTTPException(
+        501,
+        "User creation pending redesign for 2-table schema. "
+        "Use get_or_create_user() + grant_department_access(). "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.post("/users/batch", response_model=APIResponse)
@@ -824,54 +434,16 @@ async def batch_create_users(
     """
     Batch create multiple users.
 
-    SUPER_USER only.
+    TODO: The auth.batch_create_users() method doesn't exist anymore.
+    Need to loop and call get_or_create_user() + grant_department_access().
 
-    Accepts a list of users with email, optional display_name, and optional department.
-    Returns counts of created, already_existed, and failed entries.
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-
-    auth = get_auth_service()
-
-    try:
-        # Convert Pydantic models to dicts
-        user_data = [
-            {
-                "email": u.email,
-                "display_name": u.display_name,
-                "department": u.department,
-            }
-            for u in request.users
-        ]
-
-        results = auth.batch_create_users(
-            actor=actor,
-            user_data=user_data,
-            default_department=request.default_department,
-            reason=request.reason,
-        )
-
-        return APIResponse(
-            success=True,
-            data={
-                "created": results["created"],
-                "created_count": len(results["created"]),
-                "already_existed": results["already_existed"],
-                "already_existed_count": len(results["already_existed"]),
-                "failed": results["failed"],
-                "failed_count": len(results["failed"]),
-                "message": f"Created {len(results['created'])} users, "
-                          f"{len(results['already_existed'])} already existed, "
-                          f"{len(results['failed'])} failed",
-            }
-        )
-
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except Exception as e:
-        logger.error(f"Error in batch create: {e}")
-        raise HTTPException(500, f"Error in batch create: {str(e)}")
+    raise HTTPException(
+        501,
+        "Batch user creation pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.put("/users/{user_id}", response_model=APIResponse)
@@ -883,50 +455,17 @@ async def update_user(
     """
     Update user details.
 
-    SUPER_USER only.
+    TODO: The auth.update_user() method signature changed.
+    No more employee_id, primary_department_slug fields.
+    Also get_user_by_id() doesn't exist.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-
-    auth = get_auth_service()
-
-    try:
-        target = auth.get_user_by_id(user_id)
-
-        if not target:
-            raise HTTPException(404, "User not found")
-
-        updated = auth.update_user(
-            actor=actor,
-            target_user=target,
-            email=request.email,
-            display_name=request.display_name,
-            employee_id=request.employee_id,
-            primary_department_slug=request.primary_department,
-            reason=request.reason,
-        )
-
-        return APIResponse(
-            success=True,
-            data={
-                "user": {
-                    "id": updated.id,
-                    "email": updated.email,
-                    "display_name": updated.display_name,
-                    "employee_id": updated.employee_id,
-                    "primary_department": updated.primary_department_slug,
-                },
-                "message": f"User updated: {updated.email}",
-            }
-        )
-
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error updating user: {e}")
-        raise HTTPException(500, f"Error updating user: {str(e)}")
+    raise HTTPException(
+        501,
+        "User update pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.delete("/users/{user_id}", response_model=APIResponse)
@@ -938,39 +477,16 @@ async def deactivate_user(
     """
     Deactivate (soft delete) a user.
 
-    SUPER_USER only.
-    User data is preserved but they cannot log in.
+    TODO: The auth.deactivate_user() method signature changed.
+    Also get_user_by_id() doesn't exist.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-
-    auth = get_auth_service()
-
-    try:
-        target = auth.get_user_by_id(user_id)
-
-        if not target:
-            raise HTTPException(404, "User not found")
-
-        reason = request.reason if request else None
-        auth.deactivate_user(actor=actor, target_user=target, reason=reason)
-
-        return APIResponse(
-            success=True,
-            data={
-                "user_id": user_id,
-                "email": target.email,
-                "message": f"User deactivated: {target.email}",
-            }
-        )
-
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error deactivating user: {e}")
-        raise HTTPException(500, f"Error deactivating user: {str(e)}")
+    raise HTTPException(
+        501,
+        "User deactivation pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )
 
 
 @admin_router.post("/users/{user_id}/reactivate", response_model=APIResponse)
@@ -982,33 +498,12 @@ async def reactivate_user(
     """
     Reactivate a previously deactivated user.
 
-    SUPER_USER only.
+    TODO: The auth.reactivate_user() method signature changed.
+
+    STUB: Returns 501 Not Implemented until admin portal is redesigned.
     """
-    actor = get_current_user(x_user_email)
-    require_super_user(actor)
-
-    auth = get_auth_service()
-
-    try:
-        user = auth.reactivate_user(actor=actor, user_id=user_id, reason=reason)
-
-        return APIResponse(
-            success=True,
-            data={
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "display_name": user.display_name,
-                    "active": user.active,
-                },
-                "message": f"User reactivated: {user.email}",
-            }
-        )
-
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
-    except ValueError as e:
-        raise HTTPException(400, str(e))
-    except Exception as e:
-        logger.error(f"Error reactivating user: {e}")
-        raise HTTPException(500, f"Error reactivating user: {str(e)}")
+    raise HTTPException(
+        501,
+        "User reactivation pending redesign for 2-table schema. "
+        "See MIGRATION_001_COMPLETE.md for details."
+    )

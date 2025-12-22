@@ -194,18 +194,13 @@ async def get_current_user(
                 user = auth.get_user_by_azure_oid(graph_user.get("id"))
 
                 if user:
-                    dept_slugs = auth.get_user_department_access(user)
                     return {
                         "id": user.id,
                         "email": user.email,
                         "display_name": user.display_name,
-                        "role": user.role,
-                        "tier": user.tier.name,
-                        "employee_id": user.employee_id,
-                        "primary_department": user.primary_department_slug,
-                        "departments": dept_slugs,
+                        "departments": user.department_access,
                         "is_super_user": user.is_super_user,
-                        "can_manage_users": user.can_manage_users,
+                        "can_manage_users": len(user.dept_head_for) > 0 or user.is_super_user,
                         "auth_method": "azure_ad",
                     }
 
@@ -225,20 +220,13 @@ async def get_current_user(
         if not user:
             raise HTTPException(401, "Email domain not authorized")
 
-        # Get department access
-        dept_slugs = auth.get_user_department_access(user)
-
         return {
             "id": user.id,
             "email": user.email,
             "display_name": user.display_name,
-            "role": user.role,
-            "tier": user.tier.name,
-            "employee_id": user.employee_id,
-            "primary_department": user.primary_department_slug,
-            "departments": dept_slugs,
+            "departments": user.department_access,
             "is_super_user": user.is_super_user,
-            "can_manage_users": user.can_manage_users,
+            "can_manage_users": len(user.dept_head_for) > 0 or user.is_super_user,
             "auth_method": "legacy_email",
         }
 
@@ -555,25 +543,17 @@ async def list_users(
     department: str = None,
     user: dict = Depends(require_admin)
 ):
-    """List users. Dept heads see their dept, super users see all."""
-    auth = get_auth_service()
+    """
+    List users endpoint - DEPRECATED.
 
-    # Get the actual User object for auth operations
-    actor = auth.get_user_by_email(user["email"])
-
-    try:
-        if user["is_super_user"] and not department:
-            users = auth.list_all_users(actor)
-        elif department:
-            users = auth.list_users_in_department(actor, department)
-        elif user["primary_department"]:
-            users = auth.list_users_in_department(actor, user["primary_department"])
-        else:
-            users = []
-
-        return {"users": users, "count": len(users)}
-    except PermissionError as e:
-        raise HTTPException(403, str(e))
+    This endpoint relied on list_all_users() and list_users_in_department()
+    which were removed during the 2-table schema migration.
+    Use the new admin portal endpoints at /api/admin/users instead.
+    """
+    raise HTTPException(
+        501,
+        "This endpoint is deprecated. Use /api/admin/users (admin portal) instead."
+    )
 
 
 @app.get("/api/departments")
@@ -752,25 +732,22 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         user_email = email
                         auth_method = client_auth_method  # Update auth method for twin routing
 
-                        # Get user's departments
-                        dept_slugs = auth.get_user_department_access(user)
-
-                        # Use requested division if user has access, else primary
-                        requested_division = data.get("division", user.primary_department_slug or "warehouse")
-                        if requested_division not in dept_slugs and not user.is_super_user:
-                            requested_division = user.primary_department_slug or (dept_slugs[0] if dept_slugs else "warehouse")
+                        # Use requested division if user has access
+                        requested_division = data.get("division", "warehouse")
+                        if requested_division not in user.department_access and not user.is_super_user:
+                            requested_division = user.department_access[0] if user.department_access else "warehouse"
 
                         tenant = TenantContext(
                             tenant_id="driscoll",
                             department=requested_division,
-                            role=user.role,
+                            role="user",
                             user_email=email,
                         )
 
                         # Get appropriate twin based on auth method
                         request_twin = get_twin_for_auth(auth_method, user_email)
 
-                        auth.record_login(user)  # Track login
+                        auth.update_last_login(user.id)  # Track login
 
                         # Log login event to analytics
                         if ANALYTICS_LOADED:
@@ -790,8 +767,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             "type": "verified",
                             "email": email,
                             "division": tenant.department,
-                            "role": user.role,
-                            "departments": dept_slugs,
+                            "departments": user.department_access,
                         })
                     else:
                         # Domain not allowed
