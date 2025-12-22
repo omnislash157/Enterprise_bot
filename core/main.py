@@ -559,27 +559,26 @@ async def list_users(
 @app.get("/api/departments")
 async def list_departments(user: dict = Depends(get_current_user)):
     """
-    List departments.
+    Available departments (static list - no table)
     - Authenticated users see their accessible departments
     - Unauthenticated see all (for login UI dropdown)
     """
-    if not TENANT_SERVICE_LOADED:
-        raise HTTPException(503, "Tenant service not loaded")
-
-    tenant_svc = get_tenant_service()
-    all_depts = tenant_svc.list_departments()
+    # Static department list - departments table has been removed
+    all_depts = [
+        {"slug": "sales", "name": "Sales", "description": "Sales Department"},
+        {"slug": "purchasing", "name": "Purchasing", "description": "Purchasing Department"},
+        {"slug": "warehouse", "name": "Warehouse", "description": "Warehouse Department"},
+        {"slug": "credit", "name": "Credit", "description": "Credit Department"},
+        {"slug": "accounting", "name": "Accounting", "description": "Accounting Department"},
+        {"slug": "it", "name": "IT", "description": "IT Department"},
+    ]
 
     if user and not user.get("is_super_user"):
         # Filter to user's accessible departments
         accessible = set(user.get("departments", []))
-        all_depts = [d for d in all_depts if d.slug in accessible]
+        all_depts = [d for d in all_depts if d["slug"] in accessible]
 
-    return {
-        "departments": [
-            {"slug": d.slug, "name": d.name, "description": d.description}
-            for d in all_depts
-        ]
-    }
+    return {"departments": all_depts}
 
 
 @app.get("/api/content")

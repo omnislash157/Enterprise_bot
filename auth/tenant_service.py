@@ -98,6 +98,18 @@ class Department:
     config: dict = field(default_factory=dict)
 
 
+# Static departments list - departments table has been removed
+# Departments are now just strings in users.department_access[] array
+STATIC_DEPARTMENTS = [
+    Department(id="sales", slug="sales", name="Sales", description="Sales Department"),
+    Department(id="purchasing", slug="purchasing", name="Purchasing", description="Purchasing Department"),
+    Department(id="warehouse", slug="warehouse", name="Warehouse", description="Warehouse Department"),
+    Department(id="credit", slug="credit", name="Credit", description="Credit Department"),
+    Department(id="accounting", slug="accounting", name="Accounting", description="Accounting Department"),
+    Department(id="it", slug="it", name="IT", description="IT Department"),
+]
+
+
 @dataclass 
 class DataConnection:
     """Returned to callers - contains everything needed to query tenant data"""
@@ -277,72 +289,28 @@ class TenantService:
     # -------------------------------------------------------------------------
     
     def get_department_by_slug(self, slug: str) -> Optional[Department]:
-        """Look up department by slug"""
+        """Look up department by slug (static data)"""
         cache_key = slug
         if cache_key in self._department_cache:
             return self._department_cache[cache_key]
-        
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT id, slug, name, description
-                FROM {SCHEMA}.departments 
-                WHERE slug = %s AND active = TRUE
-            """, (slug,))
-            row = cur.fetchone()
-        
-        if not row:
-            return None
-        
-        dept = Department(
-            id=str(row["id"]),
-            slug=row["slug"],
-            name=row["name"],
-            description=row.get("description")
-        )
-        
-        self._department_cache[cache_key] = dept
+
+        # Look up from static list
+        dept = next((d for d in STATIC_DEPARTMENTS if d.slug == slug), None)
+
+        if dept:
+            self._department_cache[cache_key] = dept
+
         return dept
     
     def get_department_by_id(self, dept_id: str) -> Optional[Department]:
-        """Look up department by UUID"""
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT id, slug, name, description
-                FROM {SCHEMA}.departments 
-                WHERE id = %s AND active = TRUE
-            """, (dept_id,))
-            row = cur.fetchone()
-        
-        if not row:
-            return None
-        
-        return Department(
-            id=str(row["id"]),
-            slug=row["slug"],
-            name=row["name"],
-            description=row.get("description")
-        )
+        """Look up department by ID (static data)"""
+        # Look up from static list (id matches slug now)
+        return next((d for d in STATIC_DEPARTMENTS if d.id == dept_id), None)
     
     def list_departments(self) -> List[Department]:
-        """List all active departments"""
-        with get_db_cursor() as cur:
-            cur.execute(f"""
-                SELECT id, slug, name, description
-                FROM {SCHEMA}.departments 
-                WHERE active = TRUE
-                ORDER BY name
-            """)
-            rows = cur.fetchall()
-        
-        return [
-            Department(
-                id=str(row["id"]),
-                slug=row["slug"],
-                name=row["name"],
-                description=row.get("description")
-            )
-            for row in rows
-        ]
+        """List all active departments (static data)"""
+        # Return static list sorted by name
+        return sorted(STATIC_DEPARTMENTS, key=lambda d: d.name)
     
     # -------------------------------------------------------------------------
     # Department Content
@@ -387,48 +355,51 @@ class TenantService:
     ) -> str:
         """
         Get all content formatted for LLM context stuffing.
-        
+
         If department_slug is provided, returns only that department's content.
         If None, returns all content (for super users).
-        
+
         Returns a single string ready to inject into system prompt.
         """
+        # Build department name lookup from static list
+        dept_names = {d.slug: d.name for d in STATIC_DEPARTMENTS}
+
         with get_db_cursor() as cur:
             if department_slug:
                 cur.execute(f"""
-                    SELECT d.name as dept_name, dc.title, dc.content
-                    FROM {SCHEMA}.documents dc
-                    JOIN {SCHEMA}.departments d ON dc.department_id = d.id
-                    WHERE d.slug = %s AND dc.active = TRUE AND d.active = TRUE
-                    ORDER BY d.name, dc.title
+                    SELECT department_id, title, content
+                    FROM {SCHEMA}.documents
+                    WHERE department_id = %s AND active = TRUE
+                    ORDER BY department_id, title
                 """, (department_slug,))
             else:
                 cur.execute(f"""
-                    SELECT d.name as dept_name, dc.title, dc.content
-                    FROM {SCHEMA}.documents dc
-                    JOIN {SCHEMA}.departments d ON dc.department_id = d.id
-                    WHERE dc.active = TRUE AND d.active = TRUE
-                    ORDER BY d.name, dc.title
+                    SELECT department_id, title, content
+                    FROM {SCHEMA}.documents
+                    WHERE active = TRUE
+                    ORDER BY department_id, title
                 """)
-            
+
             rows = cur.fetchall()
-        
+
         if not rows:
             return ""
-        
+
         # Format for context stuffing
         parts = ["=== COMPANY KNOWLEDGE BASE ===\n"]
-        current_dept = None
-        
+        current_dept_id = None
+
         for row in rows:
-            if row["dept_name"] != current_dept:
-                current_dept = row["dept_name"]
-                parts.append(f"\n## {current_dept} Department\n")
-            
+            dept_id = row["department_id"]
+            if dept_id != current_dept_id:
+                current_dept_id = dept_id
+                dept_name = dept_names.get(dept_id, dept_id.title())
+                parts.append(f"\n## {dept_name} Department\n")
+
             parts.append(f"\n### {row['title']}\n")
             parts.append(row["content"])
             parts.append("\n")
-        
+
         return "\n".join(parts)
     
     # -------------------------------------------------------------------------
