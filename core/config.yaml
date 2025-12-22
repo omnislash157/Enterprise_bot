@@ -17,7 +17,7 @@ tenant:
   name: "Driscoll Foods"
   allowed_domains:
     - driscollfoods.com
-    - gmail.com            # For testing
+    # NOTE: Add testing domains in .env or local config, not here
   docs_root: ./manuals/Driscoll
   default_division: warehouse
 

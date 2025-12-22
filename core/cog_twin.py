@@ -107,7 +107,7 @@ from memory.chat_memory import ChatMemoryStore
 from memory.squirrel import SquirrelTool, SquirrelQuery
 
 # Configuration - load first to determine voice engine
-from .config import cfg, get_config, setup_logging
+from .config_loader import cfg, get_config
 from .model_adapter import create_adapter
 
 # Voice engine - conditionally import based on config
@@ -1375,7 +1375,13 @@ async def main():
     """Interactive Cognitive Twin CLI."""
     from dotenv import load_dotenv
     load_dotenv()
-    setup_logging()
+
+    # Setup logging
+    import logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+    )
 
     import sys
 

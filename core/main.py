@@ -88,36 +88,6 @@ def get_twin():
         return CogTwin()
 
 
-def get_twin_for_auth(auth_method: str, user_email: str = None):
-    """
-    Route to correct twin based on auth provider.
-
-    This allows per-request twin selection based on how the user authenticated:
-    - Azure AD / Entra ID -> EnterpriseTwin (corporate context)
-    - Google / Email / Other -> CogTwin (personal context)
-
-    Args:
-        auth_method: Authentication method ('azure_ad', 'legacy_email', 'email', etc.)
-        user_email: User's email (for logging)
-
-    Returns:
-        Twin instance (EnterpriseTwin or CogTwin)
-    """
-    from .config_loader import get_config
-
-    # Enterprise providers route to EnterpriseTwin
-    enterprise_providers = ['azure_ad', 'azuread', 'entra_id', 'microsoft']
-
-    if auth_method in enterprise_providers:
-        from .enterprise_twin import EnterpriseTwin
-        logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → EnterpriseTwin")
-        return EnterpriseTwin(get_config())
-    else:
-        from .cog_twin import CogTwin
-        logger.info(f"[AUTH] {user_email or 'user'} via {auth_method} → CogTwin")
-        return CogTwin()
-
-
 # Auth imports
 try:
     from auth.auth_service import get_auth_service, authenticate_user
@@ -694,8 +664,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     # If verify message comes, we use that email
     # If not, we use default tenant (warehouse division)
     user_email = "demo@driscollfoods.com"  # Default for unverified sessions
-    auth_method = "default"  # Track auth method for twin routing
-    request_twin = None  # Will be set based on auth method
+    request_twin = None  # Will be set on verify
 
     tenant = TenantContext(
         tenant_id="driscoll",
@@ -729,7 +698,6 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                     if user:
                         user_email = email
-                        auth_method = client_auth_method  # Update auth method for twin routing
 
                         # Use requested division if user has access
                         requested_division = data.get("division", "warehouse")
@@ -743,8 +711,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             user_email=email,
                         )
 
-                        # Get appropriate twin based on auth method
-                        request_twin = get_twin_for_auth(auth_method, user_email)
+                        # Get twin based on deployment mode (config.yaml)
+                        request_twin = get_twin()
 
                         auth.update_last_login(user.id)  # Track login
 
@@ -792,11 +760,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     else:
                         logger.warning(f"Email not in whitelist: {email}")
                         await websocket.send_json({
-                            "type": "verified",
-                            "email": email,
-                            "division": tenant.department,
-                            "warning": "Email not in whitelist, using demo mode",
+                            "type": "error",
+                            "message": "Email not authorized. Please use SSO login.",
                         })
+                        continue  # Don't proceed with unauthorized email
 
             elif msg_type == "message":
                 content = data.get("content", "")
@@ -901,7 +868,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         analytics = get_analytics_service()
                         analytics.log_event(
                             event_type="dept_switch",
-                            user_email=tenant.email or user_email,
+                            user_email=tenant.user_email or user_email,
                             session_id=session_id,
                             from_department=old_division,
                             to_department=new_division
