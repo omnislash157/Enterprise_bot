@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_replen_manual",
+  "version": "1.0",
+  "description": "Warehouse replen processes and procedures",
+  "source_file": "Replen Manual.docx",
+  "file_hash": "05a6039baaf0bdc0cbc60f26415ac19edb1ede67e3e0a151eeeaf998dbe32485",
+  "chunks": [
+    {
+      "id": "warehouse_replen_introduction_0",
+      "category": "replen",
+      "section_title": "Introduction",
+      "keywords": [
+        "replenishment",
+        "slots",
+        "product",
+        "inventory",
+        "pick",
+        "aisles",
+        "system",
+        "levels",
+        "slot",
+        "picking"
+      ],
+      "content": "Replen Manual\n\nPurpose\n\nThe purpose of the replenishment (replens) process is to ensure that all pick slots on the warehouse floor or within reaching distance remain fully stocked throughout operations. By maintaining adequate inventory levels in each slot, replens support efficient order picking, reduces downtime, and ensures consistent product availability for night pickers.\n\nOverview\n\nReplenishment hi-lo operators are responsible for continuously monitoring and restocking product slots across their assigned aisles. Typically, each operator manages three to four aisles, ensuring that all slots designated for ground-level or reachable picking remain adequately filled. Replenishment combines both visual assessment and system-guided direction to maintain optimal product levels and inventory accuracy.\n\nReplenishment Workflow\n\nMonitoring Aisles\n\nReplenishment operators move through their assigned aisles and visually check which pick slots are running low on product. They also rely on the warehouse management system (WMS) to identify slots requiring replenishment.\n\nSystem Alerts and Indicators\n\nThe hi-lo computer system displays real-time inventory data. Slots that fall below their minimum threshold appear highlighted in red on the screen. A red-highlighted slot indicates that the product is at or below the minimum case quantity and must be replenished.\n\nPulling from Reserves\n\nReplenishment operators use reserve inventory — product stored in higher rack levels — to restock floor-level pick slots. The goal is to bring the product quantity up to a satisfactory level without exceeding the slot’s maximum capacity.\n\nPick Ready Inventory (PRI)\n\nIf no reserve inventory is available, the replenishment operator may use Pick Ready Inventory (PRI) when appropriate. PRI allows limited quantities of product to be stocked directly into available pick slots to maintain picking continuity.\n\nAisle Maintenance and Organization",
+      "chunk_token_count": 471
+    },
+    {
+      "id": "warehouse_replen_introduction_1",
+      "category": "replen",
+      "section_title": "Introduction",
+      "keywords": [
+        "replenishment",
+        "product",
+        "system",
+        "aisles",
+        "inventory",
+        "maintain",
+        "safe",
+        "warehouse",
+        "pickers",
+        "workers"
+      ],
+      "content": "Replenishment workers continuously maintain the cleanliness and organization of their aisles. This includes flattening pallets for a clean appearance, ensuring safe and efficient access for other workers, and keeping the floor free of debris or damaged materials.\n\n6. Product Verification and Accuracy\n\nReplenishment operators confirm that each slot’s product matches the system description. If discrepancies are found, they communicate with Inventory Control and correct the product labeling or system records as needed.\n\n7. System Updates\n\nWhen product quantities are adjusted or replenished, operators update the system using handheld scanners or terminal input. This ensures the entire company — including Purchasing and Sales — has accurate, real-time visibility into available product levels.\n\nWhy Replenishment Matters\n\nReplenishment is critical to maintaining an efficient and productive warehouse. Without timely replenishment, pickers would frequently run out of product, causing delays, increased use of cherry pickers, and overall loss of picking efficiency. Proper replenishment ensures:\n\n-Continuous product availability for pickers.\n- Accurate and reliable inventory data.\n- Safe and organized warehouse aisles.\n- Support for night operations and overall warehouse flow.\n\nWhat you do:\n\n• Continuously monitor aisles and system alerts throughout the shift.\n\n• Replenish slots before they reach critical low levels to prevent picking delays.\n\n• Never overfill slots; maintain quantities within designated maximums.\n\n• Flatten empty pallets and maintain clean, safe aisles.\n\n• Verify product matches slot description before completing replenishment.\n\n• Update all replenishment transactions in the system immediately after completion (through the scanner).\n\n• Communicate inventory issues promptly to Inventory Control or supervision.",
+      "chunk_token_count": 449
+    }
+  ]
+}

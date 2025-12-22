@@ -1,0 +1,420 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\driver_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:37:37.530631",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_driver_introduction_0",
+      "content": "Driver Manual (Night, Street, and School Drivers)\n\nOverview\nDrivers at Driscoll Foods are responsible for delivering products safely, efficiently, and accurately to our customers. Drivers serve as the face of the company and are essential to operations. Driscoll Foods employs:\n\nStreet Drivers \u2013 Handle customer deliveries in NYC and surrounding areas\n\nSchool Drivers \u2013 Deliver to schools with strict schedules and fines for errors\n\nHelper Drivers \u2013 Assist main drivers with loading/unloading and case management\n\nTractor-Trailer Drivers \u2013 Handle long-haul deliveries, transfers, and backhauls\n\nEvery driver must adhere to company safety policies, DOT regulations, and delivery schedules, ensuring products arrive in excellent condition and on time.\n\nShift Times & Flexibility\n\nStreet Drivers (NYC): Start times vary, typically 3:00 AM for Manhattan or 5:00 AM for other NYC routes\n\nSchool Drivers: Start earlier (around 2:30\u20133:00 AM) to ensure on-time delivery by school deadlines\n\nHelper Drivers: Follow assigned drivers\u2019 schedules\n\nTractor-Trailer Drivers: Start times vary depending on routes, pickups, and backhauls\n\nEnd-of-Shift: Drivers finish when all deliveries, backhauls, and paperwork are complete, which varies daily\n\nDOT Compliance: All drivers must follow hours-of-service regulations, including mandatory rest breaks, driving limits, and accurate logging in electronic logging devices (ELDs)\n\nClock-In & Pre-Route Preparation\n\nClock in at the waiting area upon arrival\n\nObtain all necessary route documents from the dispatcher:\n\nLoading sheets\n\nCustomer invoices\n\nKeydrop forms and keys\n\nE-jack batteries (if applicable)\n\nReview the loading report:\n\nConfirms number of cases per stop\n\nDifferentiates refrigerated, frozen, and dry products\n\nIdentifies special instructions, such as keydrop deliveries or time-sensitive school deliveries\n\nVerify assigned truck/trailer and route ID in Omnitracs\n\nInspect vehicle and equipment:\n\nE-jacks, handtrucks, straps, blankets, pallets\n\nConfirm battery and vehicle readiness",
+      "content_hash": "6537149ccafa7a13",
+      "section_title": "driver",
+      "source_file": "driver_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 358,
+      "_original": {
+        "keywords": [
+          "drivers",
+          "school",
+          "deliveries",
+          "street",
+          "products",
+          "nyc",
+          "schedules",
+          "loading",
+          "trailer",
+          "backhauls"
+        ],
+        "email": "",
+        "category": "driver",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training",
+        "definition"
+      ],
+      "verbs": [
+        "deliver",
+        "handle",
+        "assist",
+        "load",
+        "unload",
+        "manage",
+        "adhere",
+        "ensure",
+        "follow",
+        "clock in",
+        "obtain",
+        "review",
+        "verify",
+        "inspect",
+        "confirm"
+      ],
+      "entities": [
+        "driver",
+        "street_driver",
+        "school_driver",
+        "helper_driver",
+        "tractor_trailer_driver",
+        "customer",
+        "route",
+        "truck",
+        "trailer",
+        "loading_sheet",
+        "invoice",
+        "keydrop_form",
+        "key",
+        "e_jack_battery",
+        "loading_report",
+        "case",
+        "product",
+        "omnitracs",
+        "eld",
+        "e_jack",
+        "handtruck",
+        "strap",
+        "blanket",
+        "pallet",
+        "shipment",
+        "backhaul"
+      ],
+      "actors": [
+        "driver",
+        "street_driver",
+        "school_driver",
+        "helper_driver",
+        "tractor_trailer_driver",
+        "dispatcher",
+        "customer"
+      ],
+      "conditions": [
+        "strict_schedule",
+        "fines_for_errors",
+        "time_sensitive",
+        "keydrop_delivery",
+        "school_deadline",
+        "hours_of_service",
+        "rest_breaks",
+        "driving_limits",
+        "refrigerated",
+        "frozen",
+        "dry",
+        "late_delivery",
+        "temperature_violation"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the typical start times for school drivers?",
+        "How do I clock in and get my route documents from the dispatcher?",
+        "What do I need to review in the loading report for keydrop deliveries?",
+        "Omnitracs isn't showing my assigned truck or route ID\u2014what do I do?",
+        "Walk me through the full pre-route prep, from clock-in to vehicle inspection including ELD logging."
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 10,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Compliance-critical with safety, DOT regs, and core driver procedures; bounded to company driver roles and prep steps; basic training level; self-contained for overview and pre-route actions; highly actionable checklists.",
+      "acronyms": {
+        "DOT": "Department of Transportation",
+        "NYC": "New York City",
+        "ELDs": "electronic logging devices"
+      },
+      "jargon": {
+        "Street Drivers": "Handle customer deliveries in NYC and surrounding areas",
+        "School Drivers": "Deliver to schools with strict schedules and fines for errors",
+        "Helper Drivers": "Assist main drivers with loading/unloading and case management",
+        "Tractor-Trailer Drivers": "Handle long-haul deliveries, transfers, and backhauls",
+        "backhauls": "Return trips involving pickups or cargo transfers",
+        "keydrop deliveries": "Deliveries requiring keydrop forms and keys for access",
+        "loading sheets": "Documents listing products for loading",
+        "loading report": "Report confirming cases per stop, product types (refrigerated, frozen, dry), and special instructions",
+        "E-jacks": "Electric pallet jacks requiring batteries",
+        "handtrucks": "Manual carts for moving goods",
+        "Omnitracs": "System for verifying assigned truck/trailer and route ID",
+        "hours-of-service regulations": "DOT rules on driving limits, rest breaks, and ELD logging"
+      },
+      "numeric_thresholds": {
+        "school_driver_start_time": {
+          "value": "2:30\u20133:00",
+          "unit": "AM",
+          "context": "School Drivers start to meet strict school deadlines"
+        },
+        "street_driver_manhattan_start": {
+          "value": "3:00",
+          "unit": "AM",
+          "context": "Typical start for Manhattan routes"
+        },
+        "street_driver_other_nyc_start": {
+          "value": "5:00",
+          "unit": "AM",
+          "context": "Typical start for other NYC routes"
+        }
+      }
+    },
+    {
+      "id": "warehouse_driver_introduction_1",
+      "content": "Ensure DOT compliance: check hours available for driving, inspect vehicle for roadworthiness, and confirm all required safety equipment is onboard\n\nLoading & Route Setup\n\nOrganize truck according to route layout:\n\nLast stops go to the nose of the truck, first stops go to the tail\n\nRefrigerated, frozen, and dry sections are clearly separated\n\nPallets are secured, strapping taller pallets if necessary\n\nReview route-specific instructions:\n\nKeydrop instructions, arrival time windows, school delivery times\n\nAdjust loading to ensure quick unloading and minimal handling\n\nHelper coordination:\n\nAssign refrigerated/frozen items to the helper\n\nAssign dry items to the driver for maximum efficiency\n\nCheck route against invoices: ensure all pallets are present and match route requirements\n\nDelivery Procedures\nStreet Deliveries\n\nFollow loading sheet and invoices to deliver products to each stop\n\nCheck labels AND case product names to prevent mispicks\n\nUse handtrucks and e-jacks efficiently, placing items in correct customer locations\n\nKeydrop deliveries: ensure codes are followed, lock doors, and photograph deliveries for proof\n\nMark all delivered items on the front sheet of the invoice\n\nMaintain professional customer interactions; courteous, patient behavior is critical\n\nFollow time windows; do not arrive too early or late\n\nSchool Deliveries\n\nMust adhere to strict delivery schedules, often by 2:00 PM for NYC schools\n\nDeliveries include case counts, frozen, refrigerated, and dry products\n\nSchools are subject to fines for missing cases ($500 per case)\n\nBe patient and courteous with school staff; handle challenges calmly\n\nVerify deliveries by marking on invoices and obtaining staff confirmation\n\nTractor-Trailer Deliveries & Backhauls\n\nHandle long-haul deliveries to other Driscoll Foods locations or customer warehouses\n\nTransfers may require relinking trailers or picking up backhaul products\n\nMaintain correct routing for backhauls, ensuring trucks return full to maximize efficiency\n\nFollow all safety protocols, secure loads, and track truck positions accurately in Omnitracs",
+      "content_hash": "6c1d9d079e0a7449",
+      "section_title": "driver",
+      "source_file": "driver_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 382,
+      "_original": {
+        "keywords": [
+          "deliveries",
+          "route",
+          "ensure",
+          "items",
+          "check",
+          "loading",
+          "truck",
+          "refrigerated",
+          "frozen",
+          "dry"
+        ],
+        "email": "",
+        "category": "driver",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "ensure",
+        "check",
+        "inspect",
+        "confirm",
+        "organize",
+        "secure",
+        "review",
+        "adjust",
+        "assign",
+        "follow",
+        "deliver",
+        "verify",
+        "use",
+        "place",
+        "lock",
+        "photograph",
+        "mark",
+        "maintain",
+        "adhere",
+        "handle",
+        "track"
+      ],
+      "entities": [
+        "truck",
+        "pallet",
+        "route",
+        "invoice",
+        "loading_sheet",
+        "delivery",
+        "handtruck",
+        "e-jack",
+        "keydrop",
+        "school",
+        "tractor_trailer",
+        "backhaul",
+        "Omnitracs"
+      ],
+      "actors": [
+        "driver",
+        "helper",
+        "customer",
+        "school_staff"
+      ],
+      "conditions": [
+        "DOT_compliance",
+        "roadworthiness",
+        "safety_equipment",
+        "time_windows",
+        "school_deliveries",
+        "missing_cases",
+        "keydrop",
+        "backhauls",
+        "temperature_separation"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do I need to check for DOT compliance before hitting the road?",
+        "How do I load the truck so last stops are at the nose and first at the tail?",
+        "What's the exact procedure for keydrop deliveries, including photos?",
+        "Schools have that $500 fine per missing case\u2014how do I verify and mark deliveries to avoid it?",
+        "Helper loaded dry stuff in the reefer and now pallets don't match invoices\u2014what a mess, how do I fix this?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        3,
+        1
+      ],
+      "importance": 10,
+      "specificity": 4,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Covers DOT compliance, safety, and core delivery processes critical for drivers; specific to trucking operations with clear steps, self-contained for procedures but assumes basic domain terms.",
+      "acronyms": {
+        "DOT": "Department of Transportation",
+        "NYC": "New York City"
+      },
+      "jargon": {
+        "DOT compliance": "Adherence to Department of Transportation regulations including hours of service and vehicle safety",
+        "hours available for driving": "Regulatory limit on driver hours under DOT rules",
+        "roadworthiness": "Vehicle condition suitable for safe road operation",
+        "nose of the truck": "Front section of the truck",
+        "tail": "Rear section of the truck",
+        "keydrop instructions": "Guidelines for unattended deliveries using access codes or keys",
+        "keydrop deliveries": "Unsupervised product drops at locked locations with photo proof",
+        "mispicks": "Errors in selecting incorrect products",
+        "e-jacks": "Electric pallet jacks",
+        "handtrucks": "Manual wheeled carts for moving loads",
+        "backhauls": "Return loads picked up after delivery to maximize truck utilization",
+        "Omnitracs": "Telematics system for tracking truck positions and routes"
+      },
+      "numeric_thresholds": {
+        "school_delivery_deadline": {
+          "value": "2:00 PM",
+          "unit": "time",
+          "context": "Strict schedule for NYC schools"
+        },
+        "fine_per_missing_case": {
+          "value": 500,
+          "unit": "USD",
+          "context": "Penalty for schools on undelivered cases"
+        }
+      }
+    },
+    {
+      "id": "warehouse_driver_introduction_2",
+      "content": "Safety & Compliance\n\nAll drivers must adhere to DOT regulations, including:\n\nMaximum driving hours\n\nRequired rest breaks\n\nAccurate log entries in ELDs\n\nMaintain safe driving practices:\n\nNo hard braking, aggressive acceleration, or distracted driving\n\nUse seatbelts and follow traffic laws\n\nFollow company safety protocols:\n\nCheck pallets for stability\n\nUse handtrucks, e-jacks, and straps safely\n\nReport any accidents or near-misses immediately\n\nEnd-of-Shift Procedures\n\nReturn to warehouse after completing deliveries, transfers, and backhauls\n\nPark assigned truck/trailer at designated loading doors\n\nReturn equipment:\n\nHandtrucks\n\nE-jack batteries\n\nStraps and blankets\n\nComplete paperwork:\n\nUndelivered cases, damages, or mispicks\n\nRoute confirmations and backhaul updates\n\nClock out once all tasks are complete\n\nPerformance & Incentives\n\nDrivers are paid hourly plus potential incentives for productivity\n\nAccuracy and efficiency are critical; mispicks or delayed deliveries impact bonuses\n\nNetradyne cameras monitor driving behavior and contribute to driver scores\n\nFollowing DOT and company procedures ensures safety, reliability, and full incentive eligibility\n\nKey Takeaways\n\nDrivers must balance speed, efficiency, and accuracy\n\nProper route preparation and equipment use are critical to completing deliveries safely\n\nCustomer interaction is vital; drivers represent Driscoll Foods professionally\n\nAll activities must comply with DOT regulations and company safety policies\n\nFlexibility is essential; shift end depends on completion of all deliveries and paperwork",
+      "content_hash": "60c7f77992a955fd",
+      "section_title": "driver",
+      "source_file": "driver_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 265,
+      "_original": {
+        "keywords": [
+          "safety",
+          "drivers",
+          "driving",
+          "deliveries",
+          "dot",
+          "use",
+          "company",
+          "regulations",
+          "follow",
+          "handtrucks"
+        ],
+        "email": "",
+        "category": "driver",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "adhere",
+        "maintain",
+        "check",
+        "use",
+        "report",
+        "return",
+        "park",
+        "complete",
+        "clock out",
+        "follow"
+      ],
+      "entities": [
+        "DOT regulations",
+        "ELD",
+        "pallet",
+        "handtruck",
+        "e-jack",
+        "strap",
+        "blanket",
+        "truck",
+        "trailer",
+        "warehouse",
+        "route",
+        "backhaul",
+        "Netradyne camera"
+      ],
+      "actors": [
+        "driver",
+        "customer"
+      ],
+      "conditions": [
+        "accident",
+        "near-miss",
+        "undelivered cases",
+        "damages",
+        "mispicks",
+        "delayed deliveries"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do I have to do at the end of my shift before clocking out?",
+        "What if I have a near-miss while driving\u2014do I need to report it?",
+        "How do I ensure accurate log entries in my ELD to stay DOT compliant?",
+        "I finished all my deliveries and backhauls but can't clock out\u2014what am I missing with the paperwork?",
+        "How does Netradyne camera footage impact my driver score and incentive pay?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 10,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Compliance-critical safety and DOT regulations, core driver procedures; clear, actionable steps for daily operations; self-contained with lists and key takeaways",
+      "acronyms": {
+        "DOT": "Department of Transportation",
+        "ELDs": "Electronic Logging Devices"
+      },
+      "jargon": {
+        "backhauls": "Return trips with cargo from customer or vendor back to warehouse",
+        "e-jacks": "Electric pallet jacks",
+        "handtrucks": "Manual pallet trucks",
+        "mispicks": "Incorrectly picked or selected items for delivery",
+        "Netradyne cameras": "Driver monitoring camera system for behavior scoring"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

@@ -4,6 +4,36 @@ Quick reference for session continuity. See CHANGELOG.md for full details.
 
 ---
 
+## 2024-12-22 01:30 - Embedder & RAG System Recon ✅
+**Type:** Documentation (no code changes)
+**Output:** docs/EMBEDDER_RAG_RECON.md (960 lines)
+
+**Mission:** Stop whack-a-moling RAG issues - document entire embedding/RAG/ingestion system
+
+**Top 5 Findings:**
+1. **RAG DEAD** - `enterprise.documents` table deleted in Migration 002 (collateral damage)
+2. **Ingestion DEAD** - Targets `department_content` table (doesn't exist), broken imports
+3. **Duplicate embedders** - AsyncEmbedder (full-featured) + EmbeddingClient (minimal) doing same job
+4. **Column mismatch** - Ingestion writes 19 columns, RAG expects 15 columns
+5. **Source data READY** - 10+ JSON chunk files in Manuals/Driscoll/ ready to ingest
+
+**Documentation:**
+- 4 phases: Embedder wiring, database audit, personal SaaS stubs, ingestion pipeline
+- Full DDL for `enterprise.documents` table (15 columns, 6 indexes, pgvector)
+- 9-step fix order (2-3 hours including testing)
+- Wiring map: Every embedder call traced to file:line
+- Environment checklist: DEEPINFRA_API_KEY (required), CLOUDFLARE/TEI (optional)
+
+**Critical Path:**
+1. Create `enterprise.documents` table (Migration 003)
+2. Fix 4 file edits in `ingest_to_postgres.py` (~60 lines)
+3. Run ingestion with --embed flag
+4. Test RAG retrieval
+
+**Next:** Fix ingestion + run Migration 003
+
+---
+
 ## 2024-12-22 00:45 - Auth Full Refactor (2-Table Schema) ✅
 **Priority:** CRITICAL - SSO READY TO TEST
 **Mission:** Complete refactor from 7-table to 2-table auth schema
@@ -92,3 +122,30 @@ Quick reference for session continuity. See CHANGELOG.md for full details.
 ---
 
 **CHANGELOG.md:** 881 lines available. Read .claude/CHANGELOG.md for full details if needed.
+
+---
+
+## 2024-12-22 01:15 - Config Deep Recon ✅
+**Type:** Documentation (no code changes)
+**Output:** docs/CONFIG_DEEP_RECON.md (960 lines)
+
+**Mission:** Stop whack-a-moling - document entire config/routing/twin system
+
+**Top 5 Findings:**
+1. **Twin routing broken** - Startup uses `get_twin()` (config-based) → EnterpriseTwin, Runtime uses `get_twin_for_auth()` (auth-based) → CogTwin for email login
+2. **Email login security hole** - Anyone can impersonate by sending email string via WebSocket (no password/token)
+3. **Duplicate config loaders** - config.py (204 lines, DEAD) + config_loader.py (286 lines, ACTIVE)
+4. **TenantContext.email missing** - Code expects `.email` but field is `.user_email` (post-refactor debt)
+5. **Production backdoors** - gmail.com in allowed_domains, no is_production flag
+
+**Documentation:**
+- 10 file audits with line numbers
+- 18 environment variables mapped
+- 42 config keys documented
+- 3 wiring diagrams (request/config/auth flows)
+- 12 prioritized recommendations
+
+**Critical Issues:** 2 security (email login, gmail.com), 3 functional (twin routing, TenantContext, manifest)
+
+**Next:** Fix critical issues based on recon
+

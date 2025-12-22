@@ -1,0 +1,249 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\dispatching_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:36:56.376716",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_dispatching_introduction_0",
+      "content": "Dispatching Manual\n\nOverview of Night Dispatch Operations\n\nNight dispatching at Driscoll Foods begins at approximately 2:00 AM. The dispatch team is responsible for preparing routes, organizing paperwork, coordinating equipment, and ensuring that every driver begins their day correctly. This job requires focus, organization, attention to detail, and strong communication.\n\nBeginning Shift Setup\n\nAt the start of the shift, dispatchers organize invoices, stop paperwork, and loading sheets. Route IDs are marked on documents. Key-drop routes require retrieving and organizing keys from the key wall in alphabetical (AA\u2013ZZ) and numerical (01\u201399) order.\n\nEarly Driver Processing (3:00 AM \u2013 4:00 AM)\n\nThe first wave of drivers arrives around 3:00 AM. Dispatchers distribute paperwork, assign helpers if needed, provide e-jack batteries, and track everything on the Dispatch Sheet.\n\nMain Driver Rush (4:00 AM \u2013 5:30 AM)\n\nThis is the busiest period. Dispatchers must work one driver at a time to avoid mistakes, distribute paperwork, ensure key-drop forms are included, and manage available drivers without routes.\n\nEquipment Distribution\n\nDispatchers distribute correctly labeled e-jack batteries and ensure drivers collect their personal handtrucks. Battery tracking is important for end-of-day accounting.\n\nUsing Omnitracs\n\nDispatchers must enter truck numbers into Omnitracs for each route. Accuracy is critical for tracking and compliance.\n\nLoading Report\n\nEach driver must receive a loading report as part of their paperwork. Dispatchers verify that the correct version is included.\n\nManaging Helpers\n\nDrivers may request helpers. Dispatchers decide based on stop count, case volume, and route difficulty. Safety and efficiency guide decisions.\n\nHandling Missing Routes or Issues\n\nDrivers without a route are notified and may become available helpers. Dispatchers track all available personnel.\n\nEnd-of-Setup Responsibilities",
+      "content_hash": "e6c1a89c809c0791",
+      "section_title": "dispatching",
+      "source_file": "dispatching_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 349,
+      "_original": {
+        "keywords": [
+          "dispatchers",
+          "paperwork",
+          "driver",
+          "drivers",
+          "routes",
+          "route",
+          "helpers",
+          "dispatch",
+          "their",
+          "loading"
+        ],
+        "email": "",
+        "category": "dispatching",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "training",
+        "reference",
+        "compliance"
+      ],
+      "verbs": [
+        "prepare",
+        "organize",
+        "coordinate",
+        "ensure",
+        "mark",
+        "retrieve",
+        "distribute",
+        "assign",
+        "provide",
+        "track",
+        "work",
+        "manage",
+        "collect",
+        "enter",
+        "verify",
+        "receive",
+        "request",
+        "decide",
+        "notify"
+      ],
+      "entities": [
+        "invoice",
+        "stop_paperwork",
+        "loading_sheet",
+        "route_id",
+        "key_drop_route",
+        "dispatch_sheet",
+        "e_jack_battery",
+        "handtruck",
+        "truck_number",
+        "omnitracs",
+        "loading_report",
+        "key_drop_form",
+        "route"
+      ],
+      "actors": [
+        "dispatcher",
+        "driver",
+        "helper"
+      ],
+      "conditions": [
+        "night_dispatch",
+        "shift_start",
+        "early_driver_processing",
+        "main_driver_rush",
+        "key_drop_routes",
+        "drivers_without_route",
+        "helper_request",
+        "high_stop_count",
+        "high_case_volume",
+        "route_difficulty"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time does the night dispatch shift start?",
+        "How do I organize the keys from the key wall for key-drop routes?",
+        "What if a driver arrives during the rush but doesn't have a route assigned?",
+        "Drivers are backing up during the 4-5:30 AM rush and I can't keep up\u2014what am I doing wrong?",
+        "How do I decide if a route needs a helper based on stops and case volume?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core operational process for night dispatching, with specific timelines, steps, and tools; self-contained for shift setup but cuts off at end; requires basic dispatcher training.",
+      "acronyms": {},
+      "jargon": {
+        "key-drop routes": "Routes requiring retrieval and organization of keys from the key wall in alphabetical (AA\u2013ZZ) and numerical (01\u201399) order",
+        "e-jack batteries": "Batteries for drivers' electric pallet jacks or similar equipment, distributed and tracked by dispatchers",
+        "Dispatch Sheet": "Tracking sheet for drivers, paperwork, equipment, and available personnel",
+        "Omnitracs": "Software system for entering truck numbers per route to enable tracking and compliance",
+        "loading report": "Document verifying loads that must be included in each driver's paperwork",
+        "key wall": "Storage area for keys organized alphabetically (AA\u2013ZZ) and numerically (01\u201399)",
+        "helpers": "Additional personnel assigned to drivers based on stop count, case volume, and route difficulty",
+        "stop paperwork": "Documents related to delivery stops, organized and distributed to drivers",
+        "loading sheets": "Documents prepared at shift start detailing loads for routes",
+        "stop count": "Number of delivery stops on a route, factor in assigning helpers",
+        "case volume": "Quantity of cases on a route, factor in assigning helpers",
+        "Route IDs": "Unique identifiers marked on invoices, stop paperwork, and loading sheets"
+      },
+      "numeric_thresholds": {
+        "night_dispatch_start": {
+          "value": "2:00",
+          "unit": "AM",
+          "context": "Approximate start of night dispatching operations"
+        },
+        "early_driver_processing": {
+          "value": "3:00-4:00",
+          "unit": "AM",
+          "context": "Period for first wave of drivers: paperwork distribution, helpers, e-jack batteries, Dispatch Sheet tracking"
+        },
+        "main_driver_rush": {
+          "value": "4:00-5:30",
+          "unit": "AM",
+          "context": "Busiest period for processing drivers one at a time"
+        },
+        "key_alphabetical_order": {
+          "value": "AA-ZZ",
+          "unit": "",
+          "context": "Alphabetical organization of keys on key wall for key-drop routes"
+        },
+        "key_numerical_order": {
+          "value": "01-99",
+          "unit": "",
+          "context": "Numerical organization of keys on key wall for key-drop routes"
+        }
+      }
+    },
+    {
+      "id": "warehouse_dispatching_introduction_1",
+      "content": "After all drivers have been processed, dispatchers review the Dispatch Sheet for accuracy and send it to transportation leadership. This document guides operations for the entire day.\n\nImportance of the Role\n\nNight dispatching is a high-pressure position requiring organization and calm decision-making. Dispatchers ensure correct paperwork, equipment, helper assignments, and route accuracy, directly affecting customer satisfaction and transportation success.",
+      "content_hash": "689b79767d654499",
+      "section_title": "dispatching",
+      "source_file": "dispatching_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 76,
+      "_original": {
+        "keywords": [
+          "dispatchers",
+          "accuracy",
+          "transportation",
+          "after",
+          "drivers",
+          "processed",
+          "review",
+          "dispatch",
+          "sheet",
+          "send"
+        ],
+        "email": "",
+        "category": "dispatching",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "process",
+        "review",
+        "send",
+        "ensure"
+      ],
+      "entities": [
+        "Dispatch Sheet",
+        "driver",
+        "route",
+        "paperwork",
+        "equipment",
+        "helper"
+      ],
+      "actors": [
+        "dispatcher",
+        "driver",
+        "transportation leadership",
+        "customer"
+      ],
+      "conditions": [
+        "after all drivers processed",
+        "high-pressure"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I wrap up after all drivers are processed?",
+        "What happens to the Dispatch Sheet after dispatchers review it?",
+        "What must night dispatchers ensure for helper assignments and route accuracy?",
+        "Night dispatching is killing me - what are the key things I have to get right?",
+        "What if there's a mistake on the Dispatch Sheet before sending it to transportation leadership?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 7,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process in night dispatching, clear final step and role overview, actionable for dispatchers but assumes some context on Dispatch Sheet.",
+      "acronyms": {},
+      "jargon": {
+        "Dispatch Sheet": "Document reviewed by dispatchers for accuracy after processing drivers, sent to transportation leadership to guide daily operations",
+        "Night dispatching": "High-pressure dispatching role requiring organization and calm decision-making",
+        "helper assignments": "Assignments of support personnel to drivers or routes, ensured correct by dispatchers",
+        "route accuracy": "Ensuring routes are correctly assigned and scheduled"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

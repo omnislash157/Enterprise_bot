@@ -1,0 +1,390 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\routing_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:45:27.039882",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_routing_introduction_0",
+      "content": "Routing Manual\n\nOverview\n\nRouting is one of the most crucial roles in Driscoll Foods operations. The Routing Department ensures that every customer receives their order accurately and on time each day. In simple terms, routing is the process of creating the delivery routes that our trucks drive daily, placing customers as stops along those routes in an efficient, logical order.\n\nRouting is primarily a desk-based position that uses two main systems: RNA (RoadNet Anywhere) and DispatchTrack. With approximately 2,000 customers per day, the routing team makes sure every product from the warehouse is delivered at the correct time and in the most efficient manner possible.\n\nRouting by Type\n\nRouting is divided into two major categories:\n- Schools\n- Street Customers\n\nEach type has its own timeline, rules, and system requirements\n\nRouting for Schools\n\nRouting for schools is always completed five days in advance because schools submit their orders earlier. The process begins in Telnet:\n\nGo to Telnet \u2192 21, 1, date you are routing for (five days ahead)\n\nOnce the file is prepared, go to the desktop folder \u201cSend Orders to RoadNet\u201d and double-click it. It will \u201cblink cast\u201d to confirm the file is sent to RNA.\n\nIn Telnet, go to \u201cCreate Route\u201d and drag the routing day into the designated box. This loads all your stops onto the map in RNA.\n\nNow you can begin creating your routes.\n\nBuilding Routes in RNA\n\nWhen routing, several key factors must be considered:\n- Total Stops\n- Distance Between Stops\n- Arrival and Departure Times\n- Total Weight and Case Cube\n\nFor straight trucks (used for school deliveries):\n- Maximum case cube: 600\n- Maximum stops per route: 10\n\nSteps to Build Routes:",
+      "content_hash": "3926f5ac5a0cbeff",
+      "section_title": "routing",
+      "source_file": "routing_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 365,
+      "_original": {
+        "keywords": [
+          "routing",
+          "routes",
+          "stops",
+          "rna",
+          "schools",
+          "day",
+          "customers",
+          "telnet",
+          "their",
+          "order"
+        ],
+        "email": "",
+        "category": "routing",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "policy",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "route",
+        "create",
+        "place",
+        "ensure",
+        "use",
+        "prepare",
+        "send",
+        "drag",
+        "load",
+        "build",
+        "consider"
+      ],
+      "entities": [
+        "route",
+        "customer",
+        "order",
+        "truck",
+        "stop",
+        "warehouse"
+      ],
+      "actors": [
+        "routing_team",
+        "driver",
+        "customer",
+        "school"
+      ],
+      "conditions": [
+        "schools",
+        "five_days_in_advance",
+        "straight_trucks",
+        "max_stops_10",
+        "max_case_cube_600"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How many days in advance do we route for schools?",
+        "Walk me through starting school routing in Telnet and getting stops into RNA.",
+        "What's the max case cube and stops per route for straight trucks on school runs?",
+        "I double-clicked 'Send Orders to RoadNet' but it didn't blink cast\u2014what's wrong?",
+        "What key factors like case cube do I need to watch when building routes in RNA?"
+      ],
+      "question_complexity": [
+        1,
+        3,
+        1,
+        2,
+        2
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 6,
+      "completeness_score": 6,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational process for school routing with detailed preparatory steps using specific systems; bounded to one customer type, requires software familiarity, somewhat self-contained but cuts off before full route-building steps.",
+      "acronyms": {
+        "RNA": "RoadNet Anywhere"
+      },
+      "jargon": {
+        "blink cast": "Confirmation signal when sending file to RNA",
+        "case cube": "Volume measure considering cases and cubic space for loads",
+        "straight trucks": "Trucks used specifically for school deliveries",
+        "Street Customers": "Non-school customers routed differently from schools",
+        "Telnet": "Internal system for order preparation and route creation"
+      },
+      "numeric_thresholds": {
+        "daily_customers": {
+          "value": 2000,
+          "unit": "customers",
+          "context": "Approximately handled per day"
+        },
+        "school_routing_advance": {
+          "value": 5,
+          "unit": "days",
+          "context": "Routing for schools completed in advance"
+        },
+        "straight_truck_max_case_cube": {
+          "value": 600,
+          "unit": "",
+          "context": "Maximum for straight trucks used in school deliveries"
+        },
+        "straight_truck_max_stops": {
+          "value": 10,
+          "unit": "stops",
+          "context": "Maximum per route for straight trucks"
+        }
+      }
+    },
+    {
+      "id": "warehouse_routing_introduction_1",
+      "content": "1. Click \u201cCreate New Route.\u201d\n2. Label the route based on its zone (Bronx or Manhattan schools).\n3. Divide the total cube by 600 to estimate how many trucks/routes you\u2019ll need.\n4. Drag the stops from the map into your created routes, arranging them in a horseshoe pattern.\n5. Review arrival/departure times and customer notes carefully.\n6. Assign drivers, ensuring each has the right route type and stop count.\n7. Check the helper box for all school routes.\n\nRouting for Streets\n\nStreet routing follows the same process but occurs daily around 5:15 PM, since customers can submit orders until 5:00 PM the day before.\n\nStreet routes differ in a few ways:\n\nUp to 12 stops allowed per route\n\nStricter delivery time windows\n\nCustomers are graded (A+, A, A-, B+, etc.) and higher-graded customers must be prioritized\n\nZones for street routing:\n01 \u2013 Long Island\n02 \u2013 Queens\n03 \u2013 Brooklyn\n04 \u2013 Bronx\n05 \u2013 Westchester\n06 \u2013 Dutchess\n10 \u2013 Jails\n(and more for Connecticut, Massachusetts, Maryland, etc.)\n\nRouting in DispatchTrack\n\nIf you routed Manhattan in RNA, you will route Bronx in DispatchTrack (and vice versa).\n\nSteps:\n\nIn Telnet, enter 35, 1, date you\u2019re routing.\n\nDouble-click \u201cSend to DispatchTrack.\u201d\n\nA file will appear in the Commun folder named ORDERS.R.\n\nRename it to ORDERS1.CSV (or the next number available).\n\nOpen DispatchTrack \u2192 Orders \u2192 Import and verify orders in Telnet.\n\nUpload the Excel file and proceed to Routing.\n\nBuild routes as in RNA, focusing on compactness and time windows.\n\nName and save routes (e.g., D5M Manhattan Schools). DispatchTrack does not auto-save.\n\nPreparation and Timing\n\nThroughout the day, preparation is key. Take downloads through Telnet and start building routes every 45 minutes before 5 PM. This ensures a fast turnaround once all orders are finalized. Email sales reps during the day with any questions about delivery windows or customer notes.\n\nBy being proactive, routing can meet the 5:15 PM deadline so that night crews can begin loading trucks on time. If routing is delayed, the entire delivery chain suffers.",
+      "content_hash": "5f333dacb6dd08b1",
+      "section_title": "routing",
+      "source_file": "routing_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 439,
+      "_original": {
+        "keywords": [
+          "routing",
+          "routes",
+          "route",
+          "orders",
+          "dispatchtrack",
+          "bronx",
+          "manhattan",
+          "street",
+          "customers",
+          "day"
+        ],
+        "email": "",
+        "category": "routing",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "click",
+        "create",
+        "label",
+        "divide",
+        "estimate",
+        "drag",
+        "arrange",
+        "review",
+        "assign",
+        "check",
+        "enter",
+        "send",
+        "rename",
+        "open",
+        "import",
+        "verify",
+        "upload",
+        "proceed",
+        "build",
+        "name",
+        "save",
+        "take",
+        "email",
+        "prioritize"
+      ],
+      "entities": [
+        "route",
+        "stop",
+        "truck",
+        "driver",
+        "zone",
+        "customer",
+        "customer_note",
+        "order",
+        "DispatchTrack",
+        "Telnet",
+        "file",
+        "Excel_file",
+        "cube"
+      ],
+      "actors": [
+        "driver",
+        "sales_rep",
+        "router",
+        "night_crew"
+      ],
+      "conditions": [
+        "school_routes",
+        "street_routes",
+        "delivery_time_windows",
+        "customer_grades",
+        "zones",
+        "up_to_12_stops",
+        "daily_routing_5_15_PM",
+        "orders_until_5_PM",
+        "build_every_45_minutes"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I create a new route for school deliveries?",
+        "What's the max number of stops per street route and how do I prioritize customers?",
+        "If I routed Manhattan schools in RNA, what's the full process for Bronx in DispatchTrack?",
+        "How do I estimate the number of trucks needed from the total cube?",
+        "I'm trying to send orders to DispatchTrack via Telnet but no ORDERS.R file shows up in Commun \u2013 help!"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for daily routing with clear steps, specific to company tools and zones but broadly applicable within operations, actionable with basic training.",
+      "acronyms": {},
+      "jargon": {
+        "RNA": "Alternative routing system used for school routes (e.g., Manhattan when DispatchTrack is used for Bronx)",
+        "DispatchTrack": "Routing software platform for building and managing routes",
+        "Telnet": "Terminal interface for accessing routing commands and sending orders",
+        "cube": "Total volume measure of deliveries used to estimate required trucks or routes",
+        "horseshoe pattern": "Efficient circular arrangement of stops on a route to minimize travel",
+        "helper box": "Indicator or checkbox for routes requiring an additional helper",
+        "route type": "Specific classification of route matching driver qualifications",
+        "stop count": "Number of delivery stops assigned to a route",
+        "customer grades": "Priority ratings for street customers (e.g., A+, A, A-, B+), with higher grades prioritized",
+        "zones": "Geographic delivery areas coded numerically (e.g., 01 \u2013 Long Island, 02 \u2013 Queens, 03 \u2013 Brooklyn, 04 \u2013 Bronx, 05 \u2013 Westchester, 06 \u2013 Dutchess, 10 \u2013 Jails)"
+      },
+      "numeric_thresholds": {
+        "max_stops_street_route": {
+          "value": 12,
+          "context": "Up to 12 stops allowed per route for street routing"
+        },
+        "cube_divisor": {
+          "value": 600,
+          "context": "Divide the total cube by 600 to estimate number of trucks/routes"
+        },
+        "order_submission_cutoff": {
+          "value": "5:00 PM",
+          "unit": "time",
+          "context": "Customers can submit orders until 5:00 PM the day before for street routing"
+        },
+        "street_routing_time": {
+          "value": "5:15 PM",
+          "unit": "time",
+          "context": "Daily time for street routing process"
+        },
+        "route_building_interval": {
+          "value": 45,
+          "unit": "minutes",
+          "context": "Start building routes every 45 minutes before 5 PM"
+        },
+        "telnet_routing_entry": {
+          "value": "35, 1, date",
+          "context": "Command entered in Telnet: 35, 1, date you\u2019re routing"
+        }
+      }
+    },
+    {
+      "id": "warehouse_routing_introduction_2",
+      "content": "Backhauls and Efficiency\n\nEvery truck should leave full and return full. Returning full is made possible through backhauls, managed by Chun. Chun schedules pickups for trucks to collect products on their way back. You can view backhauls in Telnet by entering 9, 3, PO#.\n\nWhy Routing is important:\n\nRouting is the backbone of the delivery process at Driscoll Foods. It ensures every customer\u2019s order is planned, organized, and delivered efficiently. By using RNA and DispatchTrack correctly, paying attention to delivery windows, cubes, and notes, and communicating with drivers and sales, routing makes the entire distribution process possible.\n\nBeing precise, proactive, and on time are the keys to successful routing.",
+      "content_hash": "60f3544647eece6b",
+      "section_title": "routing",
+      "source_file": "routing_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 141,
+      "_original": {
+        "keywords": [
+          "routing",
+          "backhauls",
+          "full",
+          "possible",
+          "chun",
+          "delivery",
+          "process",
+          "efficiency",
+          "truck",
+          "leave"
+        ],
+        "email": "",
+        "category": "routing",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "leave",
+        "return",
+        "schedule",
+        "collect",
+        "view",
+        "enter",
+        "plan",
+        "organize",
+        "deliver",
+        "use",
+        "communicate",
+        "route"
+      ],
+      "entities": [
+        "truck",
+        "backhaul",
+        "purchase_order",
+        "customer",
+        "order",
+        "route",
+        "driver"
+      ],
+      "actors": [
+        "Chun",
+        "driver",
+        "sales",
+        "customer",
+        "dispatch"
+      ],
+      "conditions": [
+        "delivery_windows",
+        "on_time"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I view backhauls in Telnet?",
+        "Who schedules the backhauls for our trucks?",
+        "What's the Telnet sequence to check backhauls by PO#?",
+        "Trucks keep coming back empty\u2014what's up with backhauls and Chun?",
+        "Why is routing the backbone of our delivery process, and what are the keys to doing it successfully?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core to logistics efficiency and routing backbone; specific Telnet steps for backhauls make it actionable; simple concepts, mostly self-contained but part of broader manual.",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "RNA": "Routing software (inferred from context)"
+      },
+      "jargon": {
+        "backhauls": "Scheduled pickups for trucks to collect products on the return trip from deliveries, ensuring trucks return full",
+        "routing": "Process of planning, organizing, and scheduling customer orders for efficient delivery",
+        "delivery windows": "Specific time frames allocated for customer deliveries",
+        "cubes": "Volume or cubic capacity measurements for orders",
+        "DispatchTrack": "Software tool used for routing and dispatch management",
+        "Telnet": "Internal terminal-based system for accessing operational data, such as viewing backhauls"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

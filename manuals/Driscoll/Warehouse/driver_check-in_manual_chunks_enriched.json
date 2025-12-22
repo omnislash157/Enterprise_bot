@@ -1,0 +1,249 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\driver_check-in_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:37:17.725757",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_driver_checkin_introduction_0",
+      "content": "Driver Check-In Manual\n\nOverview\n\nDriver Check-In is responsible for ensuring all documentation, returned products, and equipment from drivers are properly collected, verified, organized, and routed to the correct departments. This team is essential for end-of-day accountability, inventory accuracy, product quality control, and clear communication across the company.\n\nCore Responsibilities\n\nBring every truck in as drivers return.\n\nEnsure drivers clean the backs of their trucks.\n\nRemove and organize pallets from each truck.\n\nCollect all paperwork, including invoices and Driver Return Forms.\n\nVerify all returned cases and confirm that the driver\u2019s stated reason is correct\n\nSort all returned items into the correct zones (refused, meat/produce/eggs/chicken, vendor returns)\n\nTrack which trucks are back, and which remain on the road.\n\nDeliver invoices to Invoice Cleaning once a cart is filled.\n\nEnsure pallets are organized into uniform stacks (ideally 13 high) for night shift use.\n\nEnsure straps and blankets are placed into their proper containers for loaders.\n\nStay on duty until transportation clears all remaining drivers.\n\nDriver Return Forms\n\nAll drivers return two key documents:\n\nTheir invoice packet (white & yellow sheets for each stop).\n\nDriver Return Form.\n\nPotential Pick Up form\n\nDriver Return Form fields:\n\nDriver name\n\nRoute number\n\nHelper name (if applicable)\n\nStraps and blanket count\n\nSignature\n\nReturned cases section (customer, order #, item description, item #, reason code)\n\nColor coding:\n\n\u2022 School drivers \u2192 Green driver return form\n\n\u2022 All others \u2192 White driver return form\n\nReturn Reason Codes\n\n1 \u2013 Mispick\n\n2 \u2013 Short on Load\n\n3 \u2013 Short / Found on Truck\n\n4 \u2013 Sales Error\n\n5 \u2013 Product Quality / Temperature Issue\n\n6 \u2013 Product / Case Damaged\n\n7 \u2013 NYC DOE Refused (Schools only)\n\n8 \u2013 Product Over\n\nReturned Product Processing\n\nDriver Check-In verifies each returned case and organizes as follows:\n\nBehind the team: All refused cases\n\nLeft side: Meat, poultry, fish, eggs, produce returns\n\nFront area: Vendor returns and customer pickups\n\nVendor returns are later moved to Receiving.",
+      "content_hash": "631752d2e9cd2b69",
+      "section_title": "driver_checkin",
+      "source_file": "driver_check-in_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 417,
+      "_original": {
+        "keywords": [
+          "driver",
+          "return",
+          "returned",
+          "drivers",
+          "product",
+          "form",
+          "returns",
+          "check",
+          "correct",
+          "truck"
+        ],
+        "email": "",
+        "category": "driver_checkin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "reference",
+        "training",
+        "compliance"
+      ],
+      "verbs": [
+        "bring",
+        "ensure",
+        "clean",
+        "remove",
+        "organize",
+        "collect",
+        "verify",
+        "confirm",
+        "sort",
+        "track",
+        "deliver",
+        "place"
+      ],
+      "entities": [
+        "truck",
+        "pallet",
+        "invoice",
+        "Driver Return Form",
+        "returned cases",
+        "straps",
+        "blankets",
+        "route",
+        "helper",
+        "customer",
+        "order",
+        "item",
+        "reason code",
+        "Potential Pick Up form",
+        "vendor returns"
+      ],
+      "actors": [
+        "driver",
+        "Driver Check-In",
+        "helper",
+        "loaders",
+        "transportation",
+        "Invoice Cleaning",
+        "Receiving"
+      ],
+      "conditions": [
+        "mispick",
+        "short on load",
+        "short / found on truck",
+        "sales error",
+        "product quality / temperature issue",
+        "product / case damaged",
+        "NYC DOE refused",
+        "product over",
+        "school drivers"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": true,
+      "synthetic_questions": [
+        "What are the core responsibilities of the Driver Check-In team?",
+        "How do I sort returned cases like refused, meat/produce, and vendor returns?",
+        "What's reason code 7 on the Driver Return Form?",
+        "I'm confused about the color coding for Driver Return Forms\u2014what's green for?",
+        "Walk me through verifying a Driver Return Form and processing the returns with reason codes."
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core end-of-day business process for inventory and accountability, detailed steps and codes make it actionable and mostly self-contained for driver check-in team",
+      "acronyms": {
+        "NYC DOE": "New York City Department of Education"
+      },
+      "jargon": {
+        "Driver Check-In": "Team/process for collecting, verifying, and routing driver documentation, returns, and equipment at end-of-day",
+        "Driver Return Form": "Document drivers complete detailing returns, including driver info, straps/blanket counts, and returned cases with reason codes",
+        "mispick": "Return reason code 1: Incorrect item picked or delivered",
+        "Short on Load": "Return reason code 2: Insufficient quantity loaded for delivery",
+        "refused cases": "Customer-refused products, organized behind the Driver Check-In team",
+        "vendor returns": "Supplier-destined returns, initially organized in front area then moved to Receiving",
+        "Invoice Cleaning": "Destination for batched invoices after verification"
+      },
+      "numeric_thresholds": {
+        "pallet_stack_height": {
+          "value": 13,
+          "unit": "high",
+          "context": "Ideal uniform stack height for pallets for night shift use"
+        }
+      }
+    },
+    {
+      "id": "warehouse_driver_checkin_introduction_1",
+      "content": "Refused/damaged/expired cases cannot be returned to inventory and must be documented accurately.\n\nCustomer Pick-Up Report\n\nDriver Check-In must review and mark off the Customer Pick-Up Report daily. This report lists all cases scheduled to be picked up from customers. Checking off each pickup confirms the request was fulfilled, ensuring the rest of the company, especially Sales, Transportation, and Invoice Cleaning knows that the customer\u2019s needs were completed accurately.\n\nThis step is critical because:\n\nIt prevents missed credits.\n\nConfirms customer satisfaction.\n\nEnsures returned product is properly routed.\n\nMaintains accurate inventory and financial records.\n\nInvoice Collection & Delivery\n\nEach truck\u2019s invoice count must match the number of scheduled stops. Once verified, invoices are placed in a rolling cart. When full, the cart is delivered to Invoice Cleaning so that credits, adjustments, and billing can be finalized.\n\nEnd-of-Day Protocol\n\nTwo Driver Check-In team members remain on duty until transportation confirms whether remaining drivers have cases returning. If drivers have returns, the team must remain until those cases are processed and placed appropriately. If not, transportation instructs those drivers to submit invoices directly to Invoice Cleaning, allowing the Driver Check-In team to close out.\n\nAll pallets, equipment, and paperwork must be organized and accounted for before departure.",
+      "content_hash": "c9299548eab75ae5",
+      "section_title": "driver_checkin",
+      "source_file": "driver_check-in_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 263,
+      "_original": {
+        "keywords": [
+          "invoice",
+          "cases",
+          "customer",
+          "report",
+          "driver",
+          "check",
+          "confirms",
+          "transportation",
+          "cleaning",
+          "team"
+        ],
+        "email": "",
+        "category": "driver_checkin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "review",
+        "mark off",
+        "confirm",
+        "verify",
+        "document",
+        "place",
+        "deliver",
+        "process",
+        "submit",
+        "organize",
+        "account for",
+        "route"
+      ],
+      "entities": [
+        "case",
+        "inventory",
+        "Customer Pick-Up Report",
+        "credit",
+        "product",
+        "invoice",
+        "truck",
+        "stop",
+        "rolling cart",
+        "Invoice Cleaning",
+        "pallet",
+        "equipment",
+        "paperwork",
+        "return"
+      ],
+      "actors": [
+        "Driver Check-In",
+        "Sales",
+        "Transportation",
+        "Invoice Cleaning",
+        "driver",
+        "customer",
+        "team members"
+      ],
+      "conditions": [
+        "refused",
+        "damaged",
+        "expired",
+        "daily",
+        "end-of-day",
+        "returns"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do I do with refused, damaged, or expired cases at Driver Check-In?",
+        "How do I handle the Customer Pick-Up Report each day?",
+        "What's the end-of-day protocol if drivers still have returns coming in?",
+        "Why is marking off the Customer Pick-Up Report so critical for Invoice Cleaning?",
+        "We're stuck waiting at end of day because transportation hasn't confirmed returns yet\u2014what's the rule here?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational procedures for inventory accuracy, credits, and end-of-day closeout in Driver Check-In; specific to team tasks but straightforward and actionable with minimal context needed.",
+      "acronyms": {},
+      "jargon": {
+        "cases": "Units of product (e.g., containers or shipments) that can be refused, damaged, expired, picked up, or returned",
+        "Customer Pick-Up Report": "Daily report listing all cases scheduled for customer pickup, used to confirm fulfillment",
+        "Driver Check-In": "Team or process responsible for reviewing pickups, verifying invoices, and processing returns",
+        "Invoice Cleaning": "Department or process for finalizing credits, adjustments, and billing from collected invoices",
+        "rolling cart": "Cart used to transport batches of verified invoices to Invoice Cleaning"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

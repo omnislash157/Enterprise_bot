@@ -1,0 +1,393 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\hr_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:38:03.515390",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_hr_introduction_0",
+      "content": "Human Resources Department Manual\n\nOverview\n\nHR at Driscoll Foods is led by Samantha Giordano and consists of four team members\n\nThe department handles payroll, employee complaints, hiring, injuries, compliance, and all personnel documentation.\n\nNeutrality, confidentiality, and professionalism are always essential.\n\nA lot of the job is unanticipated and spontaneous.\n\nTeam Structure\n\nSamantha Giordano \u2013 HR Lead overseeing payroll, incentives, investigations, interviews, injuries, compliance, and invoice cleaning.\n\nTeam Members (4) \u2013 Support with tracking, reporting, onboarding, filing, and communication across Operations and other departments.\n\nPayroll & Incentives\n\nMondays: major payroll and timecard review day.\n\nOnly certain HR members have access to timecards, PTO, sick days, and incentive logs.\n\nDriscoll employees can be verified in Paychex; Stonehill agency hires require manual entry.\n\nTuesday: incentives must be completed by noon.\n\nFridays: high volume of payroll questions from employees.\n\nHR updates spreadsheets for incentives, bonuses, hourly pay, and corrections.\n\nEmployee Communication\n\nHR must speak clearly and patiently with employees.\n\nSamantha asks many clarifying questions to understand issues fully.\n\nExplanations must be simple and easy for all employees to understand.\n\nHR prioritizes poise, patience, and accuracy in communication.\n\nAttendance Tracking & Write\u2011Ups\n\nNayeli reviews the Night Shift Recap from Kudjoe every morning.\n\nTracks absences, reasons, and notes if employees are in their first 90 days using Paychex.\n\nReviews Dispatch Sheet from Delareese for absent drivers\n\nUpdates the Ops Attendance Tracker with offense numbers.\n\nMaintains the Write-Up Tracker and uploads related documents to employee Paychex files.\n\nDocumentation & Records\n\nHR maintains individual employee folders with onboarding documents, write-ups, agreements, and reports.\n\nJob applications are received through Indeed.\n\nNon-operations applications are forwarded to Sam Cuesta to pass to department heads.",
+      "content_hash": "4d5eb4d309c956cb",
+      "section_title": "hr",
+      "source_file": "hr_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 354,
+      "_original": {
+        "keywords": [
+          "payroll",
+          "employees",
+          "employee",
+          "incentives",
+          "department",
+          "samantha",
+          "team",
+          "members",
+          "communication",
+          "paychex"
+        ],
+        "email": "",
+        "category": "hr",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "oversee",
+        "handle",
+        "support",
+        "track",
+        "report",
+        "onboard",
+        "file",
+        "communicate",
+        "review",
+        "access",
+        "verify",
+        "enter",
+        "complete",
+        "update",
+        "speak",
+        "ask",
+        "prioritize",
+        "understand",
+        "maintain",
+        "upload",
+        "receive",
+        "forward"
+      ],
+      "entities": [
+        "payroll",
+        "timecard",
+        "PTO",
+        "sick_days",
+        "incentive_logs",
+        "Paychex",
+        "spreadsheets",
+        "Night Shift Recap",
+        "Dispatch Sheet",
+        "Ops Attendance Tracker",
+        "Write-Up Tracker",
+        "employee folders",
+        "onboarding documents",
+        "write-ups",
+        "agreements",
+        "reports",
+        "job applications"
+      ],
+      "actors": [
+        "Samantha Giordano",
+        "HR team members",
+        "Nayeli",
+        "Kudjoe",
+        "Delareese",
+        "Sam Cuesta",
+        "employees",
+        "Operations",
+        "department heads",
+        "Driscoll employees",
+        "Stonehill agency hires"
+      ],
+      "conditions": [
+        "mondays_payroll",
+        "tuesday_incentives_noon",
+        "fridays_high_volume",
+        "first_90_days",
+        "absences",
+        "night_shift",
+        "absent_drivers"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who is the HR lead at Driscoll Foods?",
+        "How does HR handle major payroll and timecard reviews?",
+        "What time on Tuesdays do incentives have to be completed by?",
+        "Nayeli reviews the Night Shift Recap from Kudjoe every morning\u2014what does she track from it?",
+        "It's Friday and no one's answering my payroll questions\u2014what's the deal with HR?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 4,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core HR processes including payroll, compliance, and tracking; specific company procedures but broad dept overview; simple language, actionable steps for staff, self-contained chunk.",
+      "acronyms": {
+        "HR": "Human Resources",
+        "PTO": "Paid Time Off",
+        "Ops": "Operations"
+      },
+      "jargon": {
+        "onboarding": "process of integrating new hires into the company",
+        "write-ups": "formal disciplinary records or warnings",
+        "timecards": "records of employee hours worked",
+        "incentive logs": "records tracking performance-based pay incentives",
+        "Night Shift Recap": "daily summary report from night shift supervisor",
+        "Dispatch Sheet": "list of driver assignments and absences",
+        "Ops Attendance Tracker": "spreadsheet tracking attendance offenses in operations",
+        "Write-Up Tracker": "system for monitoring disciplinary actions",
+        "Paychex": "payroll and HR management software",
+        "invoice cleaning": "processing and correcting invoice records"
+      },
+      "numeric_thresholds": {
+        "hr_team_members": {
+          "value": 4,
+          "unit": "members",
+          "context": "Number of HR support team members"
+        },
+        "new_employee_period": {
+          "value": 90,
+          "unit": "days",
+          "context": "Tracking special notes for employees in their first 90 days"
+        },
+        "incentives_deadline": {
+          "value": "noon",
+          "unit": "",
+          "context": "Incentives must be completed by noon on Tuesdays"
+        }
+      }
+    },
+    {
+      "id": "warehouse_hr_introduction_1",
+      "content": "HR depends on documentation from Transportation and Ops to complete reports and verification processes.\n\nBereavement & Loan Policy\n\nPaid bereavement leave applies to parents, in-laws, siblings, and grandparents.\n\nLoan repayment agreements are tracked; employees who quit must repay within 7 days\n\nLoan requests are assessed using hire date, balance owed, attendance, and write-up history.\n\nInjury Handling & Workers Compensation\n\nAll injuries must be reported immediately.\n\nHR completes an injury report and confirms if the employee wants medical attention (Concentra or CityMD).\n\nWorkers Comp insurance is through Sentry.\n\nHR emails incident details to Sentry and the broker to receive a claim number.\n\nEmployees must miss 7+ days to receive Workers Comp benefits.\n\nHR tracks all incidents in the Log of Work-Related Illnesses or Injuries for annual submission to the Bureau of Labor Statistics.\n\nHR must investigate injuries thoroughly to confirm validity and prevent unnecessary liability.\n\nHiring Process\n\nHR reviews Indeed applications daily.\n\nConducts phone screenings in English or Spanish using prepared question prompts.\n\nScreenings last ~4 minutes to determine if an in-person interview is needed.\n\nIn-person interviews include a warehouse test (electric jack operation).\n\nHR evaluates applicant experience, skill, professionalism, and fitness.\n\nCompliance & Legal Requirements\n\nHR must follow labor laws and internal company policies.\n\nFMLA allows eligible employees 12 weeks of job-protected leave.\n\nAll terminations must be reported to the Department of Labor within 7 days.\n\nHR must investigate all complaints and allegations\u2014none can be dismissed without review.\n\nConfidentiality is always required.\n\nThursday Check Distribution\n\nHR receives Operations checks on Thursday.\n\nChecks are scanned for documentation and sorted by order.\n\nBreakdown is created by Sam Cuesta.\n\nManagers distribute checks Thursday night or Friday morning.\n\nDaily Workflow\n\nHR balances structured tasks (payroll, trackers, incentive logs) with unpredictable events such as injuries, complaints, and employee requests.",
+      "content_hash": "456f1a7c6d9ad87f",
+      "section_title": "hr",
+      "source_file": "hr_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 382,
+      "_original": {
+        "keywords": [
+          "injuries",
+          "loan",
+          "employees",
+          "days",
+          "workers",
+          "labor",
+          "thursday",
+          "checks",
+          "documentation",
+          "bereavement"
+        ],
+        "email": "",
+        "category": "hr",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "assess",
+        "balance",
+        "complete",
+        "confirm",
+        "conduct",
+        "create",
+        "determine",
+        "distribute",
+        "email",
+        "evaluate",
+        "follow",
+        "investigate",
+        "receive",
+        "report",
+        "review",
+        "scan",
+        "sort",
+        "track",
+        "verify",
+        "repay"
+      ],
+      "entities": [
+        "bereavement_leave",
+        "loan_repayment_agreement",
+        "loan_request",
+        "injury",
+        "injury_report",
+        "workers_comp_claim",
+        "claim_number",
+        "log_of_work_related_illnesses_or_injuries",
+        "application",
+        "phone_screening",
+        "interview",
+        "warehouse_test",
+        "complaint",
+        "allegation",
+        "check",
+        "payroll",
+        "tracker",
+        "incentive_log"
+      ],
+      "actors": [
+        "HR",
+        "Transportation",
+        "Ops",
+        "employee",
+        "applicant",
+        "manager",
+        "Sam_Cuesta",
+        "Sentry",
+        "broker",
+        "Department_of_Labor",
+        "Bureau_of_Labor_Statistics"
+      ],
+      "conditions": [
+        "employee_quits",
+        "7_day_repayment",
+        "hire_date",
+        "balance_owed",
+        "attendance",
+        "write_up_history",
+        "injury_immediate_report",
+        "miss_7_days",
+        "FMLA_eligible",
+        "12_weeks_leave",
+        "termination_report_7_days",
+        "Thursday_checks"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who qualifies for paid bereavement leave? Does it include grandparents?",
+        "What if an employee quits\u2014do they have to repay their loan within 7 days?",
+        "How do I report a workplace injury right away, and what's next with Workers Comp?",
+        "The injury report is done but nothing's happening\u2014what's HR supposed to do next, including with Sentry?",
+        "What role does HR play in investigating injuries and submitting the Log of Work-Related Illnesses or Injuries to the Bureau of Labor Statistics?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 4,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Covers critical compliance (Workers Comp, FMLA, legal reporting), safety (injury handling), core processes (hiring, loans, checks); specific steps provided, self-contained for HR reference, requires basic HR knowledge.",
+      "acronyms": {
+        "HR": "Human Resources",
+        "Ops": "Operations",
+        "FMLA": "Family and Medical Leave Act",
+        "Workers Comp": "Workers' Compensation"
+      },
+      "jargon": {
+        "bereavement leave": "Paid leave for death of family members including parents, in-laws, siblings, and grandparents",
+        "write-up history": "Record of employee disciplinary actions",
+        "phone screenings": "Initial ~4-minute phone interviews in English or Spanish using prepared questions to assess interview eligibility",
+        "warehouse test": "Practical in-person test involving electric jack operation",
+        "Log of Work-Related Illnesses or Injuries": "HR-maintained record for annual submission to Bureau of Labor Statistics",
+        "job-protected leave": "Leave guaranteeing return to the same job, e.g., under FMLA",
+        "claim number": "Identifier issued by Sentry insurance for workers compensation claims"
+      },
+      "numeric_thresholds": {
+        "loan_repayment_quit": {
+          "value": 7,
+          "unit": "days",
+          "context": "Employees who quit must repay loan within"
+        },
+        "workers_comp_benefit_wait": {
+          "value": 7,
+          "unit": "days",
+          "context": "Employees must miss 7+ days to receive benefits"
+        },
+        "phone_screening_duration": {
+          "value": 4,
+          "unit": "minutes",
+          "context": "Screenings last ~4 minutes"
+        },
+        "fmla_leave_duration": {
+          "value": 12,
+          "unit": "weeks",
+          "context": "Job-protected leave for eligible employees"
+        },
+        "termination_reporting_deadline": {
+          "value": 7,
+          "unit": "days",
+          "context": "All terminations reported to Department of Labor within"
+        }
+      }
+    },
+    {
+      "id": "warehouse_hr_introduction_2",
+      "content": "Organization and adaptability are crucial to maintaining efficiency and compliance.",
+      "content_hash": "c4caec76e4a2947f",
+      "section_title": "hr",
+      "source_file": "hr_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 13,
+      "_original": {
+        "keywords": [
+          "organization",
+          "adaptability",
+          "crucial",
+          "maintaining",
+          "efficiency",
+          "compliance"
+        ],
+        "email": "",
+        "category": "hr",
+        "subcategory": ""
+      },
+      "query_types": [
+        "policy",
+        "compliance"
+      ],
+      "verbs": [
+        "maintaining"
+      ],
+      "entities": [],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Why is staying organized important in HR?",
+        "How does being adaptable help us maintain compliance?",
+        "What if our team isn't organized during busy seasons\u2014does it affect efficiency?",
+        "I'm overwhelmed and can't keep things straight\u2014why do organization and adaptability even matter?",
+        "How do organization and adaptability ensure FLSA compliance in HR operations?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 4,
+      "specificity": 1,
+      "complexity": 1,
+      "completeness_score": 3,
+      "actionability_score": 2,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Generic HR principle on organization and adaptability for efficiency/compliance; broadly applicable, simple to understand, but vague, fragmentary, and lacks specific actions or context.",
+      "acronyms": {},
+      "jargon": {},
+      "numeric_thresholds": {}
+    }
+  ]
+}

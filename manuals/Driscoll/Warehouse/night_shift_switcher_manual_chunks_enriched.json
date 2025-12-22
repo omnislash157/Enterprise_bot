@@ -1,0 +1,239 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_switcher_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:42:01.843128",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_switcher_introduction_0",
+      "content": "Night Shift Switcher Manual\n\nOverview\n\nSwitchers are essential for maintaining efficient truck movement at the warehouse. They are responsible for moving trucks into dock doors for loading and out to the parking lot once loading is complete. Without switchers, the warehouse floor would become congested, slowing down pickers, loaders, and the entire night shift operation.\n\nNight shift switches work from 4:00 PM or 5:00 PM until all trucks are properly staged and organized, usually around 4:00 AM.\n\nShift Schedule and Breaks\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nBreaks must be coordinated to ensure trucks continue moving and doors remain clear.\n\nRoles and Responsibilities\n\nSwitchers are responsible for coordinating truck movements to maintain an efficient and safe workflow on the warehouse floor.\n\nCore responsibilities include:\n\nMoving trucks into dock doors for loading, following the schedule provided by the transportation department.\n\nMoving trucks out to the parking lot once the loading process is complete.\n\nPrioritizing even-numbered doors first, then handling odd-numbered doors, to keep the floor organized.\n\nMonitoring the door lights to know when a truck is fully loaded and ready to be moved.\n\nKeeping track of all truck locations to ensure drivers can quickly access their trucks in the morning.\n\nMemorizing which trucks are assigned to which routes, maintaining consistency for drivers who prefer the same truck daily.\n\nWorking continuously outside, regardless of weather conditions, to keep truck flow smooth and the warehouse floor manageable.\n\nEfficiency and Safety\n\nSwitchers must be constantly moving to prevent the floor from becoming congested.\n\nTrucks cannot be moved until they are fully loaded, and the door is closed.\n\nMaintaining awareness of personnel on the floor is essential to prevent accidents.\n\nEfficient truck movement keeps pickers and loaders on schedule, supporting overall shift productivity.\n\nImportance of the Role\n\nSwitchers are the heartbeat of dock operations during the night shift. Their performance ensures:",
+      "content_hash": "5b4a2f1f9006d80d",
+      "section_title": "night_shift_switcher",
+      "source_file": "night_shift_switcher_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 399,
+      "_original": {
+        "keywords": [
+          "trucks",
+          "truck",
+          "shift",
+          "floor",
+          "switchers",
+          "moving",
+          "doors",
+          "night",
+          "warehouse",
+          "loading"
+        ],
+        "email": "",
+        "category": "night_shift_switcher",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "maintaining",
+        "moving",
+        "coordinating",
+        "prioritizing",
+        "handling",
+        "monitoring",
+        "keeping track",
+        "memorizing",
+        "working",
+        "preventing",
+        "staging"
+      ],
+      "entities": [
+        "truck",
+        "dock door",
+        "warehouse floor",
+        "parking lot",
+        "door light",
+        "route"
+      ],
+      "actors": [
+        "switcher",
+        "picker",
+        "loader",
+        "driver",
+        "transportation department",
+        "personnel"
+      ],
+      "conditions": [
+        "night shift",
+        "fully loaded",
+        "door closed",
+        "even-numbered doors",
+        "odd-numbered doors",
+        "weather conditions",
+        "breaks coordinated",
+        "door lights"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time does the night shift switcher start and usually end?",
+        "How do door lights tell switchers when a truck is ready to move?",
+        "Do switchers prioritize even-numbered dock doors before odd ones?",
+        "What if trucks are backing up during my break time?",
+        "The warehouse floor keeps getting congested\u2014what am I doing wrong as a switcher?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse night shift process critical for efficiency and safety; specific to switcher role; straightforward language needing minimal training; mostly self-contained overview of duties despite cutoff; provides clear responsibilities and steps for immediate action.",
+      "acronyms": {},
+      "jargon": {
+        "switchers": "Warehouse workers responsible for moving trucks into dock doors for loading and out to the parking lot after loading",
+        "dock doors": "Specific bays in the warehouse where trucks are loaded and unloaded",
+        "pickers": "Warehouse employees who select and gather items for orders",
+        "loaders": "Warehouse employees who physically load trucks at dock doors",
+        "door lights": "Status indicators on dock doors signaling when a truck is fully loaded and ready to move",
+        "staging": "Process of positioning and organizing loaded trucks in the parking lot for driver access"
+      },
+      "numeric_thresholds": {
+        "short_break_duration": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Two 15-minute breaks per shift"
+        },
+        "lunch_break_duration": {
+          "value": 30,
+          "unit": "minutes",
+          "context": "One 30-minute lunch break per shift"
+        },
+        "shift_start_earliest": {
+          "value": 16,
+          "unit": "00 (24-hour)",
+          "context": "Night shift starts at 4:00 PM (16:00) or 5:00 PM (17:00)"
+        },
+        "shift_end_approx": {
+          "value": 4,
+          "unit": "00 AM (24-hour)",
+          "context": "Shift ends around 4:00 AM when trucks are staged"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_switcher_introduction_1",
+      "content": "Trucks are available for loading on time\n\nThe warehouse floor remains organized and safe\n\nPickers and loaders can operate efficiently\n\nDrivers receive their assigned trucks quickly in the morning\n\nBy keeping the dock and parking operations smooth, switchers directly impact the efficiency and success of the entire night shift.\n\nBest Practices\n\nAlways follow the transportation department\u2019s door and route sheets.\n\nPrioritize even-numbered doors first, then odd-numbered doors.\n\nMonitor dock door lights closely to know when trucks are ready to move.\n\nKeep track of truck locations and assigned routes.\n\nCommunicate with drivers and warehouse staff to maintain smooth operations.\n\nRemain vigilant, especially in adverse weather, to prevent accidents and delays.",
+      "content_hash": "64b3e7ef2c0071e9",
+      "section_title": "night_shift_switcher",
+      "source_file": "night_shift_switcher_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 141,
+      "_original": {
+        "keywords": [
+          "trucks",
+          "warehouse",
+          "drivers",
+          "assigned",
+          "dock",
+          "operations",
+          "smooth",
+          "door",
+          "numbered",
+          "doors"
+        ],
+        "email": "",
+        "category": "night_shift_switcher",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "follow",
+        "prioritize",
+        "monitor",
+        "track",
+        "communicate",
+        "maintain",
+        "prevent",
+        "operate",
+        "receive",
+        "move",
+        "load"
+      ],
+      "entities": [
+        "trucks",
+        "warehouse",
+        "dock",
+        "route",
+        "door",
+        "door_sheets",
+        "route_sheets",
+        "dock_door_lights"
+      ],
+      "actors": [
+        "switcher",
+        "drivers",
+        "warehouse_staff",
+        "pickers",
+        "loaders"
+      ],
+      "conditions": [
+        "adverse_weather",
+        "on_time",
+        "organized",
+        "safe",
+        "efficient",
+        "night_shift"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I prioritize dock doors during the night shift?",
+        "What are dock door lights for and how do I use them?",
+        "What if it's bad weather\u2014how do I avoid accidents and delays as a switcher?",
+        "The parking lot's a mess, drivers are waiting forever\u2014what am I missing on tracking trucks?",
+        "How does smooth switching impact the whole night shift efficiency?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core best practices for night shift switchers, critical for efficiency, safety, and shift success; role-specific but straightforward, self-contained list of actionable steps.",
+      "acronyms": {},
+      "jargon": {
+        "switchers": "Yard personnel responsible for moving and positioning trucks/trailers at docks and parking areas",
+        "pickers": "Warehouse workers who select and gather items from storage for orders",
+        "loaders": "Warehouse workers who load selected items onto trucks",
+        "dock door lights": "Indicator lights at loading docks signaling when trucks are ready to depart",
+        "door and route sheets": "Documents from the transportation department specifying assigned dock doors and delivery routes for trucks"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}
