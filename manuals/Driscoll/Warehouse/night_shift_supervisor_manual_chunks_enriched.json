@@ -1,0 +1,245 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_supervisor_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:41:38.390129",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_supervisor_introduction_0",
+      "content": "Night Shift Supervisor Manual\n\nOverview\n\nSupervisors are the leaders of the night shift warehouse teams, responsible for maintaining productivity, accuracy, and compliance across all operations. They oversee pickers, checkers, hi-lo operators, and clerks to ensure the shift runs efficiently and safely.\n\nSupervisors typically work the full night shift, starting at 4:00 PM or 5:00 PM and ending when all work is complete (around 4:00 AM).\n\nShift Schedule and Breaks\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nSupervisors must monitor break times to ensure their team is taking breaks at the correct times and that work coverage is maintained.\n\nFootwear: Steel-toe, above-ankle shoes are required for safety compliance.\n\nRoles and Responsibilities\n\nSupervisors are responsible for managing and guiding their teams. Each supervisor oversees a specific area:\n\nTemperature Zone Supervisors: Each zone (dry, cooler, freezer) has a dedicated supervisor.\n\nPicker/Checker Supervisor: Oversees picking and checking operations across the shift.\n\nCore responsibilities include:\n\nMonitoring team productivity and providing direction if performance falls behind.\n\nCatching mistakes from team members and addressing them according to company policy.\n\nAdministering write-ups, suspensions, or recommending termination in consultation with Kudjoe.\n\nChecking crew attendance and reporting missing or late employees to Kudjoe, noting whether they notified the supervisor or not.\n\nInspecting break rooms, locker rooms, and machine rooms to ensure employees are not taking unauthorized breaks.\n\nHelping team members maintain speed and efficiency by jumping in to assist with tasks such as hi-lo operation or replenishment when needed.\n\nTeam Management and Communication\n\nSupervisors must communicate clearly with their teams about expectations, productivity standards, and safety.\n\nProviding feedback and guidance ensures employees understand how they are performing and what is required to meet shift goals.",
+      "content_hash": "0c49c3aa7c2ab1d5",
+      "section_title": "night_shift_supervisor",
+      "source_file": "night_shift_supervisor_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 357,
+      "_original": {
+        "keywords": [
+          "shift",
+          "supervisors",
+          "supervisor",
+          "team",
+          "breaks",
+          "night",
+          "teams",
+          "productivity",
+          "ensure",
+          "work"
+        ],
+        "email": "",
+        "category": "night_shift_supervisor",
+        "subcategory": ""
+      },
+      "query_types": [
+        "policy",
+        "compliance",
+        "training",
+        "definition",
+        "reference"
+      ],
+      "verbs": [
+        "oversee",
+        "maintain",
+        "ensure",
+        "monitor",
+        "manage",
+        "guide",
+        "provide",
+        "catch",
+        "address",
+        "administer",
+        "recommend",
+        "check",
+        "report",
+        "inspect",
+        "help",
+        "assist",
+        "communicate"
+      ],
+      "entities": [
+        "warehouse",
+        "team",
+        "shift",
+        "break_room",
+        "locker_room",
+        "machine_room"
+      ],
+      "actors": [
+        "supervisor",
+        "picker",
+        "checker",
+        "hi_lo_operator",
+        "clerk",
+        "employee",
+        "Kudjoe"
+      ],
+      "conditions": [
+        "performance_behind",
+        "mistake",
+        "late_employee",
+        "missing_employee",
+        "unauthorized_break"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the typical start and end times for night shift supervisors?",
+        "What kind of footwear is required for night shift work?",
+        "How do I report a late hi-lo operator who didn't notify me to Kudjoe?",
+        "What if I catch someone in the locker room taking an unauthorized break?",
+        "Team's productivity is tanking with mistakes everywhere \u2013 do I write them up, help with replenishment, or what?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core operational guide for night shift supervisors, emphasizing safety, compliance, and team management; highly actionable with clear responsibilities, mostly self-contained despite minor external references like 'Kudjoe'.",
+      "acronyms": {},
+      "jargon": {
+        "pickers": "Warehouse workers who select items from storage locations to fulfill orders",
+        "checkers": "Workers who verify the accuracy and completeness of picked orders",
+        "hi-lo operators": "Forklift or pallet truck operators (hi-lo refers to high-low lift equipment)",
+        "replenishment": "Process of restocking forward picking areas from reserve or bulk storage",
+        "write-ups": "Formal written disciplinary warnings issued to employees",
+        "Temperature Zone Supervisors": "Supervisors assigned to specific warehouse areas based on temperature control (dry, cooler, freezer)",
+        "dry": "Ambient temperature storage zone",
+        "cooler": "Refrigerated storage zone",
+        "freezer": "Frozen storage zone"
+      },
+      "numeric_thresholds": {
+        "short_break_duration": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Two breaks per shift"
+        },
+        "lunch_break_duration": {
+          "value": 30,
+          "unit": "minutes",
+          "context": "One lunch break per shift"
+        },
+        "shift_start_early": {
+          "value": "4:00 PM",
+          "unit": "time",
+          "context": "One possible night shift start time"
+        },
+        "shift_start_late": {
+          "value": "5:00 PM",
+          "unit": "time",
+          "context": "Alternative night shift start time"
+        },
+        "shift_end_time": {
+          "value": "4:00 AM",
+          "unit": "time",
+          "context": "Approximate end time when all work is complete"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_supervisor_introduction_1",
+      "content": "Maintaining a visible presence on the floor keeps employees accountable and helps prevent errors or slowdowns.\n\nSafety and Compliance\n\nSupervisors enforce all safety protocols, including proper equipment use, warehouse traffic awareness, and personal protective equipment compliance.\n\nSteel-toe shoes above the ankle are mandatory for all supervisors and strongly encouraged for employees.\n\nSupervisors set the tone for safety culture on the floor and model proper procedures for employees.\n\nImportance of the Role\n\nSupervisors are essential to the success of the night shift. They ensure:\n\nEmployees are productive and accurate\n\nMistakes are caught and corrected immediately\n\nAttendance and break policies are enforced\n\nWorkflow is smooth and the team meets nightly goals\n\nBy keeping the team organized, efficient, and accountable, supervisors directly contribute to the company\u2019s operational success and customer satisfaction.\n\nBest Practices\n\nWalk the floor constantly to observe employee activity.\n\nAddress productivity issues promptly and constructively.\n\nAssist team members when needed to maintain shift speed.\n\nMonitor attendance and break compliance carefully.\n\nCommunicate with Kudjoe regarding staffing, performance issues, and any incidents.",
+      "content_hash": "1e6113d035f96367",
+      "section_title": "night_shift_supervisor",
+      "source_file": "night_shift_supervisor_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 219,
+      "_original": {
+        "keywords": [
+          "supervisors",
+          "employees",
+          "floor",
+          "safety",
+          "compliance",
+          "team",
+          "accountable",
+          "proper",
+          "equipment",
+          "success"
+        ],
+        "email": "",
+        "category": "night_shift_supervisor",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "maintain",
+        "keep",
+        "prevent",
+        "enforce",
+        "model",
+        "ensure",
+        "catch",
+        "correct",
+        "walk",
+        "observe",
+        "address",
+        "assist",
+        "monitor",
+        "communicate"
+      ],
+      "entities": [
+        "warehouse",
+        "equipment"
+      ],
+      "actors": [
+        "supervisor",
+        "employees",
+        "team_members"
+      ],
+      "conditions": [
+        "errors",
+        "slowdowns",
+        "productivity_issues",
+        "performance_issues",
+        "incidents"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What shoes are mandatory for night shift supervisors?",
+        "What if an employee isn't complying with PPE or warehouse traffic rules?",
+        "How do supervisors contribute to productivity, safety culture, and meeting nightly goals?",
+        "I'm frustrated with employees taking long breaks and slowing us down\u2014what do I do?",
+        "What should I communicate to Kudjoe about staffing issues or incidents?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "importance": 9,
+      "specificity": 4,
+      "complexity": 2,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core to night shift supervisor role with safety/compliance emphasis; bounded to warehouse supervision; simple concepts; self-contained overview with clear best practices.",
+      "acronyms": {},
+      "jargon": {
+        "steel-toe shoes above the ankle": "Mandatory safety footwear with metal toes extending above the ankle for foot protection",
+        "warehouse traffic awareness": "Vigilance regarding movement of vehicles, equipment, and personnel in the warehouse to prevent accidents",
+        "personal protective equipment": "PPE, required gear such as helmets, gloves, or vests to ensure safety compliance",
+        "safety culture": "The shared values, attitudes, and behaviors that prioritize safety on the warehouse floor",
+        "walk the floor": "Supervisory practice of continuously patrolling the warehouse area to monitor and support employees"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

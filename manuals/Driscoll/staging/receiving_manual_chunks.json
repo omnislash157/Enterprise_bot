@@ -1,0 +1,66 @@
+{
+  "knowledge_base": "driscoll_warehouse_receiving_manual",
+  "version": "1.0",
+  "description": "Warehouse receiving processes and procedures",
+  "source_file": "Receiving Manual.docx",
+  "file_hash": "f09b72c11a731a1b2bc46766fa59f3f76425655952fceab8b33e642739c5f658",
+  "chunks": [
+    {
+      "id": "warehouse_receiving_introduction_0",
+      "category": "receiving",
+      "section_title": "Introduction",
+      "keywords": [
+        "receiving",
+        "truck",
+        "warehouse",
+        "receivers",
+        "unloading",
+        "delivery",
+        "paperwork",
+        "their",
+        "dock",
+        "door"
+      ],
+      "content": "Receiving Manual\n\nPurpose\n\nThe purpose of the Receiving process is to accurately and efficiently accept incoming deliveries from vendors and backhauls. Receiving ensures that all products entering the warehouse are verified, labeled, and recorded correctly in the system, maintaining inventory integrity and ensuring product quality and safety from the moment it arrives.\n\nOverview\n\nReceiving takes place on the warehouse floor, at the loading docks. When delivery trucks arrive, receivers are responsible for unloading, verifying, labeling, and documenting all inbound products. The process connects directly to inventory management, purchasing, and putaway operations, making accuracy in receiving essential for the entire warehouse workflow.\n\nReceiving Workflow\n\nTruck Arrival and Documentation\n\nWhen a delivery truck arrives, the driver brings the delivery paperwork and places it into the bin located at their assigned dock door. Truckers often wait in their vehicles until receiving is completed unless they are responsible for unloading their own truck. Each dock door has an indicator light that shows when a truck is parked and ready for unloading.\n\nUnloading the Truck\n\nReceivers use pallet jacks to unload all pallets from the truck. Pallets are lined up neatly inside near the dock door they were unloaded from to keep track of which shipment belongs to which truck.\n\nPaperwork Verification\n\nReceivers retrieve the purchase order (PO) paperwork and confirm that the total number of cases on the PO matches the quantities listed on the driver's product sheet. If the counts differ, receivers note that there may be a shortage. Accurate verification ensures the warehouse records match what was actually delivered.\n\nLabel Printing and Application",
+      "chunk_token_count": 428
+    },
+    {
+      "id": "warehouse_receiving_introduction_1",
+      "category": "receiving",
+      "section_title": "Introduction",
+      "keywords": [
+        "product",
+        "receivers",
+        "truck",
+        "label",
+        "temperature",
+        "system",
+        "its",
+        "pallet",
+        "cases",
+        "receiver"
+      ],
+      "content": "Labels are printed using the Telnet system. Each label corresponds to a product and identifies its storage location in the warehouse. When a pallet contains only one product, receivers simply apply the label(s) to the correct number of cases as indicated (for example, 30 cases per label). If a pallet has multiple layers or quantities, additional labels are placed halfway down the stack to signal lumpers where to break down the pallet.\n\nProduct Matching and Scanning\n\nReceivers ensure that the label is applied to the correct product by checking the manufacturer numbers (MANU#) and product descriptions. After confirming accuracy, the receiver scans the product into the system and enters its expiration date. This allows the warehouse management system to track product dates and availability.\n\nCompletion of Truck Receiving\n\nOnce all pallets from a truck have been labeled, scanned, and verified, the receiver reviews the PO again to confirm that all ordered products were received. Any shortages, overages, or damages are noted directly on the PO.\n\nDocumentation and Sign-Off\n\nThe receiver signs and dates the PO, recording details such as truck cleanliness, product temperature, and any issues observed. The same process is followed for the driver’s Bill of Lading (BOL). Both documents provide visibility and historical accuracy for inventory and audits.\n\nTemperature Checks (Cooler/Freezer Docks)\n\nFor perishable or frozen items, receivers must check and record the temperature of the products using company-approved instruments. Accurate temperature recording is critical for food safety compliance and audit requirements.\n\nSubmission of Documents\n\nAfter completing all paperwork and verification, receivers deliver both the PO and BOL to the front desk (Raul or Josh) for processing. They then proceed to receive the next scheduled truck.\n\nPotential Refusals\n\nReceivers can refuse products and send them back on the truck if the cases are damaged, product is past or close to its expiration date, or if the produce might be spoiled",
+      "chunk_token_count": 498
+    },
+    {
+      "id": "warehouse_receiving_introduction_2",
+      "category": "receiving",
+      "section_title": "Introduction",
+      "keywords": [
+        "product",
+        "receiving",
+        "safety",
+        "inventory",
+        "issues",
+        "delivered",
+        "accurately",
+        "paperwork",
+        "labeling",
+        "any"
+      ],
+      "content": "Why Receiving Matters\n\nThe Receiving department is the first line of defense for product accuracy, food safety, and inventory integrity. Mistakes at this stage can lead to shortages, mispicks, and compliance issues downstream. Proper receiving ensures:\n\n- The company only accepts and pays for what was actually delivered.\n- Inventory is tracked accurately from the moment it enters the building.\n- Product freshness and safety standards are met.\n- Smooth transitions to putaway and replenishment operations.\n\nWhat you do:\n\n• Verify paperwork thoroughly before labeling or scanning any product.\n\n• Always check MANU#s and product names to ensure accurate labeling.\n\n• Record all product temperatures accurately, especially for cooler and freezer deliveries.\n\n• Keep the dock area clean and organized during and after unloading.\n\n• Report any discrepancies or product issues immediately to supervisors.\n\n• Handle all paperwork carefully and ensure it is signed, dated, and delivered promptly.\n\n• Never mix products from different trucks until verification is complete.",
+      "chunk_token_count": 259
+    }
+  ]
+}

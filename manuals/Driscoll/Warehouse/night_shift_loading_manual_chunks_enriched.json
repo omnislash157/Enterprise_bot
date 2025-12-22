@@ -1,0 +1,251 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_loading_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:40:50.123374",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_loading_introduction_0",
+      "content": "Night Shift Loading Manual\n\nOverview:\nLoading during the PM shift begins at 4:00 PM or 5:00 PM and continues until all trucks are fully loaded, typically ending around 4:00 AM. This job plays a vital role in the efficiency and accuracy of the entire night shift operation. Loaders ensure that all products picked during the shift are correctly loaded onto the designated trucks in an organized and safe manner for timely delivery.\n\nStarting the Shift:\nLoaders start by clocking in and going to the window, where they receive their loading sheets from the clerks. The clerk will assign the next available truck door to load. Pallets for each order are placed in front of the door by the pickers. Before beginning, loaders verify the order information and ensure that all pallets correspond to the correct route.\n\nLoading Procedure:\n\nCheck the Order:\nReview each pallet\u2019s labels to ensure the route and stop information match your assigned truck. Every pallet for a given order must be accounted for before loading begins.\n\nTruck Layout and Organization:\n\nLoad the last stops (those furthest along the route) to the nose of the truck.\n\nLoad the first stops (those earliest along the route) at the tail, closest to the door.\n\nThis ensures efficient unloading for the drivers and prevents confusion during deliveries.\n\nSafety and Stability:\n\nPallets several feet tall must be strapped down within the truck for stability.\n\nSingle-layer pallets do not require strapping.\n\nIf a pallet is not wrapped securely, rewrap it before loading to avoid shifting or damage during transport.\n\nLoading Execution:\n\nUse your jack to move pallets carefully into the truck, following the stop sequence order.\n\nBe vigilant to ensure all pallets on the sheet are loaded onto the correct truck.\n\nDo not mix routes, each truck should contain pallets only for its assigned deliveries.",
+      "content_hash": "61d803559e6d0ef2",
+      "section_title": "night_shift_loading",
+      "source_file": "night_shift_loading_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 392,
+      "_original": {
+        "keywords": [
+          "truck",
+          "loading",
+          "pallets",
+          "shift",
+          "order",
+          "during",
+          "ensure",
+          "route",
+          "loaded",
+          "loaders"
+        ],
+        "email": "",
+        "category": "night_shift_loading",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "training",
+        "compliance"
+      ],
+      "verbs": [
+        "clock in",
+        "receive",
+        "assign",
+        "verify",
+        "ensure",
+        "review",
+        "check",
+        "account for",
+        "load",
+        "strap down",
+        "rewrap",
+        "move"
+      ],
+      "entities": [
+        "loading sheet",
+        "pallet",
+        "truck door",
+        "order",
+        "route",
+        "stop",
+        "truck",
+        "jack"
+      ],
+      "actors": [
+        "loader",
+        "clerk",
+        "picker",
+        "driver"
+      ],
+      "conditions": [
+        "night shift",
+        "PM shift",
+        "pallets several feet tall",
+        "single-layer pallets",
+        "not wrapped securely"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I start my shift as a night shift loader?",
+        "What order do I load the pallets into the truck \u2013 first stops or last stops first?",
+        "Do I need to strap down single-layer pallets or just the tall ones?",
+        "I'm staring at these pallets and the labels don't match my route sheet \u2013 what the hell do I do now?",
+        "For stability on the nose of the truck, when do I rewrap and strap pallets in stop sequence?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core night shift process critical for efficiency, safety, and accuracy; bounded to loaders' scenario; requires basic warehouse training; well-structured and self-contained procedures; highly actionable steps.",
+      "acronyms": {},
+      "jargon": {
+        "PM shift": "Evening shift starting in the late afternoon",
+        "loading sheets": "Documents received from clerks assigning truck doors and orders",
+        "pallets": "Platforms on which products are stacked for transport",
+        "route": "Delivery path sequence assigned to a specific truck",
+        "stop": "Individual delivery location along the route",
+        "nose of the truck": "Front end of the truck where last stops (furthest along route) are loaded",
+        "tail": "Rear end of the truck closest to the door where first stops (earliest along route) are loaded",
+        "jack": "Pallet jack, manual tool used to move pallets",
+        "single-layer pallets": "Pallets with only one layer of product, exempt from strapping requirement"
+      },
+      "numeric_thresholds": {
+        "shift_start_early": {
+          "value": 4,
+          "unit": "PM hour",
+          "context": "Loading begins at 4:00 PM or 5:00 PM"
+        },
+        "shift_start_late": {
+          "value": 5,
+          "unit": "PM hour",
+          "context": "Loading begins at 4:00 PM or 5:00 PM"
+        },
+        "shift_end_typical": {
+          "value": 4,
+          "unit": "AM hour",
+          "context": "Typically ending around 4:00 AM"
+        },
+        "strapping_layer_threshold": {
+          "value": 1,
+          "unit": "layer",
+          "context": "Single-layer pallets do not require strapping"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_loading_introduction_1",
+      "content": "Efficiency and Floor Flow:\nThe pace of loading directly impacts the rest of the warehouse operation. If loaders fall behind, the floor becomes congested with pallets, making it harder for everyone to move and work efficiently. Staying on schedule keeps workflow smooth and helps the entire team stay productive.\n\nBreaks and Timing:\nEach loader receives:\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\nThese must be taken in designated areas\u2014not on the floor or near trucks.\n\nAfter Completing a Load:\nWhen a truck is fully loaded, return the paperwork to the clerk. You will then receive the next loading assignment. Staying efficient and consistent allows the entire night shift to finish on time and supports the company\u2019s goal of accurate and on-time deliveries.\n\nSteel toe shoes above the ankle or necessary given company policy.\n\nPerformance and Pay:\nLoaders are paid per pallet loaded, with opportunities to earn more through efficiency and productivity. However, accuracy is equally important\u2014misloads negatively impact both company performance and individual pay. Strive to balance speed with precision.\n\nWhy Loading Matters:\n\nYou must keep everyone safe by clearing the floor and without the pallets going into the truck then deliveries cannot happen so making sure the truck is loaded safely and the weight distribution is okay then you will be successful. Following the paperwork and not misloading any pallets is important so customers can get their correct orders, and the company can be efficient in spending the money that it is, rather than extra if they must pick up a pallet and not. The driver will be efficient in unloading a truck if you are efficient in loading a truck, you doing well will help the next person do well which means the company will do well at the end of the day.",
+      "content_hash": "dd4d4dc8cd695208",
+      "section_title": "night_shift_loading",
+      "source_file": "night_shift_loading_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 383,
+      "_original": {
+        "keywords": [
+          "truck",
+          "company",
+          "floor",
+          "loading",
+          "efficient",
+          "pallets",
+          "loaded",
+          "then",
+          "well",
+          "efficiency"
+        ],
+        "email": "",
+        "category": "night_shift_loading",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "training",
+        "compliance"
+      ],
+      "verbs": [
+        "load",
+        "return",
+        "receive",
+        "take",
+        "clear",
+        "follow",
+        "stay",
+        "finish",
+        "distribute"
+      ],
+      "entities": [
+        "pallet",
+        "truck",
+        "paperwork",
+        "warehouse",
+        "floor",
+        "breaks",
+        "lunch break",
+        "steel toe shoes"
+      ],
+      "actors": [
+        "loader",
+        "clerk",
+        "driver",
+        "customer",
+        "team"
+      ],
+      "conditions": [
+        "fall behind",
+        "fully loaded",
+        "misload",
+        "behind schedule",
+        "on schedule",
+        "weight distribution",
+        "congestion"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How many breaks do loaders get on night shift?",
+        "What do I do after I finish loading a truck?",
+        "Where can I take my lunch break? Not on the floor right?",
+        "The floor is always backed up with pallets\u2014what am I supposed to do to keep things moving?",
+        "How does avoiding misloads and balancing truck weight distribution help the driver and company efficiency?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core safety, efficiency, and procedural info for night shift loaders; highly critical and actionable with clear steps, though minor fragments and run-ons slightly reduce completeness.",
+      "acronyms": {},
+      "jargon": {
+        "loaders": "Warehouse employees responsible for loading pallets onto trucks",
+        "pallets": "Platforms used for stacking and transporting goods in the warehouse",
+        "misloads": "Incorrectly loading wrong pallets onto trucks, leading to delivery errors",
+        "floor flow": "The smooth movement and efficiency of operations on the warehouse floor",
+        "clerk": "Warehouse staff member who handles paperwork and assigns loading tasks",
+        "night shift": "The overnight work period for warehouse operations",
+        "weight distribution": "Proper balancing of pallet weights in the truck for safe transport"
+      },
+      "numeric_thresholds": {
+        "short_break_duration": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Two 15-minute breaks per loader"
+        },
+        "lunch_break_duration": {
+          "value": 30,
+          "unit": "minutes",
+          "context": "One 30-minute lunch break per loader"
+        }
+      }
+    }
+  ]
+}

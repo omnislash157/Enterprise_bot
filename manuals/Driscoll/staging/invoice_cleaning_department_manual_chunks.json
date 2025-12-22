@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_invoice_cleaning_department_manual",
+  "version": "1.0",
+  "description": "Warehouse invoice processes and procedures",
+  "source_file": "Invoice Cleaning Department Manual.docx",
+  "file_hash": "3e76af285e6a271c86ba7df0e5799f7f8a96c8990308983ada74ee1eebba71ef",
+  "chunks": [
+    {
+      "id": "warehouse_invoice_introduction_0",
+      "category": "invoice",
+      "section_title": "Introduction",
+      "keywords": [
+        "invoices",
+        "day",
+        "invoice",
+        "transfer",
+        "department",
+        "processing",
+        "warehouses",
+        "cleaning",
+        "releasing",
+        "handles"
+      ],
+      "content": "Invoice Cleaning Department Manual\n\nOverview\n\nThe Invoice Cleaning Department is responsible for processing, organizing, releasing, archiving, and maintaining invoices from all company warehouses. This role ensures accurate credit allocation, correct documentation, internal communication, and compliance with workflow standards.\n\nFour employees work in this department:\n\nSandra – Handles Street accounts and Stroudsburg invoices.\n\nMikayla – Handles Street accounts and Stroudsburg invoices.\n\nAlexa – Scans all invoices and completes the daily sales report.\n\nCorinna – Handles all remaining invoices and creates the Customer Pick-Up Report.\n\nDaily Workflow Timeline\n\n**9:00 AM – 10:00 AM:** Alexa completes the Sales Report for all warehouses.\n\n**10:30 AM – 11:00 AM:** Other warehouses begin sending their invoices via Revver.\n\n**11:00 AM – 3:00 PM:** The team works on invoices from the previous day.\n\n**Morning Priority:** All transfer invoices must be processed first.\n\n*Same-Day Releases:** Certain groups require same-day invoice releasing.\n\n**Around 3:00 PM:** The department completes the daily work and begins getting ahead for the next day.\n\nSystems Used\n\n**Revver:** Receives invoices from non-Wayne warehouses.\n\n**Telnet:** Main invoice processing system (releasing, deleting, printing barcodes).\n\n**UnForm Archive:** Stores all released invoices and displays customer credits.\n\n**Email:** All communications must CC the Invoice Cleaning group to maintain transparency.\n\nProcessing Transfer Invoices\n\nTransfer invoices always come first each day.\n\nSteps:\n\n1. In Telnet enter: S → X → 'transfer' to pull all transfers.\n\n2. Manually delete transfer orders using the command: 2 → 2 → Order # → Password: del69.\n\n3. These transfers are deleted even though the department works on yesterday’s invoices.\n\n4. All transfer order barcodes are saved for **one week** in case they need to be scanned or reappear in the system.\n\nSame-Day Release Groups\n\nThese accounts require same-day invoice processing because they care about credit but not the items on invoices:",
+      "chunk_token_count": 494
+    },
+    {
+      "id": "warehouse_invoice_introduction_1",
+      "category": "invoice",
+      "section_title": "Introduction",
+      "keywords": [
+        "invoices",
+        "telnet",
+        "day",
+        "enter",
+        "barcodes",
+        "customer",
+        "archive",
+        "invoice",
+        "report",
+        "steps"
+      ],
+      "content": "**Einstein Bagels:** S → Z → E+\n\n**Massachusetts:** S → Z → MA\n\n**Harvest Group:** S → Z → C*7\n\n**Sage:** S → Z → =W\n\n**Williams College:** S → Z → W\n\nThese must be processed immediately upon arrival.\n\nReleasing Invoices to UnForm Archive\n\nReleasing invoices moves them into the archive for visibility by the sales team.\n\nSteps:\n\n1. In Telnet enter: 14 → 3 → INV → Enter → Enter → Date.\n\n2. Alexa scans all barcodes so they move into the UnForm Archive.\n\n3. The archive records credits and provides customer visibility.\n\n4. All credits for returned cases are created based on the archived documentation.\n\nPrinting Invoice Barcodes\n\nAll barcodes for invoices can be printed as needed.\n\nSteps:\n\n1. In Telnet enter: 14 → 5 → M (or any printer)\n\n2. All invoice barcodes will print for scanning or filing.\n\nCustomer Pick-Up Report\n\nCorinna creates the Customer Pick-Up Report each day.\n\nThis report shows:\n\nAll items scheduled for pickup by drivers.\n\nThe exact cases customers expect to be returned.\n\nConfirmation sections for driver check-in.\n\nThis report ensures:\n\nTransportation knows what to collect.\n\nDrivers verify pickups by marking items off.\n\nThe rest of the company is notified that all customer pickup requests were satisfied.\n\nDeleting Invoices from Telnet\n\nAfter invoices are processed and archived, they must be deleted from Telnet.\n\nSteps:\n\n1. In Telnet enter: 14 → 6 → Y → Printer # → Y → Enter.\n\n2. This removes them permanently from the Telnet system.\n\nCommunication Standards\n\nAll communication involving invoices MUST include the Invoice Cleaning email group.\n\nReasons:\n\nEnsures all team members stay aligned.\n\nPrevents missed transfers, same-day releases, or customer credits.\n\nCreates a record of questions, issues, and clarifications.\n\nEnd-of-Day Tasks\n\nBy around 3 PM the department completes the day’s invoice workload.\n\nEnd-of-day duties include:\n\nPreparing ahead for the next day’s invoices.\n\nEnsuring all same-day release groups are completed\n\nValidating that all transfers were deleted.\n\nConfirming barcodes were scanned and archived properly.\n\nClearing any remaining Telnet queues.",
+      "chunk_token_count": 486
+    }
+  ]
+}

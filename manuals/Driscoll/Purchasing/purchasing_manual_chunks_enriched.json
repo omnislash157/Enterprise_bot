@@ -1,0 +1,2715 @@
+{
+  "source_file": "manuals\\Driscoll\\Purchasing\\purchasing_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:30:38.367598",
+  "chunk_count": 32,
+  "chunks": [
+    {
+      "id": "warehouse_codes",
+      "content": "Warehouse codes: 01=Wayne, 02=NY (Amsterdam), 05=PA (Stroudsburg), 09=5th Street. Use these codes when entering POs or running reports.",
+      "content_hash": "f9b45e23213c82cf",
+      "section_title": "reference - warehouses",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 0,
+      "token_count": 23,
+      "_original": {
+        "keywords": [
+          "warehouse number",
+          "Wayne",
+          "PA",
+          "NY",
+          "Amsterdam",
+          "Stroudsburg",
+          "5th street",
+          "warehouse code"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "warehouses"
+      },
+      "query_types": [
+        "lookup",
+        "reference",
+        "definition"
+      ],
+      "verbs": [
+        "use",
+        "enter",
+        "run"
+      ],
+      "entities": [
+        "warehouse",
+        "purchase_order"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What warehouse code goes with Wayne?",
+        "How do I enter the code for NY Amsterdam on a PO?",
+        "What's the code for the PA Stroudsburg warehouse when running reports?",
+        "The system won't accept '5th Street' for my PO - what code do I need?",
+        "In warehouse reports, which code corresponds to 5th Street and why use codes?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core reference for warehouse codes in PO entry and reports; simple to understand, self-contained list with direct usage instruction.",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "NY": "New York",
+        "PA": "Pennsylvania"
+      },
+      "jargon": {
+        "warehouse codes": "Codes representing specific warehouse locations: 01=Wayne, 02=NY (Amsterdam), 05=PA (Stroudsburg), 09=5th Street"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "po_maintenance_navigation",
+      "content": "PO Maintenance/Open PO screen: Menu 9 (Purchasing) > 21 (Purchase Orders on File). Enter warehouse number and your buyer or analyst number to view open POs.",
+      "content_hash": "6cbfc6632525c4bc",
+      "section_title": "purchasing - navigation",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 1,
+      "token_count": 33,
+      "_original": {
+        "keywords": [
+          "PO maintenance",
+          "open PO",
+          "purchase orders on file",
+          "find PO"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "navigation"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "view",
+        "lookup"
+      ],
+      "entities": [
+        "purchase_order",
+        "warehouse"
+      ],
+      "actors": [
+        "buyer",
+        "analyst",
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I get to the open PO screen?",
+        "What's the menu path for PO Maintenance to view open purchase orders?",
+        "I can't find my open POs \u2013 where do I enter the warehouse and buyer number?",
+        "How do I navigate to Purchase Orders on File in Purchasing?",
+        "Stuck trying to pull up open POs for my warehouse, which menu option under Purchasing?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core purchasing navigation for viewing open POs; specific menu steps, simple to follow, fully self-contained and directly actionable for trained users",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "PO Maintenance/Open PO screen": "Screen for maintaining and viewing open purchase orders",
+        "Purchasing": "Procurement or buying module/department",
+        "Purchase Orders on File": "List of active or open purchase orders",
+        "warehouse number": "Unique identifier for a warehouse location",
+        "buyer number": "Identifier for a procurement buyer",
+        "analyst number": "Identifier for a procurement analyst",
+        "open POs": "Active purchase orders not yet closed or fully processed"
+      },
+      "numeric_thresholds": {
+        "menu_purchasing": {
+          "value": 9,
+          "context": "Main menu option for Purchasing module"
+        },
+        "menu_po_file": {
+          "value": 21,
+          "context": "Submenu for Purchase Orders on File"
+        }
+      }
+    },
+    {
+      "id": "po_confirmation_rules",
+      "content": "PO confirmation rules: POs must be confirmed at least TWO DAYS prior to order hitting the building. ETA dates must be adjusted EVERY SINGLE DAY. PO discrepancies must be addressed immediately.",
+      "content_hash": "4a692c886aaa18d8",
+      "section_title": "purchasing - procedures",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 2,
+      "token_count": 40,
+      "_original": {
+        "keywords": [
+          "confirm PO",
+          "PO confirmation",
+          "ETA",
+          "two days",
+          "discrepancy"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "procedures"
+      },
+      "query_types": [
+        "policy",
+        "compliance"
+      ],
+      "verbs": [
+        "confirm",
+        "adjust",
+        "address"
+      ],
+      "entities": [
+        "purchase_order"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [
+        "two_days_prior",
+        "daily_adjustment",
+        "po_discrepancy"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How many days before the order hits the building do I need to confirm a PO?",
+        "Do I have to adjust ETA dates on POs every single day?",
+        "What happens if there's a PO discrepancy - do I address it immediately?",
+        "There's a discrepancy on this PO and I'm slammed - can I deal with it later or do I have to do it now?",
+        "Is the two-day PO confirmation rule strict, or can I get away with confirming one day before delivery if ETA changed?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core purchasing process rules essential for timely operations, highly actionable and self-contained with clear directives, minimal expertise needed.",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "ETA": "Estimated Time of Arrival"
+      },
+      "jargon": {
+        "order hitting the building": "Arrival of the order at the warehouse or facility",
+        "PO discrepancies": "Differences or issues between the purchase order and actual receipt or invoice"
+      },
+      "numeric_thresholds": {
+        "PO_confirmation_prior_days": {
+          "value": 2,
+          "unit": "days",
+          "context": "POs must be confirmed at least this prior to order hitting the building"
+        },
+        "ETA_adjustment_frequency": {
+          "value": 1,
+          "unit": "days",
+          "context": "ETA dates must be adjusted every single this period"
+        }
+      }
+    },
+    {
+      "id": "lost_sales_report",
+      "content": "Lost Sales Report: Must be reviewed every morning by each analyst. Target fill rate is 99.5%. Report is generated and emailed from reports@driscollfoods.com each morning.",
+      "content_hash": "f2051646f7aa2706",
+      "section_title": "purchasing - reports",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 3,
+      "token_count": 32,
+      "_original": {
+        "keywords": [
+          "lost sales",
+          "fill rate",
+          "99.5",
+          "analyst report",
+          "morning report"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "reports"
+      },
+      "query_types": [
+        "policy",
+        "reference",
+        "compliance"
+      ],
+      "verbs": [
+        "review",
+        "generate",
+        "email"
+      ],
+      "entities": [
+        "Lost Sales Report",
+        "fill rate"
+      ],
+      "actors": [
+        "analyst"
+      ],
+      "conditions": [
+        "every morning",
+        "target fill rate 99.5%"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "When do I need to review the Lost Sales Report?",
+        "What's the target fill rate in the Lost Sales Report?",
+        "From what email address is the Lost Sales Report sent each morning?",
+        "I didn't get the Lost Sales Report email this morning\u2014what do I do?",
+        "As a purchasing analyst, what's the daily protocol for handling the Lost Sales Report and its 99.5% fill rate target?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core daily business process for analysts in purchasing reports; straightforward, self-contained, and directly actionable with clear routine and target.",
+      "acronyms": {},
+      "jargon": {
+        "Lost Sales Report": "Daily report tracking sales lost due to stockouts or fulfillment issues, emailed from reports@driscollfoods.com",
+        "fill rate": "Percentage of customer orders successfully fulfilled from available inventory"
+      },
+      "numeric_thresholds": {
+        "target_fill_rate": {
+          "value": 99.5,
+          "unit": "%",
+          "context": "Minimum acceptable fill rate reviewed in Lost Sales Report"
+        }
+      }
+    },
+    {
+      "id": "print_stock_status",
+      "content": "Print Stock Status by Vendor: Menu 5 > 15 > 2. Enter S=Short version, D=Day or S=Select vendor, enter day (M/T/W/R/F), buyer code, printer#, warehouse (01=Wayne), N=secondary vendors, Y=show other warehouse, N=flagged items (or Y to show lockouts/special orders/no inventory).",
+      "content_hash": "d18abc78f554d9f6",
+      "section_title": "purchasing - reports",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 4,
+      "token_count": 52,
+      "_original": {
+        "keywords": [
+          "stock status",
+          "print stock status",
+          "inventory report",
+          "vendor report"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "reports"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "print",
+        "enter",
+        "select"
+      ],
+      "entities": [
+        "vendor",
+        "warehouse",
+        "inventory",
+        "stock_status"
+      ],
+      "actors": [
+        "purchasing_agent",
+        "buyer"
+      ],
+      "conditions": [
+        "short_version",
+        "day",
+        "secondary_vendors",
+        "other_warehouse",
+        "flagged_items",
+        "lockouts",
+        "special_orders",
+        "no_inventory"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I print the stock status by vendor report?",
+        "What menu path do I use to run stock status by vendor?",
+        "How can I print a short version of stock status for Wayne warehouse on Thursday, excluding secondary vendors?",
+        "The stock status report isn't showing lockouts or no inventory items\u2014what am I doing wrong?",
+        "What if I want to include flagged items like special orders in the vendor stock status?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing report procedure, specific menu navigation and options provided, actionable steps for trained users with minor system familiarity assumed.",
+      "acronyms": {
+        "S": "Short version or Select vendor",
+        "D": "Day",
+        "M": "Monday",
+        "T": "Tuesday",
+        "W": "Wednesday",
+        "R": "Thursday",
+        "F": "Friday",
+        "01": "Wayne"
+      },
+      "jargon": {
+        "Stock Status": "Inventory availability report by vendor",
+        "buyer code": "Identifier for the purchasing buyer responsible for the vendor",
+        "printer#": "Printer number for report output",
+        "warehouse": "Distribution center, coded e.g., 01=Wayne",
+        "secondary vendors": "Alternative suppliers beyond primary",
+        "flagged items": "Inventory items marked for special attention or issues",
+        "lockouts": "Restricted or locked inventory items",
+        "special orders": "Custom or non-stock orders",
+        "no inventory": "Items with zero stock on hand"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "po_entry_navigation",
+      "content": "Enter Purchase Order: Menu 9 > 1. Enter operator# (first order only after login), vendor# (or A to lookup), Y/N for pickup. If pickup: M=Managed or B=Backhaul - for managed, enter pickup date then arrival date. Enter PO date (format: 011924), use arrows to select ETA based on lead time.",
+      "content_hash": "ed28951bf3f8dc9a",
+      "section_title": "purchasing - order_entry",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 5,
+      "token_count": 65,
+      "_original": {
+        "keywords": [
+          "enter PO",
+          "purchase order entry",
+          "new PO",
+          "place order"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "order_entry"
+      },
+      "query_types": [
+        "how_to",
+        "lookup"
+      ],
+      "verbs": [
+        "enter",
+        "lookup",
+        "select"
+      ],
+      "entities": [
+        "purchase_order",
+        "vendor",
+        "operator"
+      ],
+      "actors": [
+        "purchasing_agent",
+        "operator",
+        "vendor"
+      ],
+      "conditions": [
+        "first_order_after_login",
+        "pickup",
+        "managed",
+        "backhaul"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I start entering a purchase order?",
+        "What's the date format when entering the PO date?",
+        "For a pickup order, how do I choose managed vs backhaul and what dates go in?",
+        "I'm trying to enter a PO but it keeps asking for operator# even after the first one\u2014what gives?",
+        "How do I use the arrows to pick ETA based on vendor lead time in order entry?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing process for order entry, clear menu-driven steps, actionable but assumes basic system familiarity",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "ETA": "Estimated Time of Arrival",
+        "Y/N": "Yes/No"
+      },
+      "jargon": {
+        "operator#": "Operator identifier (e.g., driver or employee number)",
+        "vendor#": "Vendor identifier",
+        "pickup": "Arrangement for collecting goods from vendor",
+        "Managed": "Managed pickup service (company-handled collection)",
+        "Backhaul": "Backhaul pickup (using return transport leg)",
+        "lead time": "Time between order placement and expected delivery"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "po_entry_warehouse_email",
+      "content": "PO Entry warehouse/sending: Defaults to 01 (Wayne). Press F4 to change warehouse - enter 02 (Amsterdam) or 05 (Stroudsburg). Enter items and quantities, Y to print, E to email. Accept email/CC addresses, enter message with pertinent info, enter 1 to send. Confirmation email sent to you.",
+      "content_hash": "87dcaecb5396da58",
+      "section_title": "purchasing - order_entry",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 6,
+      "token_count": 59,
+      "_original": {
+        "keywords": [
+          "PO warehouse",
+          "change warehouse",
+          "email PO",
+          "send PO",
+          "F4"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "order_entry"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "press",
+        "change",
+        "enter",
+        "print",
+        "email",
+        "accept",
+        "send"
+      ],
+      "entities": [
+        "purchase_order",
+        "warehouse",
+        "item",
+        "quantity"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [
+        "defaults_to_01_Wayne",
+        "warehouse_02_Amsterdam",
+        "warehouse_05_Stroudsburg"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I change the default warehouse from 01 Wayne in PO Entry?",
+        "What if I need to send a PO from the Amsterdam warehouse instead of Wayne?",
+        "In PO Entry, how do I use F4 to switch the sending warehouse to 02 or 05?",
+        "PO Entry defaults to Wayne every time and I can't figure out how to get Amsterdam - help!",
+        "What's the full process to enter items, print or email a PO, and confirm it's sent?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process in purchasing order entry, focused on warehouse selection and sending; clear, step-by-step instructions that are actionable with basic system familiarity, mostly self-contained for the described sub-task.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "PO Entry": "Process for entering purchase orders",
+        "warehouse/sending": "Field defaulting to warehouse 01 (Wayne) for PO dispatch",
+        "F4": "Function key to prompt and change warehouse options",
+        "Wayne": "Warehouse code 01",
+        "Amsterdam": "Warehouse code 02",
+        "Stroudsburg": "Warehouse code 05"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "wipeout_report",
+      "content": "Wipeout Report: Notification sent to buyer when Sales keys out a larger than normal order. Address this IMMEDIATELY to prevent stock issues.",
+      "content_hash": "baf66c38dc29e7e5",
+      "section_title": "purchasing - alerts",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 7,
+      "token_count": 28,
+      "_original": {
+        "keywords": [
+          "wipeout",
+          "large order",
+          "unusual order",
+          "sales alert"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "alerts"
+      },
+      "query_types": [
+        "definition",
+        "policy",
+        "troubleshoot",
+        "how_to"
+      ],
+      "verbs": [
+        "notify",
+        "key_out",
+        "address",
+        "prevent"
+      ],
+      "entities": [
+        "Wipeout_Report",
+        "order",
+        "inventory"
+      ],
+      "actors": [
+        "buyer",
+        "sales_rep"
+      ],
+      "conditions": [
+        "larger_than_normal_order",
+        "over_limit"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is the Wipeout Report?",
+        "What should I do if I get a Wipeout Report notification?",
+        "When Sales keys out a larger than normal order, what alert does the buyer get?",
+        "Why do I have to address the Wipeout Report immediately? I'm swamped here!",
+        "How does ignoring a Wipeout Report lead to stock issues in purchasing?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 7,
+      "actionability_score": 8,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Critical for inventory management in purchasing; specific to large sales orders; simple to grasp; self-contained on what it is and urgency; directly prompts immediate action to prevent issues.",
+      "acronyms": {},
+      "jargon": {
+        "Wipeout Report": "Notification sent to buyer when Sales keys out a larger than normal order",
+        "keys out": "Sales department enters or processes an order in the system"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "po_history_lookup",
+      "content": "PO History Lookup: Menu 9 > 30. Enter PO# directly, or V + vendor number to search by vendor. Alternative: Go to vendor 28 screen, press H for full history.",
+      "content_hash": "6ea42cae2ac8dc13",
+      "section_title": "purchasing - inquiry",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 8,
+      "token_count": 39,
+      "_original": {
+        "keywords": [
+          "PO history",
+          "lookup PO",
+          "find purchase order",
+          "vendor history"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "inquiry"
+      },
+      "query_types": [
+        "how_to",
+        "lookup"
+      ],
+      "verbs": [
+        "enter",
+        "search",
+        "go",
+        "press",
+        "lookup"
+      ],
+      "entities": [
+        "purchase_order",
+        "vendor"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I look up the history for a specific PO?",
+        "What's the way to search PO history using just the vendor number?",
+        "How do you get full PO history from the vendor 28 screen?",
+        "I don't have the PO number\u2014how can I still check a vendor's history?",
+        "Menu 9 > 30 isn't pulling up what I need for this vendor, what's the other way?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing inquiry function, frequently used; specific steps for common scenario, self-contained with clear actions, assumes basic system knowledge",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "PO History Lookup": "Function to retrieve the history of a purchase order",
+        "Menu 9 > 30": "Navigation path in the system menu to access PO history lookup",
+        "V + vendor number": "Command format to search PO history by vendor (V followed by vendor number)",
+        "vendor 28 screen": "Specific vendor screen (menu option 28) for accessing details and history",
+        "H": "Keyboard shortcut to display full vendor PO history"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "school_report",
+      "content": "School Vendor Projection Report: Menu 2 > 14 > 4. Enter next school day, then date 10 school days out (exclude weekends), buyer number, x3, printer#. Lists items by vendor for NYC Schools. ITALICIZED items = potential shorts within 10 days - focus on these. Options: place order, increase existing order, or move PO earlier. Note: email version loses italics formatting.",
+      "content_hash": "77c66b4d80bb5558",
+      "section_title": "purchasing - reports",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 9,
+      "token_count": 79,
+      "_original": {
+        "keywords": [
+          "school report",
+          "NYC schools",
+          "projection",
+          "school vendor",
+          "italicized"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "reports"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "place",
+        "increase",
+        "move",
+        "focus",
+        "exclude",
+        "list"
+      ],
+      "entities": [
+        "vendor",
+        "purchase_order",
+        "items",
+        "report"
+      ],
+      "actors": [
+        "buyer",
+        "purchasing_agent",
+        "vendor",
+        "customer"
+      ],
+      "conditions": [
+        "shortage",
+        "potential shorts",
+        "within 10 days",
+        "exclude weekends"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I access the School Vendor Projection Report?",
+        "What do the italicized items mean in the School Vendor Projection Report?",
+        "How do I enter dates for the Vendor Projection Report to exclude weekends and handle potential shorts with PO adjustments?",
+        "The emailed School Vendor Projection Report doesn't show italics\u2014what gives?",
+        "What's the buyer number input and options like moving a PO earlier in the NYC Schools projection report?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing report for avoiding vendor shortages in NYC schools; specific procedure with clear menu path, inputs, focus (italics), and actions; self-contained for trained users.",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "NYC": "New York City"
+      },
+      "jargon": {
+        "School Vendor Projection Report": "Report accessed via Menu 2 > 14 > 4 listing items by vendor for NYC Schools with italicized potential shorts",
+        "potential shorts": "Potential shortages within 10 days (italicized in report)",
+        "buyer number": "Identifier used as input (multiplied by 3)",
+        "printer#": "Printer identifier for report output"
+      },
+      "numeric_thresholds": {
+        "projection_period": {
+          "value": 10,
+          "unit": "school days",
+          "context": "Enter date 10 school days out from next school day (exclude weekends); identifies potential shorts to focus on"
+        },
+        "buyer_multiplier": {
+          "value": 3,
+          "unit": "",
+          "context": "Input after buyer number (x3)"
+        }
+      }
+    },
+    {
+      "id": "intercompany_transfer_entry",
+      "content": "Intercompany Transfers: Enter in Menu 31 (Transfer Entry). Enter vendor number for the transfer type based on origin warehouse and temperature zone.",
+      "content_hash": "7f0b16b45c04caff",
+      "section_title": "purchasing - transfers",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 10,
+      "token_count": 28,
+      "_original": {
+        "keywords": [
+          "transfer",
+          "intercompany",
+          "internal transfer",
+          "warehouse transfer"
+        ],
+        "email": "",
+        "category": "purchasing",
+        "subcategory": "transfers"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "enter"
+      ],
+      "entities": [
+        "transfer",
+        "vendor",
+        "warehouse"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [
+        "origin_warehouse",
+        "temperature_zone"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter an intercompany transfer?",
+        "What menu do I use for Transfer Entry on intercompany transfers?",
+        "Which vendor number goes with frozen temperature zone transfers from origin warehouse 2?",
+        "I'm lost trying to do an intercompany transfer - where the heck do I start in the system?",
+        "How do I pick the right vendor number for intercompany transfers based on origin warehouse and temp zone?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing transfer process, clear actionable steps for entry, minor context needed for vendor mapping",
+      "acronyms": {},
+      "jargon": {
+        "Intercompany Transfers": "Transfers of goods between different legal entities or divisions within the same corporate group",
+        "Menu 31": "Specific system menu for accessing Transfer Entry functionality",
+        "Transfer Entry": "Process or screen used to record intercompany transfer transactions",
+        "vendor number": "Unique identifier assigned to vendors or internal entities in the ERP or inventory system",
+        "origin warehouse": "The source warehouse from which goods are transferred",
+        "temperature zone": "Storage category based on required temperature conditions (e.g., frozen, refrigerated, ambient)"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "transfer_vendor_numbers_amsterdam",
+      "content": "Amsterdam Internal Transfer vendor numbers: 222111=Dry, 222112=Cooler, 222113=Freezer. Use these when transferring FROM Amsterdam.",
+      "content_hash": "7802d586e07fc6f6",
+      "section_title": "reference - transfers",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 11,
+      "token_count": 18,
+      "_original": {
+        "keywords": [
+          "Amsterdam transfer",
+          "NY transfer",
+          "222111",
+          "222112",
+          "222113"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "transfers"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "use",
+        "transfer"
+      ],
+      "entities": [
+        "vendor",
+        "warehouse"
+      ],
+      "actors": [],
+      "conditions": [
+        "transferring FROM Amsterdam",
+        "internal transfer"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What vendor numbers do I use for internal transfers from Amsterdam?",
+        "Which vendor number goes with dry goods when transferring from Amsterdam?",
+        "What if I'm setting up an internal transfer of cooler items from Amsterdam\u2014what's the right vendor number?",
+        "Ugh, the system keeps rejecting my freezer transfer from Amsterdam. What vendor number am I supposed to use?",
+        "What are the AMS outbound internal xfer vendor codes for Dry, Cooler, and Freezer?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 8,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core operational detail for internal transfers from Amsterdam, highly specific and actionable with clear vendor codes, fully self-contained and simple.",
+      "acronyms": {},
+      "jargon": {
+        "vendor numbers": "Unique codes identifying specific internal transfer locations or types from Amsterdam",
+        "Dry": "Ambient (non-refrigerated) storage type",
+        "Cooler": "Refrigerated storage type",
+        "Freezer": "Frozen storage type"
+      },
+      "numeric_thresholds": {
+        "Amsterdam_Dry_vendor_number": {
+          "value": 222111,
+          "context": "Used when transferring FROM Amsterdam Dry storage"
+        },
+        "Amsterdam_Cooler_vendor_number": {
+          "value": 222112,
+          "context": "Used when transferring FROM Amsterdam Cooler storage"
+        },
+        "Amsterdam_Freezer_vendor_number": {
+          "value": 222113,
+          "context": "Used when transferring FROM Amsterdam Freezer storage"
+        }
+      }
+    },
+    {
+      "id": "transfer_vendor_numbers_wayne",
+      "content": "Wayne Internal Transfer vendor numbers: 898989=Dry, 899898=Cooler, 899999=Freezer. Use these when transferring FROM Wayne internally.",
+      "content_hash": "c4267daa59bdf71b",
+      "section_title": "reference - transfers",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 12,
+      "token_count": 19,
+      "_original": {
+        "keywords": [
+          "Wayne transfer",
+          "898989",
+          "899898",
+          "899999",
+          "internal transfer"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "transfers"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "transfer",
+        "use"
+      ],
+      "entities": [
+        "vendor",
+        "warehouse"
+      ],
+      "actors": [],
+      "conditions": [
+        "internal_transfer_from_Wayne"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the vendor numbers for internal transfers from Wayne?",
+        "I'm transferring dry goods from Wayne internally\u2014what vendor number should I use?",
+        "Wayne IT vendor nums: confirm for Cooler and Freezer?",
+        "Why is my Wayne freezer internal transfer getting rejected? What's the right vendor number?",
+        "For transfers originating FROM Wayne's cooler, which vendor number goes in the system?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 8,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core reference for internal Wayne transfers using specific vendor numbers; highly actionable and self-contained for that narrow scenario, simple to understand.",
+      "acronyms": {},
+      "jargon": {
+        "Wayne Internal Transfer": "Internal process for transferring goods from the Wayne facility using specific vendor numbers",
+        "vendor numbers": "Numeric codes representing internal storage types for transfers from Wayne",
+        "Dry": "Dry storage",
+        "Cooler": "Refrigerated (cooler) storage",
+        "Freezer": "Frozen storage"
+      },
+      "numeric_thresholds": {
+        "wayne_dry_vendor_number": {
+          "value": 898989,
+          "context": "Used when transferring from Wayne to Dry storage internally"
+        },
+        "wayne_cooler_vendor_number": {
+          "value": 899898,
+          "context": "Used when transferring from Wayne to Cooler storage internally"
+        },
+        "wayne_freezer_vendor_number": {
+          "value": 899999,
+          "context": "Used when transferring from Wayne to Freezer storage internally"
+        }
+      }
+    },
+    {
+      "id": "transfer_vendor_numbers_between",
+      "content": "Inter-warehouse transfer vendor numbers: 104807=Wayne to NY (1-2), 111111=NY to Wayne (2-1), 666666=Wayne to PA (1-5), 555555=PA to Wayne (5-1), 104809=Wayne to 5th Street (1-9), 999111=5th Street to Wayne (9-1).",
+      "content_hash": "276d506fce5887d7",
+      "section_title": "reference - transfers",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 13,
+      "token_count": 39,
+      "_original": {
+        "keywords": [
+          "transfer between warehouses",
+          "Wayne to NY",
+          "NY to Wayne",
+          "PA transfer",
+          "5th street"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "transfers"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "transfer",
+        "lookup"
+      ],
+      "entities": [
+        "vendor",
+        "warehouse"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the vendor number for transferring from Wayne to NY?",
+        "I'm trying to move stock from NY back to Wayne, but what's the right vendor code?",
+        "What inter-warehouse transfer vendor number do I use for 1-5 (Wayne to PA)?",
+        "Ugh, the system rejected my PA to Wayne transfer\u2014what's the correct vendor number?",
+        "For returns to Wayne from 5th Street or PA, what are the respective IWT vendor numbers?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 8,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core reference for inter-warehouse transfers, highly actionable lookup table, self-contained with minimal context needed, specific to warehouse pairs but straightforward for users in purchasing/logistics.",
+      "acronyms": {},
+      "jargon": {
+        "inter-warehouse transfer": "Process of moving goods between warehouses using specific vendor numbers",
+        "vendor numbers": "Unique numeric codes assigned to specific directional transfers between warehouses (e.g., 104807 for Wayne to NY)",
+        "warehouse codes": "Numeric identifiers for warehouse locations: 1=Wayne, 2=NY, 5=PA, 9=5th Street"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "item_setup_overview",
+      "content": "New Item Setup: Limit new items - all must be approved by manager. Salesman requests require DSM approval. Required specs: pack size, net & gross weight, case cube, manufacturer#, item#, UPC, TI HI, billing type, shelf life, guaranteed shelf life (what vendor guarantees customer receives). Contact vendor for specs.",
+      "content_hash": "39414efbeac53a5f",
+      "section_title": "item_management - setup",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 14,
+      "token_count": 63,
+      "_original": {
+        "keywords": [
+          "new item",
+          "set up item",
+          "item setup",
+          "add item",
+          "item approval"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "setup"
+      },
+      "query_types": [
+        "policy",
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "approve",
+        "request",
+        "contact",
+        "setup"
+      ],
+      "entities": [
+        "item",
+        "vendor"
+      ],
+      "actors": [
+        "salesman",
+        "manager",
+        "DSM",
+        "vendor",
+        "customer"
+      ],
+      "conditions": [
+        "new_item",
+        "salesman_request"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What approvals are needed to set up a new item?",
+        "What are all the required specs for new item setup?",
+        "Salesman is requesting a new item\u2014what's the approval process?",
+        "Why can't I just add this new item without manager approval? This is frustrating!",
+        "Where do I source the TI/HI, case cube, and guaranteed shelf life for a new item setup?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for new item setup in purchasing, provides clear approvals and spec list, self-contained and highly actionable with basic domain knowledge",
+      "acronyms": {
+        "DSM": "District Sales Manager",
+        "UPC": "Universal Product Code",
+        "TI HI": "Tiers and Height (pallet configuration: TI = cases per layer, HI = layers per pallet)"
+      },
+      "jargon": {
+        "pack size": "Quantity or dimensions of product in a single pack",
+        "net weight": "Weight of the product excluding packaging",
+        "gross weight": "Total weight of the product including packaging",
+        "case cube": "Volume of one case, typically measured in cubic feet",
+        "manufacturer#": "Manufacturer's product identifier or number",
+        "item#": "Internal item identifier or number",
+        "billing type": "Method or category for invoicing the item",
+        "shelf life": "Duration product remains usable from production",
+        "guaranteed shelf life": "Minimum shelf life vendor guarantees upon delivery to customer"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "item_setup_process",
+      "content": "Item Setup Process: Search for similar items to get sequential item number. Go to empty item screen, press F1, enter a number from similar items. Press A to begin entering. Field 2: Enter description with broader category first (e.g., 'CHIP POTATO BBQ' not 'BBQ POTATO CHIP', 'DRESSING ITALIAN HOMESTYLE' not 'HOMESTYLE ITALIAN DRESSING').",
+      "content_hash": "8eb4cf769cce4f4a",
+      "section_title": "item_management - setup",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 15,
+      "token_count": 68,
+      "_original": {
+        "keywords": [
+          "item maintenance",
+          "enter item",
+          "item number",
+          "F1"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "setup"
+      },
+      "query_types": [
+        "how_to",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "search",
+        "go",
+        "press",
+        "enter",
+        "create",
+        "setup"
+      ],
+      "entities": [
+        "item",
+        "item_number",
+        "description"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I start setting up a new item?",
+        "How do I get the sequential item number for a new product?",
+        "What's the right way to enter the description in Field 2?",
+        "I'm on the empty item screen, entered a number but nothing happens\u2014what next?",
+        "After searching similar items, what keystrokes get me into new item entry with proper description order?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core item setup process in purchasing management, frequently needed for adding new items, clear sequential steps with examples, requires basic system familiarity but highly actionable and mostly self-contained",
+      "acronyms": {},
+      "jargon": {
+        "sequential item number": "Item ID obtained by searching similar items to continue the numbering sequence",
+        "empty item screen": "Blank screen or form used for creating new item entries",
+        "Field 2": "Specific field in the item setup form for entering the item description"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "item_setup_fields",
+      "content": "Item Setup key fields: Field 6 (Billing Type): 1=by case, 2=by weight (LB/OZ), 3=catchweight (variable weight like 4-7 LBs). Field 8 (Pieces per case): Enter split quantity or 1 if no split. Generally avoid splits except sturdy self-contained items (gallon jugs of mayo/oil OK, loose fry bags NO). Fields 10/11: Net/gross weight. Field 14: Case cube. Field 17: Landed cost.",
+      "content_hash": "cd8db2efa825844b",
+      "section_title": "item_management - fields",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 16,
+      "token_count": 78,
+      "_original": {
+        "keywords": [
+          "billing type",
+          "pieces per case",
+          "case cube",
+          "landed cost",
+          "catchweight"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "fields"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "avoid",
+        "setup"
+      ],
+      "entities": [
+        "item",
+        "case"
+      ],
+      "actors": [],
+      "conditions": [
+        "no split",
+        "split quantity",
+        "sturdy self-contained items",
+        "catchweight"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do the numbers 1, 2, and 3 mean in Field 6 for Billing Type?",
+        "How do I set up a catchweight item that varies like 4-7 lbs?",
+        "Can I use splits in Field 8 for loose fry bags, or is that a no-go?",
+        "I'm trying to enter pieces per case but getting errors\u2014what items are okay for splits?",
+        "For gallon jugs of mayo, what's the guidance on Field 8 splits and Fields 10/11 weights?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core item setup process in purchasing, frequently needed for accurate billing/inventory; provides specific field guidance with examples, self-contained for key fields, highly actionable steps.",
+      "acronyms": {
+        "LB": "pound",
+        "OZ": "ounce"
+      },
+      "jargon": {
+        "catchweight": "variable weight like 4-7 LBs",
+        "case cube": "cubic volume of a case (Field 14)",
+        "landed cost": "total cost to receive item at warehouse (Field 17)",
+        "net weight": "weight without packaging (Field 10)",
+        "gross weight": "weight with packaging (Field 11)",
+        "pieces per case": "split quantity or 1 if no split (Field 8)",
+        "split": "dividing cases into pieces, generally avoid except sturdy self-contained items"
+      },
+      "numeric_thresholds": {
+        "billing_type_by_case": {
+          "value": 1,
+          "context": "Field 6"
+        },
+        "billing_type_by_weight": {
+          "value": 2,
+          "unit": "LB/OZ",
+          "context": "Field 6"
+        },
+        "billing_type_catchweight": {
+          "value": 3,
+          "context": "Field 6"
+        },
+        "pieces_per_case_no_split": {
+          "value": 1,
+          "context": "Field 8"
+        },
+        "catchweight_example_range": {
+          "value": "4-7",
+          "unit": "LBs",
+          "context": "variable weight example"
+        }
+      }
+    },
+    {
+      "id": "item_setup_fields_continued",
+      "content": "Item Setup additional fields: Field 20: Unit type (bag/box/bottle) if applicable. Field 21: Manufacturer and item number. Field 22: Temperature zone. Field 23: Skip (F2). Field 27: TI/HI. Field 28: UPC. Field 32: Category number (? then spacebar to lookup). Field 37: Skip (F2). Field 38: Vendor number. Field 40: Alpha name (search term for sales reps). Field 41: Brand name.",
+      "content_hash": "fabccc6d48e35679",
+      "section_title": "item_management - fields",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 17,
+      "token_count": 79,
+      "_original": {
+        "keywords": [
+          "manufacturer number",
+          "temperature zone",
+          "TI HI",
+          "UPC",
+          "category",
+          "vendor",
+          "alpha name",
+          "brand"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "fields"
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "setup",
+        "lookup",
+        "skip"
+      ],
+      "entities": [
+        "item",
+        "vendor"
+      ],
+      "actors": [
+        "sales_rep",
+        "purchasing_agent"
+      ],
+      "conditions": [
+        "if_applicable"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": true,
+      "synthetic_questions": [
+        "What goes in Field 20 for item setup?",
+        "How do I enter TI/HI for a palletized item?",
+        "What's Field 22 for, and what are the options?",
+        "Field 23 and 37 say skip with F2 - what the heck does that mean? I'm stuck here!",
+        "In item setup, where do I put the UPC, vendor number, and alpha name for sales reps?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core guidance for item setup fields in purchasing system, essential for accurate inventory management; specific to that process, actionable steps with some assumed interface knowledge.",
+      "acronyms": {
+        "TI/HI": "Tiers per layer / Layers high (pallet configuration)",
+        "UPC": "Universal Product Code"
+      },
+      "jargon": {
+        "Alpha name": "Alphabetical search term used by sales reps for item lookup",
+        "Category number": "Product category identifier (lookup via ? then spacebar)",
+        "Temperature zone": "Designated storage area based on temperature requirements (e.g., ambient, refrigerated, frozen)",
+        "Unit type": "Packaging format (e.g., bag, box, bottle)",
+        "Vendor number": "Supplier or vendor identifier"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "item_lockout_codes",
+      "content": "Item Lockout codes (Field 43): X=Cannot key out until back in stock AND/OR on order (sales can key if on order based on ETA). Y=Locked to everyone, no keying unless inventory on hand. S=Locked out to BOE only. D=Locked out to street sales only.",
+      "content_hash": "e256a50a59c1ec34",
+      "section_title": "item_management - lockout",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 18,
+      "token_count": 57,
+      "_original": {
+        "keywords": [
+          "lockout",
+          "X lockout",
+          "Y lockout",
+          "S lockout",
+          "D lockout",
+          "field 43"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "lockout"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "policy"
+      ],
+      "verbs": [
+        "key out",
+        "key",
+        "lock out"
+      ],
+      "entities": [
+        "item",
+        "inventory",
+        "order"
+      ],
+      "actors": [
+        "sales",
+        "BOE",
+        "street sales"
+      ],
+      "conditions": [
+        "back in stock",
+        "on order",
+        "ETA",
+        "inventory on hand"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does the X lockout code in Field 43 mean?",
+        "If an item has a Y code, can anyone key it out?",
+        "What's the difference between S and D lockouts for BOE versus street sales?",
+        "Why won't the system let me key out this item with a Y code\u2014am I doing something wrong?",
+        "For an X-locked item on order, when can sales key it out based on ETA?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core inventory management process with specific lockout codes; clear definitions make it actionable and mostly self-contained for domain users.",
+      "acronyms": {
+        "ETA": "Estimated Time of Arrival",
+        "BOE": "BOE"
+      },
+      "jargon": {
+        "Item Lockout codes": "Codes (X, Y, S, D) in Field 43 that restrict who can sell or order out-of-stock items",
+        "Field 43": "System field storing the item lockout code",
+        "key out": "Process or enter a sale/order for an item (typically out-of-stock)",
+        "keying": "Entering or processing a sale/order for an item",
+        "back in stock": "Item replenished and available in inventory",
+        "on order": "Item has a purchase order placed with supplier",
+        "inventory on hand": "Current available stock quantity",
+        "street sales": "Direct retail or walk-in sales channel"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "item_special_flags",
+      "content": "Item special flags: Field 45 (Taxable): Food items=N, non-food items may be Y. Field 46 (DWO - Done When Out): Item will not be reordered, discontinued by Driscoll or manufacturer. Field 47 (Special Order): N=stocked item, Y=brought in for specific purpose/won't move (adds burden to item). Field 53 (Exclude Special): Y ensures special item mark won't fall off.",
+      "content_hash": "ca060e8c4ba4ef18",
+      "section_title": "item_management - flags",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 19,
+      "token_count": 75,
+      "_original": {
+        "keywords": [
+          "taxable",
+          "DWO",
+          "done when out",
+          "special order",
+          "discontinued"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "flags"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference",
+        "policy"
+      ],
+      "verbs": [
+        "reorder",
+        "discontinue",
+        "bring in",
+        "move",
+        "add",
+        "ensure"
+      ],
+      "entities": [
+        "item",
+        "food items",
+        "non-food items",
+        "inventory"
+      ],
+      "actors": [
+        "Driscoll",
+        "manufacturer"
+      ],
+      "conditions": [
+        "taxable",
+        "DWO - Done When Out",
+        "special order",
+        "exclude special",
+        "discontinued",
+        "specific purpose"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does Field 45 (Taxable) get set to for food items?",
+        "What's DWO in Field 46 mean, and why won't those items get reordered?",
+        "How do I make sure the special item mark doesn't fall off? Is Field 53 the one?",
+        "Ugh, this item's special flag keeps disappearing\u2014what's Field 53 (Exclude Special) for?",
+        "What if an item is discontinued by Driscoll\u2014do I flag it as DWO in Field 46, and what's the impact on reordering?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core to item management in purchasing, specific flag definitions are self-contained and directly guide flag usage without deep expertise needed",
+      "acronyms": {
+        "DWO": "Done When Out"
+      },
+      "jargon": {
+        "Taxable": "Field 45 flag: Food items=N, non-food items may be Y",
+        "Special Order": "Field 47 flag: N=stocked item, Y=brought in for specific purpose/won't move (adds burden to item)",
+        "Exclude Special": "Field 53 flag: Y ensures special item mark won't fall off",
+        "Done When Out": "Field 46 flag: Item will not be reordered, discontinued by Driscoll or manufacturer",
+        "special item mark": "A persistent indicator or label on special items"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "close_code_item",
+      "content": "Close Code an Item: Menu 5 > 1 > Enter item#, Left arrow to movement screen, F8, enter salesman# or 6-digit customer#, Y to add. Can also close code to warehouse: C=Wayne, P=Stroudsburg, type DIV enter A enter=Amsterdam. Note: This is different from Field 43 lockout which prevents ALL salesmen from keying.",
+      "content_hash": "da4904e5ccf6698b",
+      "section_title": "item_management - restrictions",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 20,
+      "token_count": 67,
+      "_original": {
+        "keywords": [
+          "close code",
+          "restrict item",
+          "salesman restriction",
+          "customer restriction"
+        ],
+        "email": "",
+        "category": "item_management",
+        "subcategory": "restrictions"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "definition"
+      ],
+      "verbs": [
+        "close",
+        "enter",
+        "add",
+        "type",
+        "navigate"
+      ],
+      "entities": [
+        "item",
+        "salesman",
+        "customer",
+        "warehouse"
+      ],
+      "actors": [
+        "salesman"
+      ],
+      "conditions": [
+        "field_43_lockout",
+        "restrictions"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I close code an item in the system?",
+        "What's the menu path to close code an item for a specific salesman?",
+        "How can I close code an item to the Wayne warehouse using DIV?",
+        "Close code vs Field 43 lockout - what's the difference and when to use each?",
+        "I entered the item number and hit F8 but now it's blocking ALL salesmen - I only wanted one out! How do I do this right?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 8,
+      "complexity": 6,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core procedure for item restrictions in management system, highly specific steps with warehouse options, assumes basic system familiarity but self-contained and directly actionable",
+      "acronyms": {
+        "C": "Wayne",
+        "P": "Stroudsburg",
+        "A": "Amsterdam"
+      },
+      "jargon": {
+        "Close Code an Item": "Procedure to mark an item as closed in the system",
+        "movement screen": "System screen for viewing or managing item movements",
+        "Field 43 lockout": "System lockout feature in Field 43 that prevents all salesmen from entering data",
+        "keying": "Entering or inputting sales data or orders"
+      },
+      "numeric_thresholds": {
+        "customer_number_digits": {
+          "value": 6,
+          "unit": "digits",
+          "context": "Format for customer numbers"
+        }
+      }
+    },
+    {
+      "id": "category_burden_lookup",
+      "content": "Category Burden Lookup: Menu 5 > 8. Press ? and dropdown will appear to find burden rate for specific category.",
+      "content_hash": "03e662723052aa56",
+      "section_title": "pricing - burden",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 21,
+      "token_count": 26,
+      "_original": {
+        "keywords": [
+          "category burden",
+          "burden rate",
+          "inventory group"
+        ],
+        "email": "",
+        "category": "pricing",
+        "subcategory": "burden"
+      },
+      "query_types": [
+        "how_to",
+        "lookup"
+      ],
+      "verbs": [
+        "lookup",
+        "press",
+        "find"
+      ],
+      "entities": [
+        "category",
+        "burden_rate",
+        "menu",
+        "dropdown"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I find the burden rate for a specific category?",
+        "Where do I go in the menu for Category Burden Lookup?",
+        "I'm in Menu 5 > 8 but pressing ? doesn't show the dropdown\u2014what's wrong?",
+        "What's the step-by-step for burden lookup in pricing - burden?",
+        "How do you access the category dropdown for precise burden rates?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core pricing process for burden rates in purchasing, specific menu navigation with clear steps, self-contained and immediately actionable for trained users",
+      "acronyms": {},
+      "jargon": {
+        "Category Burden Lookup": "Menu path (Menu 5 > 8) used to access burden rates for specific categories",
+        "burden rate": "Overhead or indirect cost rate applied to specific categories"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "salescost_calculator",
+      "content": "Sales Cost Calculator: Type 'SLSCOST' from home Telnet page. Enter landed cost (include freight), select category from dropdown, enter if special order (Y/N), enter if cost is by case or pound. Output: SLS cost (what reps mark up from) and MKT price (approx 7% margin target for reps to meet profit margins).",
+      "content_hash": "002470d5bd40f61f",
+      "section_title": "pricing - calculator",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 22,
+      "token_count": 67,
+      "_original": {
+        "keywords": [
+          "SLSCOST",
+          "sales cost",
+          "calculator",
+          "MKT price",
+          "markup",
+          "margin"
+        ],
+        "email": "",
+        "category": "pricing",
+        "subcategory": "calculator"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "definition"
+      ],
+      "verbs": [
+        "type",
+        "enter",
+        "select",
+        "calculate",
+        "markup"
+      ],
+      "entities": [
+        "landed_cost",
+        "freight",
+        "category",
+        "special_order",
+        "sls_cost",
+        "mkt_price"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "special_order",
+        "cost_by_case_or_pound",
+        "include_freight",
+        "margin_target"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I access the Sales Cost Calculator from the Telnet home page?",
+        "What do I need to enter into SLSCOST, like landed cost and all that?",
+        "Do I include freight in the landed cost for the SLS cost calculator?",
+        "The MKT price in SLSCOST is way off \u2013 what am I doing wrong with special orders?",
+        "How does the calculator figure out SLS cost and the 7% margin MKT price for reps?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core pricing tool for sales reps, frequently used in business processes; specific to SLSCOST calculator with clear steps; requires basic domain familiarity (e.g., landed cost); self-contained instructions assuming Telnet access; highly actionable for immediate use.",
+      "acronyms": {
+        "SLSCOST": "Sales Cost Calculator",
+        "SLS": "Sales",
+        "MKT": "Market"
+      },
+      "jargon": {
+        "landed cost": "total cost of goods including freight to destination",
+        "special order": "non-standard or custom order",
+        "reps": "sales representatives",
+        "mark up": "increase price above cost basis",
+        "margin target": "target profit margin percentage"
+      },
+      "numeric_thresholds": {
+        "margin_target": {
+          "value": 7,
+          "unit": "%",
+          "context": "approx 7% margin target for reps to meet profit margins"
+        }
+      }
+    },
+    {
+      "id": "unipro_overview",
+      "content": "Unipro Foodservice: Driscoll Foods is member of Unipro, largest US foodservice cooperative with 850+ distributors/members. Allows smaller distributors to compete with national companies. Members pool purchases with Unipro suppliers who provide allowances and deals in return.",
+      "content_hash": "98bd6e630c6f7341",
+      "section_title": "vendor_management - unipro",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 23,
+      "token_count": 46,
+      "_original": {
+        "keywords": [
+          "Unipro",
+          "cooperative",
+          "foodservice",
+          "850 distributors",
+          "allowances"
+        ],
+        "email": "",
+        "category": "vendor_management",
+        "subcategory": "unipro"
+      },
+      "query_types": [
+        "definition",
+        "reference",
+        "lookup"
+      ],
+      "verbs": [
+        "pool",
+        "provide"
+      ],
+      "entities": [
+        "vendor",
+        "purchase",
+        "distributor",
+        "supplier",
+        "cooperative"
+      ],
+      "actors": [
+        "distributor",
+        "member",
+        "vendor",
+        "supplier"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is Unipro Foodservice?",
+        "Is Driscoll Foods a member of Unipro?",
+        "How does our Unipro membership help us compete with national foodservice companies?",
+        "I'm confused\u2014why do we pool purchases through Unipro for supplier allowances and deals?",
+        "In vendor management, how does Unipro's cooperative structure with 850+ members provide competitive advantages via pooled buying?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 7,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 8,
+      "actionability_score": 5,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core to vendor management and purchasing processes; specific to Unipro but broadly useful for members; simple language; self-contained overview; informs strategy but lacks direct steps",
+      "acronyms": {
+        "US": "United States"
+      },
+      "jargon": {
+        "foodservice cooperative": "Cooperative organization of food distributors that pools member purchases for better supplier deals",
+        "pool purchases": "Combining purchases across members to leverage buying power for allowances and deals",
+        "allowances": "Supplier-provided discounts or rebates in exchange for pooled volume purchases"
+      },
+      "numeric_thresholds": {
+        "unipro_members": {
+          "value": 850,
+          "unit": "distributors/members",
+          "context": "Unipro, the largest US foodservice cooperative, has 850+ distributors/members"
+        }
+      }
+    },
+    {
+      "id": "unipro_allowances",
+      "content": "Unipro Allowances: UPA1 (Earned Distributor Allowance/EDA) - Each supplier has own EDA, percentage or dollar amount collected monthly on purchases. UPA2 (Supplier Pooled Allowance/SPA) - Periodic deals offered by Unipro throughout year. Unipro website has supplier info: payment terms, contacts, broker info, FOB locations, shipping minimums, Letters of Guarantee.",
+      "content_hash": "43dab4ab9e3a99e2",
+      "section_title": "vendor_management - allowances",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 24,
+      "token_count": 63,
+      "_original": {
+        "keywords": [
+          "UPA1",
+          "UPA2",
+          "EDA",
+          "SPA",
+          "earned distributor allowance",
+          "pooled allowance"
+        ],
+        "email": "",
+        "category": "vendor_management",
+        "subcategory": "allowances"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "collect",
+        "offer",
+        "lookup"
+      ],
+      "entities": [
+        "supplier",
+        "EDA",
+        "UPA1",
+        "SPA",
+        "UPA2",
+        "purchases",
+        "payment_terms",
+        "contacts",
+        "broker_info",
+        "FOB_locations",
+        "shipping_minimums",
+        "letters_of_guarantee"
+      ],
+      "actors": [
+        "supplier",
+        "distributor",
+        "Unipro"
+      ],
+      "conditions": [
+        "monthly",
+        "periodic"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is UPA1 or the Earned Distributor Allowance (EDA)?",
+        "How does the Supplier Pooled Allowance (SPA) work?",
+        "What's the difference between each supplier's EDA and Unipro's SPA?",
+        "I'm confused about Unipro allowances\u2014where do I find supplier FOB locations and shipping minimums?",
+        "What supplier info like payment terms, broker contacts, and Letters of Guarantee is on the Unipro website?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core to vendor purchasing processes via Unipro, bounded to specific allowance programs, simple terminology with explanations, self-contained overview with website pointer, enables immediate checks on purchases/deals.",
+      "acronyms": {
+        "UPA1": "Earned Distributor Allowance",
+        "EDA": "Earned Distributor Allowance",
+        "UPA2": "Supplier Pooled Allowance",
+        "SPA": "Supplier Pooled Allowance"
+      },
+      "jargon": {
+        "FOB locations": "Supplier locations under Free On Board shipping terms where risk transfers",
+        "shipping minimums": "Minimum order quantities required for supplier shipping",
+        "Letters of Guarantee": "Supplier-provided guarantee documents listed on Unipro website",
+        "broker info": "Contact and details for brokers handling supplier products"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "vendor_allowance_entry",
+      "content": "Add Vendor Allowances: In Purchase Order Menu, go to 28 (Vendor Master File Maintenance), select AL. First complete Header (H): Affect Totals (Y=deduct from invoice total, N=no effect), COG (Y=deduct from cost of goods/received cost, N=no effect), Total PO (0 for individual items, negative $ to apply to all items).",
+      "content_hash": "64d34925ad5513f8",
+      "section_title": "vendor_management - allowances",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 25,
+      "token_count": 65,
+      "_original": {
+        "keywords": [
+          "add allowance",
+          "vendor allowance",
+          "allowance maintenance",
+          "charge"
+        ],
+        "email": "",
+        "category": "vendor_management",
+        "subcategory": "allowances"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "add",
+        "go",
+        "select",
+        "complete",
+        "affect",
+        "deduct",
+        "maintain"
+      ],
+      "entities": [
+        "vendor",
+        "purchase_order",
+        "vendor_master_file",
+        "invoice",
+        "cost_of_goods"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [
+        "affect_totals_Y_N",
+        "cog_Y_N",
+        "total_po_0_individual",
+        "total_po_negative_all"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": true,
+      "synthetic_questions": [
+        "How do I add vendor allowances in the Purchase Order Menu?",
+        "What do I set for Affect Totals and COG in the vendor allowance header?",
+        "How do I make a vendor allowance apply to all items on a PO using Total PO?",
+        "I'm trying to enter AL in Vendor Master File Maintenance but the header is confusing\u2014help!",
+        "If I want allowances to deduct from invoice total and COGS without affecting individual items, what's the setup?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing process for handling vendor allowances, specific steps in system menu, requires basic training but highly actionable and mostly self-contained",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "H": "Header",
+        "COG": "Cost of Goods",
+        "AL": "Allowance"
+      },
+      "jargon": {
+        "Vendor Allowances": "Credits or deductions applied by vendors to purchase orders",
+        "Vendor Master File Maintenance": "System function for updating and maintaining vendor records",
+        "Affect Totals": "Flag determining if allowance impacts invoice totals (Y/N)",
+        "Total PO": "Field specifying allowance application scope (0 for items, negative $ for all)"
+      },
+      "numeric_thresholds": {
+        "menu_option": {
+          "value": 28,
+          "unit": "",
+          "context": "Position in Purchase Order Menu for Vendor Master File Maintenance"
+        },
+        "total_po_individual_items": {
+          "value": 0,
+          "unit": "",
+          "context": "Value to apply allowance to individual items"
+        }
+      }
+    },
+    {
+      "id": "vendor_allowance_items",
+      "content": "Item Allowances/Charges: Select C, enter 6-digit item#, choose #1 for allowance or #3 for charge. Select basis: Case price, Net weight, Catch weight, Percentage, or Gross weight. Select #2 to add allowance value or #4 for charge value. Allowance deducts from COG, Charge adds to COG. Up arrow then Y to finish. To apply to open PO, go into PO and enter through items.",
+      "content_hash": "98c504bf167894e0",
+      "section_title": "vendor_management - allowances",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 26,
+      "token_count": 83,
+      "_original": {
+        "keywords": [
+          "item allowance",
+          "item charge",
+          "allowance by case",
+          "percentage allowance"
+        ],
+        "email": "",
+        "category": "vendor_management",
+        "subcategory": "allowances"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "select",
+        "enter",
+        "choose",
+        "add",
+        "finish",
+        "apply"
+      ],
+      "entities": [
+        "item",
+        "allowance",
+        "charge",
+        "purchase_order"
+      ],
+      "actors": [
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I set up an item allowance or charge?",
+        "What basis options are available for item allowances like case price or catch weight?",
+        "How does selecting #1 for allowance versus #3 for charge impact COG?",
+        "I'm stuck after entering the 6-digit item# and picking the basis - what next to add the value?",
+        "What's the full process to create a percentage-based charge on an open PO and finish it?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core vendor management process for item allowances/charges, detailed step-by-step instructions, self-contained for trained users",
+      "acronyms": {
+        "COG": "Cost of Goods",
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "Item Allowances": "Adjustments that deduct from Cost of Goods",
+        "Item Charges": "Adjustments that add to Cost of Goods",
+        "Case price": "Pricing basis per case",
+        "Net weight": "Weight after deductions (tare subtracted)",
+        "Catch weight": "Actual variable weight of random-weight items",
+        "Gross weight": "Total weight including packaging",
+        "item#": "Item number"
+      },
+      "numeric_thresholds": {
+        "item_number_digits": {
+          "value": 6,
+          "unit": "digits",
+          "context": "Enter 6-digit item number"
+        }
+      }
+    },
+    {
+      "id": "freight_fields_overview",
+      "content": "Freight Fields usage: Freight Allowance 1 = Pickup with allowance that nets down on invoice. Freight Allowance 2 = Pickup allowance NOT netted on invoice (bill back). Freight Charge 1 = Pickup (no invoice effect) OR delivery freight that DOES affect PO. Freight Charge 2 = Delivery freight that does NOT affect invoice. Always review PO freight screen before confirming. Contact manager if uncertain.",
+      "content_hash": "26c9bf92e49bb19f",
+      "section_title": "freight - configuration",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 27,
+      "token_count": 83,
+      "_original": {
+        "keywords": [
+          "freight allowance",
+          "freight charge",
+          "pickup allowance",
+          "bill back"
+        ],
+        "email": "",
+        "category": "freight",
+        "subcategory": "configuration"
+      },
+      "query_types": [
+        "definition",
+        "policy",
+        "reference",
+        "lookup",
+        "escalation"
+      ],
+      "verbs": [
+        "review",
+        "confirm",
+        "verify",
+        "contact",
+        "escalate"
+      ],
+      "entities": [
+        "purchase_order",
+        "invoice"
+      ],
+      "actors": [
+        "purchasing_agent",
+        "supervisor"
+      ],
+      "conditions": [
+        "uncertain"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does Freight Allowance 1 mean for pickups?",
+        "How do I set up a pickup allowance that nets down on the invoice?",
+        "What's the difference between Freight Charge 1 and Freight Charge 2 on the PO freight screen?",
+        "I'm totally confused about Freight Allowance 2 - when do I use it instead of 1?",
+        "If delivery freight doesn't affect the invoice but I'm unsure after reviewing the PO freight screen, what next?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core purchasing process for freight field usage in POs, specific to system fields but common scenario, requires basic training, self-contained definitions with clear review actions.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "Freight Allowance 1": "Pickup with allowance that nets down on invoice",
+        "Freight Allowance 2": "Pickup allowance NOT netted on invoice (bill back)",
+        "Freight Charge 1": "Pickup (no invoice effect) OR delivery freight that DOES affect PO",
+        "Freight Charge 2": "Delivery freight that does NOT affect invoice",
+        "nets down": "Deducted from the invoice total",
+        "bill back": "Billed back separately",
+        "PO freight screen": "Screen in the Purchase Order displaying freight details"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "backhaul_minimum",
+      "content": "Backhaul minimum: All backhauls must have minimum $200 of freight.",
+      "content_hash": "86b26b84c5512348",
+      "section_title": "freight - rules",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 28,
+      "token_count": 13,
+      "_original": {
+        "keywords": [
+          "backhaul",
+          "minimum freight",
+          "$200",
+          "pickup minimum"
+        ],
+        "email": "",
+        "category": "freight",
+        "subcategory": "rules"
+      },
+      "query_types": [
+        "policy",
+        "compliance",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [
+        "backhaul",
+        "freight"
+      ],
+      "actors": [],
+      "conditions": [
+        "minimum $200 freight"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the minimum freight required for backhauls?",
+        "What if a backhaul has only $150 worth of freight?",
+        "Is the backhaul minimum $200 of freight for all loads?",
+        "Why is the system rejecting my $190 backhaul - what's the minimum?",
+        "Does the $200 freight minimum apply to every backhaul, no exceptions?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core freight rule enforcing minimum value for backhauls, critical for logistics compliance and efficiency; simple, self-contained, and directly actionable with basic domain awareness.",
+      "acronyms": {},
+      "jargon": {
+        "backhaul": "Return trip of a vehicle after primary delivery, often requiring minimum freight to justify"
+      },
+      "numeric_thresholds": {
+        "backhaul_freight_minimum": {
+          "value": 200,
+          "unit": "USD",
+          "context": "All backhauls must have minimum freight value"
+        }
+      }
+    },
+    {
+      "id": "truck_capacity_straight",
+      "content": "Straight Truck capacity: Max 12 pallets, max weight 2400 lbs, max cube 700.",
+      "content_hash": "866718e02ed91c84",
+      "section_title": "freight - capacity",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 29,
+      "token_count": 16,
+      "_original": {
+        "keywords": [
+          "straight truck",
+          "truck capacity",
+          "pallets",
+          "weight limit",
+          "cube"
+        ],
+        "email": "",
+        "category": "freight",
+        "subcategory": "capacity"
+      },
+      "query_types": [
+        "lookup",
+        "reference",
+        "definition"
+      ],
+      "verbs": [],
+      "entities": [
+        "pallet",
+        "straight truck"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the max pallet capacity for a straight truck?",
+        "What if my load has 13 pallets, can it go on a straight truck?",
+        "What's the max cube on a straight truck in freight capacity?",
+        "Why is the straight truck limited to 2400 lbs? My shipment is just over!",
+        "How do I know if a load fits a straight truck with 11 pallets at 2300 lbs and 680 cube?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core freight capacity data for straight trucks, essential for load planning; simple, self-contained specs with direct limits for immediate use.",
+      "acronyms": {},
+      "jargon": {
+        "Straight Truck": "A single-unit truck with cab and cargo body in one piece, without a separate trailer (e.g., box truck)",
+        "cube": "Cargo volume capacity, typically measured in cubic feet"
+      },
+      "numeric_thresholds": {
+        "straight_truck_pallets_max": {
+          "value": 12,
+          "unit": "pallets",
+          "context": "Maximum pallets for Straight Truck capacity"
+        },
+        "straight_truck_weight_max": {
+          "value": 2400,
+          "unit": "lbs",
+          "context": "Maximum weight for Straight Truck capacity"
+        },
+        "straight_truck_cube_max": {
+          "value": 700,
+          "unit": "cube",
+          "context": "Maximum cube for Straight Truck capacity"
+        }
+      }
+    },
+    {
+      "id": "truck_capacity_tractor",
+      "content": "Tractor Trailer (53') capacity: Max 24-25 pallets, max weight 42,500 lbs (dry) or 43,500 lbs (reefer), max cube 1400.",
+      "content_hash": "6fadd79be8a74d78",
+      "section_title": "freight - capacity",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 30,
+      "token_count": 24,
+      "_original": {
+        "keywords": [
+          "tractor trailer",
+          "53 foot",
+          "trailer capacity",
+          "dry van",
+          "reefer"
+        ],
+        "email": "",
+        "category": "freight",
+        "subcategory": "capacity"
+      },
+      "query_types": [
+        "lookup",
+        "reference",
+        "definition"
+      ],
+      "verbs": [],
+      "entities": [
+        "tractor_trailer",
+        "pallet",
+        "shipment"
+      ],
+      "actors": [],
+      "conditions": [
+        "dry",
+        "reefer"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the maximum number of pallets in a 53' tractor trailer?",
+        "What if we're using a reefer trailer \u2013 does the weight limit change for a 53'?",
+        "What's the max cube on a 53' trailer?",
+        "Damn, why is the dry van 53' capped at 42,500 lbs? I keep hitting that limit!",
+        "For a 53' tractor trailer, break down the pallet, weight (dry/reefer), and cube capacities."
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core for freight operations and load planning, common trailer specs, simple to understand, self-contained capacities for immediate use in shipping decisions.",
+      "acronyms": {},
+      "jargon": {
+        "Tractor Trailer": "Semi-truck with detachable trailer (53 feet standard length)",
+        "reefer": "Refrigerated trailer",
+        "dry": "Non-refrigerated (dry van) trailer",
+        "cube": "Cubic capacity (volume in cubic feet)",
+        "pallets": "Standardized wooden or plastic platforms for unitizing cargo"
+      },
+      "numeric_thresholds": {
+        "max_pallets": {
+          "value": "24-25",
+          "unit": "pallets",
+          "context": "Tractor Trailer (53') capacity"
+        },
+        "max_weight_dry": {
+          "value": 42500,
+          "unit": "lbs",
+          "context": "Tractor Trailer (53') dry capacity"
+        },
+        "max_weight_reefer": {
+          "value": 43500,
+          "unit": "lbs",
+          "context": "Tractor Trailer (53') reefer capacity"
+        },
+        "max_cube": {
+          "value": 1400,
+          "unit": "cubic feet",
+          "context": "Tractor Trailer (53') volume capacity"
+        }
+      }
+    },
+    {
+      "id": "dot_schedule",
+      "content": "DOT Foods Schedule (cutoff is noon): Wayne - Monday for Friday delivery, Thursday for Wednesday delivery. NY - Monday for Friday delivery. PA - Thursday for Wednesday delivery. DOT website: https://www.dotfoods.com/shop/",
+      "content_hash": "f33e9b2d80cf8a5a",
+      "section_title": "vendor_management - dot",
+      "source_file": "purchasing_manual_chunks.json",
+      "department_id": "purchasing",
+      "chunk_index": 31,
+      "token_count": 40,
+      "_original": {
+        "keywords": [
+          "DOT",
+          "DOT Foods",
+          "DOT schedule",
+          "DOT cutoff",
+          "dot order"
+        ],
+        "email": "",
+        "category": "vendor_management",
+        "subcategory": "dot"
+      },
+      "query_types": [
+        "lookup",
+        "reference",
+        "policy"
+      ],
+      "verbs": [
+        "deliver",
+        "lookup",
+        "shop"
+      ],
+      "entities": [
+        "vendor",
+        "warehouse",
+        "shipment",
+        "route"
+      ],
+      "actors": [
+        "purchasing_agent",
+        "vendor",
+        "warehouse_mgr"
+      ],
+      "conditions": [
+        "cutoff",
+        "delivery_schedule"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the cutoff time for DOT Foods orders?",
+        "When do I need to submit by for Friday delivery from Wayne?",
+        "What's the DOT Foods noon cutoff schedule for Wayne, NY, and PA DCs?",
+        "Ugh, I keep screwing up the PA cutoff for Wednesday DOT delivery\u2014what day is it?",
+        "What if I want Wednesday delivery to Wayne\u2014what's the latest order day?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core vendor scheduling info for timely deliveries, highly actionable and self-contained for purchasing team, simple to grasp.",
+      "acronyms": {
+        "DOT": "DOT Foods",
+        "NY": "New York",
+        "PA": "Pennsylvania"
+      },
+      "jargon": {
+        "cutoff": "Order submission deadline time for DOT Foods deliveries",
+        "Wayne": "DOT Foods delivery location or facility"
+      },
+      "numeric_thresholds": {
+        "order_cutoff": {
+          "value": "noon",
+          "unit": "time of day",
+          "context": "Deadline for DOT Foods orders to meet specified delivery schedules"
+        }
+      }
+    }
+  ]
+}

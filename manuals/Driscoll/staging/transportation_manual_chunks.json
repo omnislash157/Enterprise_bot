@@ -1,0 +1,66 @@
+{
+  "knowledge_base": "driscoll_warehouse_transportation_manual",
+  "version": "1.0",
+  "description": "Warehouse transportation processes and procedures",
+  "source_file": "transportation manual.docx",
+  "file_hash": "185b31d7a596a90c250f14fa55be5adc0bbcd61702c9bc8659e8775b39ed6163",
+  "chunks": [
+    {
+      "id": "warehouse_transportation_introduction_0",
+      "category": "transportation",
+      "section_title": "Introduction",
+      "keywords": [
+        "transportation",
+        "drivers",
+        "routes",
+        "driver",
+        "school",
+        "route",
+        "backhauls",
+        "equipment",
+        "ids",
+        "stops"
+      ],
+      "content": "Transportation Manual\n\nIntroduction\n\nPurpose: Transportation ensures that all drivers complete deliveries accurately, safely, and on time, while also serving as the liaison between drivers, customers, and internal departments.\n\nScope: Covers all transportation employees, supervisors, and their workflows, including school routes, street routes, backhauls, hotshots, equipment tracking, and reporting.\n\nTeam Structure\n\nMike Palma – Transportation Manager: Oversees department operations.\n\nDelareese Delgado – Supervisor of Schools: Ensures school routes are completed by 2 PM.\n\nPatrick Brown – Supervises alphabetical route IDs.\n\nVictor Polanco – Supervises letter IDs and Connecticut routes, truck maintenance, fuel, cameras, cleaning, and safety compliance.\n\nChun Ng – Handles backhauls and unplanned “hotshots.”\n\nBernie – Handles backend operations, equipment tracking, and reporting.\n\nDaily Workflow – Transportation Staff\n\nStart of Shift (Approx. 2 AM)\n\nOrganize invoices, loading sheets, and route documents received from night clerks.\n\nAssign drivers to routes and verify route IDs, keydrop documents, and e-jack batteries.\n\nTrack each driver’s equipment and ensure readiness for the shift.\n\nDriver Monitoring\n\nTrack driver location and stops using IntelliShift.\n\nLog remaining stops at 10 AM, 12 PM, 2 PM, 4 PM to monitor on-time completion.\n\nEnsure school deliveries meet deadlines (latest by 2 PM).\n\nCoordinate with nearby drivers to redistribute stops if someone is falling behind.\n\nIssue Handling\n\nVehicle breakdowns: Contact Allegiance or Penske trucks; use in-house mechanics if possible.\n\nReport truck issues in Telnet: 30, 18, date, route ID, E, 100, message, driver, location, follow, 1 (send), enter.\n\nCustomer issues: Merge calls with sales teams, resolve delivery errors, verify keydrops, and coordinate backhauls.\n\nSafety issues: Monitor Netradyne cameras for speeding, hard braking, drowsiness, or distracted driving; enforce corrective action or bonus adjustments.\n\nDriver Types and Responsibilities\n\nA. School Drivers\n\nStart times: Typically 5 AM.",
+      "chunk_token_count": 493
+    },
+    {
+      "id": "warehouse_transportation_introduction_1",
+      "category": "transportation",
+      "section_title": "Introduction",
+      "keywords": [
+        "drivers",
+        "equipment",
+        "sheets",
+        "deliver",
+        "maintain",
+        "track",
+        "keydrop",
+        "product",
+        "safety",
+        "backhauls"
+      ],
+      "content": "Obtain documents, batteries (if applicable), and review loading sheets\n\nDeliver products to schools, ensuring accuracy due to potential fines ($500 per case).\n\nKey duties:\n\nFollow loading sheets carefully.\n\nHandle refrigerated and dry items efficiently.\n\nMaintain professional interactions with school staff.\n\nTrack deliveries, mark invoices, and return all equipment.\n\nB. Street Drivers / NYC Drivers\n\nStart times: Manhattan – 3 AM, other zones – 5 AM.\n\nCollect paperwork and equipment from dispatch.\n\nDeliver to restaurants, stores, or keydrop locations.\n\nVerify product against invoices, check cases for mispicks, and handle refrigerated/dry items with helper.\n\nFor keydrop stops: Photograph storage for verification, lock premises afterward.\n\nFollow DOT rules, traffic regulations, and maintain safety awareness.\n\nC. Tractor Trailer Drivers\n\nRequire CDL A license.\n\nDeliver products to warehouses or other Driscoll Foods locations.\n\nMay perform transfers and backhauls.\n\nSame verification processes as street drivers.\n\nEnsure full trucks leaving and returning to optimize efficiency and revenue.\n\nBackhauls and Hotshots (Chun Ng)\n\nPre-planned backhauls: Ensure trucks return with product for revenue optimization.\n\nHotshots: Unplanned deliveries to collect product quickly.\n\nTrack and coordinate with drivers for timely execution.\n\nEquipment Management (Bernie / Victor)\n\nMonitor all trucks, jacks, e-jack batteries, straps, blankets, and handtrucks.\n\nMaintain and repair equipment, assign to responsible employees, and document in reports.\n\nDaily reporting ensures all resources are accounted for, available, and ready.\n\nReporting and Documentation\n\nIntelliShift: Track truck location, driver, stops, and completion.\n\nNetradyne: Monitor driving behavior and enforce safety standards.\n\nTelnet: Log vehicle issues, route problems, and communicate with internal teams.\n\nDispatch sheets: Document driver assignments, route completion, and keydrop statuses.\n\nEnd-of-day: Cease routes in IntelliShift, ensure all reports are accurate for the next day.\n\nSafety and Compliance",
+      "chunk_token_count": 488
+    },
+    {
+      "id": "warehouse_transportation_introduction_2",
+      "category": "transportation",
+      "section_title": "Introduction",
+      "keywords": [
+        "vehicle",
+        "safety",
+        "customer",
+        "dot",
+        "management",
+        "issues",
+        "equipment",
+        "jacks",
+        "communication",
+        "transportation"
+      ],
+      "content": "DOT rules: Hours of service, break requirements, vehicle inspections.\n\nRoad safety: Defensive driving, safe handling of refrigerated and dry products.\n\nIncident management: Immediate reporting of accidents, vehicle issues, or customer complaints.\n\nEquipment safety: Proper use of jacks, handtrucks, e-jacks, and securing loads.\n\nCommunication Protocols\n\nTransportation acts as the central liaison between drivers, dispatch, sales, and warehouse.\n\nAll issues, delays, or customer concerns are communicated promptly.\n\nTeam members support each other and can cover for absences.\n\nOverview\n\nTransportation is essential to Driscoll Foods’ operations: ensures timely deliveries, driver safety, vehicle maintenance, equipment management, and customer satisfaction.\n\nEffective teamwork, communication, and vigilance ensure operational efficiency, compliance with DOT, and maximized company revenue.",
+      "chunk_token_count": 211
+    }
+  ]
+}

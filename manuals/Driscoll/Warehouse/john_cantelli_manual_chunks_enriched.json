@@ -1,0 +1,411 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\john_cantelli_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:39:19.771551",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_john_cantelli_introduction_0",
+      "content": "Driver Hotline & Internal Operations Manual\n\nFor Intern Training\n\nOverview\n\nThe Driver Hotline & Operations Support role acts as the central communication hub between:\n\nDrivers\n\nOperations\n\nInventory Control\n\nSales\n\nCustomer Service\n\nCredit Department\n\nThis position ensures:\n\nAccurate relay of critical information\n\nCorrect handling of operational errors\n\nProper adjustment of weights, invoices, and credits\n\nTimely preparation and distribution of daily VIP reports\n\nAccurate logging and approval of driver wait time payments\n\nRetrieval of picker information when needed\n\nThis job directly affects company financial accuracy, customer satisfaction, and operational efficiency.\n\nResponsibilities by Category\n\nDriver Hotline Email Management\n\nPurpose\n\nThe Driver Hotline email is the primary communication channel for reporting driver issues, customer issues, operational errors, delays, wait times, and credit requests.\n\nDaily Duties\n\nMonitor the inbox continuously throughout the day\n\nRead each message and determine:\n\nDoes it need to be forwarded to Sales?\n\nInventory Control?\n\nTransportation?\n\nCustomer Service?\n\nCredit Teams\n\nRespond when necessary with clear, professional communication\n\nLog information when required (weight changes, wait times, credits)\n\nForwarding Rules\n\nType of Issue | Who It Gets Sent To | Notes\nDelivery errors / missing items | Sales and Ops Errors | Always provide route, stop, and invoice #\nWeight discrepancies | Inventory Control (James Serrago) | These will be adjusted daily\nPickup-related credits | Credit Department | Include all documentation\nWait time issues | Transportation & HR (via spreadsheet) | Must exceed 15 minutes\n\nOps Errors (Operations Errors)\n\nPurpose\n\nTo communicate and document issues originating from picking, routing, warehouse processes, or loading that cause incorrect deliveries.\n\nSteps\n\nReceive error from driver hotline or sales.\n\nMake note of route, product, invoice #, and issue.\n\nForward details to Inventory Control (for product-related errors), Sales, and Ops leadership.\n\nFollow up if necessary to ensure corrections or credits are made.\n\nWeight Changes\n\nPurpose",
+      "content_hash": "611cd306826c6451",
+      "section_title": "john_cantelli",
+      "source_file": "john_cantelli_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 384,
+      "_original": {
+        "keywords": [
+          "driver",
+          "errors",
+          "hotline",
+          "sales",
+          "operations",
+          "inventory",
+          "control",
+          "customer",
+          "credit",
+          "credits"
+        ],
+        "email": "",
+        "category": "john_cantelli",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "troubleshoot",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "monitor",
+        "read",
+        "determine",
+        "forward",
+        "respond",
+        "log",
+        "relay",
+        "handle",
+        "adjust",
+        "prepare",
+        "distribute",
+        "approve",
+        "retrieve",
+        "receive",
+        "note",
+        "follow up"
+      ],
+      "entities": [
+        "driver",
+        "route",
+        "invoice",
+        "credit",
+        "inventory",
+        "shipment",
+        "wait time payment",
+        "VIP report"
+      ],
+      "actors": [
+        "driver",
+        "sales",
+        "inventory_control",
+        "transportation",
+        "customer_service",
+        "credit_department",
+        "ops",
+        "hr"
+      ],
+      "conditions": [
+        "delivery errors",
+        "missing items",
+        "weight discrepancies",
+        "wait time exceed 15 minutes",
+        "pickup-related credits",
+        "operational errors",
+        "delays"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is the main purpose of the Driver Hotline email?",
+        "How do I handle weight discrepancies reported in the Driver Hotline?",
+        "What if a driver emails about wait time issues over 15 minutes?",
+        "For ops errors like missing items on a route, what details do I note and who gets forwarded?",
+        "I'm swamped with Driver Hotline emails about delivery errors\u2014who do I send them to and what info is needed? This is frustrating!"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 4,
+      "complexity": 4,
+      "completeness_score": 6,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for central operations hub role, detailed procedures and rules with table, actionable steps provided, but chunk cuts off mid-section making it somewhat incomplete",
+      "acronyms": {
+        "Ops": "Operations"
+      },
+      "jargon": {
+        "Driver Hotline": "primary communication channel for reporting driver issues, customer issues, operational errors, delays, wait times, and credit requests",
+        "Ops Errors": "issues originating from picking, routing, warehouse processes, or loading that cause incorrect deliveries",
+        "weight discrepancies": "differences between reported and actual delivery weights requiring adjustment by Inventory Control",
+        "picker information": "details on warehouse pickers retrieved when needed",
+        "VIP reports": "daily reports prepared and distributed for key stakeholders"
+      },
+      "numeric_thresholds": {
+        "wait_time_threshold": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Wait time issues must exceed this to forward to Transportation & HR"
+        }
+      }
+    },
+    {
+      "id": "warehouse_john_cantelli_introduction_1",
+      "content": "Adjust catch weight items so customers are billed correctly.\n\nProcess Owner:\n\nInventory Control \u2013 James Serrago generates the catch weight report.\nYou update invoices based on this report.\n\nSteps in Telnet\n\nA. Changing Weights (Invoice Adjustment)\n\n2, 3, Enter order # / invoice #, C Update the weight to the correct value\n\nB. Printing the Updated Invoice\n\n2, 25, M, order #, Enter through, printer #\n\nCredits Processing\n\nCredits come from drivers, salespeople, pickups, weight corrections, and Ops issues.\n\nSources\n\nDriver pickup sheets (created by Jhanfranco\n\nSales credit requests\n\nWeight-related adjustments\n\nOps errors\n\nCustomer service escalations\n\nGeneral Credit Entry\n\nTelnet:\n\n8, DRIS, 1, operator ID, customer #, invoice #\n\nWeight-Related Credits\n\nSteps:\n\nGo to: 2 \u2192 1 \u2192 I \u2192 invoice #\n\nSearch for item via item #\n\nOn the right side, find the total cost\n\nOn the first screen, find the price per lb\n\nDivide total cost by price to determine weight\n\nEnter calculated weight\n\nDocument invoice # on sheet\n\nAlways starts with \u201cX\u201d for weight credits\n\nExpired Invoices (Over 15 Months Old)\n\nIf invoices are older than 15 months, it does not exist in the system\n\nIn the invoice field: type X\n\nFor item: use 444444 (miscellaneous non-splitable item code)\n\nAdd these to a spreadsheet\n\nSend spreadsheet to:\n\nPhil Carson\n\nSara\n\nCredit Team\n\nVIP Report\n\nPurpose\n\nEnsure important customers\u2019 orders are prioritized for the night shift.\n\nResponsible Parties\n\nCustomer Service decides what is a VIP\n\nAll new customers are VIP for their first order\n\nDaily Timing\n\nCompleted every day at 5 PM\n\nHow to Generate the VIP Report\n\nIn Telnet:\n\n30, 21, tomorrow\u2019s date\n\nCompiling the VIP Template\n\nCopy data from Telnet into the daily template\n\nRemove duplicates\n\nDouble-check each VIP customer\u2019s orders are included\n\nSend final completed list to night clerks\n\nPicker Identification in Telnet\n\nPurpose\n\nFind which picker selected what items in case of errors, shortages, or disputes.\n\nSteps:\n\n27, 36, 4, date, route #, 1st word of customer name\n\nSystem displays picker information for each item.\n\nDriver Wait Time Logging\n\nPurpose",
+      "content_hash": "bc61c60d4bb66717",
+      "section_title": "john_cantelli",
+      "source_file": "john_cantelli_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 436,
+      "_original": {
+        "keywords": [
+          "weight",
+          "invoice",
+          "vip",
+          "telnet",
+          "customer",
+          "item",
+          "report",
+          "credits",
+          "customers",
+          "invoices"
+        ],
+        "email": "",
+        "category": "john_cantelli",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "lookup"
+      ],
+      "verbs": [
+        "adjust",
+        "generate",
+        "update",
+        "change",
+        "print",
+        "process",
+        "create",
+        "search",
+        "find",
+        "divide",
+        "calculate",
+        "determine",
+        "enter",
+        "document",
+        "add",
+        "send",
+        "ensure",
+        "decide",
+        "copy",
+        "remove",
+        "double-check",
+        "display"
+      ],
+      "entities": [
+        "invoice",
+        "order",
+        "customer",
+        "credit",
+        "item",
+        "report",
+        "catch_weight_report",
+        "driver_pickup_sheet",
+        "sales_credit_request",
+        "spreadsheet",
+        "VIP_report",
+        "template",
+        "route",
+        "picker"
+      ],
+      "actors": [
+        "Inventory_Control",
+        "James_Serrago",
+        "Jhanfranco",
+        "drivers",
+        "salespeople",
+        "Ops",
+        "Customer_service",
+        "Phil_Carson",
+        "Sara",
+        "Credit_Team",
+        "night_clerks",
+        "picker"
+      ],
+      "conditions": [
+        "catch_weight",
+        "weight_corrections",
+        "Ops_issues",
+        "customer_service_escalations",
+        "expired_invoices_over_15_months",
+        "VIP_customers",
+        "new_customers",
+        "errors",
+        "shortages",
+        "disputes"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I update weights on an invoice for catch weight items?",
+        "What's the Telnet process for weight-related credits?",
+        "What if an invoice is over 15 months old when I'm trying to process a credit?",
+        "The system says the invoice doesn't exist for this credit\u2014it's super old, what do I do now?",
+        "How do I generate the VIP report and get it ready for night shift?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 6,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational processes for billing accuracy, credits, and prioritization; provides specific Telnet steps but chunk is somewhat fragmented and cut off at end.",
+      "acronyms": {
+        "VIP": "Very Important Person (context: important or new customers)",
+        "Ops": "Operations (context: Ops issues or errors)",
+        "DRIS": "(Unspecified menu code in Telnet for credits)"
+      },
+      "jargon": {
+        "catch weight items": "Products billed based on actual weighed amount rather than fixed weight",
+        "catch weight report": "Report generated for adjusting weights on catch weight items",
+        "Telnet": "Company's terminal-based inventory and order management system",
+        "picker": "Warehouse employee responsible for selecting items for orders",
+        "route #": "Delivery route identifier",
+        "night clerks": "Night shift staff handling order prioritization",
+        "Driver pickup sheets": "Sheets created by drivers for pickup-related credits",
+        "invoice #": "Invoice number used for adjustments and credits",
+        "item #": "Item identifier for searching and adjusting in system"
+      },
+      "numeric_thresholds": {
+        "expired_invoices_age": {
+          "value": 15,
+          "unit": "months",
+          "context": "Invoices older than 15 months do not exist in the system; use special code X and 444444"
+        },
+        "vip_report_time": {
+          "value": "5 PM",
+          "unit": "",
+          "context": "VIP report completed every day at 5 PM"
+        },
+        "misc_item_code": {
+          "value": 444444,
+          "unit": "",
+          "context": "Miscellaneous non-splitable item code for credits on expired invoices"
+        },
+        "new_customer_vip_orders": {
+          "value": 1,
+          "unit": "order",
+          "context": "All new customers are VIP for their first order"
+        }
+      }
+    },
+    {
+      "id": "warehouse_john_cantelli_introduction_2",
+      "content": "Drivers are eligible to be paid for wait times of 15 minutes or more, verified through Intellishift. You mark these down in an Excel which you will send to Samantha Cuesta.\n\nSteps:\n\nMonitor Driver Hotline for any wait time emails\n\nLog each instance into the wait time spreadsheet:\n\nRoute ID\n\nDriver name\n\nStop\n\nLength of wait time\n\nVerify using Intellishift data\n\nSend completed records to Sam Cuesta\n\nSam issues payment approvals\n\n8. Additional Operational Tasks\n\nCommunication Normalization\n\nAlways relay information factually, with:\n\nRoute #\n\nStop #\n\nCustomer name\n\nInvoice #\n\nIssue description\n\nAvoid emotional or speculative language.\n\nCustomer History Lookups\n\nIf asked about previous POs or customer history: 9, 30 or 9, 3 in Telnet\n\nImportance of This Role\n\nThis position ensures:\n\nAccurate customer billing\n\nPrevention of financial losse\n\nProper credit issuance\n\nReliable communication across departments\n\nSmooth night shift operations\n\nHistorical record accuracy\n\nReduced customer complaints\n\nVerified driver compensation\n\nThis role is critical to overall company performance.",
+      "content_hash": "a953a5c411329c6c",
+      "section_title": "john_cantelli",
+      "source_file": "john_cantelli_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 204,
+      "_original": {
+        "keywords": [
+          "customer",
+          "wait",
+          "driver",
+          "time",
+          "verified",
+          "intellishift",
+          "send",
+          "cuesta",
+          "route",
+          "name"
+        ],
+        "email": "",
+        "category": "john_cantelli",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "lookup",
+        "training"
+      ],
+      "verbs": [
+        "monitor",
+        "log",
+        "verify",
+        "send",
+        "relay",
+        "lookup",
+        "approve",
+        "mark",
+        "issue",
+        "pay"
+      ],
+      "entities": [
+        "driver",
+        "route",
+        "stop",
+        "wait_time",
+        "spreadsheet",
+        "intellishift",
+        "customer",
+        "invoice",
+        "purchase_order",
+        "payment"
+      ],
+      "actors": [
+        "driver",
+        "Samantha Cuesta",
+        "Sam Cuesta",
+        "warehouse staff",
+        "customer"
+      ],
+      "conditions": [
+        "wait times of 15 minutes or more",
+        "verified through Intellishift",
+        "asked about previous POs or customer history"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I log and process driver wait times for payment?",
+        "What steps do I follow when I get a wait time report from the Driver Hotline?",
+        "How do I verify a driver's wait time using Intellishift before sending the spreadsheet to Samantha?",
+        "I put all the wait times in the Excel but Samantha hasn't approved payments\u2014what am I missing?",
+        "When relaying a customer issue, what specific details like Route # or Invoice # do I need to include, and how do I check past POs in Telnet?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational processes for driver compensation, billing accuracy, and communication; provides clear, specific steps with tools referenced, mostly self-contained for the role.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "Intellishift": "Platform for verifying driver wait times",
+        "Driver Hotline": "Channel for monitoring driver wait time emails",
+        "Route ID": "Identifier for a delivery route",
+        "Stop": "Specific delivery location on a route",
+        "Telnet": "System for customer history lookups (e.g., previous POs)",
+        "Communication Normalization": "Standard factual relay of info using Route #, Stop #, Customer name, Invoice #, Issue description",
+        "wait time spreadsheet": "Excel log for driver wait time instances"
+      },
+      "numeric_thresholds": {
+        "wait_time_threshold": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Minimum wait time for driver payment eligibility"
+        },
+        "telnet_customer_history_1": {
+          "value": "9,30",
+          "unit": "",
+          "context": "Telnet option for previous POs or customer history"
+        },
+        "telnet_customer_history_2": {
+          "value": "9,3",
+          "unit": "",
+          "context": "Telnet option for previous POs or customer history"
+        }
+      }
+    }
+  ]
+}

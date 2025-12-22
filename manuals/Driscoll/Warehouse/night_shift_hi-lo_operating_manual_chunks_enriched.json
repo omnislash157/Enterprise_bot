@@ -1,0 +1,259 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_hi-lo_operating_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:40:25.390306",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_hilo_introduction_0",
+      "content": "Night Shift Hi-Lo Operator Manual\n\nOverview\n\nThe Hi-Lo Operator plays a crucial role during the night shift by ensuring that products are accessible, replenished, and properly maintained for efficient picking and accurate inventory. Hi-Lo operators support the overall productivity of the warehouse and directly impact on the speed and success of the night operations.\n\nNight shift hi-lo operators typically begin at 4:00 PM or 5:00 PM and work until all necessary replenishment and retrieval tasks are completed, usually around 4:00 AM.\n\nShift Schedule and Breaks\n\nHi-Lo operators follow the standard night shift break schedule:\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nBreaks may not be taken in the machine room or on the warehouse floor.\n\nRole and Responsibilities\n\nAs a Hi-Lo Operator, you are responsible for replenishing products, retrieving cases or pallets that are out of reach, and supporting pickers so they can maintain their productivity and meet company goals.\n\nCore responsibilities include:\n\nOperating the Hi-Lo machine safely and efficiently throughout the warehouse.\n\nBringing products down from higher slots so pickers can access it.\n\nReplenishing products into empty or low slots to maintain stock availability.\n\nVisiting the clerks regularly to obtain short sheets\u2014lists of items that pickers could not find or mark as missing.\n\nSearching for and retrieving these \u201cshort\u201d items, which may be ghost pallets or misplaced cases.\n\nFinding and assigning proper substitutions in the system when required.\n\nScanning each slot and updating counts to keep the system\u2019s inventory accurate.\n\nCommunicating with pickers, clerks, and supervisors to ensure smooth workflow.\n\nEfficiency and Teamwork\n\nThis position is essential for keeping the warehouse floor moving efficiently.\n\nPickers rely on Hi-Lo operators to bring down products promptly.\n\nThe speed and accuracy of a Hi-Lo operator affect not only their own productivity but also that of the picking team.\n\nBeing proactive and organized helps prevent delays and keeps the shift on schedule.",
+      "content_hash": "c3d562e9497958fe",
+      "section_title": "night_shift_hilo",
+      "source_file": "night_shift_hi-lo_operating_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 401,
+      "_original": {
+        "keywords": [
+          "shift",
+          "night",
+          "products",
+          "pickers",
+          "operator",
+          "operators",
+          "warehouse",
+          "productivity",
+          "schedule",
+          "breaks"
+        ],
+        "email": "",
+        "category": "night_shift_hilo",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "training"
+      ],
+      "verbs": [
+        "ensuring",
+        "replenished",
+        "maintained",
+        "supporting",
+        "begin",
+        "work",
+        "follow",
+        "taken",
+        "replenishing",
+        "retrieving",
+        "supporting",
+        "operating",
+        "bringing",
+        "replenishing",
+        "visiting",
+        "obtaining",
+        "searching",
+        "retrieving",
+        "finding",
+        "assigning",
+        "scanning",
+        "updating",
+        "communicating",
+        "keeping",
+        "bring",
+        "affect",
+        "being"
+      ],
+      "entities": [
+        "products",
+        "pallets",
+        "cases",
+        "slots",
+        "short_sheets",
+        "ghost_pallets",
+        "misplaced_cases",
+        "substitutions",
+        "inventory",
+        "warehouse",
+        "hi-lo_machine",
+        "system"
+      ],
+      "actors": [
+        "hi-lo_operator",
+        "picker",
+        "clerk",
+        "supervisor"
+      ],
+      "conditions": [
+        "night_shift",
+        "out_of_reach",
+        "empty_slots",
+        "low_slots",
+        "short_items",
+        "missing_items",
+        "breaks",
+        "lunch_break"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time does the night shift for Hi-Lo operators start and end?",
+        "What's the break schedule like for us Hi-Lo operators on night shift?",
+        "How do I handle short sheets from the clerks, like finding ghost pallets?",
+        "Pickers are yelling about missing items\u2014what am I supposed to do about those shorts and substitutions?",
+        "How does being proactive as a Hi-Lo operator impact the whole picking team's efficiency and schedule?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core warehouse role and process documentation; specific to night shift Hi-Lo ops; requires basic training; self-contained overview with clear responsibilities and schedule for immediate use.",
+      "acronyms": {},
+      "jargon": {
+        "Hi-Lo Operator": "Worker responsible for operating the Hi-Lo machine to replenish products, retrieve out-of-reach cases or pallets, and support pickers during night shift.",
+        "Hi-Lo machine": "Warehouse equipment used for safely accessing higher slots, replenishing low slots, and retrieving products.",
+        "short sheets": "Lists of items obtained from clerks that pickers could not find or marked as missing.",
+        "ghost pallets": "Pallets associated with short items that are difficult to locate physically.",
+        "misplaced cases": "Cases that are out of their proper storage locations.",
+        "slots": "Storage locations in warehouse racks, which can be higher, low, or empty."
+      },
+      "numeric_thresholds": {
+        "night_shift_start_times": {
+          "value": [
+            "4:00 PM",
+            "5:00 PM"
+          ],
+          "context": "Typical start times for hi-lo operators"
+        },
+        "night_shift_end_time": {
+          "value": "4:00 AM",
+          "context": "Approximate completion time when replenishment and retrieval tasks are done"
+        },
+        "short_break_duration": {
+          "value": 15,
+          "unit": "minutes",
+          "quantity": 2,
+          "context": "Standard night shift breaks"
+        },
+        "lunch_break_duration": {
+          "value": 30,
+          "unit": "minutes",
+          "quantity": 1,
+          "context": "Standard night shift lunch break"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_hilo_introduction_1",
+      "content": "Always verify that the correct cases and quantities are retrieved accuracy prevents mispicks that could harm the company and its customer relationships.\n\nSafety and Awareness\n\nHi-Lo operation is one of the most safety-sensitive roles in the warehouse. Operators must always be alert and follow all safety protocols.\n\nMaintain awareness of pedestrians, jacks, and other Hi-Lo operators in your area.\n\nEnsure pallets are secure and stable before lifting or lowering.\n\nNever exceed capacity limits or lift with unbalanced loads.\n\nUse proper lighting and visibility checks when moving between aisles.\n\nWear steel toe shoes that are above the ankle given that is company policy\n\nImportance of the Role\n\nHi-Lo operators are the backbone of the warehouse operation at night. Their precision and timing keep the picking and loading teams on pace, prevent inventory shortages, and ensure the company\u2019s data and customer orders remain accurate. Every case retrieved or replenished correctly keeps Driscoll Foods running efficiently and professionally through the night.",
+      "content_hash": "fded5fb380f00620",
+      "section_title": "night_shift_hilo",
+      "source_file": "night_shift_hi-lo_operating_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 205,
+      "_original": {
+        "keywords": [
+          "company",
+          "safety",
+          "operators",
+          "always",
+          "retrieved",
+          "customer",
+          "awareness",
+          "operation",
+          "warehouse",
+          "ensure"
+        ],
+        "email": "",
+        "category": "night_shift_hilo",
+        "subcategory": ""
+      },
+      "query_types": [
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "verify",
+        "retrieve",
+        "follow",
+        "maintain",
+        "ensure",
+        "lift",
+        "lower",
+        "use",
+        "wear",
+        "check"
+      ],
+      "entities": [
+        "cases",
+        "quantities",
+        "pallets",
+        "Hi-Lo",
+        "warehouse",
+        "inventory",
+        "customer orders"
+      ],
+      "actors": [
+        "Hi-Lo operators",
+        "pedestrians",
+        "picking teams",
+        "loading teams",
+        "customers"
+      ],
+      "conditions": [
+        "mispicks",
+        "unbalanced loads",
+        "capacity limits",
+        "improper lighting",
+        "steel toe shoes policy",
+        "inventory shortages"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What kind of shoes do I need to wear as a Hi-Lo operator?",
+        "How do I verify I'm getting the correct cases and quantities to avoid mispicks?",
+        "What if a pallet looks unstable\u2014should I still lift it with the Hi-Lo?",
+        "I'm frustrated always watching for pedestrians and other jacks\u2014why all this awareness stuff?",
+        "How does being precise as a night shift Hi-Lo operator prevent inventory shortages and keep orders accurate?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 10,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Safety-critical for Hi-Lo ops with direct protocols and verification steps; bounded to night shift role, basic training level, mostly self-contained actionable advice.",
+      "acronyms": {},
+      "jargon": {
+        "Hi-Lo": "Warehouse forklift or pallet truck used for lifting and moving pallets",
+        "mispicks": "Incorrect selection of cases or items during picking process",
+        "jacks": "Pallet jacks, manual or powered devices for moving pallets",
+        "pallets": "Platforms (wooden or plastic) used to stack and transport goods",
+        "picking": "Process of retrieving items from storage locations for customer orders",
+        "replenished": "Restocking inventory in picking locations from reserve storage"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\replen_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:44:52.398376",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_replen_introduction_0",
+      "content": "Replen Manual\n\nPurpose\n\nThe purpose of the replenishment (replens) process is to ensure that all pick slots on the warehouse floor or within reaching distance remain fully stocked throughout operations. By maintaining adequate inventory levels in each slot, replens support efficient order picking, reduces downtime, and ensures consistent product availability for night pickers.\n\nOverview\n\nReplenishment hi-lo operators are responsible for continuously monitoring and restocking product slots across their assigned aisles. Typically, each operator manages three to four aisles, ensuring that all slots designated for ground-level or reachable picking remain adequately filled. Replenishment combines both visual assessment and system-guided direction to maintain optimal product levels and inventory accuracy.\n\nReplenishment Workflow\n\nMonitoring Aisles\n\nReplenishment operators move through their assigned aisles and visually check which pick slots are running low on product. They also rely on the warehouse management system (WMS) to identify slots requiring replenishment.\n\nSystem Alerts and Indicators\n\nThe hi-lo computer system displays real-time inventory data. Slots that fall below their minimum threshold appear highlighted in red on the screen. A red-highlighted slot indicates that the product is at or below the minimum case quantity and must be replenished.\n\nPulling from Reserves\n\nReplenishment operators use reserve inventory \u2014 product stored in higher rack levels \u2014 to restock floor-level pick slots. The goal is to bring the product quantity up to a satisfactory level without exceeding the slot\u2019s maximum capacity.\n\nPick Ready Inventory (PRI)\n\nIf no reserve inventory is available, the replenishment operator may use Pick Ready Inventory (PRI) when appropriate. PRI allows limited quantities of product to be stocked directly into available pick slots to maintain picking continuity.\n\nAisle Maintenance and Organization",
+      "content_hash": "af70cdb91cf0850d",
+      "section_title": "replen",
+      "source_file": "replen_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 352,
+      "_original": {
+        "keywords": [
+          "replenishment",
+          "slots",
+          "product",
+          "inventory",
+          "pick",
+          "aisles",
+          "system",
+          "levels",
+          "slot",
+          "picking"
+        ],
+        "email": "",
+        "category": "replen",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "ensure",
+        "maintaining",
+        "support",
+        "reduces",
+        "monitoring",
+        "restocking",
+        "manages",
+        "ensuring",
+        "check",
+        "rely",
+        "identify",
+        "displays",
+        "appear",
+        "indicates",
+        "replenished",
+        "pulling",
+        "use",
+        "restock",
+        "bring",
+        "exceeding",
+        "stocked",
+        "maintain"
+      ],
+      "entities": [
+        "pick slots",
+        "warehouse floor",
+        "inventory",
+        "product slots",
+        "aisles",
+        "warehouse management system",
+        "WMS",
+        "hi-lo computer system",
+        "reserve inventory",
+        "floor-level pick slots",
+        "Pick Ready Inventory",
+        "PRI",
+        "rack levels"
+      ],
+      "actors": [
+        "replenishment operators",
+        "hi-lo operators",
+        "night pickers"
+      ],
+      "conditions": [
+        "running low on product",
+        "below minimum threshold",
+        "highlighted in red",
+        "at or below minimum case quantity",
+        "no reserve inventory available"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the purpose of the replenishment process?",
+        "How do I figure out which pick slots need restocking?",
+        "What does a red-highlighted slot mean on the hi-lo computer?",
+        "What if there's no reserve inventory available for a low pick slot?",
+        "Some slots look low when I'm walking the aisles but the WMS isn't showing red \u2013 do I ignore them?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 8,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core warehouse replenishment process essential for operations; provides clear workflow overview and steps for operators, but cuts off at aisle maintenance, needing minor additional context.",
+      "acronyms": {
+        "WMS": "warehouse management system",
+        "PRI": "Pick Ready Inventory"
+      },
+      "jargon": {
+        "pick slots": "storage locations on the warehouse floor or within reaching distance for order picking",
+        "hi-lo operators": "operators using hi-lo equipment to monitor and restock aisles",
+        "reserve inventory": "product stored in higher rack levels used to restock pick slots",
+        "minimum threshold": "inventory level below which a slot requires replenishment (highlighted in red)",
+        "maximum capacity": "upper limit for product quantity in a pick slot",
+        "night pickers": "warehouse staff performing order picking during night shifts"
+      },
+      "numeric_thresholds": {
+        "aisles_per_operator": {
+          "value": "3-4",
+          "context": "typically managed by each replenishment operator"
+        }
+      }
+    },
+    {
+      "id": "warehouse_replen_introduction_1",
+      "content": "Replenishment workers continuously maintain the cleanliness and organization of their aisles. This includes flattening pallets for a clean appearance, ensuring safe and efficient access for other workers, and keeping the floor free of debris or damaged materials.\n\n6. Product Verification and Accuracy\n\nReplenishment operators confirm that each slot\u2019s product matches the system description. If discrepancies are found, they communicate with Inventory Control and correct the product labeling or system records as needed.\n\n7. System Updates\n\nWhen product quantities are adjusted or replenished, operators update the system using handheld scanners or terminal input. This ensures the entire company \u2014 including Purchasing and Sales \u2014 has accurate, real-time visibility into available product levels.\n\nWhy Replenishment Matters\n\nReplenishment is critical to maintaining an efficient and productive warehouse. Without timely replenishment, pickers would frequently run out of product, causing delays, increased use of cherry pickers, and overall loss of picking efficiency. Proper replenishment ensures:\n\n-Continuous product availability for pickers.\n- Accurate and reliable inventory data.\n- Safe and organized warehouse aisles.\n- Support for night operations and overall warehouse flow.\n\nWhat you do:\n\n\u2022 Continuously monitor aisles and system alerts throughout the shift.\n\n\u2022 Replenish slots before they reach critical low levels to prevent picking delays.\n\n\u2022 Never overfill slots; maintain quantities within designated maximums.\n\n\u2022 Flatten empty pallets and maintain clean, safe aisles.\n\n\u2022 Verify product matches slot description before completing replenishment.\n\n\u2022 Update all replenishment transactions in the system immediately after completion (through the scanner).\n\n\u2022 Communicate inventory issues promptly to Inventory Control or supervision.",
+      "content_hash": "a5545eefad1cde45",
+      "section_title": "replen",
+      "source_file": "replen_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 328,
+      "_original": {
+        "keywords": [
+          "replenishment",
+          "product",
+          "system",
+          "aisles",
+          "inventory",
+          "maintain",
+          "safe",
+          "warehouse",
+          "pickers",
+          "workers"
+        ],
+        "email": "",
+        "category": "replen",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "training",
+        "compliance"
+      ],
+      "verbs": [
+        "maintain",
+        "flatten",
+        "ensure",
+        "keep",
+        "confirm",
+        "communicate",
+        "correct",
+        "update",
+        "adjust",
+        "replenish",
+        "monitor",
+        "verify"
+      ],
+      "entities": [
+        "pallet",
+        "aisle",
+        "product",
+        "slot",
+        "inventory",
+        "system",
+        "scanner",
+        "terminal",
+        "cherry_picker",
+        "warehouse"
+      ],
+      "actors": [
+        "replenishment_workers",
+        "replenishment_operators",
+        "Inventory_Control",
+        "pickers",
+        "Purchasing",
+        "Sales",
+        "supervisor"
+      ],
+      "conditions": [
+        "discrepancies",
+        "critical_low_levels",
+        "inventory_issues",
+        "debris",
+        "damaged_materials"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I keep aisles clean and organized as a replen worker?",
+        "What do I do if the product in a slot doesn't match the system description?",
+        "How do I update the system right after a replen using the handheld scanner?",
+        "Why do I have to verify every slot's product? It's slowing me down!",
+        "What happens if slots hit critical low without replen, and why not just overfill?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse process critical for efficiency, safety, and inventory accuracy; provides clear, actionable steps for replenishment workers with minimal external context needed.",
+      "acronyms": {},
+      "jargon": {
+        "replenishment": "Process of restocking inventory slots from reserve stock to maintain availability",
+        "aisles": "Designated walkways in the warehouse lined with storage slots",
+        "flattening pallets": "Collapsing or breaking down empty pallets to maintain a clean and organized appearance",
+        "slots": "Specific storage locations in aisles holding products for picking",
+        "Inventory Control": "Team or department responsible for resolving inventory discrepancies and updating records",
+        "handheld scanners": "Portable devices used by workers to scan and update inventory system records",
+        "cherry pickers": "Elevated lift equipment used to access high storage areas when slots are empty",
+        "pickers": "Warehouse workers who select and gather products from slots for orders",
+        "system alerts": "Notifications from the inventory system indicating low stock or other issues",
+        "critical low levels": "Threshold stock quantities in slots that trigger replenishment to avoid delays",
+        "designated maximums": "Upper limits on slot quantities to prevent overfilling"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

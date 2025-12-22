@@ -1,0 +1,241 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\inventory_control_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:38:24.532931",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_inventory_introduction_0",
+      "content": "Inventory Control Manual\n\nOverview\n\nInventory Control is one of the most essential departments at Driscoll Foods. It ensures that all item quantities in the warehouse management system accurately reflect the true stock levels. Without precise inventory data, the company\u2019s operations\u2014from purchasing to sales\u2014would be disrupted. The team performs continuous cycle counts, verifies scanned data, corrects errors, and maintains full transparency for audits, financial records, and operational efficiency.\n\nPurpose and Importance\n\nThe purpose of Inventory Control is to ensure data integrity within the warehouse system. This allows the Purchasing and Sales departments to make informed decisions based on accurate quantities of available products. By performing daily counts and system checks, the team prevents discrepancies that could lead to product shortages, overstocking, or missed sales opportunities.\n\nDaily Responsibilities\n\nInventory Control performs several key daily tasks, including:\n\nConducting daily cycle counts for perishable items such as milk, eggs, and bread.\n\nVerifying item quantities and adjusting records for accuracy.\n\nIdentifying unscanned products or incorrect date entries made by warehouse workers.\n\nCommunicating product shorts and discrepancies to relevant departments via email.\n\nProviding zone managers with insight on where space is available for slotting\n\nSupporting the nightly picking operations by ensuring accurate product data.\n\nTelnet Functions and Commands\n\nInventory Control uses the Telnet system extensively to manage and verify data. Below are some of the primary Telnet commands and their functions:\n\n5, 12, and then Item Number \u2013 Displays key information such as Quantity On-Hand (QTY O/H), Quantity Committed, and Physically Available.\n\nPHY, 22 \u2013 Used to adjust item quantities in the system.\n\n9, 30 \u2013 Shows Purchase Order (PO) history and allows tracking of where items were scanned away\n\nPHY, 29, W, aisle (DO000000\u2013D0999999), date \u2013 Runs a velocity report to analyze movement speed of products.",
+      "content_hash": "7f9529961dc267e7",
+      "section_title": "inventory",
+      "source_file": "inventory_control_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 378,
+      "_original": {
+        "keywords": [
+          "inventory",
+          "control",
+          "system",
+          "data",
+          "item",
+          "quantities",
+          "daily",
+          "departments",
+          "warehouse",
+          "sales"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "lookup",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "ensure",
+        "perform",
+        "verify",
+        "correct",
+        "maintain",
+        "conduct",
+        "adjust",
+        "identify",
+        "communicate",
+        "provide",
+        "support",
+        "display",
+        "show",
+        "run"
+      ],
+      "entities": [
+        "inventory",
+        "warehouse",
+        "purchase_order",
+        "item",
+        "product",
+        "aisle"
+      ],
+      "actors": [
+        "Inventory_Control",
+        "warehouse_worker",
+        "zone_manager",
+        "Purchasing",
+        "Sales"
+      ],
+      "conditions": [
+        "shortage",
+        "discrepancy",
+        "overstocking",
+        "unscanned_product",
+        "incorrect_date_entry"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the main daily responsibilities of the Inventory Control team?",
+        "How do I use Telnet to check Quantity On-Hand for a specific item?",
+        "What's the PHY, 29, W command for and how do I run a velocity report?",
+        "The bread counts are all off because of unscanned items\u2014what do we do?",
+        "What if there's a discrepancy in perishable cycle counts like eggs\u2014how do we communicate it?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 9,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core business process for inventory management at Driscoll Foods, frequently referenced by team; specific to their Telnet system and daily tasks (bounded scenario); requires basic inventory training; self-contained overview with clear responsibilities and commands; highly actionable with explicit steps and Telnet functions.",
+      "acronyms": {
+        "QTY O/H": "Quantity On-Hand",
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "cycle counts": "Continuous or daily counts of subsets of inventory items to verify accuracy",
+        "slotting": "Process of assigning and optimizing storage locations for products in warehouse zones",
+        "picking operations": "Nightly warehouse process of selecting and preparing items for orders",
+        "velocity report": "Report generated to analyze the movement speed and turnover rate of products",
+        "Quantity Committed": "Portion of inventory reserved or allocated for outgoing orders",
+        "Physically Available": "Actual physical stock quantity available after accounting for commitments",
+        "product shorts": "Shortages or insufficient quantities of products identified in inventory"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_inventory_introduction_1",
+      "content": "BIN, 01, slot# \u2013 Looks up slot locations and their associated products\n\nPHY, 1, 01, aisle (DO000000\u2013DO999999), A, D (or C, F), A \u2013 Checks for empty slots in a given aisle.\n\nTeam Roles and Collaboration\n\nThe Inventory Control team works closely with multiple departments including Warehouse Operations, Purchasing, Sales, and Quality Assurance. Team members play vital roles in maintaining accuracy and order across all systems:\n\nJose \u2013 Constantly reviews and corrects errors made by others, ensuring that item data is accurate and reliable.\n\n- Billy (Head of Team) \u2013 Oversees overall inventory accuracy and is responsible for managing item recalls. In the event of a product recall, such as one caused by contamination (e.g., salmonella), Billy uses system tracking to determine where the affected product has been distributed internally and externally.\n\nYear-End and Audit Importance\n\nInventory Control plays a crucial role in the annual company-wide cycle count conducted at the end of the calendar year. These counts are essential for company audits and financial reporting to banks and other stakeholders. Accurate numbers during this process ensure compliance and transparency.\n\nWhy Inventory control matters:\n\nWithout Inventory Control, the accuracy of the warehouse management system would degrade over time, leading to missing pallets, expired products, and incorrect sales availability. The team\u2019s vigilance ensures that every case in the warehouse is accounted for and that company operations continue smoothly and efficiently.\n\nWhat you do:\n\nCycle counts\n\nFix others\u2019 mistakes\n\nCheck dates\n\nLocate product in the warehouses\n\nHelp decide whether something needs more or less",
+      "content_hash": "d917c44ccdf1507a",
+      "section_title": "inventory",
+      "source_file": "inventory_control_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 327,
+      "_original": {
+        "keywords": [
+          "team",
+          "inventory",
+          "control",
+          "warehouse",
+          "accuracy",
+          "product",
+          "company",
+          "slot",
+          "products",
+          "aisle"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": ""
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "looks up",
+        "checks",
+        "reviews",
+        "corrects",
+        "oversees",
+        "manages",
+        "determine",
+        "conducts",
+        "fix",
+        "check",
+        "locate",
+        "decide",
+        "maintain",
+        "ensure"
+      ],
+      "entities": [
+        "slot",
+        "products",
+        "aisle",
+        "item data",
+        "product recall",
+        "pallets",
+        "expired products",
+        "warehouse",
+        "inventory",
+        "case"
+      ],
+      "actors": [
+        "Inventory Control team",
+        "Jose",
+        "Billy",
+        "Warehouse Operations",
+        "Purchasing",
+        "Sales",
+        "Quality Assurance"
+      ],
+      "conditions": [
+        "product recall",
+        "contamination",
+        "salmonella",
+        "empty slots",
+        "year-end cycle count",
+        "audits",
+        "errors"
+      ],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I look up the product in a specific slot like slot# 01?",
+        "What's the PHY command for checking empty slots in aisle DO123456?",
+        "Who do I go to when someone messes up the item data in the system?",
+        "What does Billy do if there's a salmonella recall on a product?",
+        "Why are our year-end cycle counts such a big deal for audits?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 7,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse inventory processes with specific commands, team roles, audit/compliance importance; actionable for lookups/counts but assumes system familiarity.",
+      "acronyms": {},
+      "jargon": {
+        "BIN": "Identifier used to look up slot locations and associated products",
+        "PHY": "Command or function to check for empty slots in a given aisle",
+        "slot#": "Specific slot number in warehouse storage",
+        "aisle": "Warehouse section identified by codes like DO000000\u2013DO999999",
+        "cycle counts": "Periodic inventory verification processes conducted by the team",
+        "item recalls": "Process managed by team head for handling product issues",
+        "product recall": "Retrieval of distributed products due to issues like contamination (e.g., salmonella)",
+        "warehouse management system": "System for tracking and maintaining warehouse inventory accuracy",
+        "pallets": "Large storage units holding warehouse inventory",
+        "expired products": "Products past their usable date that need monitoring"
+      },
+      "numeric_thresholds": {
+        "aisle_id_range": {
+          "min": "DO000000",
+          "max": "DO999999",
+          "context": "Range of aisle identifiers used in PHY command"
+        }
+      }
+    }
+  ]
+}
