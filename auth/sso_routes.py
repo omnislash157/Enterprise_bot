@@ -165,10 +165,9 @@ async def handle_callback(request: CallbackRequest):
                 "id": user.id,
                 "email": user.email,
                 "display_name": user.display_name,
-                "role": user.role,
-                "departments": user.dept_slugs,
+                "departments": user.department_access,
                 "is_super_user": user.is_super_user,
-                "can_manage_users": user.can_manage_users,
+                "can_manage_users": len(user.dept_head_for) > 0 or user.is_super_user,
             },
         )
     except HTTPException:
@@ -200,8 +199,6 @@ async def handle_refresh(request: RefreshRequest):
     if not user:
         raise HTTPException(401, "User not found")
 
-    dept_slugs = auth.get_user_department_access(user)
-
     from datetime import datetime
     now = datetime.utcnow()
     expires_in = int((azure_user.expires_at - now).total_seconds()) if azure_user.expires_at else 3600
@@ -214,10 +211,9 @@ async def handle_refresh(request: RefreshRequest):
             "id": user.id,
             "email": user.email,
             "display_name": user.display_name,
-            "role": user.role,
-            "departments": dept_slugs,
+            "departments": user.department_access,
             "is_super_user": user.is_super_user,
-            "can_manage_users": user.can_manage_users,
+            "can_manage_users": len(user.dept_head_for) > 0 or user.is_super_user,
         },
     )
 
@@ -253,37 +249,31 @@ async def provision_user(azure_user: AzureUser):
     Create or update user in our database from Azure AD info.
 
     Called on every login to keep user info in sync.
+
+    The new auth_service.get_or_create_user() handles Azure OID automatically.
+    If user exists by Azure OID or email, returns existing. Otherwise creates new.
+    New users get NO department access - admins must grant via admin portal.
     """
     auth = get_auth_service()
 
-    # Try to find existing user by Azure OID
+    # Try to find by Azure OID first
     user = auth.get_user_by_azure_oid(azure_user.oid)
 
     if user:
-        # Update existing user
-        user = auth.update_user_from_azure(
-            user_id=user.id,
-            email=azure_user.email,
-            display_name=azure_user.name,
-            azure_oid=azure_user.oid,
+        # User exists with this Azure OID - return it
+        return user
+
+    # Try get_or_create by email (handles Azure OID linking)
+    user = auth.get_or_create_user(
+        email=azure_user.email,
+        display_name=azure_user.name,
+        azure_oid=azure_user.oid
+    )
+
+    if not user:
+        raise HTTPException(
+            500,
+            f"Failed to provision user {azure_user.email}. Domain may not be registered."
         )
-    else:
-        # Try to find by email (might exist from manual creation)
-        user = auth.get_user_by_email(azure_user.email)
-
-        if user:
-            # Link existing user to Azure
-            user = auth.link_user_to_azure(user.id, azure_user.oid)
-        else:
-            # Create new user
-            user = auth.create_user_from_azure(
-                email=azure_user.email,
-                display_name=azure_user.name,
-                azure_oid=azure_user.oid,
-            )
-
-    # Get department access
-    dept_slugs = auth.get_user_department_access(user)
-    user.dept_slugs = dept_slugs
 
     return user

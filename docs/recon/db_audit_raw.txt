@@ -1,0 +1,142 @@
+=== SCHEMAS ===
+  cron
+  enterprise
+  personal
+  public
+
+=== TABLES BY SCHEMA ===
+  cron.job
+  cron.job_run_details
+  enterprise.access_config
+  enterprise.analytics_events
+  enterprise.documents
+  enterprise.query_log
+  enterprise.users
+  personal.episodes
+  personal.memory_nodes
+  personal.users
+
+=== TABLE STRUCTURES ===
+
+--- cron.job ---
+  jobid: bigint NOT NULL nextval('cron.jobid_seq'::regclass)
+  schedule: text NOT NULL 
+  command: text NOT NULL 
+  nodename: text NOT NULL 'localhost'::text
+  nodeport: integer NOT NULL inet_server_port()
+  database: text NOT NULL current_database()
+  username: text NOT NULL CURRENT_USER
+  active: boolean NOT NULL true
+  jobname: text NULL 
+
+--- cron.job_run_details ---
+  jobid: bigint NULL 
+  runid: bigint NOT NULL nextval('cron.runid_seq'::regclass)
+  job_pid: integer NULL 
+  database: text NULL 
+  username: text NULL 
+  command: text NULL 
+  status: text NULL 
+  return_message: text NULL 
+  start_time: timestamp with time zone NULL 
+  end_time: timestamp with time zone NULL 
+
+--- enterprise.access_config ---
+  id: uuid NOT NULL gen_random_uuid()
+  user_id: uuid NOT NULL 
+  department: character varying NOT NULL 
+  granted_by: uuid NULL 
+  granted_at: timestamp with time zone NULL now()
+
+--- enterprise.analytics_events ---
+  id: uuid NOT NULL gen_random_uuid()
+  tenant_id: character varying NOT NULL 'driscoll'::character varying
+  event_type: character varying NOT NULL 
+  user_email: character varying NULL 
+  event_data: jsonb NULL 
+  created_at: timestamp with time zone NULL now()
+
+--- enterprise.documents ---
+  id: uuid NOT NULL gen_random_uuid()
+  department: character varying NOT NULL 
+  title: character varying NOT NULL 
+  content: text NOT NULL 
+  embedding: USER-DEFINED NULL 
+  source_file: character varying NULL 
+  chunk_index: integer NULL 
+  section_title: character varying NULL 
+  category: character varying NULL 
+  keywords: jsonb NULL 
+  created_at: timestamp with time zone NULL now()
+  updated_at: timestamp with time zone NULL now()
+  file_hash: character varying NULL 
+  subcategory: character varying NULL 
+  token_count: integer NULL 
+  embedding_model: character varying NULL 
+  active: boolean NULL true
+  tenant_id: character varying NULL 
+  department_id: character varying NULL 
+
+--- enterprise.query_log ---
+  id: uuid NOT NULL gen_random_uuid()
+  tenant_id: character varying NOT NULL 'driscoll'::character varying
+  user_email: character varying NOT NULL 
+  query_text: text NOT NULL 
+  query_type: character varying NULL 
+  results_count: integer NULL 
+  retrieval_time_ms: double precision NULL 
+  total_time_ms: double precision NULL 
+  model_used: character varying NULL 
+  created_at: timestamp with time zone NULL now()
+
+--- enterprise.users ---
+  id: uuid NOT NULL gen_random_uuid()
+  email: character varying NOT NULL 
+  display_name: character varying NULL 
+  oid: character varying NULL 
+  role: character varying NULL 'user'::character varying
+  is_active: boolean NULL true
+  created_at: timestamp with time zone NULL now()
+  last_login_at: timestamp with time zone NULL 
+
+--- personal.episodes ---
+  id: uuid NOT NULL gen_random_uuid()
+  user_id: uuid NOT NULL 
+  title: character varying NULL 
+  summary: text NULL 
+  messages: jsonb NOT NULL 
+  embedding: USER-DEFINED NULL 
+  created_at: timestamp with time zone NULL now()
+
+--- personal.memory_nodes ---
+  id: uuid NOT NULL gen_random_uuid()
+  user_id: uuid NOT NULL 
+  conversation_id: character varying NOT NULL 
+  sequence_index: integer NOT NULL 
+  human_content: text NOT NULL 
+  assistant_content: text NOT NULL 
+  embedding: USER-DEFINED NULL 
+  intent_type: character varying NULL 
+  complexity: character varying NULL 
+  emotional_valence: character varying NULL 
+  tags: jsonb NULL 
+  cluster_id: integer NULL 
+  cluster_label: character varying NULL 
+  created_at: timestamp with time zone NULL now()
+  access_count: integer NULL 0
+  last_accessed: timestamp with time zone NULL 
+
+--- personal.users ---
+  id: uuid NOT NULL gen_random_uuid()
+  email: character varying NOT NULL 
+  auth_provider: character varying NOT NULL 
+  created_at: timestamp with time zone NULL now()
+
+=== EXTENSIONS ===
+  plpgsql v1.0
+  pgaadauth v1.9
+  pg_cron v1.6
+  azure v1.1
+  vector v0.8.0
+
+=== AUDIT COMPLETE ===
