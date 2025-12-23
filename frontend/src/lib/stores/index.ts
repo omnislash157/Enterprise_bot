@@ -2,6 +2,8 @@ export { theme, toggleTheme } from './theme';
 export { websocket } from './websocket';
 export { session } from './session';
 export type { SessionAnalytics } from './session';
+export { voice, isRecording } from './voice';
+export type { VoiceState } from './voice';
 export { artifacts, visibleArtifacts } from './artifacts';
 export type { StoredArtifact } from './artifacts';
 export { panels, hasFullscreenPanel, closedPanels } from './panels';
