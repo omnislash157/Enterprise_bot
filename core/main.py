@@ -381,6 +381,30 @@ async def startup_event():
     if hasattr(engine, 'model'):
         logger.info(f"  Model: {engine.model}")
 
+    # Initialize Redis cache
+    logger.info("[STARTUP] Initializing Redis cache...")
+    try:
+        from .cache import init_cache
+        cache = await init_cache()
+        stats = await cache.get_stats()
+        logger.info(f"[STARTUP] Cache status: {stats}")
+    except Exception as e:
+        logger.warning(f"[STARTUP] Cache init failed (continuing without): {e}")
+
+    # Warm up RAG connection pool
+    if CONFIG_LOADED and is_enterprise_mode():
+        logger.info("[STARTUP] Warming RAG connection pool...")
+        try:
+            from .enterprise_rag import EnterpriseRAGRetriever
+            config = get_config()
+            rag = EnterpriseRAGRetriever(config)
+            await rag._get_pool()  # Force pool creation
+            # Run dummy query to establish connection
+            await rag.search("warmup", department_id="warehouse", threshold=0.99)
+            logger.info("[STARTUP] RAG pool warmed")
+        except Exception as e:
+            logger.warning(f"[STARTUP] RAG warmup failed: {e}")
+
     # Warm up analytics connection pool and query plan cache
     if ANALYTICS_LOADED:
         logger.info("[STARTUP] Warming analytics connection pool...")
@@ -784,7 +808,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 twin_type = type(active_twin).__name__
 
                 if twin_type == 'EnterpriseTwin':
-                    # EnterpriseTwin: returns EnterpriseResponse (non-streaming)
+                    # EnterpriseTwin: streaming response
                     # Read division from message payload first, fallback to session state
                     message_division = data.get("division")
                     effective_division = message_division or tenant.department
@@ -793,31 +817,42 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     if message_division and message_division != tenant.department:
                         logger.info(f"[WS] Using division from message: {message_division} (session: {tenant.department})")
 
-                    response = await active_twin.think(
+                    # Stream response chunks as they arrive
+                    async for chunk in active_twin.think_streaming(
                         user_input=content,
                         user_email=user_email,
                         department=effective_division,
                         session_id=session_id,
-                        stream=False,
-                    )
+                    ):
+                        # Check for metadata marker
+                        if chunk.startswith("\n__METADATA__:"):
+                            # Parse and send as cognitive_state
+                            try:
+                                metadata = json.loads(chunk.replace("\n__METADATA__:", ""))
+                                await websocket.send_json({
+                                    "type": "cognitive_state",
+                                    "phase": "ready",
+                                    "temperature": 0.5,
+                                    "query_type": "streamed",
+                                    "tools_fired": metadata.get("tools_fired", []),
+                                    "retrieval_time_ms": metadata.get("retrieval_ms", 0),
+                                    "total_time_ms": metadata.get("total_ms", 0),
+                                })
+                            except json.JSONDecodeError:
+                                pass
+                        else:
+                            # Stream content chunk
+                            await websocket.send_json({
+                                "type": "stream_chunk",
+                                "content": chunk,
+                                "done": False,
+                            })
 
-                    # Send full response at once
-                    response_text = response.content
+                    # Send done signal
                     await websocket.send_json({
                         "type": "stream_chunk",
-                        "content": response_text,
+                        "content": "",
                         "done": True,
-                    })
-
-                    # Send context metadata
-                    await websocket.send_json({
-                        "type": "cognitive_state",
-                        "phase": "ready",
-                        "temperature": 0.5,
-                        "query_type": response.context.query_type,
-                        "tools_fired": response.context.tools_fired,
-                        "retrieval_time_ms": response.context.retrieval_time_ms,
-                        "total_time_ms": response.total_time_ms,
                     })
 
                 else:

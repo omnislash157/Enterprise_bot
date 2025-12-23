@@ -40,13 +40,43 @@ function createWebSocketStore() {
 	let messageHandlers: ((data: any) => void)[] = [];
 	let reconnectAttempts = 0;
 	const maxReconnectAttempts = 5;
+	let currentSessionId: string | null = null;
+	let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+	let intentionalClose = false;
 
-	return {
+	function attemptReconnect() {
+		if (!currentSessionId || reconnectAttempts >= maxReconnectAttempts || intentionalClose) {
+			if (reconnectAttempts >= maxReconnectAttempts) {
+				console.log('[WS] Max reconnect attempts reached');
+			}
+			return;
+		}
+
+		reconnectAttempts++;
+		const delay = Math.min(1000 * Math.pow(2, reconnectAttempts - 1), 10000); // Exponential backoff, max 10s
+		console.log(`[WS] Attempting reconnect in ${delay}ms (attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+
+		reconnectTimeout = setTimeout(() => {
+			if (currentSessionId && !intentionalClose) {
+				store.connect(currentSessionId);
+			}
+		}, delay);
+	}
+
+	const store = {
 		subscribe,
 
 		connect(sessionId: string) {
+			// Clear any pending reconnect
+			if (reconnectTimeout) {
+				clearTimeout(reconnectTimeout);
+				reconnectTimeout = null;
+			}
+
+			intentionalClose = false;
+			currentSessionId = sessionId;
 			const url = getWebSocketUrl(sessionId);
-			
+
 			try {
 				ws = new WebSocket(url);
 
@@ -61,10 +91,10 @@ function createWebSocketStore() {
 						const data = JSON.parse(event.data);
 						messageHandlers.forEach(handler => handler(data));
 
-					// Auto-handle artifact emissions
-					if (data.type === 'artifact_emit' && data.artifact) {
-						artifacts.add(data.artifact, data.suggested || false);
-					}
+						// Auto-handle artifact emissions
+						if (data.type === 'artifact_emit' && data.artifact) {
+							artifacts.add(data.artifact, data.suggested || false);
+						}
 					} catch (e) {
 						console.error('[WS] Failed to parse message:', e);
 					}
@@ -75,20 +105,33 @@ function createWebSocketStore() {
 					update(s => ({ ...s, error: 'Connection error' }));
 				};
 
-				ws.onclose = () => {
+				ws.onclose = (event) => {
 					update(s => ({ ...s, connected: false }));
-					console.log('[WS] Disconnected');
+					console.log('[WS] Disconnected:', event.code, event.reason || '');
+
+					// Auto-reconnect on abnormal close (not intentional)
+					if (!event.wasClean && !intentionalClose && currentSessionId) {
+						attemptReconnect();
+					}
 				};
 			} catch (e) {
 				update(s => ({ ...s, error: `Failed to connect: ${e}` }));
+				attemptReconnect();
 			}
 		},
 
 		disconnect() {
+			intentionalClose = true;
+			if (reconnectTimeout) {
+				clearTimeout(reconnectTimeout);
+				reconnectTimeout = null;
+			}
 			if (ws) {
 				ws.close();
 				ws = null;
 			}
+			currentSessionId = null;
+			reconnectAttempts = 0;
 			update(s => ({ ...s, connected: false, sessionId: null }));
 		},
 
