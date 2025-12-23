@@ -158,6 +158,8 @@ function createWebSocketStore() {
 			}
 		}
 	};
+
+	return store;
 }
 
 export const websocket = createWebSocketStore();
