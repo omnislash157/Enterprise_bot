@@ -4,6 +4,103 @@ This file tracks significant changes made by Claude agents to maintain continuit
 
 ---
 
+## [2024-12-22 22:30] - Trust Barriers for Context Formatters
+
+**Priority:** MEDIUM - UX polish
+**Mission:** Add explicit trust hierarchy markers so Grok knows what's LAW vs context
+
+### Problem
+Grok sees a wall of text and doesn't know what's LAW vs what's context. Need explicit trust barriers like VenomVoice uses.
+
+### Files Modified
+- `core/enterprise_twin.py` - 3 formatter methods updated
+
+### Changes
+
+**1. `_format_manual_chunks()`**
+- Header: `PROCESS MANUALS (ABSOLUTE TRUTH - COMPANY POLICY)`
+- Added: Trust level, Action (cite these), Rule (politely correct contradictions)
+
+**2. `_format_squirrel_context()`**
+- Header: `SESSION HISTORY (CONTEXT ONLY - NOT AUTHORITATIVE)`
+- Added: Trust level, NOT FOR (overriding manuals), USE FOR (tone, continuity, personality)
+
+**3. `_format_session_context()`**
+- Header: `THIS CONVERSATION (IMMEDIATE CONTEXT)`
+- Added: Trust level (HIGH for flow, LOW for policy)
+
+### Result
+Grok now sees clear hierarchy:
+- **ABSOLUTE TRUTH** = cite as law
+- **CONTEXT ONLY** = tone & personality, not authority
+- **IMMEDIATE CONTEXT** = conversation flow
+
+No more ambiguity about what overrides what.
+
+---
+
+## [2024-12-22 22:15] - Enterprise Config Lockdown
+
+**Priority:** HIGH - Production stability
+**Mission:** Lock down enterprise config to match design intent
+
+### Design Decisions (FROM HARTIGAN)
+| Feature | Setting | Rationale |
+|---------|---------|-----------|
+| Enterprise RAG | ON, threshold-only | Return everything above 0.6, not arbitrary top N |
+| Squirrel | ON (simplified) | Session continuity via Python, no SquirrelTool class |
+| Memory Pipeline | NOT IN CONFIG | If EnterpriseTwin doesn't see it, it won't try to load |
+| Top K | REMOVED | Threshold-only retrieval everywhere |
+
+### Files Modified
+
+**1. core/config.yaml**
+- Added explicit `enterprise_rag:` section with `enabled: true`, `threshold: 0.6`
+- Added `squirrel:` section with `enabled: true`, `window_minutes: 60`, `max_exchanges: 10`
+- Removed memory_pipelines/session_memory (omitted = disabled)
+- Removed deprecated context_stuffing flag
+
+**2. core/enterprise_twin.py** (8 changes)
+- Feature flags: Default to `False` instead of `True` (explicit from config)
+- Squirrel config: Added `window_minutes` and `max_exchanges` from config
+- Added `get_squirrel_context()` method: Simple Python-controlled session recall
+- Removed `squirrel` property: No more SquirrelTool class import
+- Removed `memory_pipeline` property: No more MemoryPipeline import
+- Fixed `model_adapter` property: Uses proper config keys
+- Updated RAG call: Removed `top_k=self.rag_top_k` parameter
+- Updated squirrel call: Uses `get_squirrel_context()` instead of await squirrel.recall()
+- Session memory: Always stores (for squirrel), removed conditional
+
+**3. core/enterprise_rag.py** (7 changes)
+- Removed `default_top_k` from init
+- Updated `search()` signature: Removed `top_k` parameter
+- Updated `_vector_search()`: Removed `top_k`, removed `LIMIT $5`, removed `keywords` column
+- Updated `_keyword_search()`: Removed `top_k`, removed `LIMIT $4`, removed `keywords` column
+- Updated `get_by_id()`: Removed `keywords` column
+- Updated docstring example: Removed `top_k=5`
+- All queries now threshold-only (no arbitrary caps)
+
+### Validation
+```
+✅ EnterpriseTwin: OK
+✅ EnterpriseRAGRetriever: OK
+✅ core.main.app: OK
+✅ Config loads:
+   - squirrel.enabled: True
+   - rag.enabled: True
+   - rag.threshold: 0.6
+```
+
+### Summary
+Enterprise config is now locked down:
+- Features default to OFF unless explicitly enabled in config
+- Squirrel is simplified (no SquirrelTool import, just session history)
+- Memory pipeline removed (no import = no warning logs)
+- RAG is threshold-only (returns ALL chunks above 0.6)
+- Keywords column removed from queries (doesn't exist in table)
+
+---
+
 ## [2024-12-22 21:45] - Railway Import Fix
 
 **Priority:** CRITICAL - Production restored
