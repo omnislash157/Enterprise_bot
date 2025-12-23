@@ -431,17 +431,22 @@ class EnterpriseTwin:
     async def _generate(self, system_prompt: str, user_input: str) -> str:
         """
         Generate response from model.
-        
+
         Grok sees NO tool markers in enterprise mode.
         Just the context and the query.
         """
-        messages = [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_input},
-        ]
-        
-        response = await self.model_adapter.chat(messages)
-        return response.get('content', '')
+        # GrokAdapter.messages.create() is sync, uses Anthropic-style interface
+        response = self.model_adapter.messages.create(
+            system=system_prompt,
+            messages=[{"role": "user", "content": user_input}],
+            max_tokens=self.config.get('model', {}).get('max_tokens', 4096),
+            temperature=self.config.get('model', {}).get('temperature', 0.5),
+        )
+
+        # Response is Message object with content[0].text
+        if response.content and len(response.content) > 0:
+            return response.content[0].text
+        return ""
     
     async def _async_ingest(self, session_id: str, user_input: str, response: str):
         """Async ingest to memory pipeline."""
