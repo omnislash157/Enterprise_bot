@@ -9,6 +9,7 @@
 	import Login from '$lib/components/Login.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
+	import ConnectionStatus from '$lib/components/ConnectionStatus.svelte';
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
@@ -40,6 +41,9 @@
 {:else}
 	<!-- AUTHENTICATED: Show Ribbon + Content -->
 	<div class="app-shell" class:normie-mode={$theme === 'normie'}>
+		<!-- Connection status indicator -->
+		<ConnectionStatus />
+
 		<IntelligenceRibbon />
 
 		{#key key}
