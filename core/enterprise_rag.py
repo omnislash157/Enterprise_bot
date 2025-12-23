@@ -251,7 +251,6 @@ class EnterpriseRAGRetriever:
                 section_title,
                 source_file,
                 department_id,
-                chunk_index,
                 1 - (embedding <=> $1::vector) as score
             FROM {self.table_name}
             WHERE
@@ -280,7 +279,6 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "chunk_index": row["chunk_index"],
                         "score": float(row["score"]),
                         "search_type": "vector",
                     }
@@ -326,7 +324,6 @@ class EnterpriseRAGRetriever:
                 section_title,
                 source_file,
                 department_id,
-                chunk_index,
                 ts_rank(
                     to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
                     plainto_tsquery('english', $1)
@@ -356,7 +353,6 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "chunk_index": row["chunk_index"],
                         "score": float(row["score"]) if row["score"] else 0.5,
                         "search_type": "keyword",
                     }
@@ -374,7 +370,7 @@ class EnterpriseRAGRetriever:
         sql = f"""
             SELECT
                 id, content, section_title, source_file,
-                department_id, chunk_index
+                department_id
             FROM {self.table_name}
             WHERE id = $1 AND tenant_id = $2
         """
@@ -390,7 +386,6 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "chunk_index": row["chunk_index"],
                     }
                 return None
 

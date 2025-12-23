@@ -4,6 +4,36 @@ This file tracks significant changes made by Claude agents to maintain continuit
 
 ---
 
+## [2024-12-22 22:45] - Model Adapter + Schema Fixes
+
+**Priority:** HIGH - Runtime errors
+**Mission:** Fix model adapter API and remove non-existent columns from SQL
+
+### Problem
+Two runtime issues identified:
+1. `enterprise_twin.py:_generate()` used wrong API: `await self.model_adapter.chat(messages)` but GrokAdapter uses `model_adapter.messages.create(system=..., messages=...)`
+2. `enterprise_rag.py` queried non-existent `chunk_index` column in 3 locations
+
+### Files Modified
+
+**1. core/enterprise_twin.py**
+- Fixed `_generate()` method to use correct GrokAdapter API:
+  - Changed from: `await self.model_adapter.chat(messages)`
+  - Changed to: `self.model_adapter.messages.create(system=..., messages=...)`
+  - Response extraction: `response.content[0].text`
+
+**2. core/enterprise_rag.py** (3 locations)
+- `_vector_search()`: Removed `chunk_index` from result dict
+- `_keyword_search()`: Removed `chunk_index,` from SELECT and result dict
+- `get_by_id()`: Removed `chunk_index` from SELECT and result dict
+
+### Result
+- Model adapter now correctly calls Grok API
+- SQL queries no longer reference non-existent columns
+- Both vector and keyword search work without schema errors
+
+---
+
 ## [2024-12-22 22:30] - Trust Barriers for Context Formatters
 
 **Priority:** MEDIUM - UX polish
