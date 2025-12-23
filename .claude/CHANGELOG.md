@@ -1,5 +1,15 @@
 # CogTwin Development Changelog
 
+## [2025-12-23 19:00] - Observability Infrastructure Fix
+### Files Modified
+- core/database.py - NEW FILE: Created database connection pool manager for observability routes
+- core/main.py - Updated observability route prefixes from /api/observability to /api/admin/*
+- core/main.py - Added /health/deep endpoint with comprehensive health checks
+- core/main.py - Added database pool cleanup to shutdown handler
+- core/main.py - Added start_trace and create_span imports for tracing instrumentation
+### Summary
+Implemented SDK_BUILD_OBSERVABILITY.md to connect database with analytics. Created centralized database pool manager, fixed route prefixes to match frontend expectations (/api/admin/traces, /api/admin/logs, /api/admin/alerts), added deep health check endpoint to validate observability stack, and ensured proper cleanup on shutdown. All observability endpoints should now return data from the database tables.
+
 ## [2025-12-23 18:30] - Documentation Update
 - **Modified**: `docs/FILE_TREE.md` - Complete backend structure update with observability suite
 - **Modified**: `docs/FRONTEND_TREE.md` - Complete frontend structure with voice & observability
