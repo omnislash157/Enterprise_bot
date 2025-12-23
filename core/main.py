@@ -13,11 +13,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 from datetime import datetime
+from collections import defaultdict
 import asyncio
 import json
 import os
 import logging
 import time
+import uuid
 from pathlib import Path
 from typing import Optional
 from .enterprise_tenant import TenantContext
@@ -736,6 +738,43 @@ async def get_session_stats():
     return engine.get_session_stats()
 
 # =============================================================================
+# RATE LIMITER
+# =============================================================================
+
+class RateLimiter:
+    """Simple rate limiter for WebSocket messages."""
+
+    def __init__(self, max_requests: int = 30, window_seconds: int = 60):
+        self.max_requests = max_requests
+        self.window = window_seconds
+        self.requests = defaultdict(list)
+
+    def is_allowed(self, session_id: str) -> bool:
+        """Check if session is within rate limits."""
+        now = time.time()
+        # Clean old requests
+        self.requests[session_id] = [
+            t for t in self.requests[session_id]
+            if now - t < self.window
+        ]
+        # Check limit
+        if len(self.requests[session_id]) >= self.max_requests:
+            return False
+        self.requests[session_id].append(now)
+        return True
+
+rate_limiter = RateLimiter(max_requests=30, window_seconds=60)
+
+# SECURITY: Honeypot divisions - anyone probing these is suspicious
+HONEYPOT_DIVISIONS = {"executive", "ceo", "admin", "root", "system", "superuser", "god"}
+
+# SECURITY: Session timeout (30 minutes)
+SESSION_TIMEOUT_SECONDS = 1800
+
+# SECURITY: Max message length (10k chars)
+MAX_MESSAGE_LENGTH = 10000
+
+# =============================================================================
 # WEBSOCKET CONNECTION MANAGER
 # =============================================================================
 
@@ -768,16 +807,17 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await manager.connect(session_id, websocket)
     metrics_collector.record_ws_connect()  # Record WebSocket connection
 
-    # Default tenant - verification is OPTIONAL for demo
-    # If verify message comes, we use that email
-    # If not, we use default tenant (warehouse division)
-    user_email = "demo@driscollfoods.com"  # Default for unverified sessions
+    # SECURITY: No default access - must verify before sending messages
+    user_email = None  # No default - must verify
+    user_verified = False
     request_twin = None  # Will be set on verify
+    last_activity = time.time()  # SECURITY: Track for session timeout
+    client_ip = websocket.client.host if websocket.client else "unknown"
 
     tenant = TenantContext(
         tenant_id="driscoll",
-        department=cfg("tenant.default_department", "warehouse") if CONFIG_LOADED else "warehouse",
-        role="user",
+        department="none",  # No access until verified
+        role="anonymous",
     )
 
     try:
@@ -789,7 +829,17 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         })
 
         while True:
+            # SECURITY: Check session timeout
+            if time.time() - last_activity > SESSION_TIMEOUT_SECONDS:
+                await websocket.send_json({
+                    "type": "error",
+                    "message": "Session expired due to inactivity",
+                    "code": "SESSION_EXPIRED"
+                })
+                metrics_collector.record_ws_message('out')
+                break  # End session
             data = await websocket.receive_json()
+            last_activity = time.time()  # SECURITY: Update activity timestamp
             metrics_collector.record_ws_message('in')  # Record incoming message
             msg_type = data.get("type", "message")
 
@@ -808,6 +858,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                     if user:
                         user_email = email
+                        user_verified = True  # SECURITY: Mark session as verified
 
                         # Use requested division if user has access
                         requested_division = data.get("division", "warehouse")
@@ -849,6 +900,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         metrics_collector.record_ws_message('out')  # Record outgoing message
                     else:
                         # Domain not allowed
+                        logger.warning(f"[SECURITY] Failed auth: email={email}, ip={client_ip}, reason=domain_not_authorized")
                         await websocket.send_json({
                             "type": "error",
                             "message": "Email domain not authorized",
@@ -858,6 +910,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     # Fallback to old whitelist behavior
                     if email_whitelist.verify(email):
                         user_email = email
+                        user_verified = True  # SECURITY: Mark session as verified
                         tenant = TenantContext(
                             tenant_id="driscoll",
                             department=data.get("division", tenant.department),
@@ -871,7 +924,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         })
                         metrics_collector.record_ws_message('out')  # Record outgoing message
                     else:
-                        logger.warning(f"Email not in whitelist: {email}")
+                        logger.warning(f"[SECURITY] Failed auth: email={email}, ip={client_ip}, reason=not_in_whitelist")
                         await websocket.send_json({
                             "type": "error",
                             "message": "Email not authorized. Please use SSO login.",
@@ -880,7 +933,41 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         continue  # Don't proceed with unauthorized email
 
             elif msg_type == "message":
+                # SECURITY: Require verification before processing messages
+                if not user_verified:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Authentication required. Please log in.",
+                        "code": "AUTH_REQUIRED"
+                    })
+                    metrics_collector.record_ws_message('out')
+                    continue  # Block message
+
+                # SECURITY: Rate limit check
+                if not rate_limiter.is_allowed(session_id):
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Rate limit exceeded. Please slow down.",
+                        "code": "RATE_LIMITED"
+                    })
+                    metrics_collector.record_ws_message('out')
+                    continue
+
                 content = data.get("content", "")
+
+                # SECURITY: Max message length check
+                if len(content) > MAX_MESSAGE_LENGTH:
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Message too long",
+                        "code": "MSG_TOO_LONG"
+                    })
+                    metrics_collector.record_ws_message('out')
+                    continue
+
+                # Generate request ID for audit trail
+                request_id = str(uuid.uuid4())[:8]
+                logger.info(f"[{request_id}] Message from {user_email}: {content[:50]}...")
 
                 # Use request_twin if available (auth-based routing), otherwise use global engine
                 active_twin = request_twin if request_twin else engine
@@ -902,11 +989,49 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     # EnterpriseTwin: streaming response
                     # Read division from message payload first, fallback to session state
                     message_division = data.get("division")
-                    effective_division = message_division or tenant.department
+                    effective_division = tenant.department  # Default to session
 
-                    # Log if message override is used
+                    # SECURITY: Honeypot detection
+                    if message_division and message_division.lower() in HONEYPOT_DIVISIONS:
+                        logger.critical(f"[HONEYPOT] [{request_id}] User {user_email} (IP: {client_ip}) attempted access to honeypot division: {message_division}")
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": "Access denied",
+                            "code": "ACCESS_DENIED",
+                            "request_id": request_id
+                        })
+                        metrics_collector.record_ws_message('out')
+                        continue
+
                     if message_division and message_division != tenant.department:
-                        logger.info(f"[WS] Using division from message: {message_division} (session: {tenant.department})")
+                        # SECURITY: Validate user has access to requested division
+                        if AUTH_LOADED and user_email:
+                            try:
+                                auth = get_auth_service()
+                                user = auth.get_user_by_email(user_email)
+                                if user:
+                                    if user.is_super_user or message_division in user.department_access:
+                                        effective_division = message_division
+                                        logger.info(f"[WS] Division override allowed: {user_email} -> {message_division}")
+                                    else:
+                                        logger.warning(f"[WS] Division override BLOCKED: {user_email} attempted {message_division}")
+                                        await websocket.send_json({
+                                            "type": "error",
+                                            "message": f"Access denied to department: {message_division}",
+                                            "code": "DIVISION_ACCESS_DENIED"
+                                        })
+                                        metrics_collector.record_ws_message('out')
+                                        continue
+                            except Exception as e:
+                                logger.error(f"[WS] Division check failed: {e}")
+                                # SECURITY: Fail closed - deny access on error
+                                await websocket.send_json({
+                                    "type": "error",
+                                    "message": "Authorization check failed",
+                                    "code": "AUTH_ERROR"
+                                })
+                                metrics_collector.record_ws_message('out')
+                                continue
 
                     # Stream response chunks as they arrive
                     async for chunk in active_twin.think_streaming(
@@ -995,6 +1120,17 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 new_division = data.get("division", "warehouse")
                 old_division = tenant.department
 
+                # SECURITY: Honeypot detection
+                if new_division.lower() in HONEYPOT_DIVISIONS:
+                    logger.critical(f"[HONEYPOT] User {user_email} (IP: {client_ip}) attempted set_division to honeypot: {new_division}")
+                    await websocket.send_json({
+                        "type": "error",
+                        "message": "Access denied",
+                        "code": "ACCESS_DENIED"
+                    })
+                    metrics_collector.record_ws_message('out')
+                    continue
+
                 # Validate user has access to requested division
                 if AUTH_LOADED and user_email:
                     try:
@@ -1011,7 +1147,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 continue  # Reject unauthorized division change
                     except Exception as e:
                         logger.error(f"[WS] Auth check failed during set_division: {e}")
-                        # Fail open for now, but log it
+                        # SECURITY: Fail closed - deny on error
+                        await websocket.send_json({
+                            "type": "error",
+                            "message": "Authorization check failed. Please try again.",
+                            "code": "AUTH_ERROR"
+                        })
+                        metrics_collector.record_ws_message('out')
+                        continue  # Block the division change
 
                 tenant = TenantContext(
                     tenant_id=tenant.tenant_id,
@@ -1101,9 +1244,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
         # Cleanup voice session if active
         await stop_voice_session(session_id)
     except Exception as e:
-        logger.error(f"[WS] Error in session {session_id}: {e}")
+        # SECURITY: Log full details internally, but don't leak to client
+        logger.error(f"[WS] Internal error in session {session_id}: {type(e).__name__}: {e}")
 
-        # Log error event to analytics
+        # Log error event to analytics (with full detail)
         if ANALYTICS_LOADED:
             try:
                 analytics = get_analytics_service()
@@ -1116,6 +1260,17 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 )
             except:
                 pass  # Don't let analytics errors crash the handler
+
+        # SECURITY: Send generic error to client (no internal details)
+        try:
+            await websocket.send_json({
+                "type": "error",
+                "message": "Something went wrong",
+                "code": "INTERNAL_ERROR"
+            })
+            metrics_collector.record_ws_message('out')
+        except:
+            pass  # Connection may already be closed
 
         manager.disconnect(session_id)
         metrics_collector.record_ws_disconnect()  # Record disconnect
