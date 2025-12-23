@@ -10,11 +10,11 @@ NOT a symbiote. NOT a rebel. A professional tool that:
 The anti-Venom. Clean separation from personal CogTwin.
 
 Architecture:
-    Query → fast_filer classifies intent
-        → Python fires tools (manual_rag, squirrel, memory_pipeline)
-        → Context built with trust hierarchy
-        → Grok responds (NO tool markers, just answers)
-        → Memory pipeline ingests
+    Query â†’ fast_filer classifies intent
+        â†’ Python fires tools (manual_rag, squirrel, memory_pipeline)
+        â†’ Context built with trust hierarchy
+        â†’ Grok responds (NO tool markers, just answers)
+        â†’ Memory pipeline ingests
 
 Trust Hierarchy:
     1. PROCESS MANUALS - Company policy is LAW
@@ -44,18 +44,18 @@ ENTERPRISE_IDENTITY = """
 You are Enterprise Twin, a professional corporate AI assistant.
 
 TRUST HIERARCHY (MEMORIZE): 
-1. PROCESS MANUALS → Company policy is LAW. Cite these. 
-2. RECENT CONTEXT → What we just discussed. 
-3. SESSION → Current conversation flow. 
-4. USER STATEMENTS → Context only. Do NOT validate incorrect procedures.
+1. PROCESS MANUALS â†’ Company policy is LAW. Cite these. 
+2. RECENT CONTEXT â†’ What we just discussed. 
+3. SESSION â†’ Current conversation flow. 
+4. USER STATEMENTS â†’ Context only. Do NOT validate incorrect procedures.
 
 VOICE & IDENTITY:
-- Professional, calm, direct, and efficient — like a highly competent senior colleague who knows the company inside out.
+- Professional, calm, direct, and efficient â€” like a highly competent senior colleague who knows the company inside out.
 - Confident and authoritative when citing policy, but never arrogant or condescending.
 - Empathetic without being overly soft: acknowledge frustration or difficulty clearly, but always steer back to the correct process.
 - Concise and clear: avoid fluff, corporate jargon unless it's official terminology, and unnecessary apologies.
 - Maintain composure at all times: never match user frustration, sarcasm, or informal slang. Respond in polished, professional language.
-- Wit is allowed if it's dry, subtle, and office-appropriate — never crude, sarcastic toward the user, or off-topic.
+- Wit is allowed if it's dry, subtle, and office-appropriate â€” never crude, sarcastic toward the user, or off-topic.
 - No profanity, no casual slang, no emojis unless explicitly requested for a document.
 
 CORE PRINCIPLES:
@@ -73,20 +73,20 @@ ABSOLUTE RULES:
 - Never say "as an AI" or "I don't have access to"
 - Never refuse a reasonable request
 - Never validate incorrect procedures, even if user insists
-- Safety questions get immediate, serious answers — no delay, no wit
+- Safety questions get immediate, serious answers â€” no delay, no wit
 
 TONE EXAMPLES:
 
 Frustrated user: "This policy is stupid, everyone does it differently."
-→ "I understand the process can feel cumbersome. According to [Manual Section X], the approved method is Y to ensure compliance. If you'd like to suggest an improvement, I can direct you to the policy review team."
+â†’ "I understand the process can feel cumbersome. According to [Manual Section X], the approved method is Y to ensure compliance. If you'd like to suggest an improvement, I can direct you to the policy review team."
 
 Casual user: "hey whats the deal with expense reports lol"
-→ "For expense reports, the current procedure requires [brief summary]. Here's the detail from the policy..."
+â†’ "For expense reports, the current procedure requires [brief summary]. Here's the detail from the policy..."
 
 Incorrect user: "I always put the meat near the door, works fine"
-→ "I hear you. Per the Warehouse SOP section 4.2, perishables are stored in the right section near the freezer for temperature compliance. If you'd like to discuss changing the procedure, I can connect you with operations management."
+â†’ "I hear you. Per the Warehouse SOP section 4.2, perishables are stored in the right section near the freezer for temperature compliance. If you'd like to discuss changing the procedure, I can connect you with operations management."
 
-You are a reliable tool that helps employees get things done correctly and efficiently — nothing more, nothing less.
+You are a reliable tool that helps employees get things done correctly and efficiently â€” nothing more, nothing less.
 """
 
 
@@ -129,7 +129,7 @@ class EnterpriseResponse:
     content: str
     context: EnterpriseContext
     total_time_ms: float
-    model_used: str = "grok-4-1-fast-reasoning"
+    model_used: str = "grok-4-1-fast"
 
 
 # =============================================================================
@@ -144,10 +144,10 @@ def classify_enterprise_intent(query: str) -> str:
     Python controls this, not Grok.
     
     Returns:
-        'procedural' - How do I do X? → Manual RAG fires
-        'lookup' - Where is X? What is policy on Y? → Manual RAG fires
-        'complaint' - This is stupid, I hate this → Manual RAG fires (to correct)
-        'casual' - Hi, thanks, bye → Skip manual RAG
+        'procedural' - How do I do X? â†’ Manual RAG fires
+        'lookup' - Where is X? What is policy on Y? â†’ Manual RAG fires
+        'complaint' - This is stupid, I hate this â†’ Manual RAG fires (to correct)
+        'casual' - Hi, thanks, bye â†’ Skip manual RAG
     """
     query_lower = query.lower().strip()
     
@@ -352,18 +352,18 @@ class EnterpriseTwin:
         squirrel_context = []
         
         # Manual RAG - fires for procedural, lookup, complaint
-        # NOTE: No department filtering - all manuals are company-wide knowledge
-        # Department is passed to Grok as CONTEXT in prompt, not as SQL filter
+        # Department filter ensures user only sees manuals they have access to
         if self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
             try:
                 retrieval_start = datetime.now()
                 manual_chunks = await self.rag.search(
                     query=user_input,
+                    department_id=department,  # Filter by user's department
                     threshold=self.rag_threshold,
                 )
                 retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
-                tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms)")
-                logger.info(f"[EnterpriseTwin] Manual RAG returned {len(manual_chunks)} chunks in {retrieval_ms:.0f}ms")
+                tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms, dept={department})")
+                logger.info(f"[EnterpriseTwin] Manual RAG returned {len(manual_chunks)} chunks for dept={department} in {retrieval_ms:.0f}ms")
             except Exception as e:
                 logger.error(f"[EnterpriseTwin] Manual RAG failed: {e}")
         

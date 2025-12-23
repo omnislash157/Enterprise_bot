@@ -16,8 +16,8 @@ SCHEMA (2 tables only):
    created_at, last_login_at
 
 The flow is simple:
-1. User logs in via Microsoft SSO → token validated by azure_auth.py
-2. User looked up or created here → NO automatic department access
+1. User logs in via Microsoft SSO â†’ token validated by azure_auth.py
+2. User looked up or created here â†’ NO automatic department access
 3. Super user / dept head grants access via admin portal
 4. department_access array is the source of truth
 
@@ -246,6 +246,42 @@ class AuthService:
 
         return user
 
+    def get_user_by_id(self, user_id: str) -> Optional[User]:
+        """Look up user by UUID."""
+        with get_db_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE id = %s AND is_active = TRUE
+            """, (user_id,))
+            row = cur.fetchone()
+
+        if not row:
+            return None
+
+        user = User(
+            id=str(row["id"]),
+            email=row["email"],
+            display_name=row["display_name"],
+            tenant_id=str(row["tenant_id"]),
+            azure_oid=row["azure_oid"],
+            department_access=row["department_access"] or [],
+            dept_head_for=row["dept_head_for"] or [],
+            is_super_user=row["is_super_user"] or False,
+            is_active=row["is_active"] or True,
+            created_at=row["created_at"],
+            last_login_at=row["last_login_at"]
+        )
+
+        # Cache by email
+        email_lower = user.email.lower()
+        self._user_cache[email_lower] = user
+
+        return user
+
     def get_or_create_user(
         self,
         email: str,
@@ -435,6 +471,271 @@ class AuthService:
         self._clear_user_cache(target_email_lower)
 
         return rows_affected > 0
+
+    def promote_to_dept_head(
+        self,
+        promoter: User,
+        target_email: str,
+        department: str
+    ) -> bool:
+        """
+        Promote a user to department head.
+
+        SUPER USER ONLY - dept_heads cannot promote others.
+
+        Args:
+            promoter: User doing the promotion (must be super_user)
+            target_email: User to promote
+            department: Department they will head
+
+        Returns True if successful.
+        """
+        if not promoter.is_super_user:
+            raise PermissionError("Only super users can promote department heads")
+
+        target_email_lower = target_email.lower().strip()
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            # Add department to dept_head_for array (skip if already exists)
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET dept_head_for = array_append(dept_head_for, %s)
+                WHERE LOWER(email) = %s AND NOT (%s = ANY(dept_head_for))
+            """, (department, target_email_lower, department))
+
+            # Also ensure they have access to the department
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET department_access = array_append(department_access, %s)
+                WHERE LOWER(email) = %s AND NOT (%s = ANY(department_access))
+            """, (department, target_email_lower, department))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        self._clear_user_cache(target_email_lower)
+        logger.info(f"[AuthService] {promoter.email} promoted {target_email} to dept_head for {department}")
+
+        return rows_affected > 0
+
+    def revoke_dept_head(
+        self,
+        revoker: User,
+        target_email: str,
+        department: str
+    ) -> bool:
+        """
+        Remove department head status from a user.
+
+        SUPER USER ONLY.
+
+        Note: Does NOT remove their access to the department, just their
+        ability to grant access to others.
+        """
+        if not revoker.is_super_user:
+            raise PermissionError("Only super users can revoke department head status")
+
+        target_email_lower = target_email.lower().strip()
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET dept_head_for = array_remove(dept_head_for, %s)
+                WHERE LOWER(email) = %s
+            """, (department, target_email_lower))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        self._clear_user_cache(target_email_lower)
+        logger.info(f"[AuthService] {revoker.email} revoked dept_head from {target_email} for {department}")
+
+        return rows_affected > 0
+
+    def grant_expanded_power(
+        self,
+        granter: User,
+        target_email: str,
+        department: str
+    ) -> bool:
+        """
+        Grant a dept_head the ability to grant access to another department.
+
+        SUPER USER ONLY.
+
+        Use case: Priscilla is purchasing head but owner wants her to also
+        be able to grant sales, credit access. This adds those departments
+        to her dept_head_for array WITHOUT making her "head" of that department.
+
+        Args:
+            granter: Super user doing the grant
+            target_email: User to grant expanded power to
+            department: Additional department they can grant access to
+        """
+        if not granter.is_super_user:
+            raise PermissionError("Only super users can grant expanded powers")
+
+        # Same implementation as promote_to_dept_head - the distinction is semantic
+        # (dept_head_for means "can grant access to this department")
+        return self.promote_to_dept_head(granter, target_email, department)
+
+    def make_super_user(
+        self,
+        maker: User,
+        target_email: str
+    ) -> bool:
+        """
+        Promote a user to super_user status.
+
+        SUPER USER ONLY. Use carefully - super_users have full access.
+        """
+        if not maker.is_super_user:
+            raise PermissionError("Only super users can create other super users")
+
+        target_email_lower = target_email.lower().strip()
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET is_super_user = TRUE
+                WHERE LOWER(email) = %s
+            """, (target_email_lower,))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        self._clear_user_cache(target_email_lower)
+        logger.info(f"[AuthService] {maker.email} promoted {target_email} to super_user")
+
+        return rows_affected > 0
+
+    def revoke_super_user(
+        self,
+        revoker: User,
+        target_email: str
+    ) -> bool:
+        """
+        Revoke super_user status from a user.
+
+        SUPER USER ONLY. Cannot revoke your own super_user status.
+        """
+        if not revoker.is_super_user:
+            raise PermissionError("Only super users can revoke super_user status")
+
+        target_email_lower = target_email.lower().strip()
+
+        # Prevent self-demotion
+        if target_email_lower == revoker.email.lower():
+            raise PermissionError("Cannot revoke your own super_user status")
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET is_super_user = FALSE
+                WHERE LOWER(email) = %s
+            """, (target_email_lower,))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        self._clear_user_cache(target_email_lower)
+        logger.info(f"[AuthService] {revoker.email} revoked super_user from {target_email}")
+
+        return rows_affected > 0
+
+    def list_all_users(self, requester: User) -> List[User]:
+        """
+        List all users in the company directory.
+
+        Dept heads and super users can see the full directory.
+        Regular users cannot.
+
+        Returns list of User objects (limited fields for privacy).
+        """
+        if not requester.is_super_user and not requester.dept_head_for:
+            raise PermissionError("Only department heads and super users can view the company directory")
+
+        with get_db_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE is_active = TRUE
+                ORDER BY display_name, email
+            """)
+            rows = cur.fetchall()
+
+        users = []
+        for row in rows:
+            users.append(User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                tenant_id=str(row["tenant_id"]),
+                azure_oid=row["azure_oid"],
+                department_access=row["department_access"] or [],
+                dept_head_for=row["dept_head_for"] or [],
+                is_super_user=row["is_super_user"] or False,
+                is_active=row["is_active"],
+                created_at=row["created_at"],
+                last_login_at=row["last_login_at"],
+            ))
+
+        return users
+
+    def list_users_by_department(self, requester: User, department: str) -> List[User]:
+        """
+        List all users with access to a specific department.
+
+        Dept heads can see users in departments they head.
+        Super users can see any department.
+        """
+        if not requester.is_super_user and department not in (requester.dept_head_for or []):
+            raise PermissionError(f"Cannot view users for department: {department}")
+
+        with get_db_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE is_active = TRUE AND %s = ANY(department_access)
+                ORDER BY display_name, email
+            """, (department,))
+            rows = cur.fetchall()
+
+        users = []
+        for row in rows:
+            users.append(User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                tenant_id=str(row["tenant_id"]),
+                azure_oid=row["azure_oid"],
+                department_access=row["department_access"] or [],
+                dept_head_for=row["dept_head_for"] or [],
+                is_super_user=row["is_super_user"] or False,
+                is_active=row["is_active"],
+                created_at=row["created_at"],
+                last_login_at=row["last_login_at"],
+            ))
+
+        return users
 
     # -------------------------------------------------------------------------
     # Cache Management

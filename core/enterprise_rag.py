@@ -8,7 +8,8 @@ Retrieves relevant chunks from documents table using:
 This is the manual RAG that fires for procedural/lookup/complaint queries.
 Python fires this tool, not Grok.
 
-NOTE: Single-tenant MVP - no tenant_id/department filtering yet.
+Department filtering: Pass department_id to filter results by department.
+Valid values: 'sales', 'purchasing', 'warehouse' (or None for all).
 
 Usage:
     from .enterprise_rag import EnterpriseRAGRetriever
@@ -16,10 +17,11 @@ Usage:
     rag = EnterpriseRAGRetriever(config)
     chunks = await rag.search(
         query="how do I process a credit memo",
+        department_id="sales",  # Filter by department
         threshold=0.6,  # Returns ALL chunks above this score
     )
 
-Version: 1.0.0
+Version: 1.1.0
 """
 
 import asyncio
@@ -121,7 +123,7 @@ class EnterpriseRAGRetriever:
     1. If embeddings available: vector similarity search (cosine)
     2. Fallback: keyword search on content + section_title
 
-    NOTE: Single-tenant MVP - no tenant_id/department filtering yet.
+    Department filtering: Pass department_id to filter results.
     """
     
     def __init__(self, config: Dict[str, Any]):
@@ -175,16 +177,18 @@ class EnterpriseRAGRetriever:
     async def search(
         self,
         query: str,
+        department_id: str = None,
         threshold: float = None,
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant manual chunks.
 
         Returns ALL chunks above threshold - no arbitrary cap.
-        NOTE: No department filtering - all manuals are company-wide knowledge.
+        Filters by department_id when provided.
 
         Args:
             query: User's query
+            department_id: Department filter ('sales', 'purchasing', 'warehouse', or None for all)
             threshold: Minimum similarity threshold
 
         Returns:
@@ -193,6 +197,9 @@ class EnterpriseRAGRetriever:
         threshold = threshold or self.default_threshold
 
         start_time = datetime.now()
+        
+        if department_id:
+            logger.info(f"[EnterpriseRAG] Filtering by department: {department_id}")
 
         # Try vector search first
         query_embedding = await self.embedder.embed(query)
@@ -200,6 +207,7 @@ class EnterpriseRAGRetriever:
         if query_embedding:
             results = await self._vector_search(
                 query_embedding=query_embedding,
+                department_id=department_id,
                 threshold=threshold,
             )
             search_type = "vector"
@@ -207,6 +215,7 @@ class EnterpriseRAGRetriever:
             # Fallback to keyword search
             results = await self._keyword_search(
                 query=query,
+                department_id=department_id,
             )
             search_type = "keyword"
         
@@ -218,41 +227,59 @@ class EnterpriseRAGRetriever:
     async def _vector_search(
         self,
         query_embedding: List[float],
-        threshold: float,
+        department_id: str = None,
+        threshold: float = 0.6,
     ) -> List[Dict[str, Any]]:
         """
         Vector similarity search using pgvector.
 
         Uses cosine distance: 1 - (embedding <=> query) as similarity.
         Returns ALL results above threshold - no arbitrary cap.
-        NOTE: No department filtering - all manuals are company-wide knowledge.
+        Filters by department_id when provided.
         """
         pool = await self._get_pool()
 
         # Convert embedding to pgvector format
         embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
 
-        query = f"""
-            SELECT
-                id,
-                content,
-                section_title,
-                source_file,
-                1 - (embedding <=> $1::vector) as score
-            FROM {self.table_name}
-            WHERE
-                embedding IS NOT NULL
-                AND 1 - (embedding <=> $1::vector) >= $2
-            ORDER BY embedding <=> $1::vector
-        """
+        # Build query with optional department filter
+        if department_id:
+            query = f"""
+                SELECT
+                    id,
+                    content,
+                    section_title,
+                    source_file,
+                    department_id,
+                    1 - (embedding <=> $1::vector) as score
+                FROM {self.table_name}
+                WHERE
+                    department_id = $2
+                    AND embedding IS NOT NULL
+                    AND 1 - (embedding <=> $1::vector) >= $3
+                ORDER BY embedding <=> $1::vector
+            """
+            params = (embedding_str, department_id, threshold)
+        else:
+            query = f"""
+                SELECT
+                    id,
+                    content,
+                    section_title,
+                    source_file,
+                    department_id,
+                    1 - (embedding <=> $1::vector) as score
+                FROM {self.table_name}
+                WHERE
+                    embedding IS NOT NULL
+                    AND 1 - (embedding <=> $1::vector) >= $2
+                ORDER BY embedding <=> $1::vector
+            """
+            params = (embedding_str, threshold)
 
         try:
             async with pool.acquire() as conn:
-                rows = await conn.fetch(
-                    query,
-                    embedding_str,
-                    threshold,
-                )
+                rows = await conn.fetch(query, *params)
 
                 return [
                     {
@@ -260,6 +287,7 @@ class EnterpriseRAGRetriever:
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
+                        "department": row["department_id"],
                         "score": float(row["score"]),
                         "search_type": "vector",
                     }
@@ -271,17 +299,19 @@ class EnterpriseRAGRetriever:
             # Fall back to keyword search
             return await self._keyword_search(
                 query=" ".join(str(x) for x in query_embedding[:10]),  # Dummy
+                department_id=department_id,
             )
     
     async def _keyword_search(
         self,
         query: str,
+        department_id: str = None,
     ) -> List[Dict[str, Any]]:
         """
         Keyword search fallback using PostgreSQL full-text search.
 
         Uses ts_rank for scoring. Returns all matches (no arbitrary limit).
-        NOTE: No department filtering - all manuals are company-wide knowledge.
+        Filters by department_id when provided.
         """
         pool = await self._get_pool()
 
@@ -294,28 +324,56 @@ class EnterpriseRAGRetriever:
         if not clean_query:
             clean_query = query.replace(" ", " & ")
 
-        sql = f"""
-            SELECT
-                id,
-                content,
-                section_title,
-                source_file,
-                ts_rank(
-                    to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
-                    plainto_tsquery('english', $1)
-                ) as score
-            FROM {self.table_name}
-            WHERE
-                to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, ''))
-                @@ plainto_tsquery('english', $1)
-                OR content ILIKE '%' || $1 || '%'
-                OR section_title ILIKE '%' || $1 || '%'
-            ORDER BY score DESC
-        """
+        # Build query with optional department filter
+        if department_id:
+            sql = f"""
+                SELECT
+                    id,
+                    content,
+                    section_title,
+                    source_file,
+                    department_id,
+                    ts_rank(
+                        to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
+                        plainto_tsquery('english', $1)
+                    ) as score
+                FROM {self.table_name}
+                WHERE
+                    department_id = $2
+                    AND (
+                        to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, ''))
+                        @@ plainto_tsquery('english', $1)
+                        OR content ILIKE '%' || $1 || '%'
+                        OR section_title ILIKE '%' || $1 || '%'
+                    )
+                ORDER BY score DESC
+            """
+            params = (query, department_id)
+        else:
+            sql = f"""
+                SELECT
+                    id,
+                    content,
+                    section_title,
+                    source_file,
+                    department_id,
+                    ts_rank(
+                        to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
+                        plainto_tsquery('english', $1)
+                    ) as score
+                FROM {self.table_name}
+                WHERE
+                    to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, ''))
+                    @@ plainto_tsquery('english', $1)
+                    OR content ILIKE '%' || $1 || '%'
+                    OR section_title ILIKE '%' || $1 || '%'
+                ORDER BY score DESC
+            """
+            params = (query,)
 
         try:
             async with pool.acquire() as conn:
-                rows = await conn.fetch(sql, query)
+                rows = await conn.fetch(sql, *params)
 
                 return [
                     {
@@ -323,6 +381,7 @@ class EnterpriseRAGRetriever:
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
+                        "department": row["department_id"],
                         "score": float(row["score"]) if row["score"] else 0.5,
                         "search_type": "keyword",
                     }

@@ -14,9 +14,55 @@ interface User {
     tier: string;
     employee_id: string | null;
     primary_department: string | null;
-    departments: string[];
+    departments: string[];           // department_access - what they can query
+    dept_head_for: string[];         // departments they can grant access to
     is_super_user: boolean;
     can_manage_users: boolean;
+}
+
+// =============================================================================
+// PERMISSION HELPERS (exported for use across components)
+// =============================================================================
+
+/**
+ * Can this user grant access to a specific department?
+ */
+export function canGrantAccessTo(user: User | null, dept: string): boolean {
+    if (!user) return false;
+    return user.is_super_user || (user.dept_head_for || []).includes(dept);
+}
+
+/**
+ * Can this user see admin features at all?
+ */
+export function canSeeAdmin(user: User | null): boolean {
+    if (!user) return false;
+    return user.is_super_user || (user.dept_head_for || []).length > 0;
+}
+
+/**
+ * Can this user promote/demote dept heads?
+ */
+export function canManageDeptHeads(user: User | null): boolean {
+    if (!user) return false;
+    return user.is_super_user;
+}
+
+/**
+ * Can this user promote/demote super users?
+ */
+export function canManageSuperUsers(user: User | null): boolean {
+    if (!user) return false;
+    return user.is_super_user;
+}
+
+/**
+ * Get list of departments this user can grant access to
+ */
+export function getGrantableDepartments(user: User | null, allDepartments: string[]): string[] {
+    if (!user) return [];
+    if (user.is_super_user) return allDepartments;
+    return user.dept_head_for || [];
 }
 
 interface AuthState {
@@ -362,7 +408,9 @@ export const auth = createAuthStore();
 export const isAuthenticated = derived(auth, $auth => $auth.user !== null);
 export const currentUser = derived(auth, $auth => $auth.user);
 export const userDepartments = derived(auth, $auth => $auth.user?.departments || []);
+export const userDeptHeadFor = derived(auth, $auth => $auth.user?.dept_head_for || []);
 export const isSuperUser = derived(auth, $auth => $auth.user?.is_super_user || false);
+export const canSeeAdminDerived = derived(auth, $auth => canSeeAdmin($auth.user));
 export const authInitialized = derived(auth, $auth => $auth.initialized);
 export const authLoading = derived(auth, $auth => $auth.loading);
 export const azureEnabled = derived(auth, $auth => $auth.azureEnabled);

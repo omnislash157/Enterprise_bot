@@ -20,13 +20,13 @@ export interface AdminUser {
     email: string;
     display_name: string | null;
     employee_id: string | null;
-    role: 'user' | 'dept_head' | 'super_user';
-    primary_department: string | null;
-    active: boolean;
+    department_access: string[];     // Departments they can query
+    dept_head_for: string[];         // Departments they can grant access to
+    is_super_user: boolean;
+    is_active: boolean;
     last_login_at: string | null;
-    access_level?: string;
-    is_dept_head?: boolean;
-    granted_at?: string;
+    // Computed role for display (derived from is_super_user and dept_head_for)
+    role?: 'user' | 'dept_head' | 'super_user';
 }
 
 export interface UserDetail extends AdminUser {
@@ -70,6 +70,43 @@ export interface AdminStats {
     recent_logins_7d: number;
     recent_access_changes_7d: number;
 }
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+/**
+ * Compute display role from user properties
+ * Super users > Dept heads > Regular users
+ */
+export function getDisplayRole(user: AdminUser): 'super_user' | 'dept_head' | 'user' {
+    if (user.is_super_user) return 'super_user';
+    if (user.dept_head_for && user.dept_head_for.length > 0) return 'dept_head';
+    return 'user';
+}
+
+/**
+ * Get role label for display
+ */
+export function getRoleLabel(role: string): string {
+    switch (role) {
+        case 'super_user': return 'Super User';
+        case 'dept_head': return 'Dept Head';
+        default: return 'User';
+    }
+}
+
+/**
+ * Valid department slugs (static list since we don't have a departments table)
+ */
+export const VALID_DEPARTMENTS = [
+    { slug: 'sales', name: 'Sales' },
+    { slug: 'purchasing', name: 'Purchasing' },
+    { slug: 'warehouse', name: 'Warehouse' },
+    { slug: 'credit', name: 'Credit' },
+    { slug: 'accounting', name: 'Accounting' },
+    { slug: 'it', name: 'IT' },
+];
 
 interface AdminState {
     // Users
@@ -323,6 +360,106 @@ function createAdminStore() {
             if (result.success) {
                 // Refresh user detail
                 await this.loadUserDetail(userId);
+            }
+
+            return result;
+        },
+
+        // =====================================================================
+        // DEPT HEAD MANAGEMENT (Super User Only)
+        // =====================================================================
+
+        async promoteToDeptHead(
+            targetEmail: string,
+            department: string
+        ): Promise<{ success: boolean; error?: string }> {
+            const result = await apiCall<{ message: string }>(
+                '/api/admin/dept-head/promote',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        target_email: targetEmail,
+                        department,
+                    }),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
+        async revokeDeptHead(
+            targetEmail: string,
+            department: string
+        ): Promise<{ success: boolean; error?: string }> {
+            const result = await apiCall<{ message: string }>(
+                '/api/admin/dept-head/revoke',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        target_email: targetEmail,
+                        department,
+                    }),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
+        // =====================================================================
+        // SUPER USER MANAGEMENT (Super User Only)
+        // =====================================================================
+
+        async promoteToSuperUser(
+            targetEmail: string
+        ): Promise<{ success: boolean; error?: string }> {
+            const result = await apiCall<{ message: string }>(
+                '/api/admin/super-user/promote',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        target_email: targetEmail,
+                    }),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
+            }
+
+            return result;
+        },
+
+        async revokeSuperUser(
+            targetEmail: string
+        ): Promise<{ success: boolean; error?: string }> {
+            const result = await apiCall<{ message: string }>(
+                '/api/admin/super-user/revoke',
+                {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        target_email: targetEmail,
+                    }),
+                }
+            );
+
+            if (result.success) {
+                // Refresh users list
+                const state = get({ subscribe });
+                await this.loadUsers(state.departmentFilter || undefined);
             }
 
             return result;

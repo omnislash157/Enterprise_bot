@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { isSuperUser } from '$lib/stores/auth';
+    import { isSuperUser, canSeeAdminDerived, userDeptHeadFor } from '$lib/stores/auth';
     import { clickOutside } from '$lib/utils/clickOutside';
 
     export let currentPath: string;
@@ -7,12 +7,15 @@
     let open = false;
 
     $: isAdminRoute = currentPath.startsWith('/admin');
+    
+    // User can see admin if they're a super user or dept head
+    $: canSeeAdmin = $canSeeAdminDerived;
 
     const adminLinks = [
-        { href: '/admin', label: 'Nerve Center', icon: '🎛️', superOnly: false },
+        { href: '/admin', label: 'Nerve Center', icon: '⚡', superOnly: false },
         { href: '/admin/analytics', label: 'Analytics', icon: '📊', superOnly: false },
         { href: '/admin/users', label: 'User Management', icon: '👥', superOnly: false },
-        { href: '/admin/audit', label: 'Audit Log', icon: '🔒', superOnly: true },
+        { href: '/admin/audit', label: 'Audit Log', icon: '📋', superOnly: true },
     ];
 
     function toggle() {
@@ -34,6 +37,7 @@
     }
 </script>
 
+{#if canSeeAdmin}
 <div class="admin-dropdown" use:clickOutside={close}>
     <button
         class="admin-trigger"
@@ -73,6 +77,7 @@
         </div>
     {/if}
 </div>
+{/if}
 
 <style>
     .admin-dropdown {

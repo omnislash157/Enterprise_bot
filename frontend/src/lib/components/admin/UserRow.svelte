@@ -1,12 +1,14 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import type { AdminUser, UserDetail } from '$lib/stores/admin';
+    import { getDisplayRole, getRoleLabel as getRoleLabelUtil } from '$lib/stores/admin';
 
     export let user: AdminUser;
     export let expanded = false;
     export let loading = false;
     export let selectedUserDetail: UserDetail | null = null;
-    export let isSuperUser = false;
+    export let isSuperUser = false;           // Current user is super user
+    export let currentUserDeptHeadFor: string[] = [];  // Current user's dept_head_for
 
     // New CRUD callbacks
     export let onEdit: ((user: AdminUser) => void) | undefined = undefined;
@@ -14,6 +16,13 @@
     export let onReactivate: ((user: AdminUser) => void) | undefined = undefined;
 
     const dispatch = createEventDispatcher();
+
+    // Compute display role from user properties
+    $: displayRole = getDisplayRole(user);
+
+    // Check if current user can grant access to this user
+    $: canManageUser = isSuperUser || 
+        currentUserDeptHeadFor.some(d => user.department_access?.includes(d));
 
     // Role badge styling
     function getRoleBadgeClass(role: string): string {
@@ -25,11 +34,7 @@
     }
 
     function getRoleLabel(role: string): string {
-        switch (role) {
-            case 'super_user': return 'Super User';
-            case 'dept_head': return 'Dept Head';
-            default: return 'User';
-        }
+        return getRoleLabelUtil(role);
     }
 
     function handleClick() {
@@ -49,6 +54,26 @@
     function handleChangeRole(e: Event) {
         e.stopPropagation();
         dispatch('changeRole');
+    }
+
+    function handlePromoteDeptHead(e: Event, dept: string) {
+        e.stopPropagation();
+        dispatch('promoteDeptHead', dept);
+    }
+
+    function handleRevokeDeptHead(e: Event, dept: string) {
+        e.stopPropagation();
+        dispatch('revokeDeptHead', dept);
+    }
+
+    function handlePromoteSuperUser(e: Event) {
+        e.stopPropagation();
+        dispatch('promoteSuperUser');
+    }
+
+    function handleRevokeSuperUser(e: Event) {
+        e.stopPropagation();
+        dispatch('revokeSuperUser');
     }
 
     function handleEdit(e: Event) {
@@ -72,7 +97,7 @@
     <div class="row-content">
         <div class="col-email">
             <span class="email">{user.email}</span>
-            {#if !user.active}
+            {#if !user.is_active}
                 <span class="inactive-badge">Inactive</span>
             {/if}
         </div>
@@ -85,18 +110,36 @@
         </div>
 
         <div class="col-role">
-            <span class="role-badge {getRoleBadgeClass(user.role)}">
-                {getRoleLabel(user.role)}
+            <span class="role-badge {getRoleBadgeClass(displayRole)}">
+                {getRoleLabel(displayRole)}
             </span>
+            {#if user.dept_head_for && user.dept_head_for.length > 0}
+                <div class="dept-head-badges">
+                    {#each user.dept_head_for as dept}
+                        <span class="dept-head-badge" title="Head of {dept}">{dept}</span>
+                    {/each}
+                </div>
+            {/if}
         </div>
 
         <div class="col-dept">
-            <span class="dept">{user.primary_department || '-'}</span>
+            {#if user.department_access && user.department_access.length > 0}
+                <div class="dept-tags">
+                    {#each user.department_access.slice(0, 3) as dept}
+                        <span class="dept-tag">{dept}</span>
+                    {/each}
+                    {#if user.department_access.length > 3}
+                        <span class="dept-more">+{user.department_access.length - 3}</span>
+                    {/if}
+                </div>
+            {:else}
+                <span class="dept">-</span>
+            {/if}
         </div>
 
         <div class="col-actions">
-            {#if isSuperUser}
-                {#if user.active}
+            {#if isSuperUser || canManageUser}
+                {#if user.is_active}
                     <button
                         class="action-btn edit-btn"
                         title="Edit user"
@@ -107,18 +150,20 @@
                             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                         </svg>
                     </button>
-                    <button
-                        class="action-btn deactivate-btn"
-                        title="Deactivate user"
-                        on:click={handleDeactivate}
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <line x1="15" y1="9" x2="9" y2="15"></line>
-                            <line x1="9" y1="9" x2="15" y2="15"></line>
-                        </svg>
-                    </button>
-                {:else}
+                    {#if isSuperUser}
+                        <button
+                            class="action-btn deactivate-btn"
+                            title="Deactivate user"
+                            on:click={handleDeactivate}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </button>
+                    {/if}
+                {:else if isSuperUser}
                     <button
                         class="action-btn reactivate-btn"
                         title="Reactivate user"
@@ -134,7 +179,7 @@
                 class="action-btn expand-btn"
                 title={expanded ? 'Collapse' : 'Expand'}
             >
-                {expanded ? '▼' : '▶'}
+                {expanded ? 'â–¼' : 'â–¶'}
             </button>
         </div>
     </div>
@@ -282,6 +327,47 @@
         font-size: 0.9rem;
         color: #888;
         text-transform: capitalize;
+    }
+
+    /* Department Tags */
+    .dept-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+    }
+
+    .dept-tag {
+        padding: 0.125rem 0.375rem;
+        background: rgba(59, 130, 246, 0.15);
+        border-radius: 3px;
+        font-size: 0.7rem;
+        color: #3b82f6;
+        text-transform: capitalize;
+    }
+
+    .dept-more {
+        padding: 0.125rem 0.375rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        font-size: 0.7rem;
+        color: #888;
+    }
+
+    /* Dept Head Badges */
+    .dept-head-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        margin-top: 0.25rem;
+    }
+
+    .dept-head-badge {
+        padding: 0.125rem 0.375rem;
+        background: rgba(245, 158, 11, 0.15);
+        border-radius: 3px;
+        font-size: 0.65rem;
+        color: #f59e0b;
+        text-transform: uppercase;
     }
 
     /* Role Badges */

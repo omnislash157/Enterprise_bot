@@ -5,8 +5,16 @@
     export let mode: 'grant' | 'revoke' = 'grant';
     export let departments: Department[] = [];
     export let preselectedDepartment: string | null = null;
+    // New props for permission-based filtering
+    export let grantableDepartments: string[] = [];  // Departments the current user can grant
+    export let isSuperUser: boolean = false;          // Only super users can make dept heads
 
     const dispatch = createEventDispatcher();
+
+    // Filter departments to only show ones the current user can grant
+    $: availableDepartments = mode === 'grant' && grantableDepartments.length > 0
+        ? departments.filter(d => grantableDepartments.includes(d.slug))
+        : departments;
 
     // Form state
     let selectedDepartment = preselectedDepartment || '';
@@ -30,7 +38,7 @@
         dispatch('submit', {
             departmentSlug: selectedDepartment,
             accessLevel: mode === 'grant' ? accessLevel : undefined,
-            makeDeptHead: mode === 'grant' ? makeDeptHead : undefined,
+            makeDeptHead: mode === 'grant' && isSuperUser ? makeDeptHead : false,
             reason: reason || undefined,
         });
     }
@@ -67,10 +75,15 @@
                             required
                         >
                             <option value="">Select department...</option>
-                            {#each departments as dept}
+                            {#each availableDepartments as dept}
                                 <option value={dept.slug}>{dept.name}</option>
                             {/each}
                         </select>
+                        {#if availableDepartments.length === 0}
+                            <span class="no-depts-warning">
+                                No departments available. You may not have permission to grant access.
+                            </span>
+                        {/if}
                     {/if}
                 </div>
 
@@ -97,21 +110,23 @@
                         </div>
                     </div>
 
-                    <!-- Dept Head Toggle -->
-                    <div class="form-group">
-                        <label class="checkbox-option">
-                            <input
-                                type="checkbox"
-                                bind:checked={makeDeptHead}
-                            />
-                            <span class="checkbox-label">
-                                <span class="checkbox-title">Make Department Head</span>
-                                <span class="checkbox-desc">
-                                    Allows user to manage other users in this department
+                    <!-- Dept Head Toggle (Super Users Only) -->
+                    {#if isSuperUser}
+                        <div class="form-group">
+                            <label class="checkbox-option">
+                                <input
+                                    type="checkbox"
+                                    bind:checked={makeDeptHead}
+                                />
+                                <span class="checkbox-label">
+                                    <span class="checkbox-title">Make Department Head</span>
+                                    <span class="checkbox-desc">
+                                        Allows user to manage other users in this department
+                                    </span>
                                 </span>
-                            </span>
                         </label>
                     </div>
+                    {/if}
                 {/if}
 
                 <!-- Reason (for audit) -->
@@ -269,6 +284,17 @@
     .hint {
         font-size: 0.75rem;
         color: #555;
+    }
+
+    .no-depts-warning {
+        display: block;
+        margin-top: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 68, 68, 0.1);
+        border: 1px solid rgba(255, 68, 68, 0.2);
+        border-radius: 6px;
+        font-size: 0.8rem;
+        color: #ff6b6b;
     }
 
     /* Radio Group */
