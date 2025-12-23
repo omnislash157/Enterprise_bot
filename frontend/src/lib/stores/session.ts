@@ -2,11 +2,67 @@ import { writable, get } from 'svelte/store';
 import { websocket } from './websocket';
 import { auth } from './auth';
 
+// Session state persistence keys
+const SESSION_STORAGE_KEY = 'cogtwin_session';
+const SESSION_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 interface Message {
 	role: 'user' | 'assistant';
 	content: string;
 	timestamp: Date;
 	traceId?: string;
+}
+
+interface PersistedSession {
+	sessionId: string;
+	department: string;
+	messages: Message[];
+	timestamp: number;
+}
+
+function saveSessionToStorage(sessionId: string, department: string, messages: Message[]): void {
+	try {
+		const data: PersistedSession = {
+			sessionId,
+			department,
+			messages: messages.slice(-50), // Keep last 50 messages only
+			timestamp: Date.now()
+		};
+		localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(data));
+	} catch (e) {
+		console.warn('[Session] Failed to save to localStorage:', e);
+	}
+}
+
+function loadSessionFromStorage(sessionId: string): PersistedSession | null {
+	try {
+		const saved = localStorage.getItem(SESSION_STORAGE_KEY);
+		if (!saved) return null;
+
+		const data: PersistedSession = JSON.parse(saved);
+
+		// Check if same session and not stale
+		if (data.sessionId !== sessionId) {
+			console.log('[Session] Different session ID, clearing storage');
+			localStorage.removeItem(SESSION_STORAGE_KEY);
+			return null;
+		}
+
+		if (Date.now() - data.timestamp > SESSION_TTL_MS) {
+			console.log('[Session] Session expired, clearing storage');
+			localStorage.removeItem(SESSION_STORAGE_KEY);
+			return null;
+		}
+
+		return data;
+	} catch (e) {
+		console.warn('[Session] Failed to load from localStorage:', e);
+		return null;
+	}
+}
+
+function clearSessionStorage(): void {
+	localStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 interface CognitiveState {
@@ -63,6 +119,9 @@ interface SessionState {
 	isStreaming: boolean;
 	currentDivision: string | null;  // Track the active division
 	verified: boolean;               // Track if session is verified
+	connectionState: 'connecting' | 'connected' | 'reconnecting' | 'disconnected';
+	reconnectAttempts: number;
+	sessionId: string | null;        // Track current session ID for persistence
 }
 
 function createSessionStore() {
@@ -80,15 +139,40 @@ function createSessionStore() {
 		isStreaming: false,
 		currentDivision: null,
 		verified: false,
+		connectionState: 'disconnected',
+		reconnectAttempts: 0,
+		sessionId: null,
 	});
 
 	const { subscribe, set, update } = store;
 
 	// Set up WebSocket message handler
 	let unsubscribe: (() => void) | null = null;
+	let wsUnsubscribe: (() => void) | null = null;
 	let pendingDivision: string | null = null;  // Division we want after verify
 
 	function initMessageHandler() {
+		// Subscribe to WebSocket connection state
+		wsUnsubscribe = websocket.subscribe((wsState) => {
+			const sessionState = get(store);
+
+			// Update connection state based on WebSocket state
+			if (wsState.connected && sessionState.verified) {
+				// Fully connected and verified
+				update(s => ({ ...s, connectionState: 'connected', reconnectAttempts: 0 }));
+			} else if (!wsState.connected && sessionState.verified) {
+				// Was connected before, now disconnected - reconnecting
+				update(s => ({
+					...s,
+					connectionState: 'reconnecting',
+					reconnectAttempts: s.reconnectAttempts + 1
+				}));
+			} else if (wsState.error) {
+				// Connection error
+				update(s => ({ ...s, connectionState: 'disconnected' }));
+			}
+		});
+
 		unsubscribe = websocket.onMessage((data) => {
 			switch (data.type) {
 				case 'stream_chunk':
@@ -106,9 +190,16 @@ function createSessionStore() {
 								timestamp: new Date(),
 								traceId: data.trace_id,
 							};
+							const newMessages = [...s.messages, assistantMsg];
+
+							// Auto-save to localStorage
+							if (s.sessionId && s.currentDivision) {
+								saveSessionToStorage(s.sessionId, s.currentDivision, newMessages);
+							}
+
 							return {
 								...s,
-								messages: [...s.messages, assistantMsg],
+								messages: newMessages,
 								currentStream: '',
 								isStreaming: false,
 							};
@@ -123,10 +214,12 @@ function createSessionStore() {
 						...s,
 						verified: true,
 						currentDivision: backendDivision,
+						connectionState: 'connected',
+						reconnectAttempts: 0,
 					}));
-					
+
 					console.log('[Session] Verified with division:', backendDivision);
-					
+
 					// If we have a pending division that differs, send set_division NOW
 					if (pendingDivision && pendingDivision !== backendDivision) {
 						console.log('[Session] Resending set_division:', pendingDivision, '(backend had:', backendDivision, ')');
@@ -209,9 +302,27 @@ function createSessionStore() {
 		subscribe,
 
 		init(sessionId: string, department?: string) {
+			// Store session ID for persistence
+			update(s => ({ ...s, sessionId, connectionState: 'connecting' }));
+
+			// Try to restore from localStorage first
+			const saved = loadSessionFromStorage(sessionId);
+			if (saved) {
+				console.log(`[Session] Restoring ${saved.messages.length} messages from localStorage`);
+				update(s => ({
+					...s,
+					messages: saved.messages,
+					currentDivision: saved.department
+				}));
+				// Use saved department if current doesn't match
+				if (saved.department && saved.department !== department) {
+					department = saved.department;
+				}
+			}
+
 			// Store the department we want (will be checked after verify)
 			pendingDivision = department || null;
-			
+
 			websocket.connect(sessionId);
 			initMessageHandler();
 
@@ -269,6 +380,10 @@ function createSessionStore() {
 				unsubscribe();
 				unsubscribe = null;
 			}
+			if (wsUnsubscribe) {
+				wsUnsubscribe();
+				wsUnsubscribe = null;
+			}
 			pendingDivision = null;
 			websocket.disconnect();
 		},
@@ -286,13 +401,22 @@ function createSessionStore() {
 				timestamp: new Date(),
 			};
 
-			update(s => ({
-				...s,
-				messages: [...s.messages, userMsg],
-				inputValue: '',
-				currentStream: '',
-				isStreaming: true,
-			}));
+			update(s => {
+				const newMessages = [...s.messages, userMsg];
+
+				// Auto-save to localStorage
+				if (s.sessionId && s.currentDivision) {
+					saveSessionToStorage(s.sessionId, s.currentDivision, newMessages);
+				}
+
+				return {
+					...s,
+					messages: newMessages,
+					inputValue: '',
+					currentStream: '',
+					isStreaming: true,
+				};
+			});
 
 			// Get current division to include in message
 			const state = get(store);
