@@ -256,7 +256,9 @@
 				<!-- Header -->
 				<header class="chat-header">
 					<div class="header-left">
-						<span class="logo-icon">â—ˆ</span>
+						<svg class="logo-icon" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+							<path d="M12 2L2 12l10 10 10-10L12 2zm0 3l7 7-7 7-7-7 7-7z"/>
+						</svg>
 						<h1>Driscoll Intelligence</h1>
 					</div>
 					<div class="header-center">
@@ -272,7 +274,7 @@
 						{#if $currentUser}
 							<button class="logout-btn" on:click={handleLogout} title="Sign out">
 								<span class="user-email">{$currentUser.email.split('@')[0]}</span>
-								<span class="logout-icon">â»</span>
+								<svg class="logout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
 							</button>
 						{/if}
 					</div>
@@ -282,7 +284,11 @@
 				<div class="messages-area" bind:this={messagesContainer}>
 					{#if $session.messages.length === 0 && !$session.currentStream}
 						<div class="empty-state">
-							<div class="empty-icon">â—‡</div>
+							<div class="empty-icon">
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48">
+									<path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+								</svg>
+							</div>
 							<p>Ask me anything about company procedures, policies, or operations.</p>
 							<p class="hint">I'm here to help you navigate Driscoll systems.</p>
 						</div>
@@ -304,7 +310,7 @@
 								<div class="message-content">
 									{@html marked.parse($session.currentStream)}
 								</div>
-								<span class="typing-cursor">â–Š</span>
+								<span class="typing-cursor"></span>
 							</div>
 						{/if}
 					{/if}
@@ -639,9 +645,12 @@
 
 	.message.streaming .typing-cursor {
 		display: inline-block;
-		color: #00ff41;
+		width: 2px;
+		height: 1em;
+		background: #00ff41;
 		animation: blink 0.8s step-end infinite;
 		margin-left: 2px;
+		vertical-align: text-bottom;
 	}
 
 	@keyframes blink {

@@ -30,6 +30,19 @@ from auth.azure_auth import validate_access_token, is_configured as azure_config
 from core.metrics_collector import metrics_collector
 from auth.metrics_routes import metrics_router
 
+# Observability imports
+try:
+    from core.tracing import trace_collector
+    from core.structured_logging import setup_structured_logging, shutdown_structured_logging
+    from core.alerting import alert_engine
+    from auth.tracing_routes import tracing_router
+    from auth.logging_routes import logging_router
+    from auth.alerting_routes import alerting_router
+    OBSERVABILITY_LOADED = True
+except ImportError as e:
+    logger.warning(f"Observability modules not loaded: {e}")
+    OBSERVABILITY_LOADED = False
+
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -357,6 +370,13 @@ if SSO_ROUTES_LOADED:
 app.include_router(metrics_router, prefix="/api/metrics", tags=["metrics"])
 logger.info("[STARTUP] Metrics routes loaded at /api/metrics")
 
+# Include observability routers
+if OBSERVABILITY_LOADED:
+    app.include_router(tracing_router, prefix="/api/observability", tags=["observability"])
+    app.include_router(logging_router, prefix="/api/observability", tags=["observability"])
+    app.include_router(alerting_router, prefix="/api/observability/alerts", tags=["observability"])
+    logger.info("[STARTUP] Observability routes loaded at /api/observability")
+
 # Global engine instance
 engine: Optional[CogTwin] = None
 
@@ -434,6 +454,49 @@ async def startup_event():
         logger.info("[STARTUP] psutil available - system metrics enabled")
     except ImportError:
         logger.warning("[STARTUP] psutil not installed - run: pip install psutil")
+
+    # Initialize observability stack
+    if OBSERVABILITY_LOADED:
+        logger.info("[STARTUP] Initializing observability stack...")
+        try:
+            # Get database pool for observability
+            from core.enterprise_rag import EnterpriseRAGRetriever
+            config = get_config()
+            rag = EnterpriseRAGRetriever(config)
+            db_pool = await rag._get_pool()
+
+            # Setup trace collector
+            trace_collector.set_db_pool(db_pool)
+            await trace_collector.start()
+            logger.info("[STARTUP] Trace collector started")
+
+            # Setup structured logging
+            setup_structured_logging(db_pool)
+            logger.info("[STARTUP] Structured logging enabled")
+
+            # Setup alert engine
+            alert_engine.set_db_pool(db_pool)
+            await alert_engine.start()
+            logger.info("[STARTUP] Alert engine started")
+        except Exception as e:
+            logger.error(f"[STARTUP] Observability init failed: {e}")
+
+# =============================================================================
+# SHUTDOWN
+# =============================================================================
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Clean shutdown of observability components."""
+    if OBSERVABILITY_LOADED:
+        logger.info("[SHUTDOWN] Stopping observability stack...")
+        try:
+            await trace_collector.stop()
+            await alert_engine.stop()
+            shutdown_structured_logging()
+            logger.info("[SHUTDOWN] Observability stack stopped")
+        except Exception as e:
+            logger.error(f"[SHUTDOWN] Observability cleanup error: {e}")
 
 # =============================================================================
 # HEALTH + CONFIG ENDPOINTS

@@ -272,7 +272,7 @@
             {:else}
               <span class="trigger-placeholder">Search customer...</span>
             {/if}
-            <span class="trigger-icon">â–¾</span>
+            <svg class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
           </button>
         </div>
   
@@ -332,7 +332,7 @@
             {:else}
               <span class="trigger-placeholder disabled">Select customer first</span>
             {/if}
-            <span class="trigger-icon">â–¾</span>
+            <svg class="trigger-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M6 9l6 6 6-6"/></svg>
           </button>
   
           {#if $credit.selectedInvoice}
@@ -412,7 +412,7 @@
                     <button class="item-header" on:click={() => handleToggle(item)}>
                       <div class="item-checkbox" class:checked={item.credit.selected}>
                         {#if item.credit.selected}
-                          <span class="check-mark">âœ“</span>
+                          <svg class="check-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="14" height="14"><path d="M20 6L9 17l-5-5"/></svg>
                         {/if}
                       </div>
   
@@ -440,14 +440,14 @@
                         <!-- Warning Notices -->
                         {#if item.credit.requiresOverride}
                           <div class="notice override-notice">
-                            <span class="notice-icon">âš </span>
+                            <span class="notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></span>
                             <span>Override required - will be flagged for review</span>
                           </div>
                         {/if}
   
                         {#if item.credit.wasCapped}
                           <div class="notice capped-notice">
-                            <span class="notice-icon">â†“</span>
+                            <span class="notice-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
                             <span>Qty capped from {item.credit.originalRequestedQty} to {item.credit.creditQuantity}</span>
                           </div>
                         {/if}
@@ -581,7 +581,7 @@
                         {#if item.credit.validationErrors.length > 0}
                           <div class="validation-errors">
                             {#each item.credit.validationErrors as error}
-                              <span class="error-tag">âš  {error}</span>
+                              <span class="error-tag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>{error}</span>
                             {/each}
                           </div>
                         {/if}
@@ -599,7 +599,7 @@
       <footer class="panel-footer">
         {#if $credit.error}
           <div class="error-banner">
-            <span>âš  {$credit.error}</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="display:inline;vertical-align:middle;margin-right:4px;"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>{$credit.error}</span>
             <button class="error-dismiss" on:click={() => credit.clearError()}>Ã—</button>
           </div>
         {/if}
