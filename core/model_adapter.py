@@ -4,29 +4,22 @@ model_adapter.py - Unified LLM interface for multiple providers.
 Provides Anthropic-style interface regardless of backend.
 Currently supports: Anthropic (Claude), xAI (Grok)
 
+IMPORTANT: Model names are read from environment variables, not hardcoded.
+Set these in Railway / .env:
+  - XAI_MODEL (e.g., "grok-4-1-fast-reasoning")
+  - XAI_API_KEY
+  - ANTHROPIC_API_KEY (if using Claude)
+
 The adapter normalizes:
 - Streaming interface (.messages.stream() context manager)
 - Response format (.content[0].text, .usage.input_tokens)
 - System prompt handling (Grok uses messages, Claude uses system param)
 
 Usage:
-    from model_adapter import create_adapter
+    from model_adapter import create_adapter, get_model_name
 
-    # Create adapter (reads provider from config or uses default)
-    adapter = create_adapter(
-        provider="xai",  # or "anthropic"
-        api_key=os.getenv("XAI_API_KEY"),
-        model="grok-4-1-fast-reasoning",
-    )
-
-    # Use exactly like Anthropic client
-    response = adapter.messages.create(
-        model="grok-4-1-fast-reasoning",
-        max_tokens=4096,
-        system="You are helpful.",
-        messages=[{"role": "user", "content": "Hello"}],
-    )
-    print(response.content[0].text)
+    adapter = create_adapter(provider="xai")
+    # Model name comes from XAI_MODEL env var automatically
 """
 
 import os
@@ -40,6 +33,36 @@ from contextlib import contextmanager
 import requests
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# MODEL NAME - SINGLE SOURCE OF TRUTH
+# =============================================================================
+
+def get_model_name(provider: str = "xai") -> str:
+    """
+    Get model name from environment variable.
+    
+    This is the ONLY place model names should be resolved.
+    Set XAI_MODEL or ANTHROPIC_MODEL in Railway/env.
+    
+    Raises ValueError if not set (fail fast, no silent defaults).
+    """
+    if provider == "xai":
+        model = os.getenv("XAI_MODEL")
+        if not model:
+            raise ValueError(
+                "XAI_MODEL environment variable not set. "
+                "Set it in Railway or .env (e.g., XAI_MODEL=grok-4-1-fast-reasoning)"
+            )
+        return model
+    
+    elif provider == "anthropic":
+        # Anthropic has a sensible default since it changes less often
+        return os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+    
+    else:
+        raise ValueError(f"Unknown provider: {provider}")
 
 
 # =============================================================================
@@ -127,7 +150,7 @@ class StreamManager:
 
         # Estimate tokens if not provided
         if not self._usage:
-            # Rough estimate: 1 token ≈ 4 chars
+            # Rough estimate: 1 token ~ 4 chars
             self._usage = Usage(
                 input_tokens=0,  # Unknown for streamed
                 output_tokens=len(self._collected_text) // 4,
@@ -155,10 +178,11 @@ class GrokMessages:
 
     API_BASE = "https://api.x.ai/v1"
 
-    def __init__(self, api_key: str, default_model: str = "grok-4-1-fast-reasoning"):
+    def __init__(self, api_key: str, default_model: str):
         self.api_key = api_key
         self.default_model = default_model
         self.session = self._create_session()
+        logger.info(f"[GrokMessages] Initialized with model: {default_model}")
 
     def _create_session(self) -> requests.Session:
         """Create configured requests session."""
@@ -218,7 +242,7 @@ class GrokMessages:
 
         url = f"{self.API_BASE}/chat/completions"
 
-        logger.debug(f"Grok API request: {len(openai_messages)} messages")
+        logger.debug(f"Grok API request: model={model}, {len(openai_messages)} messages")
         start = time.time()
 
         response = self.session.post(url, json=payload, timeout=(10, 120))
@@ -282,7 +306,7 @@ class GrokMessages:
 
         url = f"{self.API_BASE}/chat/completions"
 
-        logger.debug(f"Grok API stream request: {len(openai_messages)} messages")
+        logger.debug(f"Grok API stream request: model={model}, {len(openai_messages)} messages")
 
         response = self.session.post(
             url,
@@ -314,11 +338,14 @@ class GrokAdapter:
     Grok adapter with Anthropic-compatible interface.
 
     Usage:
-        adapter = GrokAdapter(api_key="...")
+        adapter = GrokAdapter(api_key="...", model="grok-4-1-fast-reasoning")
         response = adapter.messages.create(...)
     """
 
-    def __init__(self, api_key: str, model: str = "grok-4-1-fast-reasoning"):
+    def __init__(self, api_key: str, model: str):
+        if not model:
+            raise ValueError("model parameter is required - no hardcoded defaults allowed")
+        self.model = model
         self.messages = GrokMessages(api_key, default_model=model)
 
 
@@ -332,7 +359,7 @@ class AnthropicAdapter:
     Exists so we can use the same create_adapter() interface.
     """
 
-    def __init__(self, api_key: str, model: str = "claude-sonnet-4-20250514"):
+    def __init__(self, api_key: str, model: str):
         import anthropic
         self._client = anthropic.Anthropic(api_key=api_key)
         self.messages = self._client.messages
@@ -351,10 +378,14 @@ def create_adapter(
     """
     Create an LLM adapter for the specified provider.
 
+    Model names are read from environment variables if not explicitly passed:
+    - XAI_MODEL for xAI/Grok
+    - ANTHROPIC_MODEL for Anthropic/Claude
+
     Args:
         provider: "xai" (Grok) or "anthropic" (Claude)
         api_key: API key (or reads from env)
-        model: Model name (uses provider default if not specified)
+        model: Model name (or reads from env - REQUIRED for xai)
 
     Returns:
         Adapter with .messages.create() and .messages.stream() interface
@@ -363,14 +394,17 @@ def create_adapter(
         api_key = api_key or os.getenv("XAI_API_KEY")
         if not api_key:
             raise ValueError("XAI_API_KEY required for Grok")
-        model = model or "grok-4-1-fast-reasoning"
+        
+        # Model from param, then env var, then fail
+        model = model or get_model_name("xai")
+        logger.info(f"[create_adapter] Creating Grok adapter with model: {model}")
         return GrokAdapter(api_key=api_key, model=model)
 
     elif provider == "anthropic":
         api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY required for Claude")
-        model = model or "claude-sonnet-4-20250514"
+        model = model or get_model_name("anthropic")
         return AnthropicAdapter(api_key=api_key, model=model)
 
     else:
