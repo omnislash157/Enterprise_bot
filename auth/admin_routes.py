@@ -192,7 +192,7 @@ async def list_users(
                 "id": u.id,
                 "email": u.email,
                 "display_name": u.display_name,
-                "department_access": u.department_access,
+                "departments": u.department_access,  # Standardized naming for frontend
                 "dept_head_for": u.dept_head_for,
                 "is_super_user": u.is_super_user,
                 "is_active": u.is_active,
@@ -254,7 +254,7 @@ async def get_user_detail(
                 "id": target.id,
                 "email": target.email,
                 "display_name": target.display_name,
-                "department_access": target.department_access,
+                "departments": target.department_access,  # Standardized naming for frontend
                 "dept_head_for": target.dept_head_for,
                 "is_super_user": target.is_super_user,
                 "is_active": target.is_active,
@@ -321,7 +321,7 @@ async def list_department_users(
                 "id": u.id,
                 "email": u.email,
                 "display_name": u.display_name,
-                "department_access": u.department_access,
+                "departments": u.department_access,  # Standardized naming for frontend
                 "dept_head_for": u.dept_head_for,
                 "is_super_user": u.is_super_user,
                 "is_active": u.is_active,

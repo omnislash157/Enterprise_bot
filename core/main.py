@@ -785,10 +785,18 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                 if twin_type == 'EnterpriseTwin':
                     # EnterpriseTwin: returns EnterpriseResponse (non-streaming)
+                    # Read division from message payload first, fallback to session state
+                    message_division = data.get("division")
+                    effective_division = message_division or tenant.department
+
+                    # Log if message override is used
+                    if message_division and message_division != tenant.department:
+                        logger.info(f"[WS] Using division from message: {message_division} (session: {tenant.department})")
+
                     response = await active_twin.think(
                         user_input=content,
                         user_email=user_email,
-                        department=tenant.department,
+                        department=effective_division,
                         session_id=session_id,
                         stream=False,
                     )
@@ -851,9 +859,26 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
 
             elif msg_type == "set_division":
-                # Allow changing division mid-session
+                # Allow changing division mid-session (with authorization check)
                 new_division = data.get("division", "warehouse")
-                old_division = tenant.department  # Capture before change
+                old_division = tenant.department
+
+                # Validate user has access to requested division
+                if AUTH_LOADED and user_email:
+                    try:
+                        auth = get_auth_service()
+                        user = auth.get_user_by_email(user_email)
+                        if user and not user.is_super_user:
+                            if new_division not in user.department_access:
+                                logger.warning(f"[WS] Division change blocked: {user_email} attempted {new_division}")
+                                await websocket.send_json({
+                                    "type": "error",
+                                    "message": f"No access to department: {new_division}"
+                                })
+                                continue  # Reject unauthorized division change
+                    except Exception as e:
+                        logger.error(f"[WS] Auth check failed during set_division: {e}")
+                        # Fail open for now, but log it
 
                 tenant = TenantContext(
                     tenant_id=tenant.tenant_id,
