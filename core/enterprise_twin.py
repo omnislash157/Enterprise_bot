@@ -352,15 +352,14 @@ class EnterpriseTwin:
         squirrel_context = []
         
         # Manual RAG - fires for procedural, lookup, complaint
+        # NOTE: No department filtering - all manuals are company-wide knowledge
+        # Department is passed to Grok as CONTEXT in prompt, not as SQL filter
         if self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
             try:
                 retrieval_start = datetime.now()
                 manual_chunks = await self.rag.search(
                     query=user_input,
-                    department=department,
-                    tenant_id=self.tenant_id,
                     threshold=self.rag_threshold,
-                    # NOTE: No top_k - threshold-only by design
                 )
                 retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
                 tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms)")

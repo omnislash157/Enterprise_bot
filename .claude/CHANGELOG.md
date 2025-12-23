@@ -4,6 +4,55 @@ This file tracks significant changes made by Claude agents to maintain continuit
 
 ---
 
+## [2024-12-22 23:00] - RAG Architecture Cleanup (Final)
+
+**Priority:** CRITICAL - Correct architecture
+**Mission:** Remove department filtering from RAG SQL, fix model name
+
+### Architecture Decision
+Department filtering is NOT needed in RAG because:
+- All manuals are company-wide knowledge
+- A warehouse guy asking about sales process should still get an answer
+- Auth controls WHO gets in, not WHAT they see
+- Department is passed to Grok as CONTEXT in prompt, not as SQL filter
+
+### Files Modified
+
+**1. core/enterprise_rag.py** (complete rewrite of signatures)
+- `search()`: Removed `department` parameter entirely
+- `_vector_search()`: Removed `department` parameter and SQL filter
+- `_keyword_search()`: Removed `department` parameter and SQL filter
+- All result dicts: Removed `department` field
+- SQL now threshold-only: `WHERE embedding IS NOT NULL AND score >= $2`
+
+**2. core/enterprise_twin.py**
+- RAG call simplified: `await self.rag.search(query=user_input, threshold=...)`
+- Department still passed to Grok prompt as CONTEXT (line 474)
+- Added clarifying comment about architecture
+
+**3. core/model_adapter.py** (4 locations)
+- Changed `grok-4-1-fast-reasoning` → `grok-4-1-fast`
+- GrokMessages.__init__: default_model
+- GrokAdapter.__init__: model
+- create_adapter(): model default
+
+**4. core/config.yaml**
+- Changed `model.name: grok-4-1-fast-reasoning` → `grok-4-1-fast`
+
+### Final Architecture
+| Layer | Uses Department? | How? |
+|-------|------------------|------|
+| Auth | ✅ | Assigns to user profile |
+| RAG SQL | ❌ | Just threshold filtering |
+| Grok Prompt | ✅ | "Talking to warehouse guy" |
+
+### Result
+- RAG returns ALL chunks above 0.6 threshold (no department filter)
+- Model name correct for Grok API
+- Department context flows to Grok prompt, not SQL
+
+---
+
 ## [2024-12-22 22:45] - Model Adapter + Schema Fixes
 
 **Priority:** HIGH - Runtime errors

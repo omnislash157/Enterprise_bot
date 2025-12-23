@@ -4,10 +4,11 @@ Enterprise RAG Retriever - Process Manual Search
 Retrieves relevant chunks from documents table using:
 1. BGE-M3 dense vectors (semantic similarity)
 2. Keyword matching (fallback when embeddings are NULL)
-3. RLS enforcement via tenant/department context
 
 This is the manual RAG that fires for procedural/lookup/complaint queries.
 Python fires this tool, not Grok.
+
+NOTE: Single-tenant MVP - no tenant_id/department filtering yet.
 
 Usage:
     from .enterprise_rag import EnterpriseRAGRetriever
@@ -15,8 +16,6 @@ Usage:
     rag = EnterpriseRAGRetriever(config)
     chunks = await rag.search(
         query="how do I process a credit memo",
-        department="sales",
-        tenant_id="driscoll",
         threshold=0.6,  # Returns ALL chunks above this score
     )
 
@@ -117,13 +116,12 @@ class EmbeddingClient:
 class EnterpriseRAGRetriever:
     """
     Retrieves process manual chunks from PostgreSQL.
-    
+
     Search strategy:
     1. If embeddings available: vector similarity search (cosine)
     2. Fallback: keyword search on content + section_title
-    3. Always filter by tenant_id and department
-    
-    RLS is enforced at database level, but we also filter explicitly.
+
+    NOTE: Single-tenant MVP - no tenant_id/department filtering yet.
     """
     
     def __init__(self, config: Dict[str, Any]):
@@ -177,37 +175,31 @@ class EnterpriseRAGRetriever:
     async def search(
         self,
         query: str,
-        department: str,
-        tenant_id: str,
         threshold: float = None,
-        # NOTE: top_k removed - threshold-only by design
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant manual chunks.
 
         Returns ALL chunks above threshold - no arbitrary cap.
+        NOTE: No department filtering - all manuals are company-wide knowledge.
 
         Args:
             query: User's query
-            department: User's department (for filtering)
-            tenant_id: Tenant ID (for RLS)
             threshold: Minimum similarity threshold
 
         Returns:
             List of chunk dicts with content, metadata, and score
         """
         threshold = threshold or self.default_threshold
-        
+
         start_time = datetime.now()
-        
+
         # Try vector search first
         query_embedding = await self.embedder.embed(query)
-        
+
         if query_embedding:
             results = await self._vector_search(
                 query_embedding=query_embedding,
-                department=department,
-                tenant_id=tenant_id,
                 threshold=threshold,
             )
             search_type = "vector"
@@ -215,8 +207,6 @@ class EnterpriseRAGRetriever:
             # Fallback to keyword search
             results = await self._keyword_search(
                 query=query,
-                department=department,
-                tenant_id=tenant_id,
             )
             search_type = "keyword"
         
@@ -228,16 +218,14 @@ class EnterpriseRAGRetriever:
     async def _vector_search(
         self,
         query_embedding: List[float],
-        department: str,
-        tenant_id: str,
         threshold: float,
-        # NOTE: top_k removed - threshold-only by design
     ) -> List[Dict[str, Any]]:
         """
         Vector similarity search using pgvector.
 
         Uses cosine distance: 1 - (embedding <=> query) as similarity.
         Returns ALL results above threshold - no arbitrary cap.
+        NOTE: No department filtering - all manuals are company-wide knowledge.
         """
         pool = await self._get_pool()
 
@@ -250,16 +238,12 @@ class EnterpriseRAGRetriever:
                 content,
                 section_title,
                 source_file,
-                department_id,
                 1 - (embedding <=> $1::vector) as score
             FROM {self.table_name}
             WHERE
-                tenant_id = $2
-                AND (department_id = $3 OR department_id IS NULL)
-                AND embedding IS NOT NULL
-                AND 1 - (embedding <=> $1::vector) >= $4
+                embedding IS NOT NULL
+                AND 1 - (embedding <=> $1::vector) >= $2
             ORDER BY embedding <=> $1::vector
-            -- NO LIMIT - return everything above threshold
         """
 
         try:
@@ -267,8 +251,6 @@ class EnterpriseRAGRetriever:
                 rows = await conn.fetch(
                     query,
                     embedding_str,
-                    tenant_id,
-                    department,
                     threshold,
                 )
 
@@ -278,33 +260,28 @@ class EnterpriseRAGRetriever:
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
-                        "department": row["department_id"],
                         "score": float(row["score"]),
                         "search_type": "vector",
                     }
                     for row in rows
                 ]
-                
+
         except Exception as e:
             logger.error(f"[EnterpriseRAG] Vector search failed: {e}")
             # Fall back to keyword search
             return await self._keyword_search(
                 query=" ".join(str(x) for x in query_embedding[:10]),  # Dummy
-                department=department,
-                tenant_id=tenant_id,
             )
     
     async def _keyword_search(
         self,
         query: str,
-        department: str,
-        tenant_id: str,
-        # NOTE: top_k removed - return all matches
     ) -> List[Dict[str, Any]]:
         """
         Keyword search fallback using PostgreSQL full-text search.
 
         Uses ts_rank for scoring. Returns all matches (no arbitrary limit).
+        NOTE: No department filtering - all manuals are company-wide knowledge.
         """
         pool = await self._get_pool()
 
@@ -323,28 +300,22 @@ class EnterpriseRAGRetriever:
                 content,
                 section_title,
                 source_file,
-                department_id,
                 ts_rank(
                     to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
                     plainto_tsquery('english', $1)
                 ) as score
             FROM {self.table_name}
             WHERE
-                tenant_id = $2
-                AND (department_id = $3 OR department_id IS NULL)
-                AND (
-                    to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, ''))
-                    @@ plainto_tsquery('english', $1)
-                    OR content ILIKE '%' || $1 || '%'
-                    OR section_title ILIKE '%' || $1 || '%'
-                )
+                to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, ''))
+                @@ plainto_tsquery('english', $1)
+                OR content ILIKE '%' || $1 || '%'
+                OR section_title ILIKE '%' || $1 || '%'
             ORDER BY score DESC
-            -- NO LIMIT - return all matches
         """
 
         try:
             async with pool.acquire() as conn:
-                rows = await conn.fetch(sql, query, tenant_id, department)
+                rows = await conn.fetch(sql, query)
 
                 return [
                     {
@@ -352,32 +323,30 @@ class EnterpriseRAGRetriever:
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
-                        "department": row["department_id"],
                         "score": float(row["score"]) if row["score"] else 0.5,
                         "search_type": "keyword",
                     }
                     for row in rows
                 ]
-                
+
         except Exception as e:
             logger.error(f"[EnterpriseRAG] Keyword search failed: {e}")
             return []
     
-    async def get_by_id(self, chunk_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
+    async def get_by_id(self, chunk_id: str) -> Optional[Dict[str, Any]]:
         """Get a specific chunk by ID."""
         pool = await self._get_pool()
 
         sql = f"""
             SELECT
-                id, content, section_title, source_file,
-                department_id
+                id, content, section_title, source_file
             FROM {self.table_name}
-            WHERE id = $1 AND tenant_id = $2
+            WHERE id = $1
         """
 
         try:
             async with pool.acquire() as conn:
-                row = await conn.fetchrow(sql, chunk_id, tenant_id)
+                row = await conn.fetchrow(sql, chunk_id)
 
                 if row:
                     return {
@@ -385,7 +354,6 @@ class EnterpriseRAGRetriever:
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
-                        "department": row["department_id"],
                     }
                 return None
 
@@ -468,8 +436,6 @@ if __name__ == "__main__":
         # Test search
         results = await rag.search(
             query="how to process credit memo",
-            department="sales",
-            tenant_id="driscoll",
         )
         
         print(f"\nFound {len(results)} results:")
