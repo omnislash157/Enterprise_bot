@@ -129,7 +129,7 @@ class EnterpriseResponse:
     content: str
     context: EnterpriseContext
     total_time_ms: float
-    model_used: str = "grok-4-1-fast"
+    model_used: str = "grok-4-1-fast-reasoning"
 
 
 # =============================================================================
