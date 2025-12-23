@@ -21,8 +21,8 @@
     $: displayRole = getDisplayRole(user);
 
     // Check if current user can grant access to this user
-    $: canManageUser = isSuperUser || 
-        currentUserDeptHeadFor.some(d => user.department_access?.includes(d));
+    $: canManageUser = isSuperUser ||
+        currentUserDeptHeadFor.some(d => user.departments?.includes(d));
 
     // Role badge styling
     function getRoleBadgeClass(role: string): string {
@@ -123,13 +123,13 @@
         </div>
 
         <div class="col-dept">
-            {#if user.department_access && user.department_access.length > 0}
+            {#if user.departments && user.departments.length > 0}
                 <div class="dept-tags">
-                    {#each user.department_access.slice(0, 3) as dept}
+                    {#each user.departments.slice(0, 3) as dept}
                         <span class="dept-tag">{dept}</span>
                     {/each}
-                    {#if user.department_access.length > 3}
-                        <span class="dept-more">+{user.department_access.length - 3}</span>
+                    {#if user.departments.length > 3}
+                        <span class="dept-more">+{user.departments.length - 3}</span>
                     {/if}
                 </div>
             {:else}
