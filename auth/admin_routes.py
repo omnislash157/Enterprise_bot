@@ -25,6 +25,7 @@ from .auth_service import (
     User,
 )
 from .tenant_service import STATIC_DEPARTMENTS
+from .audit_service import get_audit_service
 
 logger = logging.getLogger(__name__)
 
@@ -387,6 +388,16 @@ async def grant_access(
 
         logger.info(f"[Admin] {requester.email} {action} for {target_email} to {request.department_slug}")
 
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="department_access_grant" if action == "granted access" else "dept_head_promote",
+            actor_email=requester.email,
+            target_email=target_email,
+            department_slug=request.department_slug,
+            reason=request.reason
+        )
+
         return APIResponse(
             success=True,
             message=f"Successfully {action} to {request.department_slug} for {target_email}",
@@ -433,6 +444,16 @@ async def revoke_access(
         auth.revoke_department_access(requester, target_email, request.department_slug)
 
         logger.info(f"[Admin] {requester.email} revoked {request.department_slug} access from {target_email}")
+
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="department_access_revoke",
+            actor_email=requester.email,
+            target_email=target_email,
+            department_slug=request.department_slug,
+            reason=request.reason
+        )
 
         return APIResponse(
             success=True,
@@ -494,6 +515,16 @@ async def promote_to_dept_head(
 
         logger.info(f"[Admin] {requester.email} promoted {request.target_email} to dept_head for {request.department}")
 
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="dept_head_promote",
+            actor_email=requester.email,
+            target_email=request.target_email,
+            department_slug=request.department,
+            reason=request.reason if hasattr(request, 'reason') else None
+        )
+
         return APIResponse(
             success=True,
             message=f"Successfully promoted {request.target_email} to department head for {request.department}",
@@ -536,6 +567,16 @@ async def revoke_dept_head(
         auth.revoke_dept_head(requester, request.target_email, request.department)
 
         logger.info(f"[Admin] {requester.email} revoked dept_head from {request.target_email} for {request.department}")
+
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="dept_head_revoke",
+            actor_email=requester.email,
+            target_email=request.target_email,
+            department_slug=request.department,
+            reason=None
+        )
 
         return APIResponse(
             success=True,
@@ -586,6 +627,15 @@ async def make_super_user(
 
         logger.info(f"[Admin] {requester.email} promoted {request.target_email} to super_user")
 
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="super_user_promote",
+            actor_email=requester.email,
+            target_email=request.target_email,
+            reason=None
+        )
+
         return APIResponse(
             success=True,
             message=f"Successfully promoted {request.target_email} to super user",
@@ -623,6 +673,15 @@ async def revoke_super_user(
 
         logger.info(f"[Admin] {requester.email} revoked super_user from {request.target_email}")
 
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="super_user_revoke",
+            actor_email=requester.email,
+            target_email=request.target_email,
+            reason=None
+        )
+
         return APIResponse(
             success=True,
             message=f"Successfully revoked super user status from {request.target_email}",
@@ -649,15 +708,59 @@ async def get_audit_log(
     """
     View audit log entries.
 
-    TODO: The access_audit_log table was deleted during schema migration.
-    Need to decide if we still need audit logging and recreate if needed.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Permissions:
+    - Super users: See all entries
+    - Dept heads: See entries for their departments only
     """
-    raise HTTPException(
-        501,
-        "Audit log table deleted during schema migration. "
-        "See MIGRATION_001_COMPLETE.md for details."
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Require admin access
+    if not requester.is_super_user and not requester.dept_head_for:
+        raise HTTPException(403, "Admin access required")
+
+    # Non-super users can only see their departments
+    if not requester.is_super_user and department:
+        if department not in (requester.dept_head_for or []):
+            raise HTTPException(403, f"No access to {department} audit log")
+
+    # If non-super user with no department filter, limit to their departments
+    effective_department = department
+    if not requester.is_super_user and not department:
+        # They can only see their own departments - take first one
+        if requester.dept_head_for:
+            effective_department = requester.dept_head_for[0]
+        else:
+            raise HTTPException(403, "No departments to view")
+
+    audit = get_audit_service()
+    entries = audit.query_log(
+        action=action,
+        target_email=target_email,
+        department=effective_department,
+        limit=limit,
+        offset=offset
+    )
+    total = audit.count_log(
+        action=action,
+        target_email=target_email,
+        department=effective_department
+    )
+
+    return APIResponse(
+        success=True,
+        data={
+            "entries": entries,
+            "total": total,
+            "limit": limit,
+            "offset": offset
+        }
     )
 
 
