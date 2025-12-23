@@ -15,6 +15,7 @@
     let departments: Department[] = [];
     let loading = true;
     let error = '';
+    let initialized = false;  // Track if we've done initial setup
 
     function getApiBase(): string {
         return import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -31,10 +32,11 @@
                 const data = await res.json();
                 departments = data.departments;
 
-                // Auto-select first if none selected
+                // Auto-select first if none selected, but DON'T dispatch
+                // The initial division is handled by session.init()
                 if (!selected && departments.length > 0) {
                     selected = departments[0].slug;
-                    dispatch('change', selected);
+                    // Don't dispatch on initial load - session.init handles this
                 }
             } else {
                 error = 'Failed to load departments';
@@ -45,10 +47,14 @@
         }
 
         loading = false;
+        initialized = true;
     });
 
     function handleChange() {
-        dispatch('change', selected);
+        // Only dispatch after initialization (user-triggered changes)
+        if (initialized) {
+            dispatch('change', selected);
+        }
     }
 </script>
 
@@ -63,7 +69,7 @@
                 <option value={dept.slug}>{dept.name}</option>
             {/each}
         </select>
-        <span class="dropdown-arrow">▼</span>
+        <span class="dropdown-arrow">â–¼</span>
     </div>
 {:else}
     <span class="no-access">No departments available</span>
