@@ -26,6 +26,7 @@ Version: 1.0.0
 """
 
 import asyncio
+import json
 import logging
 import os
 from dataclasses import dataclass, field
@@ -455,7 +456,146 @@ class EnterpriseTwin:
                 user_input=user_input,
                 response=response,
             )
-    
+
+    async def _generate_streaming(
+        self,
+        system_prompt: str,
+        user_input: str
+    ) -> AsyncIterator[str]:
+        """
+        Generate streaming response from model.
+
+        Yields chunks as they arrive for immediate display.
+        """
+        import httpx
+
+        api_key = os.getenv("XAI_API_KEY")
+        model = os.getenv("XAI_MODEL", "grok-4-1-fast-reasoning")
+
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            async with client.stream(
+                "POST",
+                "https://api.x.ai/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": model,
+                    "messages": [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_input},
+                    ],
+                    "max_tokens": self.config.get('model', {}).get('max_tokens', 4096),
+                    "temperature": self.config.get('model', {}).get('temperature', 0.5),
+                    "stream": True,
+                },
+            ) as response:
+                response.raise_for_status()
+
+                async for line in response.aiter_lines():
+                    if line.startswith("data: "):
+                        data = line[6:]
+                        if data == "[DONE]":
+                            break
+                        try:
+                            chunk = json.loads(data)
+                            content = chunk.get("choices", [{}])[0].get("delta", {}).get("content", "")
+                            if content:
+                                yield content
+                        except json.JSONDecodeError:
+                            continue
+
+    async def think_streaming(
+        self,
+        user_input: str,
+        user_email: str,
+        department: str,
+        session_id: str,
+    ) -> AsyncIterator[str]:
+        """
+        Process query and stream response tokens.
+
+        Yields:
+            str: Response chunks as they arrive
+        """
+        start_time = datetime.now()
+        tools_fired = []
+
+        # ===== STEP 1: Classify intent =====
+        query_type = classify_enterprise_intent(user_input)
+        logger.info(f"[EnterpriseTwin] Query classified as: {query_type}")
+
+        # ===== STEP 2: Fire tools =====
+        manual_chunks = []
+        squirrel_context = []
+
+        if self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
+            try:
+                retrieval_start = datetime.now()
+                manual_chunks = await self.rag.search(
+                    query=user_input,
+                    department_id=department,
+                    threshold=self.rag_threshold,
+                )
+                retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
+                tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms, dept={department})")
+                logger.info(f"[EnterpriseTwin] Manual RAG returned {len(manual_chunks)} chunks in {retrieval_ms:.0f}ms")
+            except Exception as e:
+                logger.error(f"[EnterpriseTwin] Manual RAG failed: {e}")
+
+        if self.squirrel_enabled:
+            squirrel_context = self.get_squirrel_context(session_id)
+            if squirrel_context:
+                tools_fired.append(f"squirrel({len(squirrel_context)} items)")
+
+        retrieval_time = (datetime.now() - start_time).total_seconds() * 1000
+
+        # ===== STEP 3: Build context =====
+        context = EnterpriseContext(
+            user_email=user_email,
+            department=department,
+            tenant_id=self.tenant_id,
+            query_type=query_type,
+            manual_chunks=manual_chunks,
+            squirrel_context=squirrel_context,
+            session_context=self._session_memories.get(session_id, [])[-5:],
+            retrieval_time_ms=retrieval_time,
+            tools_fired=tools_fired,
+        )
+
+        # ===== STEP 4: Build prompt =====
+        system_prompt = self._build_system_prompt(context)
+
+        # ===== STEP 5: Stream response =====
+        full_response = ""
+        try:
+            async for chunk in self._generate_streaming(system_prompt, user_input):
+                full_response += chunk
+                yield chunk
+        except Exception as e:
+            logger.error(f"[EnterpriseTwin] Streaming failed: {e}")
+            yield "I apologize, but I'm having trouble processing your request. Please try again."
+            full_response = "Error during generation"
+
+        total_time = (datetime.now() - start_time).total_seconds() * 1000
+
+        # ===== STEP 6: Update session memory =====
+        if session_id not in self._session_memories:
+            self._session_memories[session_id] = []
+
+        self._session_memories[session_id].append({
+            'timestamp': datetime.now().isoformat(),
+            'user_input': user_input,
+            'response': full_response[:500],
+            'query_type': query_type,
+        })
+
+        logger.info(f"[EnterpriseTwin] Streaming response completed in {total_time:.0f}ms (retrieval: {retrieval_time:.0f}ms)")
+
+        # Yield metadata as final "chunk" (frontend should handle this)
+        yield f"\n__METADATA__:{json.dumps({'tools_fired': tools_fired, 'retrieval_ms': retrieval_time, 'total_ms': total_time})}"
+
     def _build_system_prompt(self, context: EnterpriseContext) -> str:
         """
         Build system prompt with trust hierarchy baked in.

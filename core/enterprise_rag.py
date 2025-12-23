@@ -30,6 +30,8 @@ import os
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
+from .cache import get_cache
+
 logger = logging.getLogger(__name__)
 
 # Try to import database drivers
@@ -195,14 +197,28 @@ class EnterpriseRAGRetriever:
             List of chunk dicts with content, metadata, and score
         """
         threshold = threshold or self.default_threshold
-
         start_time = datetime.now()
-        
+        cache = get_cache()
+
+        # Check RAG cache first
+        if department_id:
+            cached_results = await cache.get_rag_results(query, department_id)
+            if cached_results is not None:
+                elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
+                logger.info(f"[EnterpriseRAG] CACHE HIT - returned {len(cached_results)} results in {elapsed_ms:.0f}ms")
+                return cached_results
+
         if department_id:
             logger.info(f"[EnterpriseRAG] Filtering by department: {department_id}")
 
-        # Try vector search first
-        query_embedding = await self.embedder.embed(query)
+        # Check embedding cache
+        query_embedding = await cache.get_embedding(query)
+
+        if query_embedding is None:
+            # Cache miss - generate embedding
+            query_embedding = await self.embedder.embed(query)
+            if query_embedding:
+                await cache.set_embedding(query, query_embedding)
 
         if query_embedding:
             results = await self._vector_search(
@@ -218,10 +234,14 @@ class EnterpriseRAGRetriever:
                 department_id=department_id,
             )
             search_type = "keyword"
-        
+
         elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
         logger.info(f"[EnterpriseRAG] {search_type} search returned {len(results)} results in {elapsed_ms:.0f}ms")
-        
+
+        # Cache results
+        if department_id and results:
+            await cache.set_rag_results(query, department_id, results)
+
         return results
     
     async def _vector_search(
