@@ -476,7 +476,23 @@ class EnterpriseTwin:
         # Manual chunks (HIGHEST TRUST)
         if context.manual_chunks:
             sections.append(self._format_manual_chunks(context.manual_chunks))
-        
+        else:
+            # ZERO-CHUNK GUARDRAIL
+            sections.append("""
+============================================================
+NO DOCUMENTATION FOUND
+============================================================
+IMPORTANT: No relevant process manual excerpts were found for this query.
+
+YOU MUST:
+1. Acknowledge that you don't have specific documentation on this topic
+2. DO NOT invent procedures, contact names, extension numbers, or email addresses
+3. Suggest the user contact their supervisor or the relevant department directly
+4. Offer to help with a related topic you DO have documentation for
+
+Example response: "I don't have specific documentation on that procedure. I'd recommend checking with your supervisor or the relevant department team directly. Is there something else I can help you with?"
+""")
+
         # Squirrel context (HIGH TRUST - recent)
         if context.squirrel_context:
             sections.append(self._format_squirrel_context(context.squirrel_context))
