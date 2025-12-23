@@ -2603,3 +2603,86 @@ This completes the work started in the 2024-12-23 16:00 session where we:
 3. Wrote BUILD_SHEET_007 implementation guide
 
 Now the hybrid search is live and leveraging all that pre-generated data! 🚀
+
+## [2024-12-23 21:30] - Audit Logging System Implementation
+
+### Mission Executed
+Implemented comprehensive audit logging system following BUILD_SHEET_AUDIT_LOGGING.md specifications to track all admin actions and permission changes for compliance and investigation purposes.
+
+### Files Created
+- `db/migrations/004_audit_log.sql` - PostgreSQL migration creating enterprise.audit_log table with indexes
+- `auth/audit_service.py` - AuditService singleton with log_event(), query_log(), and count_log() methods (270 lines)
+- `run_migration.py` - Python script for running database migrations (temp utility)
+
+### Files Modified
+- `auth/admin_routes.py` - Added audit logging to all 6 admin actions:
+  * Import: Added `from .audit_service import get_audit_service`
+  * Replaced stub `/api/admin/audit` endpoint (lines 641-706) with functional implementation
+  * Added audit logging after grant access action (lines 391-399)
+  * Added audit logging after revoke access action (lines 448-456)
+  * Added audit logging after dept head promote action (lines 518-526)
+  * Added audit logging after dept head revoke action (lines 571-579)
+  * Added audit logging after super user promote action (lines 630-637)
+  * Added audit logging after super user revoke action (lines 676-683)
+
+### Database Schema
+**audit_log table** (`enterprise.audit_log`)
+- Primary key: `id` (UUID, auto-generated)
+- Audit fields: `action`, `actor_email`, `target_email`, `department_slug`
+- Change tracking: `old_value`, `new_value`, `reason`
+- Context: `ip_address` (INET), `user_agent`, `metadata` (JSONB)
+- Timestamp: `created_at` (TIMESTAMPTZ)
+- Indexes: action, actor_email, target_email, department_slug, created_at (DESC), composite filter index
+
+### Backend Implementation
+**AuditService** (`auth/audit_service.py`)
+- Thread-safe singleton pattern using `get_audit_service()`
+- `log_event()`: Logs audit events with validation, returns UUID
+- `query_log()`: Filtered queries with pagination (action, actor, target, department, date range)
+- `count_log()`: Count matching entries for pagination
+- Valid actions: login, logout, department_access_grant/revoke, dept_head_promote/revoke, super_user_promote/revoke, and more
+
+**Audit Endpoint** (`GET /api/admin/audit`)
+- Permissions: Super users see all, dept heads see their departments only
+- Query parameters: `action`, `target_email`, `department`, `limit`, `offset`
+- Returns: Paginated entries with total count
+- Replaces previous 501 stub implementation
+
+### Admin Actions Instrumented
+All 6 admin actions now write to audit log after successful execution:
+1. Grant department access (`department_access_grant`)
+2. Revoke department access (`department_access_revoke`)
+3. Promote to dept head (`dept_head_promote`)
+4. Revoke dept head status (`dept_head_revoke`)
+5. Promote to super user (`super_user_promote`)
+6. Revoke super user status (`super_user_revoke`)
+
+### Frontend Impact
+- No frontend changes required - `/admin/audit` page already exists and expects this API shape
+- Audit page now displays real data instead of 501 error
+
+### Testing Notes
+- Database migration script created but requires manual execution (DB connectivity issue during implementation)
+- Manual migration command: `psql $DATABASE_URL -f db/migrations/004_audit_log.sql`
+- All code changes committed and pushed to main branch
+- Frontend audit page ready to consume real data once migration is run
+
+### Acceptance Criteria Status
+- [x] `enterprise.audit_log` table schema defined in migration file
+- [x] AuditService class provides `log_event()` and `query_log()` methods
+- [x] All 6 admin actions write to audit log
+- [x] GET `/api/admin/audit` returns paginated, filterable audit entries
+- [⏳] Frontend audit page will display real data (requires DB migration execution)
+
+### Next Steps
+1. Execute migration 004 on Azure PostgreSQL: `psql $DATABASE_URL -f db/migrations/004_audit_log.sql`
+2. Verify table creation: `SELECT * FROM enterprise.audit_log LIMIT 1;`
+3. Test audit endpoint: Perform admin action and query audit log
+4. Verify frontend `/admin/audit` page displays entries
+
+### Implementation Notes
+- Build sheet followed exactly as specified in `BUILD_SHEET_AUDIT_LOGGING.md`
+- All line numbers in build sheet accurately identified locations for edits
+- Migration file includes comprehensive indexes for query performance
+- Singleton pattern ensures single AuditService instance across application
+- Email addresses normalized to lowercase for consistent querying
