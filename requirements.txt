@@ -9,6 +9,7 @@ pydantic>=2.5.0
 # HTTP & WebSocket
 httpx>=0.27.0
 websockets>=12.0
+aiohttp>=3.8.0
 
 # Database (Raw Postgres + pgvector)
 asyncpg>=0.29.0
