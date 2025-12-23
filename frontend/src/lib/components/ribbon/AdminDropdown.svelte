@@ -13,6 +13,7 @@
 
     const adminLinks = [
         { href: '/admin', label: 'Nerve Center', icon: '⚡', superOnly: false },
+        { href: '/admin/system', label: 'System Health', icon: '💻', superOnly: false },
         { href: '/admin/analytics', label: 'Analytics', icon: '📊', superOnly: false },
         { href: '/admin/users', label: 'User Management', icon: '👥', superOnly: false },
         { href: '/admin/audit', label: 'Audit Log', icon: '📋', superOnly: true },

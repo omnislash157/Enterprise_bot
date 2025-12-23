@@ -27,6 +27,8 @@ from auth.admin_routes import admin_router
 from auth.analytics_engine.analytics_routes import analytics_router
 from auth.sso_routes import router as sso_router
 from auth.azure_auth import validate_access_token, is_configured as azure_configured
+from core.metrics_collector import metrics_collector
+from auth.metrics_routes import metrics_router
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -328,6 +330,12 @@ async def add_timing_header(request: Request, call_next):
     response = await call_next(request)
     elapsed_ms = (time.perf_counter() - start) * 1000
     response.headers["X-Response-Time"] = f"{elapsed_ms:.1f}ms"
+
+    # Record to metrics collector
+    endpoint = request.url.path
+    is_error = response.status_code >= 400
+    metrics_collector.record_request(endpoint, elapsed_ms, error=is_error)
+
     return response
 
 # Include admin router
@@ -344,6 +352,10 @@ if ANALYTICS_LOADED:
 if SSO_ROUTES_LOADED:
     app.include_router(sso_router)
     logger.info("[STARTUP] SSO routes loaded at /api/auth")
+
+# Include metrics router
+app.include_router(metrics_router, prefix="/api/metrics", tags=["metrics"])
+logger.info("[STARTUP] Metrics routes loaded at /api/metrics")
 
 # Global engine instance
 engine: Optional[CogTwin] = None
@@ -415,6 +427,13 @@ async def startup_event():
             logger.info("[STARTUP] Analytics warm-up complete")
         except Exception as e:
             logger.warning(f"[STARTUP] Analytics warm-up failed: {e}")
+
+    # Check psutil availability for system metrics
+    try:
+        import psutil
+        logger.info("[STARTUP] psutil available - system metrics enabled")
+    except ImportError:
+        logger.warning("[STARTUP] psutil not installed - run: pip install psutil")
 
 # =============================================================================
 # HEALTH + CONFIG ENDPOINTS
@@ -683,6 +702,7 @@ manager = ConnectionManager()
 @app.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await manager.connect(session_id, websocket)
+    metrics_collector.record_ws_connect()  # Record WebSocket connection
 
     # Default tenant - verification is OPTIONAL for demo
     # If verify message comes, we use that email
@@ -706,10 +726,12 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
         while True:
             data = await websocket.receive_json()
+            metrics_collector.record_ws_message('in')  # Record incoming message
             msg_type = data.get("type", "message")
 
             if msg_type == "ping":
                 await websocket.send_json({"type": "pong"})
+                metrics_collector.record_ws_message('out')  # Record outgoing message
 
             elif msg_type == "verify":
                 email = data.get("email", "")
@@ -760,12 +782,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             "division": tenant.department,
                             "departments": user.department_access,
                         })
+                        metrics_collector.record_ws_message('out')  # Record outgoing message
                     else:
                         # Domain not allowed
                         await websocket.send_json({
                             "type": "error",
                             "message": "Email domain not authorized",
                         })
+                        metrics_collector.record_ws_message('out')  # Record outgoing message
                 elif email:
                     # Fallback to old whitelist behavior
                     if email_whitelist.verify(email):
@@ -781,12 +805,14 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             "email": email,
                             "division": tenant.department,
                         })
+                        metrics_collector.record_ws_message('out')  # Record outgoing message
                     else:
                         logger.warning(f"Email not in whitelist: {email}")
                         await websocket.send_json({
                             "type": "error",
                             "message": "Email not authorized. Please use SSO login.",
                         })
+                        metrics_collector.record_ws_message('out')  # Record outgoing message
                         continue  # Don't proceed with unauthorized email
 
             elif msg_type == "message":
@@ -800,6 +826,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         "type": "error",
                         "message": "Engine not initialized",
                     })
+                    metrics_collector.record_ws_message('out')  # Record outgoing message
                     continue
 
                 # ===== TWIN-SPECIFIC HANDLING =====
@@ -838,6 +865,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                     "retrieval_time_ms": metadata.get("retrieval_ms", 0),
                                     "total_time_ms": metadata.get("total_ms", 0),
                                 })
+                                metrics_collector.record_ws_message('out')  # Record outgoing message
                             except json.JSONDecodeError:
                                 pass
                         else:
@@ -847,6 +875,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 "content": chunk,
                                 "done": False,
                             })
+                            metrics_collector.record_ws_message('out')  # Record outgoing message
 
                     # Send done signal
                     await websocket.send_json({
@@ -854,6 +883,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         "content": "",
                         "done": True,
                     })
+                    metrics_collector.record_ws_message('out')  # Record outgoing message
 
                 else:
                     # CogTwin: streams AsyncIterator[str]
@@ -876,6 +906,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 "content": chunk,
                                 "done": False,
                             })
+                            metrics_collector.record_ws_message('out')  # Record outgoing message
 
                     # Send done signal
                     await websocket.send_json({
@@ -883,6 +914,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         "content": "",
                         "done": True,
                     })
+                    metrics_collector.record_ws_message('out')  # Record outgoing message
 
                     # Send session stats
                     stats = active_twin.get_session_stats()
@@ -892,6 +924,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         "temperature": 0.5,
                         **stats,
                     })
+                    metrics_collector.record_ws_message('out')  # Record outgoing message
 
             elif msg_type == "set_division":
                 # Allow changing division mid-session (with authorization check)
@@ -910,6 +943,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                     "type": "error",
                                     "message": f"No access to department: {new_division}"
                                 })
+                                metrics_collector.record_ws_message('out')  # Record outgoing message
                                 continue  # Reject unauthorized division change
                     except Exception as e:
                         logger.error(f"[WS] Auth check failed during set_division: {e}")
@@ -940,15 +974,18 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     "type": "division_changed",
                     "division": new_division,
                 })
+                metrics_collector.record_ws_message('out')  # Record outgoing message
 
             else:
                 await websocket.send_json({
                     "type": "error",
                     "message": f"Unknown message type: {msg_type}",
                 })
+                metrics_collector.record_ws_message('out')  # Record outgoing message
 
     except WebSocketDisconnect:
         manager.disconnect(session_id)
+        metrics_collector.record_ws_disconnect()  # Record disconnect
     except Exception as e:
         logger.error(f"[WS] Error in session {session_id}: {e}")
 
@@ -967,6 +1004,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 pass  # Don't let analytics errors crash the handler
 
         manager.disconnect(session_id)
+        metrics_collector.record_ws_disconnect()  # Record disconnect
 
 
 # =============================================================================

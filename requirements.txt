@@ -28,6 +28,9 @@ PyYAML>=6.0
 # Grok API (uses OpenAI-compatible client)
 openai>=1.12.0
 
+redis>=5.0.0          # Async Redis client (has aioredis built-in now)
+hiredis>=2.0.0        # Fast Redis parser (optional but recommended)
+
 # Azure AD / MSAL
 msal>=1.24.0
 PyJWT>=2.8.0
@@ -37,3 +40,6 @@ cryptography>=41.0.0
 # Note: python-dotenv already listed above
 faiss-cpu>=1.7.4  # or faiss-gpu if CUDA available
 numpy>=1.24.0  # required by FAISS
+
+# Observability (Phase 1)
+psutil>=5.9.0

@@ -27,10 +27,12 @@ Version: 1.1.0
 import asyncio
 import logging
 import os
+import time
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 
 from .cache import get_cache
+from .metrics_collector import metrics_collector
 
 logger = logging.getLogger(__name__)
 
@@ -204,57 +206,97 @@ class EnterpriseRAGRetriever:
             List of chunk dicts with content, metadata, and score
         """
         threshold = threshold or self.default_threshold
-        start_time = datetime.now()
-        cache = get_cache()
+        start_total = time.time()
+        embedding_ms = 0
+        search_ms = 0
+        cache_hit = False
+        embedding_cache_hit = False
 
-        # Check RAG cache first (include search_mode in cache key)
-        if department_id:
-            cache_key_suffix = f"{department_id}:{search_mode}"
-            cached_results = await cache.get_rag_results(query, cache_key_suffix)
-            if cached_results is not None:
-                elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
-                logger.info(f"[EnterpriseRAG] CACHE HIT ({search_mode}) - {len(cached_results)} results in {elapsed_ms:.0f}ms")
-                return cached_results
+        try:
+            cache = get_cache()
 
-        if department_id:
-            logger.info(f"[EnterpriseRAG] Filtering by department: {department_id}")
+            # Check RAG cache first (include search_mode in cache key)
+            if department_id:
+                cache_key_suffix = f"{department_id}:{search_mode}"
+                cached_results = await cache.get_rag_results(query, cache_key_suffix)
+                if cached_results is not None:
+                    cache_hit = True
+                    elapsed_total = (time.time() - start_total) * 1000
+                    logger.info(f"[EnterpriseRAG] CACHE HIT ({search_mode}) - {len(cached_results)} results in {elapsed_total:.0f}ms")
 
-        # Check embedding cache
-        query_embedding = await cache.get_embedding(query)
+                    # Record metrics
+                    metrics_collector.record_rag_query(
+                        total_ms=elapsed_total,
+                        chunks=len(cached_results),
+                        cache_hit=True
+                    )
+                    return cached_results
 
-        if query_embedding is None:
-            # Cache miss - generate embedding
-            query_embedding = await self.embedder.embed(query)
+            if department_id:
+                logger.info(f"[EnterpriseRAG] Filtering by department: {department_id}")
+
+            # Check embedding cache and generate embedding
+            start_embed = time.time()
+            query_embedding = await cache.get_embedding(query)
+
+            if query_embedding is None:
+                # Cache miss - generate embedding
+                embedding_cache_hit = False
+                query_embedding = await self.embedder.embed(query)
+                if query_embedding:
+                    await cache.set_embedding(query, query_embedding)
+            else:
+                # Embedding cache hit
+                embedding_cache_hit = True
+
+            embedding_ms = (time.time() - start_embed) * 1000
+
+            # Vector or keyword search
+            start_search = time.time()
             if query_embedding:
-                await cache.set_embedding(query, query_embedding)
+                results = await self._vector_search(
+                    query_embedding=query_embedding,
+                    department_id=department_id,
+                    threshold=threshold,
+                    search_mode=search_mode,  # Pass through
+                    content_weight=self.content_weight,
+                    question_weight=self.question_weight,
+                )
+                search_type = f"vector_{search_mode}"
+            else:
+                # Fallback to keyword search
+                results = await self._keyword_search(
+                    query=query,
+                    department_id=department_id,
+                )
+                search_type = "keyword"
 
-        if query_embedding:
-            results = await self._vector_search(
-                query_embedding=query_embedding,
-                department_id=department_id,
-                threshold=threshold,
-                search_mode=search_mode,  # Pass through
-                content_weight=self.content_weight,
-                question_weight=self.question_weight,
+            search_ms = (time.time() - start_search) * 1000
+            elapsed_total = (time.time() - start_total) * 1000
+
+            logger.info(f"[EnterpriseRAG] {search_type} returned {len(results)} results in {elapsed_total:.0f}ms")
+
+            # Cache results
+            if department_id and results:
+                cache_key_suffix = f"{department_id}:{search_mode}"
+                await cache.set_rag_results(query, cache_key_suffix, results)
+
+            # Record metrics
+            metrics_collector.record_rag_query(
+                total_ms=elapsed_total,
+                embedding_ms=embedding_ms,
+                search_ms=search_ms,
+                chunks=len(results),
+                cache_hit=False,
+                embedding_cache_hit=embedding_cache_hit
             )
-            search_type = f"vector_{search_mode}"
-        else:
-            # Fallback to keyword search
-            results = await self._keyword_search(
-                query=query,
-                department_id=department_id,
-            )
-            search_type = "keyword"
 
-        elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
-        logger.info(f"[EnterpriseRAG] {search_type} returned {len(results)} results in {elapsed_ms:.0f}ms")
+            return results
 
-        # Cache results
-        if department_id and results:
-            cache_key_suffix = f"{department_id}:{search_mode}"
-            await cache.set_rag_results(query, cache_key_suffix, results)
-
-        return results
+        except Exception as e:
+            elapsed_total = (time.time() - start_total) * 1000
+            metrics_collector.record_rag_query(total_ms=elapsed_total, chunks=0)
+            raise
     
     async def _vector_search(
         self,
