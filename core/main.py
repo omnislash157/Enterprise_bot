@@ -29,6 +29,7 @@ from auth.sso_routes import router as sso_router
 from auth.azure_auth import validate_access_token, is_configured as azure_configured
 from core.metrics_collector import metrics_collector
 from auth.metrics_routes import metrics_router
+from voice_transcription import start_voice_session, send_voice_chunk, stop_voice_session
 
 # Observability imports
 try:
@@ -1039,6 +1040,54 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 })
                 metrics_collector.record_ws_message('out')  # Record outgoing message
 
+            # =============================================
+            # VOICE TRANSCRIPTION
+            # =============================================
+            elif msg_type == "voice_start":
+                logger.info(f"[WS] Voice session starting for {session_id}")
+
+                async def on_transcript(transcript: str, is_final: bool, confidence: float):
+                    await websocket.send_json({
+                        "type": "voice_transcript",
+                        "transcript": transcript,
+                        "is_final": is_final,
+                        "confidence": confidence,
+                        "timestamp": time.time()
+                    })
+                    metrics_collector.record_ws_message('out')
+
+                async def on_error(error: str):
+                    await websocket.send_json({
+                        "type": "voice_error",
+                        "error": error,
+                        "timestamp": time.time()
+                    })
+                    metrics_collector.record_ws_message('out')
+
+                success = await start_voice_session(session_id, on_transcript, on_error)
+
+                await websocket.send_json({
+                    "type": "voice_started" if success else "voice_error",
+                    "success": success,
+                    "error": None if success else "Failed to start voice session",
+                    "timestamp": time.time()
+                })
+                metrics_collector.record_ws_message('out')
+
+            elif msg_type == "voice_chunk":
+                audio_data = data.get("audio")
+                if audio_data:
+                    await send_voice_chunk(session_id, audio_data)
+
+            elif msg_type == "voice_stop":
+                logger.info(f"[WS] Voice session stopping for {session_id}")
+                await stop_voice_session(session_id)
+                await websocket.send_json({
+                    "type": "voice_stopped",
+                    "timestamp": time.time()
+                })
+                metrics_collector.record_ws_message('out')
+
             else:
                 await websocket.send_json({
                     "type": "error",
@@ -1049,6 +1098,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
     except WebSocketDisconnect:
         manager.disconnect(session_id)
         metrics_collector.record_ws_disconnect()  # Record disconnect
+        # Cleanup voice session if active
+        await stop_voice_session(session_id)
     except Exception as e:
         logger.error(f"[WS] Error in session {session_id}: {e}")
 

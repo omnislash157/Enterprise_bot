@@ -3,6 +3,7 @@
 	import { session } from '$lib/stores/session';
 	import { websocket } from '$lib/stores/websocket';
 	import { auth, currentUser } from '$lib/stores/auth';
+	import { voice } from '$lib/stores/voice';
 	import { marked } from 'marked';
 	import DepartmentSelector from './DepartmentSelector.svelte';
 	import CheekyLoader from './CheekyLoader.svelte';
@@ -99,6 +100,16 @@
 			e.preventDefault();
 			sendMessage();
 		}
+	}
+
+	async function toggleRecording() {
+		await voice.toggle();
+	}
+
+	// Reactive: when finalTranscript updates, append to input
+	$: if ($voice.finalTranscript && $voice.finalTranscript.trim()) {
+		inputValue = (inputValue + ' ' + $voice.finalTranscript).trim();
+		voice.clearTranscript();
 	}
 
 	// ========================================
@@ -327,7 +338,25 @@
 							on:keydown={handleKeydown}
 							rows="1"
 						></textarea>
-						<button 
+
+						<!-- Voice Input Button -->
+						<button
+							class="mic-button"
+							class:recording={$voice.isRecording}
+							on:click={toggleRecording}
+							disabled={!$websocket.connected}
+							aria-label={$voice.isRecording ? 'Stop recording' : 'Start voice input'}
+							data-tooltip={$voice.isRecording ? 'Recording...' : 'Voice input'}
+						>
+							<svg viewBox="0 0 24 24" fill={$voice.isRecording ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2">
+								<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+								<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+								<line x1="12" y1="19" x2="12" y2="23"/>
+								<line x1="8" y1="23" x2="16" y2="23"/>
+							</svg>
+						</button>
+
+						<button
 							class="send-button"
 							on:click={sendMessage}
 							disabled={!$websocket.connected || !inputValue.trim()}
@@ -338,6 +367,10 @@
 							</svg>
 						</button>
 					</div>
+
+					{#if $voice.transcript}
+						<div class="voice-preview">{$voice.transcript}</div>
+					{/if}
 					<p class="input-hint">Press Enter to send, Shift+Enter for new line</p>
 				</div>
 			</div>
@@ -793,6 +826,90 @@
 	.send-button svg {
 		width: 22px;
 		height: 22px;
+	}
+
+	/* Voice Input Button */
+	.mic-button {
+		width: 56px;
+		height: 56px;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		color: #00ff41;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		flex-shrink: 0;
+		position: relative;
+	}
+
+	.mic-button:hover:not(:disabled):not(.recording) {
+		background: rgba(0, 255, 65, 0.1);
+		border-color: #00ff41;
+		box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+		transform: scale(1.02);
+	}
+
+	.mic-button.recording {
+		background: rgba(255, 0, 64, 0.15);
+		border-color: #ff0040;
+		color: #ff0040;
+		animation: pulse-recording 1.5s ease-in-out infinite;
+	}
+
+	.mic-button:disabled {
+		background: #333;
+		color: #666;
+		cursor: not-allowed;
+		border-color: #333;
+	}
+
+	.mic-button svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	@keyframes pulse-recording {
+		0%, 100% {
+			box-shadow: 0 0 20px rgba(255, 0, 64, 0.4);
+			transform: scale(1);
+		}
+		50% {
+			box-shadow: 0 0 30px rgba(255, 0, 64, 0.6);
+			transform: scale(1.05);
+		}
+	}
+
+	/* Voice Preview (interim transcript) */
+	.voice-preview {
+		padding: 0.75rem 1rem;
+		background: rgba(0, 0, 0, 0.9);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		border-radius: 8px;
+		margin-top: 0.5rem;
+		color: #00ff41;
+		font-size: 0.9rem;
+		font-style: italic;
+	}
+
+	/* Tooltip */
+	.mic-button[data-tooltip]:hover::before {
+		content: attr(data-tooltip);
+		position: absolute;
+		bottom: calc(100% + 0.5rem);
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 0.5rem 0.75rem;
+		background: rgba(0, 0, 0, 0.9);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		border-radius: 6px;
+		font-size: 0.75rem;
+		color: #e0e0e0;
+		white-space: nowrap;
+		pointer-events: none;
+		z-index: 1000;
 	}
 
 	.input-hint {
