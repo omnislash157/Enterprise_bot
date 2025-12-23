@@ -179,7 +179,10 @@
                 class="action-btn expand-btn"
                 title={expanded ? 'Collapse' : 'Expand'}
             >
-                {expanded ? 'â–¼' : 'â–¶'}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"
+                     style="transform: rotate({expanded ? 0 : -90}deg); transition: transform 0.2s;">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
             </button>
         </div>
     </div>

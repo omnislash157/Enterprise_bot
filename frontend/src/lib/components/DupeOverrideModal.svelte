@@ -82,7 +82,7 @@
       <div class="modal-container" on:click|stopPropagation role="dialog" aria-modal="true">
         <!-- Header -->
         <div class="modal-header">
-          <div class="header-icon">âš </div>
+          <div class="header-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="32" height="32"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div>
           <div class="header-text">
             <h2 class="header-title">DUPLICATE RETURN DETECTED</h2>
             <p class="header-subtitle">
@@ -99,7 +99,15 @@
               <!-- Item Header -->
               <div class="item-header">
                 <div class="status-badge" class:blocked={item.status === 'blocked'} class:capped={item.status === 'capped'}>
-                  {item.status === 'blocked' ? 'ðŸ›‘' : 'âš '}
+                  {#if item.status === 'blocked'}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <circle cx="12" cy="12" r="10"/><path d="M4.93 4.93l14.14 14.14"/>
+                    </svg>
+                  {:else}
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/>
+                    </svg>
+                  {/if}
                 </div>
                 <div class="item-info">
                   <span class="item-sku">{item.itemNumber}</span>

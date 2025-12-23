@@ -69,7 +69,7 @@
                 <option value={dept.slug}>{dept.name}</option>
             {/each}
         </select>
-        <span class="dropdown-arrow">â–¼</span>
+        <span class="dropdown-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><path d="M6 9l6 6 6-6"/></svg></span>
     </div>
 {:else}
     <span class="no-access">No departments available</span>
