@@ -61,6 +61,8 @@ interface SessionState {
 	cognitiveState: CognitiveState;
 	analytics: SessionAnalytics;
 	isStreaming: boolean;
+	currentDivision: string | null;  // Track the active division
+	verified: boolean;               // Track if session is verified
 }
 
 function createSessionStore() {
@@ -76,12 +78,15 @@ function createSessionStore() {
 		},
 		analytics: { ...DEFAULT_ANALYTICS },
 		isStreaming: false,
+		currentDivision: null,
+		verified: false,
 	});
 
 	const { subscribe, set, update } = store;
 
 	// Set up WebSocket message handler
 	let unsubscribe: (() => void) | null = null;
+	let pendingDivision: string | null = null;  // Division we want after verify
 
 	function initMessageHandler() {
 		unsubscribe = websocket.onMessage((data) => {
@@ -109,6 +114,37 @@ function createSessionStore() {
 							};
 						});
 					}
+					break;
+
+				case 'verified':
+					// Auth complete - check if division matches what we want
+					const backendDivision = data.division || 'warehouse';
+					update(s => ({
+						...s,
+						verified: true,
+						currentDivision: backendDivision,
+					}));
+					
+					console.log('[Session] Verified with division:', backendDivision);
+					
+					// If we have a pending division that differs, send set_division NOW
+					if (pendingDivision && pendingDivision !== backendDivision) {
+						console.log('[Session] Resending set_division:', pendingDivision, '(backend had:', backendDivision, ')');
+						websocket.send({
+							type: 'set_division',
+							division: pendingDivision,
+						});
+					}
+					pendingDivision = null;
+					break;
+
+				case 'division_changed':
+					// Backend confirmed division change
+					update(s => ({
+						...s,
+						currentDivision: data.division,
+					}));
+					console.log('[Session] Division changed to:', data.division);
 					break;
 
 				case 'cognitive_state':
@@ -162,6 +198,9 @@ function createSessionStore() {
 		subscribe,
 
 		init(sessionId: string, department?: string) {
+			// Store the department we want (will be checked after verify)
+			pendingDivision = department || null;
+			
 			websocket.connect(sessionId);
 			initMessageHandler();
 
@@ -173,10 +212,11 @@ function createSessionStore() {
 					const wsState = get(websocket as any);
 					if (wsState?.connected) {
 						clearInterval(checkConnection);
+						console.log('[Session] Sending verify with division:', department);
 						websocket.send({
 							type: 'verify',
 							email: email,
-							division: department,
+							division: department,  // Include division in verify
 						});
 					}
 				}, 100);
@@ -186,11 +226,39 @@ function createSessionStore() {
 			}
 		},
 
+		setDivision(division: string) {
+			const state = get(store);
+			
+			// If not verified yet, just store as pending
+			if (!state.verified) {
+				pendingDivision = division;
+				console.log('[Session] Queued division change (not verified yet):', division);
+				return;
+			}
+			
+			// If already on this division, skip
+			if (state.currentDivision === division) {
+				console.log('[Session] Already on division:', division);
+				return;
+			}
+			
+			// Send to backend
+			console.log('[Session] Sending set_division:', division);
+			websocket.send({
+				type: 'set_division',
+				division: division,
+			});
+			
+			// Optimistically update (will be confirmed by division_changed)
+			update(s => ({ ...s, currentDivision: division }));
+		},
+
 		cleanup() {
 			if (unsubscribe) {
 				unsubscribe();
 				unsubscribe = null;
 			}
+			pendingDivision = null;
 			websocket.disconnect();
 		},
 
@@ -215,10 +283,14 @@ function createSessionStore() {
 				isStreaming: true,
 			}));
 
-			// Send to backend
+			// Get current division to include in message
+			const state = get(store);
+
+			// Send to backend WITH division (belt and suspenders)
 			websocket.send({
 				type: 'message',
 				content: messageContent,
+				division: state.currentDivision,  // Include division in every message
 			});
 		},
 

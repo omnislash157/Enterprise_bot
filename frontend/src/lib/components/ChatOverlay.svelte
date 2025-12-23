@@ -215,11 +215,9 @@
 	// AUTH HANDLERS
 	// ========================================
 	function handleDepartmentChange(department: string) {
-		// Send set_division message to backend
-		websocket.send({
-			type: 'set_division',
-			division: department,
-		});
+		// Use session store method to handle division change properly
+		// This queues the change if not verified yet, or sends immediately if verified
+		session.setDivision(department);
 	}
 
 	function handleLogout() {
@@ -258,7 +256,7 @@
 				<!-- Header -->
 				<header class="chat-header">
 					<div class="header-left">
-						<span class="logo-icon">◈</span>
+						<span class="logo-icon">â—ˆ</span>
 						<h1>Driscoll Intelligence</h1>
 					</div>
 					<div class="header-center">
@@ -274,7 +272,7 @@
 						{#if $currentUser}
 							<button class="logout-btn" on:click={handleLogout} title="Sign out">
 								<span class="user-email">{$currentUser.email.split('@')[0]}</span>
-								<span class="logout-icon">⏻</span>
+								<span class="logout-icon">â»</span>
 							</button>
 						{/if}
 					</div>
@@ -284,7 +282,7 @@
 				<div class="messages-area" bind:this={messagesContainer}>
 					{#if $session.messages.length === 0 && !$session.currentStream}
 						<div class="empty-state">
-							<div class="empty-icon">◇</div>
+							<div class="empty-icon">â—‡</div>
 							<p>Ask me anything about company procedures, policies, or operations.</p>
 							<p class="hint">I'm here to help you navigate Driscoll systems.</p>
 						</div>
@@ -306,7 +304,7 @@
 								<div class="message-content">
 									{@html marked.parse($session.currentStream)}
 								</div>
-								<span class="typing-cursor">▊</span>
+								<span class="typing-cursor">â–Š</span>
 							</div>
 						{/if}
 					{/if}

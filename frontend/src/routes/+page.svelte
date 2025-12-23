@@ -2,13 +2,21 @@
 	import { onMount, onDestroy } from 'svelte';
 	import { Canvas } from '@threlte/core';
 	import { session } from '$lib/stores/session';
+	import { currentUser } from '$lib/stores/auth';
 	import ChatOverlay from '$lib/components/ChatOverlay.svelte';
 	import Scene from '$lib/threlte/Scene.svelte';
 	import CoreBrain from '$lib/threlte/CoreBrain.svelte';
+	import { get } from 'svelte/store';
 
 	onMount(() => {
 		const sessionId = crypto.randomUUID();
-		session.init(sessionId);
+		
+		// Get user's default department from auth store
+		const user = get(currentUser);
+		const defaultDept = user?.primary_department || user?.departments?.[0] || 'warehouse';
+		
+		console.log('[Page] Initializing session with department:', defaultDept);
+		session.init(sessionId, defaultDept);
 	});
 
 	onDestroy(() => {
