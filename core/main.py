@@ -35,7 +35,7 @@ from voice_transcription import start_voice_session, send_voice_chunk, stop_voic
 
 # Observability imports
 try:
-    from core.tracing import trace_collector
+    from core.tracing import trace_collector, start_trace, create_span
     from core.structured_logging import setup_structured_logging, shutdown_structured_logging
     from core.alerting import alert_engine
     from auth.tracing_routes import tracing_router
@@ -375,10 +375,10 @@ logger.info("[STARTUP] Metrics routes loaded at /api/metrics")
 
 # Include observability routers
 if OBSERVABILITY_LOADED:
-    app.include_router(tracing_router, prefix="/api/observability", tags=["observability"])
-    app.include_router(logging_router, prefix="/api/observability", tags=["observability"])
-    app.include_router(alerting_router, prefix="/api/observability/alerts", tags=["observability"])
-    logger.info("[STARTUP] Observability routes loaded at /api/observability")
+    app.include_router(tracing_router, prefix="/api/admin/traces", tags=["observability"])
+    app.include_router(logging_router, prefix="/api/admin/logs", tags=["observability"])
+    app.include_router(alerting_router, prefix="/api/admin/alerts", tags=["observability"])
+    logger.info("[STARTUP] Observability routes loaded at /api/admin")
 
 # Global engine instance
 engine: Optional[CogTwin] = None
@@ -491,6 +491,14 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_event():
     """Clean shutdown of observability components."""
+    # Close database pool
+    try:
+        from core.database import close_db_pool
+        await close_db_pool()
+        logger.info("[SHUTDOWN] Database pool closed")
+    except Exception as e:
+        logger.error(f"[SHUTDOWN] Database cleanup error: {e}")
+
     if OBSERVABILITY_LOADED:
         logger.info("[SHUTDOWN] Stopping observability stack...")
         try:
@@ -512,6 +520,76 @@ async def health():
         "app": settings.app_name,
         "timestamp": datetime.utcnow().isoformat(),
         "engine_ready": engine is not None,
+    }
+
+@app.get("/health/deep")
+async def deep_health_check():
+    """Comprehensive health check including observability stack."""
+    from datetime import datetime
+
+    checks = {}
+    overall_status = "healthy"
+
+    # Database check
+    try:
+        from core.database import get_db_pool
+        pool = await get_db_pool()
+        async with pool.acquire() as conn:
+            await conn.fetchval("SELECT 1")
+        checks["database"] = {"status": "healthy"}
+    except Exception as e:
+        checks["database"] = {"status": "error", "message": str(e)}
+        overall_status = "unhealthy"
+
+    # Redis check
+    try:
+        from core.cache import get_redis
+        redis = await get_redis()
+        if redis:
+            await redis.ping()
+            checks["redis"] = {"status": "healthy"}
+        else:
+            checks["redis"] = {"status": "warning", "message": "Redis not configured"}
+    except Exception as e:
+        checks["redis"] = {"status": "error", "message": str(e)}
+        if overall_status == "healthy":
+            overall_status = "degraded"
+
+    # Observability tables check
+    try:
+        from core.database import get_db_pool
+        pool = await get_db_pool()
+        async with pool.acquire() as conn:
+            tables = await conn.fetch("""
+                SELECT table_name FROM information_schema.tables
+                WHERE table_schema = 'enterprise'
+                AND table_name IN ('traces', 'trace_spans', 'structured_logs', 'alert_rules', 'alerts')
+            """)
+            table_names = [r['table_name'] for r in tables]
+            expected = {'traces', 'trace_spans', 'structured_logs', 'alert_rules', 'alerts'}
+            missing = expected - set(table_names)
+            if missing:
+                checks["observability_tables"] = {"status": "error", "missing": list(missing)}
+                overall_status = "unhealthy"
+            else:
+                checks["observability_tables"] = {"status": "healthy", "count": len(table_names)}
+    except Exception as e:
+        checks["observability_tables"] = {"status": "error", "message": str(e)}
+        overall_status = "unhealthy"
+
+    # Metrics collector check
+    try:
+        if 'metrics_collector' in dir():
+            checks["metrics"] = {"status": "healthy"}
+        else:
+            checks["metrics"] = {"status": "warning", "message": "Metrics collector not in scope"}
+    except Exception as e:
+        checks["metrics"] = {"status": "error", "message": str(e)}
+
+    return {
+        "status": overall_status,
+        "timestamp": datetime.utcnow().isoformat(),
+        "checks": checks
     }
 
 @app.get("/")
