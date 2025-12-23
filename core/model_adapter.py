@@ -16,12 +16,12 @@ Usage:
     adapter = create_adapter(
         provider="xai",  # or "anthropic"
         api_key=os.getenv("XAI_API_KEY"),
-        model="grok-4-1-fast",
+        model="grok-4-1-fast-reasoning",
     )
 
     # Use exactly like Anthropic client
     response = adapter.messages.create(
-        model="grok-4-1-fast",
+        model="grok-4-1-fast-reasoning",
         max_tokens=4096,
         system="You are helpful.",
         messages=[{"role": "user", "content": "Hello"}],
@@ -155,7 +155,7 @@ class GrokMessages:
 
     API_BASE = "https://api.x.ai/v1"
 
-    def __init__(self, api_key: str, default_model: str = "grok-4-1-fast"):
+    def __init__(self, api_key: str, default_model: str = "grok-4-1-fast-reasoning"):
         self.api_key = api_key
         self.default_model = default_model
         self.session = self._create_session()
@@ -318,7 +318,7 @@ class GrokAdapter:
         response = adapter.messages.create(...)
     """
 
-    def __init__(self, api_key: str, model: str = "grok-4-1-fast"):
+    def __init__(self, api_key: str, model: str = "grok-4-1-fast-reasoning"):
         self.messages = GrokMessages(api_key, default_model=model)
 
 
@@ -363,7 +363,7 @@ def create_adapter(
         api_key = api_key or os.getenv("XAI_API_KEY")
         if not api_key:
             raise ValueError("XAI_API_KEY required for Grok")
-        model = model or "grok-4-1-fast"
+        model = model or "grok-4-1-fast-reasoning"
         return GrokAdapter(api_key=api_key, model=model)
 
     elif provider == "anthropic":
