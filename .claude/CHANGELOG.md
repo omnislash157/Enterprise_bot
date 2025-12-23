@@ -4,6 +4,65 @@ This file tracks significant changes made by Claude agents to maintain continuit
 
 ---
 
+## [2024-12-23] - WebSocket Performance Upgrades: Streaming, Redis Cache, Warmup
+
+### Mission Executed
+Optimized WebSocket performance for sub-second first-token latency. Implemented streaming from Grok, Redis caching, and connection pool warmup.
+
+### Changes Made
+
+**Redis Cache Client (NEW)**
+- `core/cache.py` - New file implementing Redis cache with NoOpCache fallback
+- Embedding cache: 24h TTL, key format `emb:{query_hash}`
+- RAG results cache: 5m TTL, key format `rag:{query_hash}:{dept}`
+
+**RAG Cache Integration**
+- `core/enterprise_rag.py:200-244` - Integrated cache lookups before embedding generation and vector search
+- Cache hits skip both embedding API calls and database queries
+
+**Streaming Response**
+- `core/enterprise_twin.py:460-597` - Added `_generate_streaming()` and `think_streaming()` methods
+- Direct HTTPX streaming to Grok API with SSE parsing
+- Metadata passed as final chunk with `__METADATA__:` prefix
+
+**WebSocket Handler**
+- `core/main.py:796-832` - EnterpriseTwin now uses streaming handler
+- Chunks sent as `stream_chunk` messages with `done: false/true`
+- Metadata sent as `cognitive_state` after stream completes
+
+**Startup Warmup**
+- `core/main.py:384-406` - Added Redis cache init and RAG pool warmup on startup
+- Runs dummy query to establish database connections early
+
+**Frontend Auto-Reconnect**
+- `frontend/src/lib/stores/websocket.ts:47-120` - Added exponential backoff reconnect
+- Tracks intentional vs abnormal disconnects
+- Max 5 reconnect attempts with 1s-10s delay
+
+### Performance Expectations
+| Metric | Before | After |
+|--------|--------|-------|
+| First token | 8-11s | <1s |
+| Repeat query | 8-11s | 200ms |
+| Embedding API calls | 100% | ~30% |
+
+### Commit
+```
+90ee566 perf: streaming, redis cache, connection warmup
+```
+
+### Verification
+1. **Redis**: Check logs for `[STARTUP] Cache status: {'connected': True, ...}`
+2. **Streaming**: Text should appear character-by-character, not all at once
+3. **Cache Hit**: Send same query twice, second should show `[EnterpriseRAG] CACHE HIT`
+4. **Reconnect**: Kill backend, frontend should auto-reconnect after restart
+
+### Prerequisites
+- Redis addon in Railway with `REDIS_URL` environment variable
+- `redis>=5.0.0` and `hiredis>=2.0.0` in requirements.txt
+
+---
+
 ## [2024-12-23] - Security Fixes: Auth Bypass, Division Handling, Zero-Chunk Guardrail
 
 ### Mission Executed
