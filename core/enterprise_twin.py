@@ -261,7 +261,7 @@ class EnterpriseTwin:
     def rag(self):
         """Lazy load RAG retriever."""
         if self._rag is None:
-            from enterprise_rag import EnterpriseRAGRetriever
+            from .enterprise_rag import EnterpriseRAGRetriever
             self._rag = EnterpriseRAGRetriever(self.config)
         return self._rag
     
@@ -270,7 +270,7 @@ class EnterpriseTwin:
         """Lazy load Squirrel tool."""
         if self._squirrel is None:
             try:
-                from squirrel import SquirrelTool
+                from memory.squirrel import SquirrelTool
                 self._squirrel = SquirrelTool(self.config)
             except ImportError:
                 logger.warning("Squirrel tool not available")
@@ -282,7 +282,7 @@ class EnterpriseTwin:
         """Lazy load memory pipeline."""
         if self._memory_pipeline is None:
             try:
-                from memory_pipeline import MemoryPipeline
+                from memory.memory_pipeline import MemoryPipeline
                 self._memory_pipeline = MemoryPipeline(self.config)
             except ImportError:
                 logger.warning("Memory pipeline not available")
@@ -293,7 +293,7 @@ class EnterpriseTwin:
     def model_adapter(self):
         """Lazy load model adapter."""
         if self._model_adapter is None:
-            from model_adapter import create_adapter
+            from .model_adapter import create_adapter
             self._model_adapter = create_adapter(self.config)
         return self._model_adapter
     
