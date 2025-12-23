@@ -156,18 +156,58 @@ async def list_users(
     """
     List users visible to the current admin.
 
-    TODO: Rewrite for 2-table schema (no more access_config table).
-    This endpoint relied on list_users_in_department() and list_all_users()
-    which were removed during schema migration.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    - Super users see all users
+    - Dept heads see users in departments they head (or all if department filter not specified)
+    - Regular users get 403
     """
-    raise HTTPException(
-        501,
-        "Admin portal pending redesign for 2-table schema. "
-        "Use grant/revoke endpoints for now. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    try:
+        if department:
+            # Filter by specific department
+            users = auth.list_users_by_department(requester, department)
+        else:
+            # List all users (dept_heads+ only)
+            users = auth.list_all_users(requester)
+
+        # Optional search filter (client-side would be better, but this works)
+        if search:
+            search_lower = search.lower()
+            users = [
+                u for u in users
+                if search_lower in u.email.lower()
+                or (u.display_name and search_lower in u.display_name.lower())
+            ]
+
+        # Convert to response format
+        user_list = [
+            {
+                "id": u.id,
+                "email": u.email,
+                "display_name": u.display_name,
+                "department_access": u.department_access,
+                "dept_head_for": u.dept_head_for,
+                "is_super_user": u.is_super_user,
+                "is_active": u.is_active,
+                "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
+            }
+            for u in users
+        ]
+
+        return APIResponse(
+            success=True,
+            data={"users": user_list, "count": len(user_list)},
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
 
 
 @admin_router.get("/users/{user_id}", response_model=APIResponse)
@@ -178,16 +218,50 @@ async def get_user_detail(
     """
     Get detailed info for a specific user.
 
-    TODO: Rewrite for 2-table schema (no more access_config, departments tables).
-    This endpoint relied on SQL joins to deleted tables.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Dept heads can view users in departments they head.
+    Super users can view any user.
     """
-    raise HTTPException(
-        501,
-        "Admin portal pending redesign for 2-table schema. "
-        "Use grant/revoke endpoints for now. "
-        "See MIGRATION_001_COMPLETE.md for details."
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Check if requester has admin access
+    if not requester.is_super_user and not requester.dept_head_for:
+        raise HTTPException(403, "Admin access required")
+
+    # Get target user by ID
+    target = auth.get_user_by_id(user_id)
+    if not target:
+        raise HTTPException(404, f"User not found: {user_id}")
+
+    # For dept_heads (non-super), check if they can see this user
+    if not requester.is_super_user:
+        # Dept head can only see users in departments they head
+        visible_depts = set(requester.dept_head_for or [])
+        target_depts = set(target.department_access or [])
+        if not visible_depts.intersection(target_depts):
+            raise HTTPException(403, "Cannot view this user")
+
+    return APIResponse(
+        success=True,
+        data={
+            "user": {
+                "id": target.id,
+                "email": target.email,
+                "display_name": target.display_name,
+                "department_access": target.department_access,
+                "dept_head_for": target.dept_head_for,
+                "is_super_user": target.is_super_user,
+                "is_active": target.is_active,
+                "created_at": target.created_at.isoformat() if target.created_at else None,
+                "last_login_at": target.last_login_at.isoformat() if target.last_login_at else None,
+            }
+        },
     )
 
 
@@ -227,16 +301,41 @@ async def list_department_users(
     """
     List all users with access to a specific department.
 
-    TODO: Rewrite for 2-table schema. Need to query users table and filter
-    by department_access array contains slug.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    - Super users can view any department
+    - Dept heads can view departments they head
     """
-    raise HTTPException(
-        501,
-        "Admin portal pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    try:
+        users = auth.list_users_by_department(requester, slug)
+
+        user_list = [
+            {
+                "id": u.id,
+                "email": u.email,
+                "display_name": u.display_name,
+                "department_access": u.department_access,
+                "dept_head_for": u.dept_head_for,
+                "is_super_user": u.is_super_user,
+                "is_active": u.is_active,
+            }
+            for u in users
+        ]
+
+        return APIResponse(
+            success=True,
+            data={"department": slug, "users": user_list, "count": len(user_list)},
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
 
 
 # =============================================================================
@@ -251,17 +350,54 @@ async def grant_access(
     """
     Grant department access to a user.
 
-    TODO: This endpoint needs get_user_by_id() which doesn't exist in new schema.
-    The new grant_department_access() signature is also different.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    - Super users can grant any department
+    - Dept heads can grant departments they head (dept_head_for)
+    - If make_dept_head=True, promotes user to dept head (super_user only)
     """
-    raise HTTPException(
-        501,
-        "Admin portal pending redesign for 2-table schema. "
-        "Use direct SQL or auth_service updates. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Get target user - support both user_id (UUID) and email
+    target_email = request.user_id  # Might be email or UUID
+    if "@" not in target_email:
+        # It's a UUID, need to look up user
+        target = auth.get_user_by_id(request.user_id)
+        if not target:
+            raise HTTPException(404, f"User not found: {request.user_id}")
+        target_email = target.email
+
+    try:
+        # If make_dept_head, requires super_user
+        if request.make_dept_head:
+            if not requester.is_super_user:
+                raise HTTPException(403, "Only super users can promote department heads")
+            auth.promote_to_dept_head(requester, target_email, request.department_slug)
+            action = "promoted to dept_head"
+        else:
+            # Regular access grant
+            auth.grant_department_access(requester, target_email, request.department_slug)
+            action = "granted access"
+
+        logger.info(f"[Admin] {requester.email} {action} for {target_email} to {request.department_slug}")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully {action} to {request.department_slug} for {target_email}",
+            data={
+                "target_email": target_email,
+                "department": request.department_slug,
+                "action": action,
+            },
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
 
 
 @admin_router.post("/access/revoke", response_model=APIResponse)
@@ -272,17 +408,228 @@ async def revoke_access(
     """
     Revoke department access from a user.
 
-    TODO: This endpoint needs get_user_by_id() which doesn't exist in new schema.
-    The new revoke_department_access() signature is also different.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    - Super users can revoke any department
+    - Dept heads can revoke departments they head (dept_head_for)
     """
-    raise HTTPException(
-        501,
-        "Admin portal pending redesign for 2-table schema. "
-        "Use direct SQL or auth_service updates. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Get target user - support both user_id (UUID) and email
+    target_email = request.user_id  # Might be email or UUID
+    if "@" not in target_email:
+        target = auth.get_user_by_id(request.user_id)
+        if not target:
+            raise HTTPException(404, f"User not found: {request.user_id}")
+        target_email = target.email
+
+    try:
+        auth.revoke_department_access(requester, target_email, request.department_slug)
+
+        logger.info(f"[Admin] {requester.email} revoked {request.department_slug} access from {target_email}")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully revoked {request.department_slug} access from {target_email}",
+            data={
+                "target_email": target_email,
+                "department": request.department_slug,
+                "action": "revoked",
+            },
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+
+
+# =============================================================================
+# DEPT HEAD MANAGEMENT (SUPER_USER ONLY)
+# =============================================================================
+
+class PromoteDeptHeadRequest(BaseModel):
+    """Request to promote user to department head."""
+    target_email: str
+    department: str
+
+
+class RevokeDeptHeadRequest(BaseModel):
+    """Request to revoke department head status."""
+    target_email: str
+    department: str
+
+
+@admin_router.post("/dept-head/promote", response_model=APIResponse)
+async def promote_to_dept_head(
+    request: PromoteDeptHeadRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Promote a user to department head.
+
+    SUPER USER ONLY.
+
+    This gives the user the ability to grant/revoke access to the specified
+    department for other users.
+    """
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    if not requester.is_super_user:
+        raise HTTPException(403, "Only super users can promote department heads")
+
+    try:
+        auth.promote_to_dept_head(requester, request.target_email, request.department)
+
+        logger.info(f"[Admin] {requester.email} promoted {request.target_email} to dept_head for {request.department}")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully promoted {request.target_email} to department head for {request.department}",
+            data={
+                "target_email": request.target_email,
+                "department": request.department,
+            },
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+
+
+@admin_router.post("/dept-head/revoke", response_model=APIResponse)
+async def revoke_dept_head(
+    request: RevokeDeptHeadRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Revoke department head status from a user.
+
+    SUPER USER ONLY.
+
+    Note: This does NOT remove their access to the department, just their
+    ability to grant access to others.
+    """
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    if not requester.is_super_user:
+        raise HTTPException(403, "Only super users can revoke department head status")
+
+    try:
+        auth.revoke_dept_head(requester, request.target_email, request.department)
+
+        logger.info(f"[Admin] {requester.email} revoked dept_head from {request.target_email} for {request.department}")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully revoked department head status from {request.target_email} for {request.department}",
+            data={
+                "target_email": request.target_email,
+                "department": request.department,
+            },
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+
+
+# =============================================================================
+# SUPER USER MANAGEMENT (SUPER_USER ONLY)
+# =============================================================================
+
+class SuperUserRequest(BaseModel):
+    """Request to promote/revoke super user status."""
+    target_email: str
+
+
+@admin_router.post("/super-user/promote", response_model=APIResponse)
+async def make_super_user(
+    request: SuperUserRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Promote a user to super user status.
+
+    SUPER USER ONLY. Use carefully - super users have full access.
+    """
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    if not requester.is_super_user:
+        raise HTTPException(403, "Only super users can promote other super users")
+
+    try:
+        auth.make_super_user(requester, request.target_email)
+
+        logger.info(f"[Admin] {requester.email} promoted {request.target_email} to super_user")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully promoted {request.target_email} to super user",
+            data={"target_email": request.target_email},
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+
+
+@admin_router.post("/super-user/revoke", response_model=APIResponse)
+async def revoke_super_user(
+    request: SuperUserRequest,
+    x_user_email: str = Header(None, alias="X-User-Email"),
+):
+    """
+    Revoke super user status from a user.
+
+    SUPER USER ONLY. Cannot revoke your own super_user status.
+    """
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    if not requester.is_super_user:
+        raise HTTPException(403, "Only super users can revoke super user status")
+
+    try:
+        auth.revoke_super_user(requester, request.target_email)
+
+        logger.info(f"[Admin] {requester.email} revoked super_user from {request.target_email}")
+
+        return APIResponse(
+            success=True,
+            message=f"Successfully revoked super user status from {request.target_email}",
+            data={"target_email": request.target_email},
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
 
 
 # =============================================================================
