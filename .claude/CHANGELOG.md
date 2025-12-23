@@ -2686,3 +2686,76 @@ All 6 admin actions now write to audit log after successful execution:
 - Migration file includes comprehensive indexes for query performance
 - Singleton pattern ensures single AuditService instance across application
 - Email addresses normalized to lowercase for consistent querying
+
+## [2024-12-23 16:30] - Session Persistence & Reconnect (Phase 1)
+
+### Mission Executed
+Implemented BUILD_SHEET_SESSION_RECONNECT Phase 1: Frontend-only session persistence and connection state tracking to survive page reloads and network blips.
+
+### Files Created
+- `frontend/src/lib/components/ConnectionStatus.svelte` - Connection state banner with reconnection feedback
+
+### Files Modified
+- `frontend/src/lib/stores/session.ts` - Added localStorage persistence, connection state tracking, auto-save
+- `frontend/src/routes/+layout.svelte` - Integrated ConnectionStatus component
+
+### Implementation Details
+
+**Session Persistence**
+- localStorage key: `cogtwin_session`
+- Stores: sessionId, department, last 50 messages, timestamp
+- TTL: 1 hour (3600000ms)
+- Auto-save triggers: on user message send, on assistant message complete
+- Functions: `saveSessionToStorage()`, `loadSessionFromStorage()`, `clearSessionStorage()`
+
+**Connection State Tracking**
+- States: `connecting` → `connected` → `reconnecting` → `disconnected`
+- Added to SessionState interface: `connectionState`, `reconnectAttempts`, `sessionId`
+- WebSocket subscription monitors connection status changes
+- Reconnect attempts tracked with max 5 retries
+
+**ConnectionStatus Component**
+- Fixed top banner (z-index 50)
+- Only visible when not connected
+- Shows spinner during reconnection with attempt counter
+- "Reload" button on permanent disconnect
+- Color-coded states: yellow (connecting), green (connected), orange (reconnecting), red (disconnected)
+
+**init() Function Updates**
+- Attempts localStorage restore before WebSocket connect
+- Restores messages and department if sessionId matches and not expired
+- Sets connectionState to 'connecting' on init
+- Updates to 'connected' on successful verify
+
+**Auto-save Strategy**
+- Saves after each user message in sendMessage()
+- Saves after each assistant message in stream_chunk handler
+- Limits to 50 most recent messages to stay within localStorage limits
+- Only saves if sessionId and currentDivision are set
+
+### Testing Scenarios
+✓ Page reload preserves messages and department
+✓ Connection banner appears during network issues
+✓ Reconnection attempts tracked (1/5, 2/5, etc.)
+✓ Stale sessions (>1 hour) cleared on reload
+✓ Different sessionIds maintain independent state
+
+### Acceptance Criteria Met
+- [x] Messages persist across page reload (localStorage)
+- [x] Department selection persists across page reload
+- [x] Connection state indicator shows "Reconnecting..." during blips
+- [x] Stale sessions (>1 hour) are cleaned up
+- [ ] Server-side session table for cross-device sync (Phase 2 - not implemented)
+
+### What's Next (Phase 2 - Optional)
+- Server-side session storage in PostgreSQL
+- Cross-device session sync
+- Session analytics and admin visibility
+- Migration 005_websocket_sessions.sql
+- core/session_manager.py backend module
+
+### Git Commit
+- Commit: 99cadad
+- Branch: main
+- Pushed: Yes
+
