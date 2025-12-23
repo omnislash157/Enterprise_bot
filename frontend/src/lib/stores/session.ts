@@ -189,6 +189,17 @@ function createSessionStore() {
 
 				case 'error':
 					console.error('[Session] Error:', data.message);
+					// Handle division access errors
+					if (data.message?.includes('No access to department')) {
+						console.warn('[Session] Division change rejected, reverting');
+						// Revert to first accessible department from auth store
+						const authState = get(auth);
+						const fallbackDivision = authState?.user?.departments?.[0] || 'warehouse';
+						update(s => ({
+							...s,
+							currentDivision: fallbackDivision,
+						}));
+					}
 					break;
 			}
 		});

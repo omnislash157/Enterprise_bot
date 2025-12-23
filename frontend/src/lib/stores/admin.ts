@@ -20,7 +20,7 @@ export interface AdminUser {
     email: string;
     display_name: string | null;
     employee_id: string | null;
-    department_access: string[];     // Departments they can query
+    departments: string[];           // Standardized: departments they can query
     dept_head_for: string[];         // Departments they can grant access to
     is_super_user: boolean;
     is_active: boolean;
@@ -83,6 +83,13 @@ export function getDisplayRole(user: AdminUser): 'super_user' | 'dept_head' | 'u
     if (user.is_super_user) return 'super_user';
     if (user.dept_head_for && user.dept_head_for.length > 0) return 'dept_head';
     return 'user';
+}
+
+/**
+ * Get user's department access (handles both old and new naming)
+ */
+export function getUserDepartments(user: AdminUser): string[] {
+    return user.departments || [];
 }
 
 /**
