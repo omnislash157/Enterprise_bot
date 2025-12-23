@@ -32,6 +32,8 @@ from contextlib import contextmanager
 
 import requests
 
+from .metrics_collector import metrics_collector
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,10 +44,10 @@ logger = logging.getLogger(__name__)
 def get_model_name(provider: str = "xai") -> str:
     """
     Get model name from environment variable.
-    
+
     This is the ONLY place model names should be resolved.
     Set XAI_MODEL or ANTHROPIC_MODEL in Railway/env.
-    
+
     Raises ValueError if not set (fail fast, no silent defaults).
     """
     if provider == "xai":
@@ -56,13 +58,32 @@ def get_model_name(provider: str = "xai") -> str:
                 "Set it in Railway or .env (e.g., XAI_MODEL=grok-4-1-fast-reasoning)"
             )
         return model
-    
+
     elif provider == "anthropic":
         # Anthropic has a sensible default since it changes less often
         return os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
-    
+
     else:
         raise ValueError(f"Unknown provider: {provider}")
+
+
+# =============================================================================
+# LLM PRICING AND COST CALCULATION
+# =============================================================================
+
+# LLM pricing (per 1M tokens) - update as needed
+LLM_PRICING = {
+    'grok-4-1-fast-reasoning': {'input': 3.00, 'output': 15.00},
+    'grok-4-1': {'input': 3.00, 'output': 15.00},
+    'claude-3-sonnet': {'input': 3.00, 'output': 15.00},
+    'claude-sonnet-4-20250514': {'input': 3.00, 'output': 15.00},
+}
+
+def calculate_cost(model: str, tokens_in: int, tokens_out: int) -> float:
+    """Calculate USD cost for LLM call."""
+    pricing = LLM_PRICING.get(model, {'input': 5.00, 'output': 15.00})
+    cost = (tokens_in * pricing['input'] + tokens_out * pricing['output']) / 1_000_000
+    return cost
 
 
 # =============================================================================
@@ -111,6 +132,9 @@ class StreamManager:
         self._collected_text = ""
         self._usage = None
         self._stream_exhausted = False
+        self._start_time = time.time()
+        self._first_token_time = None
+        self._error = False
 
     def __enter__(self):
         return self
@@ -118,8 +142,38 @@ class StreamManager:
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Exhaust stream if not already done
         if not self._stream_exhausted:
-            for _ in self.text_stream:
-                pass
+            try:
+                for _ in self.text_stream:
+                    pass
+            except Exception:
+                self._error = True
+
+        # Record metrics
+        elapsed_ms = (time.time() - self._start_time) * 1000
+        first_token_ms = (self._first_token_time - self._start_time) * 1000 if self._first_token_time else 0
+
+        if self._error:
+            metrics_collector.record_llm_call(latency_ms=elapsed_ms, error=True)
+        elif self._usage:
+            cost = calculate_cost(self._model, self._usage.input_tokens, self._usage.output_tokens)
+            metrics_collector.record_llm_call(
+                latency_ms=elapsed_ms,
+                first_token_ms=first_token_ms,
+                tokens_in=self._usage.input_tokens,
+                tokens_out=self._usage.output_tokens,
+                cost_usd=cost
+            )
+        else:
+            # No usage data, record with estimated tokens
+            estimated_tokens_out = len(self._collected_text) // 4
+            cost = calculate_cost(self._model, 0, estimated_tokens_out)
+            metrics_collector.record_llm_call(
+                latency_ms=elapsed_ms,
+                first_token_ms=first_token_ms,
+                tokens_in=0,
+                tokens_out=estimated_tokens_out,
+                cost_usd=cost
+            )
 
     @property
     def text_stream(self) -> Iterator[str]:
@@ -129,6 +183,10 @@ class StreamManager:
                 delta = chunk_data["choices"][0].get("delta", {})
                 content = delta.get("content", "")
                 if content:
+                    # Capture first token time
+                    if self._first_token_time is None:
+                        self._first_token_time = time.time()
+
                     self._collected_text += content
                     yield content
 
@@ -245,29 +303,48 @@ class GrokMessages:
         logger.debug(f"Grok API request: model={model}, {len(openai_messages)} messages")
         start = time.time()
 
-        response = self.session.post(url, json=payload, timeout=(10, 120))
-        response.raise_for_status()
+        try:
+            response = self.session.post(url, json=payload, timeout=(10, 120))
+            response.raise_for_status()
 
-        data = response.json()
-        elapsed = time.time() - start
-        logger.info(f"Grok API response: {elapsed:.2f}s")
+            data = response.json()
+            elapsed_ms = (time.time() - start) * 1000
+            logger.info(f"Grok API response: {elapsed_ms:.0f}ms")
 
-        # Extract content
-        content = data["choices"][0]["message"]["content"]
-        usage_data = data.get("usage", {})
+            # Extract content
+            content = data["choices"][0]["message"]["content"]
+            usage_data = data.get("usage", {})
 
-        return Message(
-            id=data.get("id", f"msg_{int(time.time())}"),
-            type="message",
-            role="assistant",
-            content=[TextBlock(text=content)],
-            model=model,
-            stop_reason=data["choices"][0].get("finish_reason", "end_turn"),
-            usage=Usage(
-                input_tokens=usage_data.get("prompt_tokens", 0),
-                output_tokens=usage_data.get("completion_tokens", 0),
-            ),
-        )
+            tokens_in = usage_data.get("prompt_tokens", 0)
+            tokens_out = usage_data.get("completion_tokens", 0)
+
+            # Record metrics
+            cost = calculate_cost(model, tokens_in, tokens_out)
+            metrics_collector.record_llm_call(
+                latency_ms=elapsed_ms,
+                first_token_ms=0,  # Non-streaming doesn't have TTFT
+                tokens_in=tokens_in,
+                tokens_out=tokens_out,
+                cost_usd=cost
+            )
+
+            return Message(
+                id=data.get("id", f"msg_{int(time.time())}"),
+                type="message",
+                role="assistant",
+                content=[TextBlock(text=content)],
+                model=model,
+                stop_reason=data["choices"][0].get("finish_reason", "end_turn"),
+                usage=Usage(
+                    input_tokens=tokens_in,
+                    output_tokens=tokens_out,
+                ),
+            )
+
+        except Exception as e:
+            elapsed_ms = (time.time() - start) * 1000
+            metrics_collector.record_llm_call(latency_ms=elapsed_ms, error=True)
+            raise
 
     @contextmanager
     def stream(
