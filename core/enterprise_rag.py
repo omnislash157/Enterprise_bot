@@ -130,24 +130,29 @@ class EnterpriseRAGRetriever:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        
+
         # Database config
         db_config = config.get("database", {})
         self.connection_string = os.getenv("AZURE_PG_CONNECTION_STRING") or self._build_connection_string(db_config)
-        
+
         # RAG config (threshold-only, no top_k)
         rag_config = config.get("features", {}).get("enterprise_rag", {})
         self.table_name = rag_config.get("table", "enterprise.documents")
         self.default_threshold = rag_config.get("threshold", 0.6)
         # NOTE: No default_top_k - threshold-only by design
-        
+
+        # Search mode config
+        self.search_mode = rag_config.get("search_mode", "hybrid")
+        self.content_weight = rag_config.get("content_weight", 0.7)
+        self.question_weight = rag_config.get("question_weight", 0.3)
+
         # Embedding client
         self.embedder = EmbeddingClient(config)
-        
+
         # Connection pool (lazy init)
         self._pool = None
-        
-        logger.info(f"[EnterpriseRAG] Initialized with table: {self.table_name}")
+
+        logger.info(f"[EnterpriseRAG] Initialized: table={self.table_name}, mode={self.search_mode}, weights={self.content_weight}/{self.question_weight}")
     
     def _build_connection_string(self, db_config: Dict) -> str:
         """Build connection string from config."""
@@ -181,6 +186,7 @@ class EnterpriseRAGRetriever:
         query: str,
         department_id: str = None,
         threshold: float = None,
+        search_mode: str = "hybrid",  # NEW PARAMETER
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant manual chunks.
@@ -192,6 +198,7 @@ class EnterpriseRAGRetriever:
             query: User's query
             department_id: Department filter ('sales', 'purchasing', 'warehouse', or None for all)
             threshold: Minimum similarity threshold
+            search_mode: "content", "question", or "hybrid" (default)
 
         Returns:
             List of chunk dicts with content, metadata, and score
@@ -200,12 +207,13 @@ class EnterpriseRAGRetriever:
         start_time = datetime.now()
         cache = get_cache()
 
-        # Check RAG cache first
+        # Check RAG cache first (include search_mode in cache key)
         if department_id:
-            cached_results = await cache.get_rag_results(query, department_id)
+            cache_key_suffix = f"{department_id}:{search_mode}"
+            cached_results = await cache.get_rag_results(query, cache_key_suffix)
             if cached_results is not None:
                 elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
-                logger.info(f"[EnterpriseRAG] CACHE HIT - returned {len(cached_results)} results in {elapsed_ms:.0f}ms")
+                logger.info(f"[EnterpriseRAG] CACHE HIT ({search_mode}) - {len(cached_results)} results in {elapsed_ms:.0f}ms")
                 return cached_results
 
         if department_id:
@@ -225,8 +233,11 @@ class EnterpriseRAGRetriever:
                 query_embedding=query_embedding,
                 department_id=department_id,
                 threshold=threshold,
+                search_mode=search_mode,  # Pass through
+                content_weight=self.content_weight,
+                question_weight=self.question_weight,
             )
-            search_type = "vector"
+            search_type = f"vector_{search_mode}"
         else:
             # Fallback to keyword search
             results = await self._keyword_search(
@@ -236,11 +247,12 @@ class EnterpriseRAGRetriever:
             search_type = "keyword"
 
         elapsed_ms = (datetime.now() - start_time).total_seconds() * 1000
-        logger.info(f"[EnterpriseRAG] {search_type} search returned {len(results)} results in {elapsed_ms:.0f}ms")
+        logger.info(f"[EnterpriseRAG] {search_type} returned {len(results)} results in {elapsed_ms:.0f}ms")
 
         # Cache results
         if department_id and results:
-            await cache.set_rag_results(query, department_id, results)
+            cache_key_suffix = f"{department_id}:{search_mode}"
+            await cache.set_rag_results(query, cache_key_suffix, results)
 
         return results
     
@@ -249,76 +261,173 @@ class EnterpriseRAGRetriever:
         query_embedding: List[float],
         department_id: str = None,
         threshold: float = 0.6,
+        search_mode: str = "hybrid",  # "content", "question", or "hybrid"
+        content_weight: float = 0.7,
+        question_weight: float = 0.3,
     ) -> List[Dict[str, Any]]:
         """
-        Vector similarity search using pgvector.
+        Vector similarity search using pgvector with hybrid scoring.
 
-        Uses cosine distance: 1 - (embedding <=> query) as similarity.
-        Returns ALL results above threshold - no arbitrary cap.
-        Filters by department_id when provided.
+        Search modes:
+        - "content": Traditional content-only search (current behavior)
+        - "question": Search against synthetic questions only
+        - "hybrid": Combine both scores (recommended)
+
+        Args:
+            query_embedding: Query vector (1024 dims)
+            department_id: Filter by department (optional)
+            threshold: Minimum similarity threshold
+            search_mode: "content", "question", or "hybrid"
+            content_weight: Weight for content similarity (default 0.7)
+            question_weight: Weight for question similarity (default 0.3)
+
+        Returns:
+            List of chunk dicts with content, metadata, and scores
         """
         pool = await self._get_pool()
 
-        # Convert embedding to pgvector format
+        # Format embedding for pgvector
         embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
 
-        # Build query with optional department filter
-        if department_id:
-            query = f"""
-                SELECT
-                    id,
-                    content,
-                    section_title,
-                    source_file,
-                    department_id,
-                    1 - (embedding <=> $1::vector) as score
-                FROM {self.table_name}
-                WHERE
-                    department_id = $2
-                    AND embedding IS NOT NULL
-                    AND 1 - (embedding <=> $1::vector) >= $3
-                ORDER BY embedding <=> $1::vector
-            """
-            params = (embedding_str, department_id, threshold)
-        else:
-            query = f"""
-                SELECT
-                    id,
-                    content,
-                    section_title,
-                    source_file,
-                    department_id,
-                    1 - (embedding <=> $1::vector) as score
-                FROM {self.table_name}
-                WHERE
-                    embedding IS NOT NULL
-                    AND 1 - (embedding <=> $1::vector) >= $2
-                ORDER BY embedding <=> $1::vector
-            """
-            params = (embedding_str, threshold)
+        if search_mode == "content":
+            # Original behavior - content only
+            if department_id:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        1 - (embedding <=> $1::vector) as score,
+                        1 - (embedding <=> $1::vector) as content_score,
+                        NULL as question_score
+                    FROM {self.table_name}
+                    WHERE department_id = $2
+                      AND embedding IS NOT NULL
+                      AND 1 - (embedding <=> $1::vector) >= $3
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, department_id, threshold)
+            else:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        1 - (embedding <=> $1::vector) as score,
+                        1 - (embedding <=> $1::vector) as content_score,
+                        NULL as question_score
+                    FROM {self.table_name}
+                    WHERE embedding IS NOT NULL
+                      AND 1 - (embedding <=> $1::vector) >= $2
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, threshold)
+
+        elif search_mode == "question":
+            # Question embedding only
+            if department_id:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        1 - (synthetic_questions_embedding <=> $1::vector) as score,
+                        NULL as content_score,
+                        1 - (synthetic_questions_embedding <=> $1::vector) as question_score
+                    FROM {self.table_name}
+                    WHERE department_id = $2
+                      AND synthetic_questions_embedding IS NOT NULL
+                      AND 1 - (synthetic_questions_embedding <=> $1::vector) >= $3
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, department_id, threshold)
+            else:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        1 - (synthetic_questions_embedding <=> $1::vector) as score,
+                        NULL as content_score,
+                        1 - (synthetic_questions_embedding <=> $1::vector) as question_score
+                    FROM {self.table_name}
+                    WHERE synthetic_questions_embedding IS NOT NULL
+                      AND 1 - (synthetic_questions_embedding <=> $1::vector) >= $2
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, threshold)
+
+        else:  # hybrid (default)
+            # Combined scoring: content_weight * content + question_weight * question
+            if department_id:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        synthetic_questions,
+                        1 - (embedding <=> $1::vector) as content_score,
+                        COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0) as question_score,
+                        (
+                            $4 * (1 - (embedding <=> $1::vector)) +
+                            $5 * COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0)
+                        ) as score
+                    FROM {self.table_name}
+                    WHERE department_id = $2
+                      AND embedding IS NOT NULL
+                      AND (
+                          1 - (embedding <=> $1::vector) >= $3
+                          OR COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0) >= $3
+                      )
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, department_id, threshold, content_weight, question_weight)
+            else:
+                query = f"""
+                    SELECT
+                        id, content, section_title, source_file, department_id,
+                        synthetic_questions,
+                        1 - (embedding <=> $1::vector) as content_score,
+                        COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0) as question_score,
+                        (
+                            $2 * (1 - (embedding <=> $1::vector)) +
+                            $3 * COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0)
+                        ) as score
+                    FROM {self.table_name}
+                    WHERE embedding IS NOT NULL
+                      AND (
+                          1 - (embedding <=> $1::vector) >= $4
+                          OR COALESCE(1 - (synthetic_questions_embedding <=> $1::vector), 0) >= $4
+                      )
+                    ORDER BY score DESC
+                """
+                params = (embedding_str, content_weight, question_weight, threshold)
 
         try:
             async with pool.acquire() as conn:
                 rows = await conn.fetch(query, *params)
 
-                return [
-                    {
+                results = []
+                for row in rows:
+                    result = {
                         "id": str(row["id"]),
                         "content": row["content"],
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
                         "score": float(row["score"]),
-                        "search_type": "vector",
+                        "search_type": f"vector_{search_mode}",
                     }
-                    for row in rows
-                ]
+
+                    # Add component scores for debugging/tuning
+                    if row.get("content_score") is not None:
+                        result["content_score"] = float(row["content_score"])
+                    if row.get("question_score") is not None:
+                        result["question_score"] = float(row["question_score"])
+
+                    # Include synthetic questions if available (for debugging)
+                    if "synthetic_questions" in row.keys() and row["synthetic_questions"]:
+                        result["synthetic_questions"] = row["synthetic_questions"][:3]  # First 3
+
+                    results.append(result)
+
+                return results
 
         except Exception as e:
             logger.error(f"[EnterpriseRAG] Vector search failed: {e}")
             # Fall back to keyword search
             return await self._keyword_search(
-                query=" ".join(str(x) for x in query_embedding[:10]),  # Dummy
+                query=" ".join(str(x) for x in query_embedding[:10]),
                 department_id=department_id,
             )
     
