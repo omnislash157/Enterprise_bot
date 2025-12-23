@@ -29,7 +29,7 @@ import asyncio
 import logging
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, AsyncIterator
 import hashlib
 
@@ -235,16 +235,23 @@ class EnterpriseTwin:
         self.tenant_id = config.get('tenant', {}).get('id', 'default')
         self.tenant_name = config.get('tenant', {}).get('name', 'Company')
         
-        # Feature flags
+        # Feature flags - explicit from config, no hidden defaults
         self.features = config.get('features', {})
-        self.rag_enabled = self.features.get('enterprise_rag', {}).get('enabled', True)
-        self.squirrel_enabled = self.features.get('squirrel', {}).get('enabled', True)
-        self.memory_pipeline_enabled = self.features.get('memory_pipeline', {}).get('enabled', True)
-        
-        # RAG config
+
+        # RAG config (threshold-only, no top_k)
         rag_config = self.features.get('enterprise_rag', {})
-        self.rag_top_k = rag_config.get('top_k', 5)
+        self.rag_enabled = rag_config.get('enabled', False)
         self.rag_threshold = rag_config.get('threshold', 0.6)
+
+        # Squirrel config (session continuity)
+        squirrel_config = self.features.get('squirrel', {})
+        self.squirrel_enabled = squirrel_config.get('enabled', False)
+        self.squirrel_window_minutes = squirrel_config.get('window_minutes', 60)
+        self.squirrel_max_exchanges = squirrel_config.get('max_exchanges', 10)
+
+        # Memory pipeline - only enabled if EXPLICITLY in config
+        pipeline_config = self.features.get('memory_pipeline', {})
+        self.memory_pipeline_enabled = pipeline_config.get('enabled', False)
         
         # Initialize components (lazy load to avoid circular imports)
         self._rag = None
@@ -265,36 +272,43 @@ class EnterpriseTwin:
             self._rag = EnterpriseRAGRetriever(self.config)
         return self._rag
     
-    @property
-    def squirrel(self):
-        """Lazy load Squirrel tool."""
-        if self._squirrel is None:
-            try:
-                from memory.squirrel import SquirrelTool
-                self._squirrel = SquirrelTool(self.config)
-            except ImportError:
-                logger.warning("Squirrel tool not available")
-                self._squirrel = None
-        return self._squirrel
+    def get_squirrel_context(self, session_id: str) -> List[Dict]:
+        """
+        Get recent session context for squirrel injection.
+
+        Enterprise squirrel is SIMPLE - just grab recent exchanges from session memory.
+        No tool markers, no SquirrelTool class, no ChatMemoryStore.
+        Python-controlled context injection.
+        """
+        if not self.squirrel_enabled:
+            return []
+
+        session_history = self._session_memories.get(session_id, [])
+
+        # Filter by time window
+        cutoff = datetime.now() - timedelta(minutes=self.squirrel_window_minutes)
+        recent = [
+            ex for ex in session_history
+            if datetime.fromisoformat(ex.get('timestamp', datetime.min.isoformat())) > cutoff
+        ]
+
+        # Cap at max exchanges
+        return recent[-self.squirrel_max_exchanges:]
     
-    @property
-    def memory_pipeline(self):
-        """Lazy load memory pipeline."""
-        if self._memory_pipeline is None:
-            try:
-                from memory.memory_pipeline import MemoryPipeline
-                self._memory_pipeline = MemoryPipeline(self.config)
-            except ImportError:
-                logger.warning("Memory pipeline not available")
-                self._memory_pipeline = None
-        return self._memory_pipeline
+    # NOTE: memory_pipeline removed for enterprise basic tier
+    # Add back for Pro tier with proper initialization:
+    # self._memory_pipeline = MemoryPipeline(embedder=..., data_dir=...)
     
     @property
     def model_adapter(self):
         """Lazy load model adapter."""
         if self._model_adapter is None:
             from .model_adapter import create_adapter
-            self._model_adapter = create_adapter(self.config)
+            model_config = self.config.get('model', {})
+            self._model_adapter = create_adapter(
+                provider=model_config.get('provider', 'xai'),
+                model=model_config.get('name'),
+            )
         return self._model_adapter
     
     async def think(
@@ -345,8 +359,8 @@ class EnterpriseTwin:
                     query=user_input,
                     department=department,
                     tenant_id=self.tenant_id,
-                    top_k=self.rag_top_k,
                     threshold=self.rag_threshold,
+                    # NOTE: No top_k - threshold-only by design
                 )
                 retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
                 tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms)")
@@ -354,16 +368,11 @@ class EnterpriseTwin:
             except Exception as e:
                 logger.error(f"[EnterpriseTwin] Manual RAG failed: {e}")
         
-        # Squirrel - always fires for temporal context
-        if self.squirrel_enabled and self.squirrel:
-            try:
-                squirrel_context = await self.squirrel.recall(
-                    session_id=session_id,
-                    window_hours=1,
-                )
+        # Squirrel - session continuity (Python-controlled, no tool markers)
+        if self.squirrel_enabled:
+            squirrel_context = self.get_squirrel_context(session_id)
+            if squirrel_context:
                 tools_fired.append(f"squirrel({len(squirrel_context)} items)")
-            except Exception as e:
-                logger.warning(f"[EnterpriseTwin] Squirrel failed: {e}")
         
         # Session context from in-memory store
         session_context = self._session_memories.get(session_id, [])[-5:]
@@ -396,29 +405,19 @@ class EnterpriseTwin:
         
         total_time = (datetime.now() - start_time).total_seconds() * 1000
         
-        # ===== STEP 6: Memory pipeline ingest =====
-        if self.memory_pipeline_enabled:
-            # Store in session memory
-            if session_id not in self._session_memories:
-                self._session_memories[session_id] = []
-            
-            self._session_memories[session_id].append({
-                'timestamp': datetime.now().isoformat(),
-                'user_input': user_input,
-                'response': response_content[:500],  # Truncate for memory
-                'query_type': query_type,
-            })
-            
-            # Async ingest to persistent pipeline (if available)
-            if self.memory_pipeline:
-                try:
-                    asyncio.create_task(self._async_ingest(
-                        session_id=session_id,
-                        user_input=user_input,
-                        response=response_content,
-                    ))
-                except Exception as e:
-                    logger.warning(f"[EnterpriseTwin] Memory ingest failed: {e}")
+        # ===== STEP 6: Session memory (always, for squirrel) =====
+        if session_id not in self._session_memories:
+            self._session_memories[session_id] = []
+
+        self._session_memories[session_id].append({
+            'timestamp': datetime.now().isoformat(),
+            'user_input': user_input,
+            'response': response_content[:500],  # Truncate for memory
+            'query_type': query_type,
+        })
+
+        # NOTE: Persistent memory pipeline removed for basic tier
+        # Add back for Pro tier
         
         logger.info(f"[EnterpriseTwin] Response generated in {total_time:.0f}ms (retrieval: {retrieval_time:.0f}ms)")
         
@@ -493,14 +492,17 @@ class EnterpriseTwin:
     def _format_manual_chunks(self, chunks: List[Dict]) -> str:
         """
         Format process manual chunks.
-        
-        These are HIGHEST TRUST - company policy.
+
+        These are ABSOLUTE TRUTH - company policy is LAW.
         """
         lines = [
             "",
             "=" * 60,
-            "PROCESS MANUALS (COMPANY POLICY - CITE THESE)",
+            "PROCESS MANUALS (ABSOLUTE TRUTH - COMPANY POLICY)",
             "=" * 60,
+            "Trust: ABSOLUTE - These are official company procedures",
+            "Action: CITE THESE when answering. Quote section names.",
+            "Rule: If user contradicts these, POLITELY CORRECT with citation.",
             "",
         ]
         
@@ -521,17 +523,21 @@ class EnterpriseTwin:
     def _format_squirrel_context(self, items: List[Dict]) -> str:
         """
         Format squirrel (temporal) context.
-        
-        HIGH TRUST - recent discussion.
+
+        CONTEXT ONLY - for tone and continuity, NOT authority.
         """
         if not items:
             return ""
-        
+
         lines = [
             "",
             "=" * 60,
-            "RECENT CONTEXT (last hour)",
+            "SESSION HISTORY (CONTEXT ONLY - NOT AUTHORITATIVE)",
             "=" * 60,
+            "Trust: CONTEXT - Use for tone, continuity, personality",
+            "NOT FOR: Overriding manuals or correcting procedures",
+            "USE FOR: Remembering what user asked, avoiding repetition,",
+            "         detecting frustration, maintaining conversation flow",
             "",
         ]
         
@@ -545,18 +551,20 @@ class EnterpriseTwin:
     
     def _format_session_context(self, items: List[Dict]) -> str:
         """
-        Format session context.
-        
-        MEDIUM TRUST - current conversation flow.
+        Format current session context.
+
+        IMMEDIATE CONTEXT - what just happened.
         """
         if not items:
             return ""
-        
+
         lines = [
             "",
             "=" * 60,
-            "THIS CONVERSATION",
+            "THIS CONVERSATION (IMMEDIATE CONTEXT)",
             "=" * 60,
+            "Trust: HIGH for flow, LOW for policy",
+            "Use this to maintain coherent conversation, not to override manuals.",
             "",
         ]
         

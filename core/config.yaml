@@ -25,21 +25,33 @@ tenant:
 # FEATURE FLAGS - THE MASTER SWITCHES
 # =============================================================================
 features:
-  # MEMORY SYSTEM (OFF for basic tier)
-  memory_pipelines: false       # No 5-lane retrieval
-  session_memory: false         # Don't remember within session
+  # ENTERPRISE RAG - Vector search over process manuals
+  enterprise_rag:
+    enabled: true
+    threshold: 0.6           # Return EVERYTHING above this score
+    # NOTE: No top_k - threshold-only retrieval by design
 
-  # CONTEXT STUFFING (DEPRECATED - RAG is now the only retrieval mode)
-  context_stuffing: false       # DEPRECATED - RAG replaced context stuffing
+  # SQUIRREL - Session continuity (last hour awareness)
+  # Gives Grok personality - "bro you asked that 5 times already"
+  squirrel:
+    enabled: true
+    window_minutes: 60       # How far back to look
+    max_exchanges: 10        # Cap for context size
 
-  # COGNITIVE FEATURES (ALL OFF)
-  metacognitive_mirror: false   # No phase detection
-  cognitive_profiler: false     # No user profiling
-  evolution_engine: false       # No self-improvement
-  reasoning_traces: false       # No decision logging
+  # MEMORY PIPELINES - INTENTIONALLY OMITTED
+  # If not in config, EnterpriseTwin won't try to load it
+  # Add this back for Pro tier:
+  # memory_pipeline:
+  #   enabled: true
+  #   batch_interval: 5.0
+  #   max_batch_size: 10
 
-  # EXTRACTION (OFF - no chat import)
-  chat_import: false            # Dormant
+  # COGNITIVE FEATURES (ALL OFF for enterprise)
+  metacognitive_mirror: false
+  cognitive_profiler: false
+  evolution_engine: false
+  reasoning_traces: false
+  chat_import: false
 
   # UI FEATURES
   ui:

@@ -10,15 +10,14 @@ This is the manual RAG that fires for procedural/lookup/complaint queries.
 Python fires this tool, not Grok.
 
 Usage:
-    from enterprise_rag import EnterpriseRAGRetriever
-    
+    from .enterprise_rag import EnterpriseRAGRetriever
+
     rag = EnterpriseRAGRetriever(config)
     chunks = await rag.search(
         query="how do I process a credit memo",
         department="sales",
         tenant_id="driscoll",
-        top_k=5,
-        threshold=0.6,
+        threshold=0.6,  # Returns ALL chunks above this score
     )
 
 Version: 1.0.0
@@ -134,11 +133,11 @@ class EnterpriseRAGRetriever:
         db_config = config.get("database", {})
         self.connection_string = os.getenv("AZURE_PG_CONNECTION_STRING") or self._build_connection_string(db_config)
         
-        # RAG config
+        # RAG config (threshold-only, no top_k)
         rag_config = config.get("features", {}).get("enterprise_rag", {})
         self.table_name = rag_config.get("table", "enterprise.documents")
-        self.default_top_k = rag_config.get("top_k", 5)
         self.default_threshold = rag_config.get("threshold", 0.6)
+        # NOTE: No default_top_k - threshold-only by design
         
         # Embedding client
         self.embedder = EmbeddingClient(config)
@@ -180,23 +179,23 @@ class EnterpriseRAGRetriever:
         query: str,
         department: str,
         tenant_id: str,
-        top_k: int = None,
         threshold: float = None,
+        # NOTE: top_k removed - threshold-only by design
     ) -> List[Dict[str, Any]]:
         """
         Search for relevant manual chunks.
-        
+
+        Returns ALL chunks above threshold - no arbitrary cap.
+
         Args:
             query: User's query
             department: User's department (for filtering)
             tenant_id: Tenant ID (for RLS)
-            top_k: Number of results to return
             threshold: Minimum similarity threshold
-            
+
         Returns:
             List of chunk dicts with content, metadata, and score
         """
-        top_k = top_k or self.default_top_k
         threshold = threshold or self.default_threshold
         
         start_time = datetime.now()
@@ -209,7 +208,6 @@ class EnterpriseRAGRetriever:
                 query_embedding=query_embedding,
                 department=department,
                 tenant_id=tenant_id,
-                top_k=top_k,
                 threshold=threshold,
             )
             search_type = "vector"
@@ -219,7 +217,6 @@ class EnterpriseRAGRetriever:
                 query=query,
                 department=department,
                 tenant_id=tenant_id,
-                top_k=top_k,
             )
             search_type = "keyword"
         
@@ -233,39 +230,39 @@ class EnterpriseRAGRetriever:
         query_embedding: List[float],
         department: str,
         tenant_id: str,
-        top_k: int,
         threshold: float,
+        # NOTE: top_k removed - threshold-only by design
     ) -> List[Dict[str, Any]]:
         """
         Vector similarity search using pgvector.
-        
+
         Uses cosine distance: 1 - (embedding <=> query) as similarity.
+        Returns ALL results above threshold - no arbitrary cap.
         """
         pool = await self._get_pool()
-        
+
         # Convert embedding to pgvector format
         embedding_str = "[" + ",".join(str(x) for x in query_embedding) + "]"
-        
+
         query = f"""
-            SELECT 
+            SELECT
                 id,
                 content,
                 section_title,
                 source_file,
                 department_id,
-                keywords,
                 chunk_index,
                 1 - (embedding <=> $1::vector) as score
             FROM {self.table_name}
-            WHERE 
+            WHERE
                 tenant_id = $2
                 AND (department_id = $3 OR department_id IS NULL)
                 AND embedding IS NOT NULL
                 AND 1 - (embedding <=> $1::vector) >= $4
             ORDER BY embedding <=> $1::vector
-            LIMIT $5
+            -- NO LIMIT - return everything above threshold
         """
-        
+
         try:
             async with pool.acquire() as conn:
                 rows = await conn.fetch(
@@ -274,9 +271,8 @@ class EnterpriseRAGRetriever:
                     tenant_id,
                     department,
                     threshold,
-                    top_k,
                 )
-                
+
                 return [
                     {
                         "id": str(row["id"]),
@@ -284,7 +280,6 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "keywords": row["keywords"],
                         "chunk_index": row["chunk_index"],
                         "score": float(row["score"]),
                         "search_type": "vector",
@@ -299,7 +294,6 @@ class EnterpriseRAGRetriever:
                 query=" ".join(str(x) for x in query_embedding[:10]),  # Dummy
                 department=department,
                 tenant_id=tenant_id,
-                top_k=top_k,
             )
     
     async def _keyword_search(
@@ -307,39 +301,38 @@ class EnterpriseRAGRetriever:
         query: str,
         department: str,
         tenant_id: str,
-        top_k: int,
+        # NOTE: top_k removed - return all matches
     ) -> List[Dict[str, Any]]:
         """
         Keyword search fallback using PostgreSQL full-text search.
-        
-        Uses ts_rank for scoring.
+
+        Uses ts_rank for scoring. Returns all matches (no arbitrary limit).
         """
         pool = await self._get_pool()
-        
+
         # Clean query for tsquery
         clean_query = " & ".join(
-            word.strip() for word in query.split() 
+            word.strip() for word in query.split()
             if len(word.strip()) > 2
         )
-        
+
         if not clean_query:
             clean_query = query.replace(" ", " & ")
-        
+
         sql = f"""
-            SELECT 
+            SELECT
                 id,
                 content,
                 section_title,
                 source_file,
                 department_id,
-                keywords,
                 chunk_index,
                 ts_rank(
                     to_tsvector('english', coalesce(content, '') || ' ' || coalesce(section_title, '')),
                     plainto_tsquery('english', $1)
                 ) as score
             FROM {self.table_name}
-            WHERE 
+            WHERE
                 tenant_id = $2
                 AND (department_id = $3 OR department_id IS NULL)
                 AND (
@@ -349,13 +342,13 @@ class EnterpriseRAGRetriever:
                     OR section_title ILIKE '%' || $1 || '%'
                 )
             ORDER BY score DESC
-            LIMIT $4
+            -- NO LIMIT - return all matches
         """
-        
+
         try:
             async with pool.acquire() as conn:
-                rows = await conn.fetch(sql, query, tenant_id, department, top_k)
-                
+                rows = await conn.fetch(sql, query, tenant_id, department)
+
                 return [
                     {
                         "id": str(row["id"]),
@@ -363,7 +356,6 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "keywords": row["keywords"],
                         "chunk_index": row["chunk_index"],
                         "score": float(row["score"]) if row["score"] else 0.5,
                         "search_type": "keyword",
@@ -378,19 +370,19 @@ class EnterpriseRAGRetriever:
     async def get_by_id(self, chunk_id: str, tenant_id: str) -> Optional[Dict[str, Any]]:
         """Get a specific chunk by ID."""
         pool = await self._get_pool()
-        
+
         sql = f"""
-            SELECT 
-                id, content, section_title, source_file, 
-                department_id, keywords, chunk_index
+            SELECT
+                id, content, section_title, source_file,
+                department_id, chunk_index
             FROM {self.table_name}
             WHERE id = $1 AND tenant_id = $2
         """
-        
+
         try:
             async with pool.acquire() as conn:
                 row = await conn.fetchrow(sql, chunk_id, tenant_id)
-                
+
                 if row:
                     return {
                         "id": str(row["id"]),
@@ -398,11 +390,10 @@ class EnterpriseRAGRetriever:
                         "section_title": row["section_title"],
                         "source_file": row["source_file"],
                         "department": row["department_id"],
-                        "keywords": row["keywords"],
                         "chunk_index": row["chunk_index"],
                     }
                 return None
-                
+
         except Exception as e:
             logger.error(f"[EnterpriseRAG] get_by_id failed: {e}")
             return None
