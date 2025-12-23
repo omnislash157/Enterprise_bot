@@ -24,6 +24,7 @@ from .auth_service import (
     get_auth_service,
     User,
 )
+from .tenant_service import STATIC_DEPARTMENTS
 
 logger = logging.getLogger(__name__)
 
@@ -716,10 +717,7 @@ class CreateUserRequest(BaseModel):
     """Request to create a single user."""
     email: str
     display_name: Optional[str] = None
-    employee_id: Optional[str] = None
-    role: str = "user"
-    primary_department: Optional[str] = None
-    department_access: Optional[List[str]] = None
+    department: Optional[str] = None  # Single department to grant access to
     reason: Optional[str] = None
 
 
@@ -757,20 +755,68 @@ async def create_user(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    Create a single user.
+    Create a single user with optional department access.
 
-    TODO: The auth.create_user() method signature changed.
-    No more employee_id, role, primary_department_slug fields.
-    Use auth.get_or_create_user() then grant_department_access().
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Flow:
+    1. Validate requester is admin (super_user or dept_head)
+    2. Validate department if provided
+    3. Create user via get_or_create_user()
+    4. Grant department access if specified
     """
-    raise HTTPException(
-        501,
-        "User creation pending redesign for 2-table schema. "
-        "Use get_or_create_user() + grant_department_access(). "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "Not authenticated")
+
+    # Must be super_user or dept_head to create users
+    if not requester.is_super_user and not requester.dept_head_for:
+        raise HTTPException(403, "Only admins can create users")
+
+    # Validate department if provided
+    department = request.department
+    valid_slugs = [d.slug for d in STATIC_DEPARTMENTS]
+    if department and department not in valid_slugs:
+        raise HTTPException(400, f"Invalid department: {department}. Valid: {valid_slugs}")
+
+    # Check permission to grant this department
+    if department and not requester.can_grant_access(department):
+        raise HTTPException(403, f"You cannot grant access to {department}")
+
+    try:
+        # Create user (no access by default)
+        user = auth.get_or_create_user(
+            email=request.email,
+            display_name=request.display_name
+        )
+
+        if not user:
+            raise HTTPException(400, f"Could not create user: {request.email}")
+
+        # Grant department access if specified
+        if department:
+            auth.grant_department_access(requester, request.email, department)
+
+        logger.info(f"[Admin] {x_user_email} created user {request.email} with department={department}")
+
+        return APIResponse(
+            success=True,
+            data={
+                "user": {
+                    "id": str(user.id),
+                    "email": user.email,
+                    "display_name": user.display_name,
+                    "departments": user.department_access + ([department] if department else []),
+                    "is_active": user.is_active
+                }
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except Exception as e:
+        logger.error(f"[Admin] Error creating user {request.email}: {e}")
+        raise HTTPException(500, f"Error creating user: {str(e)}")
 
 
 @admin_router.post("/users/batch", response_model=APIResponse)
@@ -779,17 +825,109 @@ async def batch_create_users(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    Batch create multiple users.
+    Batch create multiple users from CSV import.
 
-    TODO: The auth.batch_create_users() method doesn't exist anymore.
-    Need to loop and call get_or_create_user() + grant_department_access().
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Flow:
+    1. Validate requester permissions
+    2. Validate all departments in request
+    3. Process each user: create + grant access
+    4. Return summary with success/failure counts
     """
-    raise HTTPException(
-        501,
-        "Batch user creation pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "Not authenticated")
+
+    if not requester.is_super_user and not requester.dept_head_for:
+        raise HTTPException(403, "Only admins can batch create users")
+
+    valid_slugs = [d.slug for d in STATIC_DEPARTMENTS]
+
+    # Validate default department
+    if request.default_department not in valid_slugs:
+        raise HTTPException(400, f"Invalid default_department: {request.default_department}")
+
+    results = {
+        "created": [],
+        "existing": [],
+        "failed": [],
+        "total": len(request.users)
+    }
+
+    for entry in request.users:
+        try:
+            # Determine department (entry-specific or default)
+            department = entry.department or request.default_department
+
+            # Validate department
+            if department not in valid_slugs:
+                results["failed"].append({
+                    "email": entry.email,
+                    "error": f"Invalid department: {department}"
+                })
+                continue
+
+            # Check requester can grant this department
+            if not requester.can_grant_access(department):
+                results["failed"].append({
+                    "email": entry.email,
+                    "error": f"You cannot grant access to {department}"
+                })
+                continue
+
+            # Check if user already exists
+            existing_user = auth.get_user_by_email(entry.email)
+            if existing_user:
+                # User exists - just grant access if they don't have it
+                if department not in existing_user.department_access:
+                    auth.grant_department_access(requester, entry.email, department)
+                results["existing"].append({
+                    "email": entry.email,
+                    "department": department,
+                    "note": "User existed, access granted"
+                })
+                continue
+
+            # Create new user
+            user = auth.get_or_create_user(
+                email=entry.email,
+                display_name=entry.display_name
+            )
+
+            if not user:
+                results["failed"].append({
+                    "email": entry.email,
+                    "error": "Could not create user (invalid email domain?)"
+                })
+                continue
+
+            # Grant department access
+            auth.grant_department_access(requester, entry.email, department)
+
+            results["created"].append({
+                "email": entry.email,
+                "display_name": entry.display_name,
+                "department": department
+            })
+
+        except Exception as e:
+            results["failed"].append({
+                "email": entry.email,
+                "error": str(e)
+            })
+
+    logger.info(
+        f"[Admin] {x_user_email} batch import: "
+        f"{len(results['created'])} created, "
+        f"{len(results['existing'])} existing, "
+        f"{len(results['failed'])} failed"
+    )
+
+    return APIResponse(
+        success=len(results["failed"]) == 0,
+        data=results,
+        error=f"{len(results['failed'])} users failed" if results["failed"] else None
     )
 
 
