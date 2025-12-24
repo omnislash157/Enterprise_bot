@@ -1,5 +1,6 @@
 import { writable, derived, get } from 'svelte/store';
 import { websocket } from './websocket';
+import { browser } from '$app/environment';
 
 // ============================================================================
 // API BASE
@@ -8,6 +9,66 @@ import { websocket } from './websocket';
 function getApiBase(): string {
     return import.meta.env.VITE_API_URL || 'http://localhost:8000';
 }
+
+// ============================================================================
+// LANGUAGE STORE - Persisted to localStorage
+// ============================================================================
+
+export type Language = 'en' | 'es';
+
+function createLanguageStore() {
+    // Load from localStorage if in browser
+    const stored = browser ? localStorage.getItem('userLanguage') as Language : null;
+    const initial: Language = stored === 'es' ? 'es' : 'en';
+
+    const { subscribe, set, update } = writable<Language>(initial);
+
+    return {
+        subscribe,
+        set(lang: Language) {
+            if (browser) {
+                localStorage.setItem('userLanguage', lang);
+            }
+            set(lang);
+        },
+        toggle() {
+            update(current => {
+                const newLang = current === 'en' ? 'es' : 'en';
+                if (browser) {
+                    localStorage.setItem('userLanguage', newLang);
+                }
+                return newLang;
+            });
+        }
+    };
+}
+
+export const userLanguage = createLanguageStore();
+
+// ============================================================================
+// VOICE SPEED STORE - Persisted to localStorage
+// ============================================================================
+
+function createVoiceSpeedStore() {
+    const stored = browser ? localStorage.getItem('voiceSpeed') : null;
+    const initial = stored ? parseFloat(stored) : 1.35;  // Default 1.35x
+
+    const { subscribe, set } = writable<number>(initial);
+
+    return {
+        subscribe,
+        set(speed: number) {
+            // Clamp between 0.75 and 2.0
+            const clamped = Math.max(0.75, Math.min(2.0, speed));
+            if (browser) {
+                localStorage.setItem('voiceSpeed', clamped.toString());
+            }
+            set(clamped);
+        }
+    };
+}
+
+export const voiceSpeed = createVoiceSpeedStore();
 
 // ============================================================================
 // TYPES
@@ -90,10 +151,12 @@ function createVoiceStore() {
             audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
         }
 
-        // Notify backend to open Deepgram connection
+        // Notify backend to open Deepgram connection with current language
+        const currentLanguage = get(userLanguage);
         websocket.send({
             type: 'voice_start',
             timestamp: Date.now(),
+            language: currentLanguage,  // 'en' or 'es'
         });
 
         mediaRecorder = new MediaRecorder(audioStream, {
@@ -248,16 +311,20 @@ let isPlaying = false;
 /**
  * Queue a sentence for TTS playback with optional callback when audio STARTS.
  * This enables synchronized text reveal - text appears as audio plays.
+ * @param language - 'en' or 'es' for voice selection
  */
 export async function queueSentenceAudio(
     sentence: string,
-    onStart?: () => void
+    onStart?: () => void,
+    language: Language = 'en'
 ): Promise<void> {
     try {
+        // Use language-specific voice
+        const voice = language === 'es' ? 'es' : 'default';
         const response = await fetch(`${getApiBase()}/api/tts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: sentence, voice: 'default' })
+            body: JSON.stringify({ text: sentence, voice })
         });
 
         if (!response.ok) {
@@ -285,6 +352,9 @@ function playNext(): void {
     }
     isPlaying = true;
     const { audio, onStart } = audioQueue.shift()!;
+
+    // Apply voice speed setting
+    audio.playbackRate = get(voiceSpeed);
 
     // Call onStart callback when audio begins - this reveals the text
     onStart?.();
@@ -328,9 +398,12 @@ export function clearAudioQueue(): void {
 
 /**
  * Legacy: Speak full text at once (fallback for short responses)
+ * @param language - 'en' or 'es' for voice selection
  */
-export async function speakText(text: string, voice = 'professional'): Promise<void> {
+export async function speakText(text: string, language: Language = 'en'): Promise<void> {
     try {
+        // Use language-specific voice
+        const voice = language === 'es' ? 'es' : 'professional';
         const response = await fetch(`${getApiBase()}/api/tts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -350,6 +423,7 @@ export async function speakText(text: string, voice = 'professional'): Promise<v
         console.error('[TTS] Failed:', err);
         // Fallback to browser TTS
         const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = language === 'es' ? 'es-ES' : 'en-US';
         speechSynthesis.speak(utterance);
     }
 }

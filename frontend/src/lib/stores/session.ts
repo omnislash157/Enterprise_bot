@@ -1,6 +1,7 @@
 import { writable, get } from 'svelte/store';
 import { websocket } from './websocket';
 import { auth } from './auth';
+import { userLanguage } from './voice';
 
 // Session state persistence keys
 const SESSION_STORAGE_KEY = 'cogtwin_session';
@@ -456,12 +457,13 @@ function createSessionStore() {
 			// Get current division to include in message
 			const state = get(store);
 
-			// Send to backend WITH division and file_ids
+			// Send to backend WITH division, file_ids, and language
 			websocket.send({
 				type: 'message',
 				content: messageContent,
 				division: state.currentDivision,
 				file_ids: file_ids || [],  // Include file_ids for xAI Files API
+				language: get(userLanguage),  // 'en' or 'es'
 			});
 		},
 

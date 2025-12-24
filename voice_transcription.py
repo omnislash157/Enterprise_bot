@@ -27,8 +27,10 @@ DEEPGRAM_TTS_URL = "https://api.deepgram.com/v1/speak"
 
 # Aura voices - pick your vibe
 AURA_VOICES = {
-    "default": "aura-2-delia-en",        # Your pick - American female
-    "professional": "aura-2-delia-en",   # Alias          
+    "default": "aura-2-delia-en",        # American female (English)
+    "professional": "aura-2-delia-en",   # Alias
+    "en": "aura-2-delia-en",             # English
+    "es": "aura-2-lucia-es",             # Spanish female
 }
 
 
@@ -60,24 +62,27 @@ class DeepgramBridge:
         session_id: str,
         on_transcript: Callable[[str, bool, float], Awaitable[None]],
         on_error: Callable[[str], Awaitable[None]],
-        config: Optional[DeepgramConfig] = None
+        config: Optional[DeepgramConfig] = None,
+        language: str = "en"
     ):
         self.session_id = session_id
         self.on_transcript = on_transcript
         self.on_error = on_error
         self.config = config or DeepgramConfig()
+        self.language = language  # 'en' or 'es'
 
         self._ws: Optional[websockets.WebSocketClientProtocol] = None
         self._receive_task: Optional[asyncio.Task] = None
         self._connected = False
 
-    def _build_url(self) -> str:
+    def _build_url(self, language: str = "en") -> str:
         """Build Deepgram WebSocket URL - minimal working config.
 
         Let Deepgram auto-detect encoding/sample_rate from audio stream.
         Adding explicit encoding params causes HTTP 400 errors.
         """
-        return f"{DEEPGRAM_WS_URL}?model=nova-2"
+        lang_code = "es" if language == "es" else "en-US"
+        return f"{DEEPGRAM_WS_URL}?model=nova-2&language={lang_code}"
 
     async def connect(self) -> bool:
         """Open connection to Deepgram."""
@@ -87,7 +92,7 @@ class DeepgramBridge:
             return False
 
         try:
-            url = self._build_url()
+            url = self._build_url(self.language)
             headers = {"Authorization": f"Token {DEEPGRAM_API_KEY}"}
 
             self._ws = await websockets.connect(
@@ -188,17 +193,19 @@ async def start_voice_session(
     session_id: str,
     on_transcript: Callable[[str, bool, float], Awaitable[None]],
     on_error: Callable[[str], Awaitable[None]],
+    language: str = "en"
 ) -> bool:
     """Start a new voice transcription session."""
     # Close existing if any
     if session_id in _active_bridges:
         await stop_voice_session(session_id)
 
-    bridge = DeepgramBridge(session_id, on_transcript, on_error)
+    bridge = DeepgramBridge(session_id, on_transcript, on_error, language=language)
     success = await bridge.connect()
 
     if success:
         _active_bridges[session_id] = bridge
+        logger.info(f"[Voice] Session started for {session_id} (language={language})")
 
     return success
 

@@ -517,6 +517,7 @@ class EnterpriseTwin:
         user_email: str,
         department: str,
         session_id: str,
+        language: str = "en",
     ) -> AsyncIterator[str]:
         """
         Process query and stream response tokens.
@@ -524,12 +525,19 @@ class EnterpriseTwin:
         Args:
             user_input: Either a string OR a content array with file references
                         e.g., [{"type": "text", "text": "..."}, {"type": "file", "file_id": "..."}]
+            language: 'en' for English, 'es' for Spanish responses
 
         Yields:
             str: Response chunks as they arrive
         """
         start_time = datetime.now()
         tools_fired = []
+
+        # DEBUG: Log input type for file upload tracing
+        if isinstance(user_input, list):
+            file_refs = [item for item in user_input if item.get("type") == "file"]
+            if file_refs:
+                logger.info(f"[EnterpriseTwin] Received {len(file_refs)} file reference(s): {file_refs}")
 
         # Extract text for classification/search (handles both string and content array)
         if isinstance(user_input, str):
@@ -584,7 +592,7 @@ class EnterpriseTwin:
         )
 
         # ===== STEP 4: Build prompt =====
-        system_prompt = self._build_system_prompt(context)
+        system_prompt = self._build_system_prompt(context, language)
 
         # ===== STEP 5: Stream response =====
         full_response = ""
@@ -615,18 +623,24 @@ class EnterpriseTwin:
         # Yield metadata as final "chunk" (frontend should handle this)
         yield f"\n__METADATA__:{json.dumps({'tools_fired': tools_fired, 'retrieval_ms': retrieval_time, 'total_ms': total_time})}"
 
-    def _build_system_prompt(self, context: EnterpriseContext) -> str:
+    def _build_system_prompt(self, context: EnterpriseContext, language: str = "en") -> str:
         """
         Build system prompt with trust hierarchy baked in.
-        
+
         Order matters - manual chunks come first (highest trust).
         User statements are NOT included as "ground truth".
         """
         sections = []
-        
+
         # Identity block (the voice)
         sections.append(ENTERPRISE_IDENTITY)
-        
+
+        # Language instruction
+        if language == "es":
+            sections.append("\nIMPORTANT: Respond ENTIRELY in Spanish. Responde completamente en español.")
+        else:
+            sections.append("\nRespond in English.")
+
         # Company context
         sections.append(f"\nCOMPANY: {self.tenant_name}")
         sections.append(f"DEPARTMENT: {context.department}")
