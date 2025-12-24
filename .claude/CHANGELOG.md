@@ -1,5 +1,15 @@
 # CogTwin Development Changelog
 
+## [2025-12-24] - File Upload via xAI Files API
+### Files Modified
+- core/main.py - Added /api/upload/file endpoint (xAI proxy), WebSocket handler extracts file_ids and builds content array
+- core/model_adapter.py - Updated type hints for content arrays (Dict[str, Any])
+- core/enterprise_twin.py - Updated _generate_streaming and think_streaming to handle Union[str, List[Dict]] user_input
+- frontend/src/lib/components/ChatOverlay.svelte - Upload button + file chips UI
+- frontend/src/lib/stores/session.ts - sendMessage accepts file_ids parameter
+### Summary
+Added file upload button to chat interface. Files proxy to xAI Files API which handles storage, extraction (PDF/DOCX/XLSX/images), and automatic RAG via document_search tool. Grok responds with citations referencing uploaded files. No local extraction or storage needed. Supports PDF, DOCX, XLSX, TXT, CSV, PNG, JPG up to 30MB.
+
 ## [2025-12-23 20:15] - Admin Integration Fix (Option B Complete)
 ### Files Modified
 - core/database.py - CREATED: Database pool manager with asyncpg (missing module that caused 14 endpoint crashes)

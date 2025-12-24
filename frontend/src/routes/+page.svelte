@@ -8,8 +8,26 @@
 	import CoreBrain from '$lib/threlte/CoreBrain.svelte';
 	import { get } from 'svelte/store';
 
+	// Persist sessionId across navigations within the same browser tab
+	const SESSION_KEY = 'cogtwin_active_session';
+
+	function getOrCreateSessionId(): string {
+		// Check if we have an active session for this tab
+		const existing = sessionStorage.getItem(SESSION_KEY);
+		if (existing) {
+			console.log('[Page] Reusing existing session:', existing.substring(0, 8) + '...');
+			return existing;
+		}
+		
+		// Create new session
+		const newId = crypto.randomUUID();
+		sessionStorage.setItem(SESSION_KEY, newId);
+		console.log('[Page] Created new session:', newId.substring(0, 8) + '...');
+		return newId;
+	}
+
 	onMount(() => {
-		const sessionId = crypto.randomUUID();
+		const sessionId = getOrCreateSessionId();
 		
 		// Get user's default department from auth store
 		const user = get(currentUser);

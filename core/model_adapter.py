@@ -255,8 +255,8 @@ class GrokMessages:
     def _convert_to_openai_format(
         self,
         system: str,
-        messages: List[Dict[str, str]],
-    ) -> List[Dict[str, str]]:
+        messages: List[Dict[str, Any]],
+    ) -> List[Dict[str, Any]]:
         """
         Convert Anthropic-style (system param + messages) to OpenAI-style (all in messages).
         """
@@ -276,7 +276,7 @@ class GrokMessages:
         model: Optional[str] = None,
         max_tokens: int = 4096,
         system: str = "",
-        messages: List[Dict[str, str]] = None,
+        messages: List[Dict[str, Any]] = None,
         temperature: float = 0.7,
         **kwargs,
     ) -> Message:
@@ -352,7 +352,7 @@ class GrokMessages:
         model: Optional[str] = None,
         max_tokens: int = 4096,
         system: str = "",
-        messages: List[Dict[str, str]] = None,
+        messages: List[Dict[str, Any]] = None,
         temperature: float = 0.7,
         **kwargs,
     ) -> Generator[StreamManager, None, None]:
