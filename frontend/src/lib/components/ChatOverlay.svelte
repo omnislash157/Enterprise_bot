@@ -3,7 +3,7 @@
 	import { session } from '$lib/stores/session';
 	import { websocket } from '$lib/stores/websocket';
 	import { auth, currentUser } from '$lib/stores/auth';
-	import { voice } from '$lib/stores/voice';
+	import { voice, speakText } from '$lib/stores/voice';
 	import { marked } from 'marked';
 	import DepartmentSelector from './DepartmentSelector.svelte';
 	import CheekyLoader from './CheekyLoader.svelte';
@@ -56,6 +56,11 @@
 	let attachedFiles: Array<{file_id: string, file_name: string, file_size: number}> = [];
 	let fileInput: HTMLInputElement;
 	let uploadingFile = false;
+
+	// ========================================
+	// VOICE OUTPUT (TTS) STATE
+	// ========================================
+	let voiceMode = false;
 
 	function openFileDialog() {
 		fileInput?.click();
@@ -135,6 +140,29 @@
 				});
 			}
 		});
+	}
+
+	// ========================================
+	// VOICE OUTPUT (TTS) - Speak when response finishes
+	// ========================================
+	let wasStreaming = false;
+	$: {
+		// Detect transition from streaming -> not streaming
+		if (wasStreaming && !$session.isStreaming && voiceMode) {
+			// Get the last assistant message
+			const lastMsg = $session.messages[$session.messages.length - 1];
+			if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content) {
+				// Strip markdown/metadata and speak
+				const cleanText = lastMsg.content
+					.replace(/\n__METADATA__:.*/s, '')  // Remove metadata
+					.replace(/[#*_`]/g, '')             // Remove markdown chars
+					.trim();
+				if (cleanText) {
+					speakText(cleanText);
+				}
+			}
+		}
+		wasStreaming = $session.isStreaming;
 	}
 
 	// ========================================
@@ -407,7 +435,7 @@
 							rows="1"
 						></textarea>
 
-						<!-- Voice Input Button -->
+						<!-- Voice Input Button (STT) -->
 						<button
 							class="mic-button"
 							class:recording={$voice.isRecording}
@@ -421,6 +449,26 @@
 								<path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
 								<line x1="12" y1="19" x2="12" y2="23"/>
 								<line x1="8" y1="23" x2="16" y2="23"/>
+							</svg>
+						</button>
+
+						<!-- Voice Output Button (TTS) -->
+						<button
+							class="speaker-button"
+							class:active={voiceMode}
+							on:click={() => voiceMode = !voiceMode}
+							aria-label={voiceMode ? 'Disable voice output' : 'Enable voice output'}
+							title={voiceMode ? 'Voice output ON' : 'Voice output OFF'}
+						>
+							<svg viewBox="0 0 24 24" fill={voiceMode ? 'currentColor' : 'none'} stroke="currentColor" stroke-width="2">
+								<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+								{#if voiceMode}
+									<path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+									<path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+								{:else}
+									<line x1="23" y1="9" x2="17" y2="15"/>
+									<line x1="17" y1="9" x2="23" y2="15"/>
+								{/if}
 							</svg>
 						</button>
 
@@ -981,6 +1029,41 @@
 			box-shadow: 0 0 30px rgba(255, 0, 64, 0.6);
 			transform: scale(1.05);
 		}
+	}
+
+	/* Voice Output Button (TTS) */
+	.speaker-button {
+		width: 56px;
+		height: 56px;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		color: #00ff41;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		flex-shrink: 0;
+		position: relative;
+	}
+
+	.speaker-button:hover {
+		background: rgba(0, 255, 65, 0.1);
+		border-color: #00ff41;
+		box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+		transform: scale(1.02);
+	}
+
+	.speaker-button.active {
+		background: rgba(0, 255, 65, 0.15);
+		border-color: #00ff41;
+		box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+	}
+
+	.speaker-button svg {
+		width: 22px;
+		height: 22px;
 	}
 
 	/* Voice Preview (interim transcript) */
