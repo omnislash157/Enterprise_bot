@@ -1,5 +1,20 @@
 # CogTwin Development Changelog
 
+## [2024-12-24 15:00] - Sentence-Chunked Streaming TTS
+### Files Modified
+- frontend/src/lib/stores/voice.ts - Added queueSentenceAudio(), streamingSentenceDetector(), clearAudioQueue(), playNext()
+- frontend/src/lib/components/ChatOverlay.svelte - Wired sentence detection into streaming, added audio queue clear on new message
+### Summary
+Implemented sentence-chunked TTS for faster voice response (~500ms time-to-audio vs ~4s waiting for full response). As streaming text arrives, sentences are detected at boundary markers (. ! ?) and immediately queued for TTS generation. Audio plays sequentially - first sentence plays while later sentences are still generating. Queue clears when user sends new message.
+
+## [2024-12-24 14:30] - Voice Mode TTS/STT Fixes
+### Files Modified
+- frontend/src/lib/stores/voice.ts - Added getApiBase() function, TTS endpoint now uses full API URL
+- voice_transcription.py - Changed model from nova-3 to nova-2, voice from asteria to aura-2-delia-en
+- claude_sdk_toolkit/RECON_FILE_UPLOAD_WIRING.md - Updated with voice mode debug notes
+### Summary
+**RECON MISSION COMPLETE**: Executed full reconnaissance of voice mode deployment architecture. Identified TTS 404 root cause: frontend used relative path `/api/tts` instead of full URL with `getApiBase()` pattern. Fixed cross-origin API call issue. Also fixed STT WebSocket 400 error by changing to valid Deepgram model (nova-2) and set correct voice (aura-2-delia-en American female). Ready for Railway deployment and testing.
+
 ## [2025-12-24] - File Upload via xAI Files API
 ### Files Modified
 - core/main.py - Added /api/upload/file endpoint (xAI proxy), WebSocket file_ids extraction
