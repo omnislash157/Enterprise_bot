@@ -2,6 +2,14 @@ import { writable, derived, get } from 'svelte/store';
 import { websocket } from './websocket';
 
 // ============================================================================
+// API BASE
+// ============================================================================
+
+function getApiBase(): string {
+    return import.meta.env.VITE_API_URL || 'http://localhost:8000';
+}
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -229,7 +237,7 @@ export const isRecording = derived(voice, $voice => $voice.isRecording);
 
 export async function speakText(text: string, voice = 'professional'): Promise<void> {
     try {
-        const response = await fetch('/api/tts', {
+        const response = await fetch(`${getApiBase()}/api/tts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, voice })
