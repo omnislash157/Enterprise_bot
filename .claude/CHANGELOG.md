@@ -1,5 +1,11 @@
 # CogTwin Development Changelog
 
+## [2024-12-24 16:00] - Fix Deepgram STT 400 Error
+### Files Modified
+- voice_transcription.py - Simplified _build_url() to use minimal params (model=nova-2 only)
+### Summary
+Fixed HTTP 400 error from Deepgram STT WebSocket. The explicit encoding/sample_rate params were causing connection failures. Changed to minimal config: `?model=nova-2` only. Deepgram auto-detects encoding from the audio stream (webm-opus from browser MediaRecorder).
+
 ## [2024-12-24 15:30] - Synchronized Text-Audio Voice Mode
 ### Files Modified
 - frontend/src/lib/stores/voice.ts - Added onStart callback to queueSentenceAudio(), QueuedAudio interface
