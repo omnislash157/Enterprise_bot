@@ -72,17 +72,12 @@ class DeepgramBridge:
         self._connected = False
 
     def _build_url(self) -> str:
-        """Build Deepgram WebSocket URL with query params."""
-        params = [
-            f"model={self.config.model}",
-            f"language={self.config.language}",
-            f"smart_format={str(self.config.smart_format).lower()}",
-            f"interim_results={str(self.config.interim_results).lower()}",
-            f"punctuate={str(self.config.punctuate).lower()}",
-            f"encoding={self.config.encoding}",
-            f"sample_rate={self.config.sample_rate}",
-        ]
-        return f"{DEEPGRAM_WS_URL}?{'&'.join(params)}"
+        """Build Deepgram WebSocket URL - minimal working config.
+
+        Let Deepgram auto-detect encoding/sample_rate from audio stream.
+        Adding explicit encoding params causes HTTP 400 errors.
+        """
+        return f"{DEEPGRAM_WS_URL}?model=nova-2"
 
     async def connect(self) -> bool:
         """Open connection to Deepgram."""
