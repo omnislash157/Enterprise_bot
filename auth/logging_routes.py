@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 logging_router = APIRouter()
 
 
-@logging_router.get("/logs")
+@logging_router.get("/")
 async def list_logs(
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
@@ -83,7 +83,7 @@ async def list_logs(
         return {'logs': [], 'error': str(e)}
 
 
-@logging_router.get("/logs/{log_id}")
+@logging_router.get("/{log_id}")
 async def get_log(log_id: str):
     """Get a single log entry with full details."""
     try:
@@ -106,7 +106,7 @@ async def get_log(log_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@logging_router.get("/logs/stats/levels")
+@logging_router.get("/stats/levels")
 async def get_log_level_stats(hours: int = Query(24, ge=1, le=168)):
     """Get log counts by level."""
     try:
@@ -198,7 +198,7 @@ class LogStreamManager:
 log_stream_manager = LogStreamManager()
 
 
-@logging_router.websocket("/logs/stream")
+@logging_router.websocket("/stream")
 async def log_stream(websocket: WebSocket):
     """WebSocket endpoint for real-time log streaming."""
     await log_stream_manager.connect(websocket)
