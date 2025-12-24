@@ -1,5 +1,12 @@
 # CogTwin Development Changelog
 
+## [2024-12-24 15:30] - Synchronized Text-Audio Voice Mode
+### Files Modified
+- frontend/src/lib/stores/voice.ts - Added onStart callback to queueSentenceAudio(), QueuedAudio interface
+- frontend/src/lib/components/ChatOverlay.svelte - Added voiceSyncedText state, updated template to display synced text in voice mode
+### Summary
+True voice mode experience: text now reveals in sync with audio playback. When voice mode is on, text is buffered and only revealed as each sentence's audio starts playing. This creates a natural reading-along experience where text and voice stay in sync. Trade-off: slightly more latency (~500ms per sentence for TTS generation) but perceptually unified output.
+
 ## [2024-12-24 15:00] - Sentence-Chunked Streaming TTS
 ### Files Modified
 - frontend/src/lib/stores/voice.ts - Added queueSentenceAudio(), streamingSentenceDetector(), clearAudioQueue(), playNext()

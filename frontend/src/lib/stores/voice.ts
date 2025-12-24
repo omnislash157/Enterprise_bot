@@ -232,18 +232,27 @@ export const voice = createVoiceStore();
 export const isRecording = derived(voice, $voice => $voice.isRecording);
 
 // ============================================================================
-// TEXT-TO-SPEECH (Deepgram Aura) - Sentence-Chunked Streaming
+// TEXT-TO-SPEECH (Deepgram Aura) - Synchronized Streaming
 // ============================================================================
 
-// Audio queue for sentence-by-sentence playback
-let audioQueue: HTMLAudioElement[] = [];
+// Audio queue with callbacks for text sync
+interface QueuedAudio {
+    audio: HTMLAudioElement;
+    sentence: string;
+    onStart?: () => void;
+}
+
+let audioQueue: QueuedAudio[] = [];
 let isPlaying = false;
 
 /**
- * Queue a sentence for TTS playback.
- * Audio plays sequentially - first sentence plays while others are still generating.
+ * Queue a sentence for TTS playback with optional callback when audio STARTS.
+ * This enables synchronized text reveal - text appears as audio plays.
  */
-export async function queueSentenceAudio(sentence: string): Promise<void> {
+export async function queueSentenceAudio(
+    sentence: string,
+    onStart?: () => void
+): Promise<void> {
     try {
         const response = await fetch(`${getApiBase()}/api/tts`, {
             method: 'POST',
@@ -251,15 +260,21 @@ export async function queueSentenceAudio(sentence: string): Promise<void> {
             body: JSON.stringify({ text: sentence, voice: 'default' })
         });
 
-        if (!response.ok) return;
+        if (!response.ok) {
+            // Still call onStart so text appears even if TTS fails
+            onStart?.();
+            return;
+        }
 
         const blob = await response.blob();
         const audio = new Audio(URL.createObjectURL(blob));
-        audioQueue.push(audio);
+        audioQueue.push({ audio, sentence, onStart });
 
         if (!isPlaying) playNext();
     } catch (err) {
         console.error('[TTS] Sentence queue failed:', err);
+        // Still reveal text on error
+        onStart?.();
     }
 }
 
@@ -269,7 +284,11 @@ function playNext(): void {
         return;
     }
     isPlaying = true;
-    const audio = audioQueue.shift()!;
+    const { audio, onStart } = audioQueue.shift()!;
+
+    // Call onStart callback when audio begins - this reveals the text
+    onStart?.();
+
     audio.onended = () => {
         URL.revokeObjectURL(audio.src);
         playNext();
@@ -299,7 +318,7 @@ export function streamingSentenceDetector(chunk: string, buffer: string): { buff
  * Clear the audio queue (e.g., when user sends new message)
  */
 export function clearAudioQueue(): void {
-    audioQueue.forEach(audio => {
+    audioQueue.forEach(({ audio }) => {
         audio.pause();
         URL.revokeObjectURL(audio.src);
     });
