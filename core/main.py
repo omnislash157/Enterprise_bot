@@ -28,16 +28,13 @@ import time
 import uuid
 from pathlib import Path
 from typing import Optional
-from .enterprise_tenant import TenantContext
-from auth.auth_service import get_auth_service, authenticate_user
-from auth.tenant_service import get_tenant_service
-from auth.admin_routes import admin_router
-from auth.analytics_engine.analytics_routes import analytics_router
-from auth.sso_routes import router as sso_router
-from auth.azure_auth import validate_access_token, is_configured as azure_configured
 from core.metrics_collector import metrics_collector
 from auth.metrics_routes import metrics_router
 from voice_transcription import start_voice_session, send_voice_chunk, stop_voice_session, text_to_speech
+
+# Setup logging FIRST (before any imports that might reference logger)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Observability imports
 try:
@@ -51,10 +48,6 @@ try:
 except ImportError as e:
     logger.warning(f"Observability modules not loaded: {e}")
     OBSERVABILITY_LOADED = False
-
-# Setup logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # =============================================================================
 # CONFIG - Load settings from environment or defaults
@@ -1184,6 +1177,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     # EnterpriseTwin: streaming response
                     # Read division from message payload first, fallback to session state
                     message_division = data.get("division")
+                    user_language = data.get("language", "en")  # Extract language for LLM response
                     effective_division = tenant.department  # Default to session
 
                     # SECURITY: Honeypot detection
@@ -1243,6 +1237,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         user_email=user_email,
                         department=effective_division,
                         session_id=session_id,
+                        language=user_language,
                     ):
                         # Check for metadata marker
                         if chunk.startswith("\n__METADATA__:"):
@@ -1391,7 +1386,8 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
             # VOICE TRANSCRIPTION
             # =============================================
             elif msg_type == "voice_start":
-                logger.info(f"[WS] Voice session starting for {session_id}")
+                voice_language = data.get("language", "en")  # Extract language for STT
+                logger.info(f"[WS] Voice session starting for {session_id} (lang={voice_language})")
 
                 async def on_transcript(transcript: str, is_final: bool, confidence: float):
                     await websocket.send_json({
@@ -1411,7 +1407,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     })
                     metrics_collector.record_ws_message('out')
 
-                success = await start_voice_session(session_id, on_transcript, on_error)
+                success = await start_voice_session(session_id, on_transcript, on_error, language=voice_language)
 
                 await websocket.send_json({
                     "type": "voice_started" if success else "voice_error",
