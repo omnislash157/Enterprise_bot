@@ -58,11 +58,12 @@
 	let uploadingFile = false;
 
 	// ========================================
-	// VOICE OUTPUT (TTS) STATE
+	// VOICE OUTPUT (TTS) STATE - Synchronized text/audio
 	// ========================================
 	let voiceMode = false;
 	let sentenceBuffer = '';
 	let previousStreamLength = 0;
+	let voiceSyncedText = '';  // Text that has started playing (synced with audio)
 
 	function openFileDialog() {
 		fileInput?.click();
@@ -145,7 +146,7 @@
 	}
 
 	// ========================================
-	// VOICE OUTPUT (TTS) - Sentence-chunked streaming
+	// VOICE OUTPUT (TTS) - Synchronized text/audio streaming
 	// ========================================
 	let wasStreaming = false;
 
@@ -162,12 +163,17 @@
 			sentenceBuffer = newBuffer;
 
 			if (sentence) {
-				// Clean markdown and queue for TTS (fire and forget)
+				// Clean markdown and queue for TTS with sync callback
 				const cleanSentence = sentence
 					.replace(/[#*_`]/g, '')
 					.trim();
 				if (cleanSentence) {
-					queueSentenceAudio(cleanSentence);
+					// Capture sentence for closure
+					const sentenceToReveal = sentence;
+					queueSentenceAudio(cleanSentence, () => {
+						// Callback fires when audio STARTS playing - reveal text
+						voiceSyncedText += sentenceToReveal + ' ';
+					});
 				}
 			}
 		}
@@ -178,12 +184,15 @@
 		if (wasStreaming && !$session.isStreaming && voiceMode) {
 			// Flush remaining buffer
 			if (sentenceBuffer.trim()) {
-				const cleanText = sentenceBuffer
+				const remainingText = sentenceBuffer;
+				const cleanText = remainingText
 					.replace(/\n__METADATA__:.*/s, '')
 					.replace(/[#*_`]/g, '')
 					.trim();
 				if (cleanText) {
-					queueSentenceAudio(cleanText);
+					queueSentenceAudio(cleanText, () => {
+						voiceSyncedText += remainingText;
+					});
 				}
 			}
 			// Reset for next message
@@ -199,10 +208,11 @@
 	function sendMessage() {
 		if (!inputValue.trim() || !$websocket.connected) return;
 
-		// Clear any pending audio when sending new message
+		// Clear any pending audio and synced text when sending new message
 		clearAudioQueue();
 		sentenceBuffer = '';
 		previousStreamLength = 0;
+		voiceSyncedText = '';
 
 		const file_ids = attachedFiles.map(f => f.file_id);
 		session.sendMessage(inputValue.trim(), file_ids);
@@ -430,14 +440,20 @@
 							</div>
 						{/each}
 
-					{#if $session.isStreaming && !$session.currentStream}
+					{#if $session.isStreaming && !$session.currentStream && !(voiceMode && voiceSyncedText)}
 						<div class="cheeky-thinking">
 							<CheekyLoader category={cheekyCategory} spinnerType="food" size="sm" />
 						</div>
-					{:else if $session.currentStream}
+					{:else if $session.currentStream || (voiceMode && voiceSyncedText)}
 							<div class="message assistant streaming">
 								<div class="message-content">
-									{@html marked.parse($session.currentStream)}
+									{#if voiceMode}
+										<!-- Voice mode: show text synced with audio playback -->
+										{@html marked.parse(voiceSyncedText || '')}
+									{:else}
+										<!-- Normal mode: show text as it streams -->
+										{@html marked.parse($session.currentStream)}
+									{/if}
 								</div>
 								<span class="typing-cursor"></span>
 							</div>
