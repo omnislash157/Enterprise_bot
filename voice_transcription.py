@@ -27,17 +27,15 @@ DEEPGRAM_TTS_URL = "https://api.deepgram.com/v1/speak"
 
 # Aura voices - pick your vibe
 AURA_VOICES = {
-    "professional": "aura-asteria-en",   # Female, neutral
-    "friendly": "aura-luna-en",          # Female, warm
-    "corporate": "aura-orion-en",        # Male, authoritative
-    "casual": "aura-arcas-en",           # Male, conversational
+    "default": "aura-2-delia-en",        # Your pick - American female
+    "professional": "aura-2-delia-en",   # Alias          
 }
 
 
 @dataclass
 class DeepgramConfig:
     """Deepgram streaming configuration."""
-    model: str = "nova-3"
+    model: str = "nova-2"
     language: str = "en-US"
     smart_format: bool = True
     interim_results: bool = True

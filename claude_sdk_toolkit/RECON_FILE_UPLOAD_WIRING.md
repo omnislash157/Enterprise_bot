@@ -1,261 +1,117 @@
-# RECON: File Upload Wiring Map
+# Voice Mode Debug Handoff
 
-## MISSION OBJECTIVE
-Map all integration points for adding file upload to CogTwin chat interface.
-Grok 4.1 handles extraction/RAG via Files API - we're building a thin proxy.
+## Session Summary (2024-12-24)
+Added voice mode with STT (Deepgram) and TTS (Deepgram Aura). Both have issues in production.
 
-**READ ONLY - NO CODE CHANGES**
+## What Was Built
 
----
+### STT (Speech-to-Text) - Voice Input
+- **File**: `voice_transcription.py` - DeepgramBridge class
+- **Trigger**: Mic button → WebSocket `voice_start` message
+- **Flow**: Browser audio → base64 chunks → Deepgram WebSocket → transcripts back
 
-## CONTEXT: What We're Building
+### TTS (Text-to-Speech) - Voice Output  
+- **File**: `voice_transcription.py` - `text_to_speech()` function added
+- **Endpoint**: `POST /api/tts` in `core/main.py` (line 767)
+- **Frontend**: `speakText()` in `frontend/src/lib/stores/voice.ts`
+- **Trigger**: Speaker button toggle → auto-speaks when response finishes streaming
+- **Flow**: Response text → `/api/tts` → Deepgram Aura → audio bytes → browser playback
+- **Fallback**: Browser native `speechSynthesis` (robot voice) if TTS fails
 
-```
-User Flow:
-1. User clicks upload button in chat
-2. File uploads via REST to /api/upload
-3. Backend proxies to xAI /v1/files, gets file_id
-4. User sends chat message, file_id attached
-5. Grok processes with automatic document_search
-6. Response streams back with citations
-```
+## Current Issues
 
-xAI API Pattern:
+### Issue 1: TTS 404 (Critical)
+**Symptom**: `POST /api/tts` returns 404, falls back to robot voice
+
+**Diagnosis**:
+- Route EXISTS in code: `core/main.py` line 767
+- Route REGISTERS locally: `python -c "from core.main import app; print([r.path for r in app.routes if 'tts' in r.path])"` returns `['/api/tts']`
+- curl to production returns **SvelteKit HTML 404**, not FastAPI 404
+- This means requests aren't reaching FastAPI at all
+
+**Root Cause Theory**: Frontend proxy isn't forwarding `/api/tts` to backend
+
+**Investigation Needed**:
+1. Check Railway service configuration
+2. Check frontend proxy/routing config (vite.config.ts? svelte.config.js?)
+3. Check if other `/api/*` routes work (they do - `/api/departments` returns 200)
+4. Compare working `/api/departments` vs non-working `/api/tts`
+
+### Issue 2: STT HTTP 400
+**Symptom**: `[Voice] Deepgram connection failed: server rejected WebSocket connection: HTTP 400`
+
+**Likely Cause**: Invalid model name
 ```python
-# Step 1: Upload file
-uploaded_file = client.files.upload(file=open("doc.pdf", "rb"), purpose="chat")
-file_id = uploaded_file.id  # "file_abc123"
+# voice_transcription.py - DeepgramConfig
+model: str = "nova-3"  # May not exist
+```
 
-# Step 2: Chat with file reference
-# Content array format:
-{
-  "messages": [{
-    "role": "user", 
-    "content": [
-      {"type": "text", "text": "Summarize this"},
-      {"type": "file", "file_id": "file_abc123"}
-    ]
-  }]
+**Fix**: Change to `nova-2` (current production model)
+
+### Issue 3: Wrong TTS Voice (Minor - fix after 404 resolved)
+**Current**: AURA_VOICES doesn't include user's choice
+**Wanted**: `aura-2-delia-en` (American female)
+
+**Fix** in `voice_transcription.py`:
+```python
+AURA_VOICES = {
+    "default": "aura-2-delia-en",
+    "professional": "aura-2-delia-en",
+    # ... rest
 }
 ```
 
----
+## Files to Investigate
 
-## RECON TARGET 1: Backend - model_adapter.py
+### Backend
+- `voice_transcription.py` - All voice logic (STT + TTS)
+- `core/main.py` - Line 40 (imports), Line 767 (`/api/tts` endpoint)
 
-**File:** `/mnt/project/model_adapter.py`
+### Frontend  
+- `frontend/src/lib/stores/voice.ts` - `speakText()` function
+- `frontend/src/lib/components/ChatOverlay.svelte` - Voice UI buttons
+- `frontend/vite.config.ts` or `svelte.config.js` - Proxy configuration?
 
-**Analyze:**
-1. Find `GrokMessages` class
-2. Map `_convert_to_openai_format()` method - this builds the messages array
-3. Find `create()` and `stream()` methods - where payload is built
-4. Check current message format: `{"role": "user", "content": "string"}`
-5. Identify what changes to support: `{"role": "user", "content": [array]}`
+### Deployment
+- `Procfile` - Start commands
+- Railway dashboard - Service configuration, environment variables
+- Check if Railway has separate frontend/backend services or combined
 
-**Questions to Answer:**
-- Line numbers for payload construction
-- Does it currently support content as array or only string?
-- Where would file_ids inject into the payload?
-- Any existing handling for content types?
-
-**Deliverable:** `MODEL_ADAPTER_WIRING.md`
-
----
-
-## RECON TARGET 2: Backend - main.py (REST Upload Endpoint)
-
-**File:** `/mnt/project/main.py`
-
-**Analyze:**
-1. Find where other REST routes are defined (not WebSocket)
-2. Look for existing file upload patterns (bulk_import references?)
-3. Find router registrations section
-4. Identify auth patterns for REST endpoints
-5. Check imports section for what's available
-
-**Questions to Answer:**
-- Where do REST routes get registered? (line numbers)
-- Is there UploadFile from FastAPI already imported?
-- Auth decorator pattern for REST endpoints?
-- Any existing /api/* REST endpoints as reference?
-
-**Deliverable:** `REST_ENDPOINT_WIRING.md`
-
----
-
-## RECON TARGET 3: Backend - WebSocket Handler
-
-**File:** `/mnt/project/main.py`
-
-**Analyze:**
-1. Find main WebSocket endpoint function
-2. Map all current message type handlers (chat, voice_start, voice_chunk, etc.)
-3. Find where chat messages get passed to the LLM
-4. Trace: message received → processed → sent to model_adapter
-5. Identify message format expected from frontend
-
-**Questions to Answer:**
-- WebSocket handler function name and line numbers
-- Current message type switch/dispatch pattern
-- Where does user message content get extracted?
-- How would file_ids attach to existing chat flow?
-- Does enterprise_twin or cog_twin handle the actual LLM call?
-
-**Deliverable:** `WEBSOCKET_WIRING.md`
-
----
-
-## RECON TARGET 4: Backend - Twin/RAG Integration
-
-**Files:** 
-- `/mnt/project/enterprise_twin.py`
-- `/mnt/project/enterprise_rag.py`
-
-**Analyze:**
-1. Find where LLM calls are made (model_adapter usage)
-2. Map how context gets built before LLM call
-3. Check if messages are modified before sending to model
-4. Find where response streams back
-
-**Questions to Answer:**
-- Which file actually calls model_adapter.messages.stream()?
-- Line numbers for LLM invocation
-- Is there a messages builder or formatter?
-- Where would file_ids need to pass through?
-
-**Deliverable:** `TWIN_INTEGRATION_WIRING.md`
-
----
-
-## RECON TARGET 5: Frontend - Chat Input Component
-
-**Directory:** Check frontend structure first
-
-**Analyze:**
-1. Find chat input/overlay component (ChatOverlay.svelte or similar)
-2. Map current button layout (send button, mic button)
-3. Find WebSocket send patterns
-4. Check for existing file input anywhere (bulk import page)
-5. Identify message format sent via WebSocket
-
-**Questions to Answer:**
-- Exact file path for chat input component
-- Current buttons and their positions
-- WebSocket store/send function used
-- Message payload format to backend
-- Any existing <input type="file"> patterns to copy?
-
-**Deliverable:** `FRONTEND_CHAT_WIRING.md`
-
----
-
-## RECON TARGET 6: Frontend - Stores
-
-**Directory:** `frontend/src/lib/stores/`
-
-**Analyze:**
-1. Find session or message store
-2. Map how messages are structured
-3. Find WebSocket store/connection
-4. Check for file-related state anywhere
-
-**Questions to Answer:**
-- Store file paths
-- Message type definitions
-- Where would file attachments go in message state?
-- WebSocket send function signature
-
-**Deliverable:** `FRONTEND_STORES_WIRING.md`
-
----
-
-## RECON TARGET 7: Reference Patterns
-
-**Voice Transcription (successful recent feature):**
-- `/mnt/project/venom_voice.py` - backend voice handling
-- Find voice WebSocket message types
-- Map the voice_start → voice_chunk → voice_stop flow
-- This is our template for file_upload flow
-
-**Bulk Import (has file upload):**
-- Find bulk import routes
-- Check how files are received
-- FastAPI UploadFile pattern
-
-**Deliverable:** `REFERENCE_PATTERNS.md`
-
----
-
-## DELIVERABLE FORMAT
-
-For each target, create a section with:
-
-```markdown
-## [TARGET NAME]
-
-### File: [path]
-
-### Key Locations
-| What | Line Numbers | Current Code |
-|------|--------------|--------------|
-| Function X | 150-180 | def function_x(): |
-| Payload build | 200-210 | payload = {...} |
-
-### Integration Point
-[Describe exactly where new code would go]
-
-### Dependencies
-[List any imports or other files involved]
-
-### Notes
-[Any concerns, blockers, or observations]
+## Environment Variables Needed
+```
+DEEPGRAM_API_KEY=9953e5xxx  (confirmed set in Railway)
 ```
 
----
+## Quick Verification Commands
 
-## FINAL DELIVERABLE
+```bash
+# Check route registers
+python -c "from core.main import app; print([r.path for r in app.routes if 'tts' in r.path])"
 
-Combine all findings into: `FILE_UPLOAD_WIRING_MAP.md`
+# Check imports work
+python -c "from voice_transcription import text_to_speech; print('OK')"
 
-Structure:
-1. Executive Summary (1 paragraph)
-2. Backend Wiring
-   - model_adapter.py changes needed
-   - main.py REST endpoint location
-   - WebSocket handler changes
-   - Twin integration points
-3. Frontend Wiring
-   - Chat component location
-   - Store changes needed
-   - Message format updates
-4. Reference Patterns
-   - Voice flow to copy
-   - File upload pattern from bulk import
-5. Dependency Check
-   - xai-sdk already in requirements.txt ✓
-   - Any other packages needed?
-6. Recommended Implementation Order
-   - Phase 1: [what first]
-   - Phase 2: [what second]
-   - Phase 3: [what third]
+# Test endpoint locally
+curl -X POST http://localhost:8000/api/tts \
+  -H "Content-Type: application/json" \
+  -d '{"text": "hello world"}' \
+  --output test.mp3 && file test.mp3
 
----
+# Compare with working endpoint
+curl https://worthy-imagination-production.up.railway.app/api/departments
+```
 
-## CONSTRAINTS
+## Hypothesis
 
-- **READ ONLY** - Do not modify any files
-- Focus on WIRING, not implementation details
-- Note exact line numbers for surgical edits
-- Flag any blockers or missing pieces
-- If frontend structure unclear, map it first
+The `/api/tts` endpoint was added AFTER the frontend proxy configuration was set up. Other `/api/*` routes work because they were defined when proxy rules were created.
 
----
+**Check for**:
+- Explicit route whitelist in frontend config
+- Catch-all `/api/*` proxy that should work but isn't
+- Railway routing rules that might need updating
 
-## SUCCESS CRITERIA
-
-Recon complete when we can answer:
-1. ✓ Exact file + line number for model_adapter file_id support
-2. ✓ Exact location for new /api/upload REST endpoint
-3. ✓ Exact WebSocket handler location for file_id pass-through
-4. ✓ Exact frontend component for upload button
-5. ✓ Complete message flow from button click to LLM response
+## Success Criteria
+1. `POST /api/tts` returns `audio/mpeg` bytes (not 404)
+2. `speakText()` plays Delia voice (not robot)
+3. STT connects without HTTP 400
+4. Full loop: Speak → Transcribe → LLM → Speak response
