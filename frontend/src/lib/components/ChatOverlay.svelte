@@ -3,7 +3,7 @@
 	import { session } from '$lib/stores/session';
 	import { websocket } from '$lib/stores/websocket';
 	import { auth, currentUser } from '$lib/stores/auth';
-	import { voice, speakText } from '$lib/stores/voice';
+	import { voice, speakText, queueSentenceAudio, streamingSentenceDetector, clearAudioQueue } from '$lib/stores/voice';
 	import { marked } from 'marked';
 	import DepartmentSelector from './DepartmentSelector.svelte';
 	import CheekyLoader from './CheekyLoader.svelte';
@@ -61,6 +61,8 @@
 	// VOICE OUTPUT (TTS) STATE
 	// ========================================
 	let voiceMode = false;
+	let sentenceBuffer = '';
+	let previousStreamLength = 0;
 
 	function openFileDialog() {
 		fileInput?.click();
@@ -143,24 +145,50 @@
 	}
 
 	// ========================================
-	// VOICE OUTPUT (TTS) - Speak when response finishes
+	// VOICE OUTPUT (TTS) - Sentence-chunked streaming
 	// ========================================
 	let wasStreaming = false;
-	$: {
-		// Detect transition from streaming -> not streaming
-		if (wasStreaming && !$session.isStreaming && voiceMode) {
-			// Get the last assistant message
-			const lastMsg = $session.messages[$session.messages.length - 1];
-			if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content) {
-				// Strip markdown/metadata and speak
-				const cleanText = lastMsg.content
-					.replace(/\n__METADATA__:.*/s, '')  // Remove metadata
-					.replace(/[#*_`]/g, '')             // Remove markdown chars
+
+	// Process streaming chunks for sentence detection
+	$: if (voiceMode && $session.currentStream) {
+		const currentLength = $session.currentStream.length;
+		if (currentLength > previousStreamLength) {
+			// Extract new chunk
+			const newChunk = $session.currentStream.slice(previousStreamLength);
+			previousStreamLength = currentLength;
+
+			// Detect complete sentences
+			const { buffer: newBuffer, sentence } = streamingSentenceDetector(newChunk, sentenceBuffer);
+			sentenceBuffer = newBuffer;
+
+			if (sentence) {
+				// Clean markdown and queue for TTS (fire and forget)
+				const cleanSentence = sentence
+					.replace(/[#*_`]/g, '')
 					.trim();
-				if (cleanText) {
-					speakText(cleanText);
+				if (cleanSentence) {
+					queueSentenceAudio(cleanSentence);
 				}
 			}
+		}
+	}
+
+	// Handle end of stream - speak any remaining buffer
+	$: {
+		if (wasStreaming && !$session.isStreaming && voiceMode) {
+			// Flush remaining buffer
+			if (sentenceBuffer.trim()) {
+				const cleanText = sentenceBuffer
+					.replace(/\n__METADATA__:.*/s, '')
+					.replace(/[#*_`]/g, '')
+					.trim();
+				if (cleanText) {
+					queueSentenceAudio(cleanText);
+				}
+			}
+			// Reset for next message
+			sentenceBuffer = '';
+			previousStreamLength = 0;
 		}
 		wasStreaming = $session.isStreaming;
 	}
@@ -170,6 +198,11 @@
 	// ========================================
 	function sendMessage() {
 		if (!inputValue.trim() || !$websocket.connected) return;
+
+		// Clear any pending audio when sending new message
+		clearAudioQueue();
+		sentenceBuffer = '';
+		previousStreamLength = 0;
 
 		const file_ids = attachedFiles.map(f => f.file_id);
 		session.sendMessage(inputValue.trim(), file_ids);

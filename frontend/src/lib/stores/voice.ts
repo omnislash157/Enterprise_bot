@@ -232,9 +232,84 @@ export const voice = createVoiceStore();
 export const isRecording = derived(voice, $voice => $voice.isRecording);
 
 // ============================================================================
-// TEXT-TO-SPEECH (Deepgram Aura)
+// TEXT-TO-SPEECH (Deepgram Aura) - Sentence-Chunked Streaming
 // ============================================================================
 
+// Audio queue for sentence-by-sentence playback
+let audioQueue: HTMLAudioElement[] = [];
+let isPlaying = false;
+
+/**
+ * Queue a sentence for TTS playback.
+ * Audio plays sequentially - first sentence plays while others are still generating.
+ */
+export async function queueSentenceAudio(sentence: string): Promise<void> {
+    try {
+        const response = await fetch(`${getApiBase()}/api/tts`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: sentence, voice: 'default' })
+        });
+
+        if (!response.ok) return;
+
+        const blob = await response.blob();
+        const audio = new Audio(URL.createObjectURL(blob));
+        audioQueue.push(audio);
+
+        if (!isPlaying) playNext();
+    } catch (err) {
+        console.error('[TTS] Sentence queue failed:', err);
+    }
+}
+
+function playNext(): void {
+    if (audioQueue.length === 0) {
+        isPlaying = false;
+        return;
+    }
+    isPlaying = true;
+    const audio = audioQueue.shift()!;
+    audio.onended = () => {
+        URL.revokeObjectURL(audio.src);
+        playNext();
+    };
+    audio.onerror = () => {
+        URL.revokeObjectURL(audio.src);
+        playNext(); // Skip failed audio, continue queue
+    };
+    audio.play().catch(() => playNext()); // Handle autoplay restrictions
+}
+
+/**
+ * Detect complete sentences in streaming text.
+ * Returns the completed sentence (if any) and remaining buffer.
+ */
+export function streamingSentenceDetector(chunk: string, buffer: string): { buffer: string; sentence: string | null } {
+    buffer += chunk;
+    // Match sentence ending with . ! or ? followed by whitespace
+    const match = buffer.match(/^(.*?[.!?])\s+(.*)$/s);
+    if (match) {
+        return { buffer: match[2], sentence: match[1] };
+    }
+    return { buffer, sentence: null };
+}
+
+/**
+ * Clear the audio queue (e.g., when user sends new message)
+ */
+export function clearAudioQueue(): void {
+    audioQueue.forEach(audio => {
+        audio.pause();
+        URL.revokeObjectURL(audio.src);
+    });
+    audioQueue = [];
+    isPlaying = false;
+}
+
+/**
+ * Legacy: Speak full text at once (fallback for short responses)
+ */
 export async function speakText(text: string, voice = 'professional'): Promise<void> {
     try {
         const response = await fetch(`${getApiBase()}/api/tts`, {

@@ -41,7 +41,7 @@ class DeepgramConfig:
     interim_results: bool = True
     punctuate: bool = True
     encoding: str = "webm-opus"
-    sample_rate: int = 16000
+    sample_rate: int = 48000
 
 
 class DeepgramBridge:
