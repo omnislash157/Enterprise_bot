@@ -2,24 +2,13 @@
 
 ## [2025-12-24] - File Upload via xAI Files API
 ### Files Modified
-- core/main.py - Added /api/upload/file endpoint (xAI proxy), WebSocket handler extracts file_ids and builds content array
+- core/main.py - Added /api/upload/file endpoint (xAI proxy), WebSocket file_ids extraction
 - core/model_adapter.py - Updated type hints for content arrays (Dict[str, Any])
-- core/enterprise_twin.py - Updated _generate_streaming and think_streaming to handle Union[str, List[Dict]] user_input
-- frontend/src/lib/components/ChatOverlay.svelte - Upload button + file chips UI
+- core/enterprise_twin.py - think_streaming accepts Union[str, List] for file content
+- frontend/src/lib/components/ChatOverlay.svelte - Upload button, file chips UI
 - frontend/src/lib/stores/session.ts - sendMessage accepts file_ids parameter
 ### Summary
-Added file upload button to chat interface. Files proxy to xAI Files API which handles storage, extraction (PDF/DOCX/XLSX/images), and automatic RAG via document_search tool. Grok responds with citations referencing uploaded files. No local extraction or storage needed. Supports PDF, DOCX, XLSX, TXT, CSV, PNG, JPG up to 30MB.
-
-## [2025-12-23 20:15] - Admin Integration Fix (Option B Complete)
-### Files Modified
-- core/database.py - CREATED: Database pool manager with asyncpg (missing module that caused 14 endpoint crashes)
-- auth/tracing_routes.py - Fixed route paths: /traces/traces → /traces (removed duplication)
-- auth/logging_routes.py - Fixed route paths: /logs/logs → /logs (removed duplication)
-- auth/alerting_routes.py - Verified correct (no duplication)
-- auth/admin_routes.py - Fixed /departments endpoint: Returns static list of 6 departments (was 501)
-- auth/admin_routes.py - Fixed /stats endpoint: Rewritten for 2-table schema (was 501)
-### Summary
-Executed BUILD_SHEET_ADMIN_INTEGRATION_FIX.md completely. Created missing core/database.py module that was causing ModuleNotFoundError on 14 observability endpoints. Fixed route path duplication in tracing/logging routes (API was serving /api/admin/traces/traces instead of /api/admin/traces). Replaced two 501 stub endpoints with working implementations. Result: Zero 501 errors, zero import errors, all 8 admin pages can now load. Traces/Logs/Alerts pages now show empty state with graceful error handling instead of crashing. Based on ADMIN_INTEGRATION_BATTLE_PLAN.md recon findings.
+File upload button in chat proxies to xAI Files API. Grok handles storage, extraction (PDF/DOCX/XLSX/images), and automatic RAG with citations. No local extraction or blob storage needed. Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPG (max 30MB).
 
 ## [2025-12-23 19:00] - Observability Infrastructure Fix
 ### Files Modified
@@ -30,6 +19,23 @@ Executed BUILD_SHEET_ADMIN_INTEGRATION_FIX.md completely. Created missing core/d
 - core/main.py - Added start_trace and create_span imports for tracing instrumentation
 ### Summary
 Implemented SDK_BUILD_OBSERVABILITY.md to connect database with analytics. Created centralized database pool manager, fixed route prefixes to match frontend expectations (/api/admin/traces, /api/admin/logs, /api/admin/alerts), added deep health check endpoint to validate observability stack, and ensured proper cleanup on shutdown. All observability endpoints should now return data from the database tables.
+
+## [2025-12-23] - Security Hardening & Threat Detection
+- **Fixed**: Auth bypass vulnerability - verify now required before messaging
+- **Fixed**: Per-message division override - permission check enforced
+- **Fixed**: Fail-open in set_division - now fails closed on auth errors
+- **Added**: Rate limiting (30 requests/60 seconds per session)
+- **Added**: Honeypot divisions (executive/admin/root/ceo/system/god/superuser)
+- **Added**: Max message length validation (10k chars)
+- **Added**: Session timeout (30 min idle disconnect)
+- **Added**: Request ID tracking on all messages
+- **Added**: Failed auth logging with IP address
+- **Added**: Sanitized error messages (no internal leakage to client)
+- **Added**: Security alert rules (SQL migration):
+- **Added**: `idx_structured_logs_security` index for fast threat queries
+- **Modified**: `core/main.py` - auth guards, rate limiter, honeypot checks
+- **Status**: Production hardened, Slack webhook pending
+- **Commits**: (pending push)
 
 ## [2025-12-23 18:30] - Documentation Update
 - **Modified**: `docs/FILE_TREE.md` - Complete backend structure update with observability suite

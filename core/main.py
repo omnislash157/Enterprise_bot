@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request, File, UploadFile, Form
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 import httpx
@@ -36,7 +37,7 @@ from auth.sso_routes import router as sso_router
 from auth.azure_auth import validate_access_token, is_configured as azure_configured
 from core.metrics_collector import metrics_collector
 from auth.metrics_routes import metrics_router
-from voice_transcription import start_voice_session, send_voice_chunk, stop_voice_session
+from voice_transcription import start_voice_session, send_voice_chunk, stop_voice_session, text_to_speech
 
 # Observability imports
 try:
@@ -758,6 +759,35 @@ async def upload_file_to_xai(
         "file_size": len(contents),
         "file_type": file.content_type,
     }
+
+# =============================================================================
+# TEXT-TO-SPEECH - Deepgram Aura
+# =============================================================================
+
+@app.post("/api/tts")
+async def tts_endpoint(request: Request):
+    """Convert text to speech, return audio bytes."""
+    body = await request.json()
+    text = body.get("text", "")
+    voice = body.get("voice", "professional")
+
+    if not text:
+        raise HTTPException(400, "No text provided")
+
+    # Cap length to prevent abuse
+    if len(text) > 5000:
+        text = text[:5000]
+
+    audio = await text_to_speech(text, voice)
+
+    if audio:
+        return Response(
+            content=audio,
+            media_type="audio/mpeg",
+            headers={"Content-Disposition": "inline; filename=speech.mp3"}
+        )
+    else:
+        raise HTTPException(500, "TTS generation failed")
 
 # =============================================================================
 # AUTH ENDPOINTS

@@ -17,11 +17,21 @@ from dataclasses import dataclass
 
 import websockets
 from websockets.exceptions import ConnectionClosed
+import httpx
 
 logger = logging.getLogger(__name__)
 
 DEEPGRAM_API_KEY = os.getenv("DEEPGRAM_API_KEY", "")
 DEEPGRAM_WS_URL = "wss://api.deepgram.com/v1/listen"
+DEEPGRAM_TTS_URL = "https://api.deepgram.com/v1/speak"
+
+# Aura voices - pick your vibe
+AURA_VOICES = {
+    "professional": "aura-asteria-en",   # Female, neutral
+    "friendly": "aura-luna-en",          # Female, warm
+    "corporate": "aura-orion-en",        # Male, authoritative
+    "casual": "aura-arcas-en",           # Male, conversational
+}
 
 
 @dataclass
@@ -89,7 +99,7 @@ class DeepgramBridge:
 
             self._ws = await websockets.connect(
                 url,
-                extra_headers=headers,
+                additional_headers=headers,  # websockets 10+ uses additional_headers
                 ping_interval=20,
                 ping_timeout=10,
             )
@@ -214,3 +224,48 @@ async def stop_voice_session(session_id: str):
     bridge = _active_bridges.pop(session_id, None)
     if bridge:
         await bridge.close()
+
+
+# =============================================================================
+# TEXT-TO-SPEECH (Deepgram Aura)
+# =============================================================================
+
+async def text_to_speech(
+    text: str,
+    voice: str = "professional"
+) -> Optional[bytes]:
+    """
+    Convert text to speech via Deepgram Aura.
+    Returns raw audio bytes (mp3) or None on failure.
+    """
+    if not DEEPGRAM_API_KEY:
+        logger.error("[TTS] DEEPGRAM_API_KEY not configured")
+        return None
+
+    if not text.strip():
+        return None
+
+    model = AURA_VOICES.get(voice, AURA_VOICES["professional"])
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(
+                DEEPGRAM_TTS_URL,
+                params={"model": model},
+                headers={
+                    "Authorization": f"Token {DEEPGRAM_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={"text": text}
+            )
+
+            if response.status_code == 200:
+                logger.info(f"[TTS] Generated {len(response.content)} bytes for {len(text)} chars")
+                return response.content
+            else:
+                logger.error(f"[TTS] Deepgram error {response.status_code}: {response.text}")
+                return None
+
+    except Exception as e:
+        logger.error(f"[TTS] Request failed: {e}")
+        return None

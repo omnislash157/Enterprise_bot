@@ -222,3 +222,32 @@ function createVoiceStore() {
 
 export const voice = createVoiceStore();
 export const isRecording = derived(voice, $voice => $voice.isRecording);
+
+// ============================================================================
+// TEXT-TO-SPEECH (Deepgram Aura)
+// ============================================================================
+
+export async function speakText(text: string, voice = 'professional'): Promise<void> {
+    try {
+        const response = await fetch('/api/tts', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text, voice })
+        });
+
+        if (!response.ok) throw new Error('TTS failed');
+
+        const audioBlob = await response.blob();
+        const audioUrl = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioUrl);
+
+        audio.onended = () => URL.revokeObjectURL(audioUrl);
+        await audio.play();
+
+    } catch (err) {
+        console.error('[TTS] Failed:', err);
+        // Fallback to browser TTS
+        const utterance = new SpeechSynthesisUtterance(text);
+        speechSynthesis.speak(utterance);
+    }
+}
