@@ -302,8 +302,39 @@ function createSessionStore() {
 		subscribe,
 
 		init(sessionId: string, department?: string) {
-			// Store session ID for persistence
-			update(s => ({ ...s, sessionId, connectionState: 'connecting' }));
+			// CRITICAL: Clean up any existing handlers/connections first
+			// This prevents stale state when navigating back to the page
+			if (unsubscribe) {
+				unsubscribe();
+				unsubscribe = null;
+			}
+			if (wsUnsubscribe) {
+				wsUnsubscribe();
+				wsUnsubscribe = null;
+			}
+			pendingDivision = null;
+			
+			// Ensure any existing connection is fully closed
+			websocket.disconnect();
+
+			// Reset store state completely (prevents stale verified flag, etc.)
+			update(s => ({
+				...s,
+				sessionId,
+				connectionState: 'connecting',
+				verified: false,           // CRITICAL: Must reset verified flag
+				currentStream: '',
+				isStreaming: false,
+				reconnectAttempts: 0,
+				currentDivision: null,
+				cognitiveState: {
+					phase: 'idle',
+					temperature: 0.5,
+					driftDetected: false,
+					gapCount: 0,
+				},
+				// Note: messages are preserved - will be overwritten below if localStorage has data
+			}));
 
 			// Try to restore from localStorage first
 			const saved = loadSessionFromStorage(sessionId);
@@ -323,29 +354,33 @@ function createSessionStore() {
 			// Store the department we want (will be checked after verify)
 			pendingDivision = department || null;
 
-			websocket.connect(sessionId);
-			initMessageHandler();
+			// Small delay to ensure previous WebSocket is fully closed
+			// This prevents race conditions with the close/open cycle
+			setTimeout(() => {
+				websocket.connect(sessionId);
+				initMessageHandler();
 
-			// Send verify message with auth after connection
-			const email = auth.getEmail();
-			if (email) {
-				// Wait for connection to establish, then verify
-				const checkConnection = setInterval(() => {
-					const wsState = get(websocket as any);
-					if (wsState?.connected) {
-						clearInterval(checkConnection);
-						console.log('[Session] Sending verify with division:', department);
-						websocket.send({
-							type: 'verify',
-							email: email,
-							division: department,  // Include division in verify
-						});
-					}
-				}, 100);
+				// Send verify message with auth after connection
+				const email = auth.getEmail();
+				if (email) {
+					// Wait for connection to establish, then verify
+					const checkConnection = setInterval(() => {
+						const wsState = get(websocket as any);
+						if (wsState?.connected) {
+							clearInterval(checkConnection);
+							console.log('[Session] Sending verify with division:', department);
+							websocket.send({
+								type: 'verify',
+								email: email,
+								division: department,  // Include division in verify
+							});
+						}
+					}, 100);
 
-				// Clear interval after 5 seconds if not connected
-				setTimeout(() => clearInterval(checkConnection), 5000);
-			}
+					// Clear interval after 5 seconds if not connected
+					setTimeout(() => clearInterval(checkConnection), 5000);
+				}
+			}, 50);
 		},
 
 		setDivision(division: string) {
@@ -388,7 +423,7 @@ function createSessionStore() {
 			websocket.disconnect();
 		},
 
-		sendMessage(content?: string) {
+		sendMessage(content?: string, file_ids?: string[]) {
 			// Use parameter or fall back to store's inputValue
 			const messageContent = content || get(store).inputValue.trim();
 
@@ -421,11 +456,12 @@ function createSessionStore() {
 			// Get current division to include in message
 			const state = get(store);
 
-			// Send to backend WITH division (belt and suspenders)
+			// Send to backend WITH division and file_ids
 			websocket.send({
 				type: 'message',
 				content: messageContent,
-				division: state.currentDivision,  // Include division in every message
+				division: state.currentDivision,
+				file_ids: file_ids || [],  // Include file_ids for xAI Files API
 			});
 		},
 

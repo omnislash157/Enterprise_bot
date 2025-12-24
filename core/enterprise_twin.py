@@ -31,7 +31,7 @@ import logging
 import os
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, AsyncIterator
+from typing import Dict, List, Optional, Any, AsyncIterator, Union
 import hashlib
 
 logger = logging.getLogger(__name__)
@@ -460,10 +460,15 @@ class EnterpriseTwin:
     async def _generate_streaming(
         self,
         system_prompt: str,
-        user_input: str
+        user_input: Union[str, List[Dict[str, Any]]]
     ) -> AsyncIterator[str]:
         """
         Generate streaming response from model.
+
+        Args:
+            system_prompt: The system prompt with context
+            user_input: Either a string OR a content array with file references
+                        e.g., [{"type": "text", "text": "..."}, {"type": "file", "file_id": "..."}]
 
         Yields chunks as they arrive for immediate display.
         """
@@ -484,7 +489,7 @@ class EnterpriseTwin:
                     "model": model,
                     "messages": [
                         {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_input},
+                        {"role": "user", "content": user_input},  # Works with string OR content array
                     ],
                     "max_tokens": self.config.get('model', {}).get('max_tokens', 4096),
                     "temperature": self.config.get('model', {}).get('temperature', 0.5),
@@ -508,7 +513,7 @@ class EnterpriseTwin:
 
     async def think_streaming(
         self,
-        user_input: str,
+        user_input: Union[str, List[Dict[str, Any]]],
         user_email: str,
         department: str,
         session_id: str,
@@ -516,14 +521,28 @@ class EnterpriseTwin:
         """
         Process query and stream response tokens.
 
+        Args:
+            user_input: Either a string OR a content array with file references
+                        e.g., [{"type": "text", "text": "..."}, {"type": "file", "file_id": "..."}]
+
         Yields:
             str: Response chunks as they arrive
         """
         start_time = datetime.now()
         tools_fired = []
 
+        # Extract text for classification/search (handles both string and content array)
+        if isinstance(user_input, str):
+            text_for_search = user_input
+        else:
+            # Content array - extract text from first text block
+            text_for_search = next(
+                (item.get("text", "") for item in user_input if item.get("type") == "text"),
+                ""
+            )
+
         # ===== STEP 1: Classify intent =====
-        query_type = classify_enterprise_intent(user_input)
+        query_type = classify_enterprise_intent(text_for_search)
         logger.info(f"[EnterpriseTwin] Query classified as: {query_type}")
 
         # ===== STEP 2: Fire tools =====
@@ -534,7 +553,7 @@ class EnterpriseTwin:
             try:
                 retrieval_start = datetime.now()
                 manual_chunks = await self.rag.search(
-                    query=user_input,
+                    query=text_for_search,
                     department_id=department,
                     threshold=self.rag_threshold,
                 )
@@ -586,7 +605,7 @@ class EnterpriseTwin:
 
         self._session_memories[session_id].append({
             'timestamp': datetime.now().isoformat(),
-            'user_input': user_input,
+            'user_input': text_for_search,  # Store text only for session memory
             'response': full_response[:500],
             'query_type': query_type,
         })

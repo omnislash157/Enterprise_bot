@@ -28,6 +28,7 @@ PyYAML>=6.0
 
 # Grok API (uses OpenAI-compatible client)
 openai>=1.12.0
+xai-sdk>=1.4.0
 
 redis>=5.0.0          # Async Redis client (has aioredis built-in now)
 hiredis>=2.0.0        # Fast Redis parser (optional but recommended)

@@ -8,9 +8,14 @@ Version: 2.0.0 (CogTwin RAG)
 """
 from __future__ import annotations
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request
+# Load environment variables FIRST (before any other imports that need them)
+from dotenv import load_dotenv
+load_dotenv()
+
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Depends, Header, Request, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
+import httpx
 from pydantic import BaseModel
 from datetime import datetime
 from collections import defaultdict
@@ -680,6 +685,81 @@ async def upload_chat(
     }
 
 # =============================================================================
+# FILE UPLOAD - Proxy to xAI Files API
+# =============================================================================
+
+@app.post("/api/upload/file")
+async def upload_file_to_xai(
+    file: UploadFile = File(...),
+    department: str = Form(None),
+    user: dict = Depends(require_auth)
+):
+    """
+    Upload file to xAI Files API for use in chat.
+
+    Supported: PDF, DOCX, XLSX, TXT, CSV, PNG, JPG (max 30MB)
+    Returns: file_id to attach to chat messages
+
+    xAI handles extraction and RAG automatically.
+    """
+    # Validate file type
+    allowed_types = {
+        "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "text/plain",
+        "text/csv",
+        "image/png",
+        "image/jpeg",
+    }
+
+    if file.content_type not in allowed_types:
+        raise HTTPException(
+            400,
+            f"Unsupported file type: {file.content_type}. "
+            f"Allowed: PDF, DOCX, XLSX, TXT, CSV, PNG, JPG"
+        )
+
+    # Read file content
+    contents = await file.read()
+
+    # Validate size (30MB max for xAI)
+    if len(contents) > 30 * 1024 * 1024:
+        raise HTTPException(400, "File too large (max 30MB)")
+
+    # Upload to xAI Files API
+    xai_api_key = os.getenv("XAI_API_KEY")
+    if not xai_api_key:
+        raise HTTPException(500, "XAI_API_KEY not configured")
+
+    try:
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                "https://api.x.ai/v1/files",
+                headers={"Authorization": f"Bearer {xai_api_key}"},
+                files={"file": (file.filename, contents, file.content_type)},
+                data={"purpose": "assistants"}
+            )
+            response.raise_for_status()
+            xai_response = response.json()
+    except httpx.HTTPError as e:
+        logger.error(f"xAI file upload failed: {e}")
+        raise HTTPException(500, f"File upload to xAI failed: {str(e)}")
+
+    file_id = xai_response.get("id")
+    if not file_id:
+        raise HTTPException(500, "xAI did not return file_id")
+
+    logger.info(f"File uploaded to xAI: {file_id} by {user.get('email', 'unknown')}")
+
+    return {
+        "file_id": file_id,
+        "file_name": file.filename,
+        "file_size": len(contents),
+        "file_type": file.content_type,
+    }
+
+# =============================================================================
 # AUTH ENDPOINTS
 # =============================================================================
 
@@ -1032,6 +1112,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     continue
 
                 content = data.get("content", "")
+                file_ids = data.get("file_ids", [])  # Extract file IDs for xAI Files API
 
                 # SECURITY: Max message length check
                 if len(content) > MAX_MESSAGE_LENGTH:
@@ -1111,9 +1192,18 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 metrics_collector.record_ws_message('out')
                                 continue
 
+                    # Build content array if files attached, otherwise use string
+                    if file_ids:
+                        user_content = [
+                            {"type": "text", "text": content},
+                            *[{"type": "file", "file_id": fid} for fid in file_ids]
+                        ]
+                    else:
+                        user_content = content  # Backward compatible - string
+
                     # Stream response chunks as they arrive
                     async for chunk in active_twin.think_streaming(
-                        user_input=content,
+                        user_input=user_content,
                         user_email=user_email,
                         department=effective_division,
                         session_id=session_id,

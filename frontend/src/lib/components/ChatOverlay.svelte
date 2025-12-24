@@ -51,6 +51,59 @@
 	let messagesContainer: HTMLDivElement;
 
 	// ========================================
+	// FILE UPLOAD STATE
+	// ========================================
+	let attachedFiles: Array<{file_id: string, file_name: string, file_size: number}> = [];
+	let fileInput: HTMLInputElement;
+	let uploadingFile = false;
+
+	function openFileDialog() {
+		fileInput?.click();
+	}
+
+	async function handleFileSelect(event: Event) {
+		const target = event.target as HTMLInputElement;
+		const files = target.files;
+		if (!files || files.length === 0) return;
+
+		uploadingFile = true;
+
+		for (const file of Array.from(files)) {
+			try {
+				const formData = new FormData();
+				formData.append('file', file);
+				formData.append('department', $session.currentDivision || 'warehouse');
+
+				const response = await fetch('/api/upload/file', {
+					method: 'POST',
+					body: formData,
+					headers: {
+						'X-User-Email': $currentUser?.email || '',
+					}
+				});
+
+				if (!response.ok) {
+					const err = await response.json();
+					throw new Error(err.detail || 'Upload failed');
+				}
+
+				const result = await response.json();
+				attachedFiles = [...attachedFiles, result];
+			} catch (err) {
+				console.error('File upload failed:', err);
+				// TODO: Show error toast
+			}
+		}
+
+		uploadingFile = false;
+		target.value = '';
+	}
+
+	function removeFile(file_id: string) {
+		attachedFiles = attachedFiles.filter(f => f.file_id !== file_id);
+	}
+
+	// ========================================
 	// 3D ROTATION STATE (The Fun Part)
 	// ========================================
 	let rotateX = 0;
@@ -89,8 +142,12 @@
 	// ========================================
 	function sendMessage() {
 		if (!inputValue.trim() || !$websocket.connected) return;
-		session.sendMessage(inputValue.trim());
+
+		const file_ids = attachedFiles.map(f => f.file_id);
+		session.sendMessage(inputValue.trim(), file_ids);
+
 		inputValue = '';
+		attachedFiles = [];  // Clear after sending
 		// Refocus input after sending
 		tick().then(() => inputElement?.focus());
 	}
@@ -329,6 +386,17 @@
 
 				<!-- Input Area -->
 				<div class="input-area">
+					{#if attachedFiles.length > 0}
+						<div class="attached-files">
+							{#each attachedFiles as file}
+								<div class="file-chip">
+									<span class="file-name">{file.file_name}</span>
+									<button class="remove-file" on:click={() => removeFile(file.file_id)}>x</button>
+								</div>
+							{/each}
+						</div>
+					{/if}
+
 					<div class="input-wrapper">
 						<textarea
 							bind:this={inputElement}
@@ -355,6 +423,39 @@
 								<line x1="8" y1="23" x2="16" y2="23"/>
 							</svg>
 						</button>
+
+						<!-- File Upload Button -->
+						<button
+							class="file-button"
+							class:has-files={attachedFiles.length > 0}
+							class:uploading={uploadingFile}
+							on:click={openFileDialog}
+							disabled={!$websocket.connected || uploadingFile}
+							aria-label="Attach files"
+						>
+							{#if uploadingFile}
+								<svg class="spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<circle cx="12" cy="12" r="10" stroke-dasharray="30 70"/>
+								</svg>
+							{:else}
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+								</svg>
+							{/if}
+							{#if attachedFiles.length > 0}
+								<span class="file-count">{attachedFiles.length}</span>
+							{/if}
+						</button>
+
+						<!-- Hidden file input -->
+						<input
+							type="file"
+							bind:this={fileInput}
+							on:change={handleFileSelect}
+							accept=".pdf,.docx,.xlsx,.txt,.csv,.png,.jpg,.jpeg"
+							multiple
+							style="display: none;"
+						/>
 
 						<button
 							class="send-button"
@@ -917,6 +1018,116 @@
 		font-size: 0.75rem;
 		color: #555;
 		text-align: center;
+	}
+
+	/* ========================================
+	   FILE UPLOAD
+	   ======================================== */
+	.file-button {
+		width: 56px;
+		height: 56px;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		color: #00ff41;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		flex-shrink: 0;
+		position: relative;
+	}
+
+	.file-button:hover:not(:disabled) {
+		background: rgba(0, 255, 65, 0.1);
+		border-color: #00ff41;
+	}
+
+	.file-button.has-files {
+		background: rgba(0, 255, 65, 0.15);
+	}
+
+	.file-button.uploading {
+		opacity: 0.7;
+	}
+
+	.file-button:disabled {
+		background: #333;
+		color: #666;
+		cursor: not-allowed;
+		border-color: #333;
+	}
+
+	.file-button svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	.file-button .spinner {
+		animation: spin 1s linear infinite;
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	.file-count {
+		position: absolute;
+		top: -4px;
+		right: -4px;
+		background: #00ff41;
+		color: #000;
+		font-size: 0.7rem;
+		font-weight: 600;
+		width: 18px;
+		height: 18px;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.attached-files {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 0.75rem 1rem;
+		background: rgba(0, 0, 0, 0.3);
+		border-bottom: 1px solid rgba(0, 255, 65, 0.15);
+	}
+
+	.file-chip {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.4rem 0.75rem;
+		background: rgba(0, 255, 65, 0.1);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		border-radius: 8px;
+		font-size: 0.85rem;
+		color: #e0e0e0;
+	}
+
+	.file-name {
+		max-width: 150px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.remove-file {
+		background: none;
+		border: none;
+		color: #ff4444;
+		font-size: 1.2rem;
+		cursor: pointer;
+		padding: 0;
+		line-height: 1;
+	}
+
+	.remove-file:hover {
+		color: #ff6666;
 	}
 
 	/* ========================================
