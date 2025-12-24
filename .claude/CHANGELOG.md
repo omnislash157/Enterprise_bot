@@ -1,5 +1,23 @@
 # CogTwin Development Changelog
 
+## [2024-12-24 17:00] - Voice Speed Slider + Settings Popover
+### Files Modified
+- frontend/src/lib/stores/voice.ts - Added voiceSpeed store (persisted to localStorage, default 1.35x), applied playbackRate to audio playback
+- frontend/src/lib/components/ChatOverlay.svelte - Replaced standalone language button with gear icon settings popover containing EN/ES toggle + speed slider (0.75x-2x)
+### Summary
+Voice speed control for TTS playback. Settings popover with gear icon consolidates language toggle (EN/ES pills) and speed slider (0.75x-2x range). Speed setting persists to localStorage and applies to audio.playbackRate in the playNext() function. Default 1.35x for slightly faster-than-natural speech.
+
+## [2024-12-24 16:30] - Multi-Language Support (English/Spanish)
+### Files Modified
+- voice_transcription.py - Added Spanish TTS voice (aura-2-lucia-es), language param to STT/TTS
+- frontend/src/lib/stores/voice.ts - Added userLanguage store with localStorage persistence, language params to TTS functions
+- frontend/src/lib/components/ChatOverlay.svelte - Added EN/ES toggle button, pass language to TTS calls
+- frontend/src/lib/stores/session.ts - Send language with WebSocket messages
+- core/main.py - Extract language param from messages/voice_start, pass to twin and voice session
+- core/enterprise_twin.py - Add language param to think_streaming and _build_system_prompt
+### Summary
+Full Spanish/English language support for warehouse workers. Toggle EN/ES persisted to localStorage. LLM responds in selected language, STT transcribes in selected language (Deepgram), TTS speaks in selected language (Deepgram Aura lucia-es for Spanish).
+
 ## [2024-12-24 16:00] - Fix Deepgram STT 400 Error
 ### Files Modified
 - voice_transcription.py - Simplified _build_url() to use minimal params (model=nova-2 only)

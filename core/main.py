@@ -739,7 +739,7 @@ async def upload_file_to_xai(
                 "https://api.x.ai/v1/files",
                 headers={"Authorization": f"Bearer {xai_api_key}"},
                 files={"file": (file.filename, contents, file.content_type)},
-                data={"purpose": "assistants"}
+                data={"purpose": "chat"}  # xAI uses "chat", not "assistants"
             )
             response.raise_for_status()
             xai_response = response.json()
@@ -1143,6 +1143,12 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 
                 content = data.get("content", "")
                 file_ids = data.get("file_ids", [])  # Extract file IDs for xAI Files API
+                
+                # DEBUG: Log file_ids for tracing file upload flow
+                if file_ids:
+                    logger.info(f"[WS] File IDs received: {file_ids}")
+                else:
+                    logger.debug(f"[WS] No file_ids in message. Keys received: {list(data.keys())}")
 
                 # SECURITY: Max message length check
                 if len(content) > MAX_MESSAGE_LENGTH:

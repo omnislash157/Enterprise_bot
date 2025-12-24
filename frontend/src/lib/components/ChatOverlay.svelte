@@ -3,7 +3,7 @@
 	import { session } from '$lib/stores/session';
 	import { websocket } from '$lib/stores/websocket';
 	import { auth, currentUser } from '$lib/stores/auth';
-	import { voice, speakText, queueSentenceAudio, streamingSentenceDetector, clearAudioQueue } from '$lib/stores/voice';
+	import { voice, speakText, queueSentenceAudio, streamingSentenceDetector, clearAudioQueue, userLanguage, voiceSpeed } from '$lib/stores/voice';
 	import { marked } from 'marked';
 	import DepartmentSelector from './DepartmentSelector.svelte';
 	import CheekyLoader from './CheekyLoader.svelte';
@@ -64,6 +64,11 @@
 	let sentenceBuffer = '';
 	let previousStreamLength = 0;
 	let voiceSyncedText = '';  // Text that has started playing (synced with audio)
+
+	// ========================================
+	// SETTINGS POPOVER STATE
+	// ========================================
+	let showSettings = false;
 
 	function openFileDialog() {
 		fileInput?.click();
@@ -168,12 +173,13 @@
 					.replace(/[#*_`]/g, '')
 					.trim();
 				if (cleanSentence) {
-					// Capture sentence for closure
+					// Capture sentence and language for closure
 					const sentenceToReveal = sentence;
+					const lang = $userLanguage;
 					queueSentenceAudio(cleanSentence, () => {
 						// Callback fires when audio STARTS playing - reveal text
 						voiceSyncedText += sentenceToReveal + ' ';
-					});
+					}, lang);
 				}
 			}
 		}
@@ -190,9 +196,10 @@
 					.replace(/[#*_`]/g, '')
 					.trim();
 				if (cleanText) {
+					const lang = $userLanguage;
 					queueSentenceAudio(cleanText, () => {
 						voiceSyncedText += remainingText;
-					});
+					}, lang);
 				}
 			}
 			// Reset for next message
@@ -520,6 +527,55 @@
 								{/if}
 							</svg>
 						</button>
+
+						<!-- Settings Button + Popover -->
+						<div class="settings-container">
+							<button
+								class="settings-button"
+								class:active={showSettings}
+								on:click={() => showSettings = !showSettings}
+								aria-label="Voice settings"
+								title="Voice settings"
+							>
+								<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+									<circle cx="12" cy="12" r="3"/>
+									<path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+								</svg>
+							</button>
+
+							{#if showSettings}
+								<div class="settings-popover">
+									<!-- Language Toggle -->
+									<div class="setting-row">
+										<span class="setting-label">Language</span>
+										<button
+											class="lang-toggle"
+											on:click={() => userLanguage.toggle()}
+										>
+											<span class="lang-option" class:active={$userLanguage === 'en'}>EN</span>
+											<span class="lang-option" class:active={$userLanguage === 'es'}>ES</span>
+										</button>
+									</div>
+
+									<!-- Speed Slider -->
+									<div class="setting-row">
+										<span class="setting-label">Speed</span>
+										<div class="speed-control">
+											<input
+												type="range"
+												min="0.75"
+												max="2"
+												step="0.05"
+												value={$voiceSpeed}
+												on:input={(e) => voiceSpeed.set(parseFloat(e.currentTarget.value))}
+												class="speed-slider"
+											/>
+											<span class="speed-value">{$voiceSpeed.toFixed(2)}x</span>
+										</div>
+									</div>
+								</div>
+							{/if}
+						</div>
 
 						<!-- File Upload Button -->
 						<button
@@ -1113,6 +1169,144 @@
 	.speaker-button svg {
 		width: 22px;
 		height: 22px;
+	}
+
+	/* Settings Button + Popover */
+	.settings-container {
+		position: relative;
+	}
+
+	.settings-button {
+		width: 56px;
+		height: 56px;
+		border-radius: 12px;
+		background: rgba(255, 255, 255, 0.05);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		color: #00ff41;
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: all 0.2s;
+		flex-shrink: 0;
+	}
+
+	.settings-button:hover {
+		background: rgba(0, 255, 65, 0.1);
+		border-color: #00ff41;
+		box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+		transform: scale(1.02);
+	}
+
+	.settings-button.active {
+		background: rgba(0, 255, 65, 0.15);
+		border-color: #00ff41;
+		box-shadow: 0 0 15px rgba(0, 255, 65, 0.4);
+	}
+
+	.settings-button svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	.settings-popover {
+		position: absolute;
+		bottom: calc(100% + 0.75rem);
+		right: 0;
+		min-width: 200px;
+		background: rgba(10, 10, 10, 0.95);
+		border: 1px solid rgba(0, 255, 65, 0.3);
+		border-radius: 12px;
+		padding: 1rem;
+		box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+		z-index: 1000;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	.setting-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.setting-label {
+		color: #888;
+		font-size: 0.85rem;
+		font-weight: 500;
+	}
+
+	/* Language Toggle Pills */
+	.lang-toggle {
+		display: flex;
+		background: rgba(0, 0, 0, 0.4);
+		border: 1px solid rgba(0, 255, 65, 0.2);
+		border-radius: 8px;
+		padding: 2px;
+		cursor: pointer;
+	}
+
+	.lang-option {
+		padding: 0.35rem 0.6rem;
+		font-size: 0.8rem;
+		font-weight: 600;
+		color: #666;
+		border-radius: 6px;
+		transition: all 0.2s;
+	}
+
+	.lang-option.active {
+		background: rgba(0, 255, 65, 0.2);
+		color: #00ff41;
+	}
+
+	/* Speed Slider */
+	.speed-control {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.speed-slider {
+		width: 80px;
+		height: 4px;
+		-webkit-appearance: none;
+		appearance: none;
+		background: rgba(0, 255, 65, 0.2);
+		border-radius: 2px;
+		outline: none;
+		cursor: pointer;
+	}
+
+	.speed-slider::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		appearance: none;
+		width: 14px;
+		height: 14px;
+		background: #00ff41;
+		border-radius: 50%;
+		cursor: pointer;
+		box-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+	}
+
+	.speed-slider::-moz-range-thumb {
+		width: 14px;
+		height: 14px;
+		background: #00ff41;
+		border: none;
+		border-radius: 50%;
+		cursor: pointer;
+		box-shadow: 0 0 8px rgba(0, 255, 65, 0.5);
+	}
+
+	.speed-value {
+		color: #00ff41;
+		font-size: 0.8rem;
+		font-weight: 600;
+		min-width: 40px;
+		text-align: right;
 	}
 
 	/* Voice Preview (interim transcript) */
