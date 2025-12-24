@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 tracing_router = APIRouter()
 
 
-@tracing_router.get("/traces")
+@tracing_router.get("/")
 async def list_traces(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
@@ -76,7 +76,7 @@ async def list_traces(
         return {'traces': [], 'total': 0, 'error': str(e)}
 
 
-@tracing_router.get("/traces/{trace_id}")
+@tracing_router.get("/{trace_id}")
 async def get_trace(trace_id: str):
     """Get a single trace with all its spans."""
     try:
@@ -110,7 +110,7 @@ async def get_trace(trace_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@tracing_router.get("/traces/stats/summary")
+@tracing_router.get("/stats/summary")
 async def get_trace_stats(hours: int = Query(24, ge=1, le=168)):
     """Get trace statistics summary."""
     try:

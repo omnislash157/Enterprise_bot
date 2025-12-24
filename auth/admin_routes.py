@@ -775,16 +775,47 @@ async def get_admin_stats(
     """
     Get admin dashboard statistics.
 
-    TODO: This endpoint queries deleted tables (departments, access_config, access_audit_log).
-    Need to rewrite for 2-table schema (just enterprise.users table).
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Rewritten for 2-table schema (enterprise.users + enterprise.audit_log).
     """
-    raise HTTPException(
-        501,
-        "Admin stats pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    from core.database import get_db_pool
+
+    try:
+        pool = await get_db_pool()
+        async with pool.acquire() as conn:
+            # User counts
+            total_users = await conn.fetchval("SELECT COUNT(*) FROM enterprise.users")
+            active_users = await conn.fetchval("SELECT COUNT(*) FROM enterprise.users WHERE is_active = true")
+            super_users = await conn.fetchval("SELECT COUNT(*) FROM enterprise.users WHERE is_super_user = true")
+
+            # Recent activity (last 24h)
+            recent_logins = await conn.fetchval("""
+                SELECT COUNT(*) FROM enterprise.users
+                WHERE last_login_at > NOW() - INTERVAL '24 hours'
+            """)
+
+            # Audit events today
+            audit_today = await conn.fetchval("""
+                SELECT COUNT(*) FROM enterprise.audit_log
+                WHERE created_at > NOW() - INTERVAL '24 hours'
+            """)
+
+            return {
+                "users": {
+                    "total": total_users,
+                    "active": active_users,
+                    "super_users": super_users,
+                    "recent_logins_24h": recent_logins
+                },
+                "audit": {
+                    "events_24h": audit_today
+                },
+                "departments": {
+                    "count": 6  # Static post-migration
+                }
+            }
+    except Exception as e:
+        logger.error(f"[Admin] Stats error: {e}")
+        return {"error": str(e), "users": {"total": 0}, "audit": {"events_24h": 0}}
 
 
 # =============================================================================
@@ -796,20 +827,22 @@ async def list_all_departments(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    List all departments.
+    List all departments (static list post-migration).
 
-    TODO: The departments table was deleted during schema migration.
+    The departments table was deleted during schema migration.
     Department slugs are now just strings in user.department_access arrays.
-    Need to use tenant_service or hardcode department list.
-
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Returns the static list of 6 departments.
     """
-    raise HTTPException(
-        501,
-        "Departments table deleted during schema migration. "
-        "Use tenant_service.list_departments() instead. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    # Static departments after 2-table schema migration
+    STATIC_DEPARTMENTS = [
+        {"slug": "credit", "name": "Credit Department", "description": "Credit and collections"},
+        {"slug": "sales", "name": "Sales Department", "description": "Sales operations"},
+        {"slug": "warehouse", "name": "Warehouse", "description": "Warehouse operations"},
+        {"slug": "accounting", "name": "Accounting", "description": "Financial operations"},
+        {"slug": "hr", "name": "Human Resources", "description": "HR operations"},
+        {"slug": "it", "name": "IT Department", "description": "Technology operations"},
+    ]
+    return {"departments": STATIC_DEPARTMENTS}
 
 
 # =============================================================================
