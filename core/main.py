@@ -1176,6 +1176,9 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     user_language = data.get("language", "en")  # Extract language for LLM response
                     effective_division = tenant.department  # Default to session
 
+                    # Track query start time for analytics
+                    query_start_time = time.perf_counter()
+
                     # SECURITY: Honeypot detection
                     if message_division and message_division.lower() in HONEYPOT_DIVISIONS:
                         logger.critical(f"[HONEYPOT] [{request_id}] User {user_email} (IP: {client_ip}) attempted access to honeypot division: {message_division}")
@@ -1227,6 +1230,12 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     else:
                         user_content = content  # Backward compatible - string
 
+                    # Track response for analytics
+                    full_response_text = ""
+                    response_metadata = {}
+                    tokens_in = 0
+                    tokens_out = 0
+
                     # Stream response chunks as they arrive
                     async for chunk in active_twin.think_streaming(
                         user_input=user_content,
@@ -1240,6 +1249,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             # Parse and send as cognitive_state
                             try:
                                 metadata = json.loads(chunk.replace("\n__METADATA__:", ""))
+                                response_metadata = metadata
                                 await websocket.send_json({
                                     "type": "cognitive_state",
                                     "phase": "ready",
@@ -1254,6 +1264,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                                 pass
                         else:
                             # Stream content chunk
+                            full_response_text += chunk
                             await websocket.send_json({
                                 "type": "stream_chunk",
                                 "content": chunk,
@@ -1268,6 +1279,33 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         "done": True,
                     })
                     metrics_collector.record_ws_message('out')  # Record outgoing message
+
+                    # Calculate response time
+                    query_elapsed_ms = int((time.perf_counter() - query_start_time) * 1000)
+
+                    # Estimate token counts (rough approximation: 1 token ~= 4 chars)
+                    tokens_in = len(content) // 4 if isinstance(content, str) else len(str(content)) // 4
+                    tokens_out = len(full_response_text) // 4
+
+                    # Log query to analytics
+                    if ANALYTICS_LOADED:
+                        try:
+                            analytics = get_analytics_service()
+                            query_id = analytics.log_query(
+                                user_email=user_email,
+                                department=effective_division,
+                                query_text=content if isinstance(content, str) else str(content)[:500],
+                                session_id=session_id,
+                                response_time_ms=query_elapsed_ms,
+                                response_length=len(full_response_text),
+                                tokens_input=tokens_in,
+                                tokens_output=tokens_out,
+                                model_used="grok-beta",
+                                user_id=None  # Could get from auth context if needed
+                            )
+                            logger.info(f"[ANALYTICS] Query logged: {query_id}")
+                        except Exception as ae:
+                            logger.warning(f"[ANALYTICS] Failed to log query: {ae}")
 
                 else:
                     # CogTwin: streams AsyncIterator[str]
