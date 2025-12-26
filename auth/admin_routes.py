@@ -37,29 +37,28 @@ admin_router = APIRouter()
 # =============================================================================
 
 class UserSummary(BaseModel):
-    """Summary user info for list views."""
+    """Summary user info for list views (2-table schema version)."""
     id: str
     email: str
     display_name: Optional[str] = None
-    employee_id: Optional[str] = None
-    role: str
-    primary_department: Optional[str] = None
-    active: bool = True
+    departments: List[str] = []
+    dept_head_for: List[str] = []
+    is_super_user: bool = False
+    is_active: bool = True
     last_login_at: Optional[datetime] = None
 
 
 class UserDetail(BaseModel):
-    """Detailed user info including department access."""
+    """Detailed user info including department access (2-table schema version)."""
     id: str
     email: str
     display_name: Optional[str] = None
-    employee_id: Optional[str] = None
-    role: str
-    tier: str
-    primary_department: Optional[str] = None
-    active: bool = True
+    departments: List[str] = []
+    dept_head_for: List[str] = []
+    is_super_user: bool = False
+    is_active: bool = True
+    created_at: Optional[datetime] = None
     last_login_at: Optional[datetime] = None
-    departments: List[dict] = []
 
 
 class GrantAccessRequest(BaseModel):
@@ -858,11 +857,9 @@ class CreateUserRequest(BaseModel):
 
 
 class UpdateUserRequest(BaseModel):
-    """Request to update user details."""
-    email: Optional[str] = None
+    """Request to update user details (2-table schema version)."""
     display_name: Optional[str] = None
-    employee_id: Optional[str] = None
-    primary_department: Optional[str] = None
+    email: Optional[str] = None
     reason: Optional[str] = None
 
 
@@ -877,11 +874,6 @@ class BatchCreateRequest(BaseModel):
     """Request for batch user creation."""
     users: List[BatchUserEntry]
     default_department: str = "warehouse"
-    reason: Optional[str] = None
-
-
-class DeactivateRequest(BaseModel):
-    """Request to deactivate a user."""
     reason: Optional[str] = None
 
 
@@ -1074,57 +1066,241 @@ async def update_user(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    Update user details.
+    Update user details (2-table schema version).
 
-    TODO: The auth.update_user() method signature changed.
-    No more employee_id, primary_department_slug fields.
-    Also get_user_by_id() doesn't exist.
+    Supports updating display_name and email fields.
+    Uses user_id which can be either UUID or email address.
 
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Permission checks:
+    - Super users can update any user
+    - Dept heads can update users in departments they head
+    - Users can update their own profile
     """
-    raise HTTPException(
-        501,
-        "User update pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Get target user - support both user_id (UUID) and email
+    target_email = user_id
+    if "@" not in user_id:
+        # It's a UUID, need to look up user
+        target = auth.get_user_by_id(user_id)
+        if not target:
+            raise HTTPException(404, f"User not found: {user_id}")
+        target_email = target.email
+
+    try:
+        # Update user
+        success = auth.update_user(
+            updater=requester,
+            target_email=target_email,
+            display_name=request.display_name,
+            email=request.email
+        )
+
+        if not success:
+            raise HTTPException(400, "No changes made or user not found")
+
+        logger.info(f"[Admin] {requester.email} updated user {target_email}")
+
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="user_update",
+            actor_email=requester.email,
+            target_email=target_email,
+            reason=request.reason
+        )
+
+        # Fetch updated user for response
+        updated_user = auth.get_user_by_email(target_email)
+        if not updated_user:
+            raise HTTPException(404, "User not found after update")
+
+        return APIResponse(
+            success=True,
+            data={
+                "user": {
+                    "id": updated_user.id,
+                    "email": updated_user.email,
+                    "display_name": updated_user.display_name,
+                    "departments": updated_user.department_access,
+                    "dept_head_for": updated_user.dept_head_for,
+                    "is_super_user": updated_user.is_super_user,
+                    "is_active": updated_user.is_active,
+                }
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except Exception as e:
+        logger.error(f"[Admin] Error updating user {target_email}: {e}")
+        raise HTTPException(500, f"Error updating user: {str(e)}")
 
 
 @admin_router.delete("/users/{user_id}", response_model=APIResponse)
 async def deactivate_user(
     user_id: str,
-    request: DeactivateRequest = None,
     x_user_email: str = Header(None, alias="X-User-Email"),
+    reason: Optional[str] = Query(None, description="Reason for deactivation"),
 ):
     """
-    Deactivate (soft delete) a user.
+    Deactivate (soft delete) a user by setting is_active = FALSE.
 
-    TODO: The auth.deactivate_user() method signature changed.
-    Also get_user_by_id() doesn't exist.
+    Uses user_id which can be either UUID or email address.
 
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Permission checks:
+    - Super users can deactivate any user
+    - Dept heads can deactivate users in departments they head
+    - Cannot deactivate yourself
     """
-    raise HTTPException(
-        501,
-        "User deactivation pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Get target user - support both user_id (UUID) and email
+    target_email = user_id
+    if "@" not in user_id:
+        # It's a UUID, need to look up user
+        target = auth.get_user_by_id(user_id)
+        if not target:
+            raise HTTPException(404, f"User not found: {user_id}")
+        target_email = target.email
+
+    try:
+        # Deactivate user
+        success = auth.deactivate_user(
+            deactivator=requester,
+            target_email=target_email
+        )
+
+        if not success:
+            raise HTTPException(400, "User not found or already deactivated")
+
+        logger.info(f"[Admin] {requester.email} deactivated user {target_email}")
+
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="user_deactivate",
+            actor_email=requester.email,
+            target_email=target_email,
+            reason=reason
+        )
+
+        return APIResponse(
+            success=True,
+            data={
+                "message": f"User {target_email} has been deactivated",
+                "target_email": target_email
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except Exception as e:
+        logger.error(f"[Admin] Error deactivating user {target_email}: {e}")
+        raise HTTPException(500, f"Error deactivating user: {str(e)}")
 
 
 @admin_router.post("/users/{user_id}/reactivate", response_model=APIResponse)
 async def reactivate_user(
     user_id: str,
     x_user_email: str = Header(None, alias="X-User-Email"),
-    reason: Optional[str] = None,
+    reason: Optional[str] = Query(None, description="Reason for reactivation"),
 ):
     """
-    Reactivate a previously deactivated user.
+    Reactivate a previously deactivated user by setting is_active = TRUE.
 
-    TODO: The auth.reactivate_user() method signature changed.
+    Uses user_id which can be either UUID or email address.
 
-    STUB: Returns 501 Not Implemented until admin portal is redesigned.
+    Permission checks:
+    - Super users can reactivate any user
+    - Dept heads can reactivate users who have access to departments they head
     """
-    raise HTTPException(
-        501,
-        "User reactivation pending redesign for 2-table schema. "
-        "See MIGRATION_001_COMPLETE.md for details."
-    )
+    if not x_user_email:
+        raise HTTPException(401, "X-User-Email header required")
+
+    auth = get_auth_service()
+    requester = auth.get_user_by_email(x_user_email)
+
+    if not requester:
+        raise HTTPException(401, "User not found")
+
+    # Get target email - support both user_id (UUID) and email
+    # For inactive users, we need to query without is_active filter
+    target_email = user_id
+    if "@" not in user_id:
+        # It's a UUID, need to look up user (including inactive)
+        from core.database import get_db_pool
+        try:
+            pool = await get_db_pool()
+            async with pool.acquire() as conn:
+                row = await conn.fetchrow("""
+                    SELECT email FROM enterprise.users WHERE id = $1
+                """, user_id)
+                if not row:
+                    raise HTTPException(404, f"User not found: {user_id}")
+                target_email = row["email"]
+        except Exception as e:
+            logger.error(f"[Admin] Error looking up user {user_id}: {e}")
+            raise HTTPException(500, f"Error looking up user: {str(e)}")
+
+    try:
+        # Reactivate user
+        success = auth.reactivate_user(
+            reactivator=requester,
+            target_email=target_email
+        )
+
+        if not success:
+            raise HTTPException(400, "User not found or already active")
+
+        logger.info(f"[Admin] {requester.email} reactivated user {target_email}")
+
+        # Audit log
+        audit = get_audit_service()
+        audit.log_event(
+            action="user_reactivate",
+            actor_email=requester.email,
+            target_email=target_email,
+            reason=reason
+        )
+
+        # Fetch reactivated user for response
+        reactivated_user = auth.get_user_by_email(target_email)
+        if not reactivated_user:
+            raise HTTPException(404, "User not found after reactivation")
+
+        return APIResponse(
+            success=True,
+            data={
+                "message": f"User {target_email} has been reactivated",
+                "user": {
+                    "id": reactivated_user.id,
+                    "email": reactivated_user.email,
+                    "display_name": reactivated_user.display_name,
+                    "departments": reactivated_user.department_access,
+                    "dept_head_for": reactivated_user.dept_head_for,
+                    "is_super_user": reactivated_user.is_super_user,
+                    "is_active": reactivated_user.is_active,
+                }
+            }
+        )
+
+    except PermissionError as e:
+        raise HTTPException(403, str(e))
+    except Exception as e:
+        logger.error(f"[Admin] Error reactivating user {target_email}: {e}")
+        raise HTTPException(500, f"Error reactivating user: {str(e)}")

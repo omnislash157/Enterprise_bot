@@ -43,6 +43,7 @@ Usage:
 """
 
 import os
+import logging
 from dataclasses import dataclass
 from typing import Optional, List, Dict
 from datetime import datetime
@@ -52,6 +53,8 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 # =============================================================================
 # DATABASE CONFIG
@@ -374,6 +377,249 @@ class AuthService:
             """, (user_id,))
             conn.commit()
             cur.close()
+
+    def update_user(
+        self,
+        updater: User,
+        target_email: str,
+        display_name: Optional[str] = None,
+        email: Optional[str] = None
+    ) -> bool:
+        """
+        Update user details (email and/or display_name).
+
+        Args:
+            updater: User performing the update (for permission check)
+            target_email: Email of user to update
+            display_name: New display name (optional)
+            email: New email address (optional)
+
+        Returns:
+            True if user was updated, False if not found
+
+        Raises:
+            PermissionError: If updater lacks permission to update target
+        """
+        target_email_lower = target_email.lower().strip()
+
+        # Get target user
+        target = self.get_user_by_email(target_email_lower)
+        if not target:
+            return False
+
+        # Permission check
+        # Super users can update anyone
+        # Dept heads can update users in their departments
+        # Users can update themselves
+        is_self = updater.email.lower() == target_email_lower
+        if not updater.is_super_user and not is_self:
+            # Check if updater is dept head for any of target's departments
+            if not updater.dept_head_for:
+                raise PermissionError(f"User {updater.email} cannot update {target_email}")
+
+            # Check if target has any departments managed by updater
+            has_permission = any(
+                dept in updater.dept_head_for
+                for dept in target.department_access
+            )
+            if not has_permission:
+                raise PermissionError(
+                    f"User {updater.email} cannot update {target_email} "
+                    "(no shared department authority)"
+                )
+
+        # Nothing to update?
+        if not display_name and not email:
+            return True
+
+        # Build update fields
+        update_fields = []
+        params = []
+
+        if display_name:
+            update_fields.append("display_name = %s")
+            params.append(display_name)
+
+        if email:
+            update_fields.append("email = %s")
+            params.append(email.lower().strip())
+
+        params.append(target_email_lower)
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET {', '.join(update_fields)}
+                WHERE LOWER(email) = %s
+            """, tuple(params))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        # Clear cache
+        self._clear_user_cache(target_email_lower)
+        if email:
+            self._clear_user_cache(email)
+
+        return rows_affected > 0
+
+    def deactivate_user(
+        self,
+        deactivator: User,
+        target_email: str
+    ) -> bool:
+        """
+        Deactivate a user (soft delete by setting is_active = false).
+
+        Args:
+            deactivator: User performing the deactivation (for permission check)
+            target_email: Email of user to deactivate
+
+        Returns:
+            True if user was deactivated, False if not found
+
+        Raises:
+            PermissionError: If deactivator lacks permission or tries to self-deactivate
+        """
+        target_email_lower = target_email.lower().strip()
+
+        # Get target user
+        target = self.get_user_by_email(target_email_lower)
+        if not target:
+            return False
+
+        # Permission checks
+        # Cannot deactivate yourself
+        if deactivator.email.lower() == target_email_lower:
+            raise PermissionError("Cannot deactivate your own account")
+
+        # Super users can deactivate anyone (except themselves)
+        if deactivator.is_super_user:
+            pass  # Permission granted
+        # Dept heads can deactivate users in departments they head
+        elif deactivator.dept_head_for:
+            has_permission = any(
+                dept in deactivator.dept_head_for
+                for dept in target.department_access
+            )
+            if not has_permission:
+                raise PermissionError(
+                    f"User {deactivator.email} cannot deactivate {target_email} "
+                    "(no shared department authority)"
+                )
+        else:
+            raise PermissionError(
+                f"User {deactivator.email} does not have deactivation privileges"
+            )
+
+        with get_db_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET is_active = FALSE
+                WHERE LOWER(email) = %s
+            """, (target_email_lower,))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        # Clear cache
+        self._clear_user_cache(target_email_lower)
+
+        return rows_affected > 0
+
+    def reactivate_user(
+        self,
+        reactivator: User,
+        target_email: str
+    ) -> bool:
+        """
+        Reactivate a previously deactivated user (set is_active = true).
+
+        Args:
+            reactivator: User performing the reactivation (for permission check)
+            target_email: Email of user to reactivate
+
+        Returns:
+            True if user was reactivated, False if not found
+
+        Raises:
+            PermissionError: If reactivator lacks permission
+        """
+        target_email_lower = target_email.lower().strip()
+
+        # For reactivation, we need to query the user even if inactive
+        # So we can't use get_user_by_email (which filters is_active=TRUE)
+        with get_db_connection() as conn:
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+
+            # Get target user (including inactive ones)
+            cur.execute(f"""
+                SELECT
+                    id, email, display_name, tenant_id, azure_oid,
+                    department_access, dept_head_for, is_super_user, is_active,
+                    created_at, last_login_at
+                FROM {SCHEMA}.users
+                WHERE LOWER(email) = %s
+            """, (target_email_lower,))
+            row = cur.fetchone()
+
+            if not row:
+                cur.close()
+                return False
+
+            target = User(
+                id=str(row["id"]),
+                email=row["email"],
+                display_name=row["display_name"],
+                tenant_id=str(row["tenant_id"]),
+                azure_oid=row["azure_oid"],
+                department_access=row["department_access"] or [],
+                dept_head_for=row["dept_head_for"] or [],
+                is_super_user=row["is_super_user"] or False,
+                is_active=row["is_active"] or False,
+                created_at=row["created_at"],
+                last_login_at=row["last_login_at"]
+            )
+
+            # Permission checks
+            # Super users can reactivate anyone
+            if reactivator.is_super_user:
+                pass  # Permission granted
+            # Dept heads can reactivate users in departments they head
+            elif reactivator.dept_head_for:
+                has_permission = any(
+                    dept in reactivator.dept_head_for
+                    for dept in target.department_access
+                )
+                if not has_permission:
+                    raise PermissionError(
+                        f"User {reactivator.email} cannot reactivate {target_email} "
+                        "(no shared department authority)"
+                    )
+            else:
+                raise PermissionError(
+                    f"User {reactivator.email} does not have reactivation privileges"
+                )
+
+            # Reactivate
+            cur.execute(f"""
+                UPDATE {SCHEMA}.users
+                SET is_active = TRUE
+                WHERE LOWER(email) = %s
+            """, (target_email_lower,))
+
+            rows_affected = cur.rowcount
+            conn.commit()
+            cur.close()
+
+        # Clear cache
+        self._clear_user_cache(target_email_lower)
+
+        return rows_affected > 0
 
     # -------------------------------------------------------------------------
     # Department Access Checks (Simple!)
