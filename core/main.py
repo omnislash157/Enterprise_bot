@@ -425,19 +425,16 @@ async def startup_event():
     except Exception as e:
         logger.warning(f"[STARTUP] Cache init failed (continuing without): {e}")
 
-    # Warm up RAG connection pool
+    # Warm up database connection pool
     if CONFIG_LOADED and is_enterprise_mode():
-        logger.info("[STARTUP] Warming RAG connection pool...")
+        logger.info("[STARTUP] Warming database connection pool...")
         try:
-            from .enterprise_rag import EnterpriseRAGRetriever
+            from .database import init_db_pool
             config = get_config()
-            rag = EnterpriseRAGRetriever(config)
-            await rag._get_pool()  # Force pool creation
-            # Run dummy query to establish connection
-            await rag.search("warmup", department_id="warehouse", threshold=0.99)
-            logger.info("[STARTUP] RAG pool warmed")
+            await init_db_pool(config)
+            logger.info("[STARTUP] Database pool initialized")
         except Exception as e:
-            logger.warning(f"[STARTUP] RAG warmup failed: {e}")
+            logger.warning(f"[STARTUP] Database pool init failed: {e}")
 
     # Warm up analytics connection pool and query plan cache
     if ANALYTICS_LOADED:
@@ -462,10 +459,9 @@ async def startup_event():
         logger.info("[STARTUP] Initializing observability stack...")
         try:
             # Get database pool for observability
-            from core.enterprise_rag import EnterpriseRAGRetriever
+            from .database import get_db_pool
             config = get_config()
-            rag = EnterpriseRAGRetriever(config)
-            db_pool = await rag._get_pool()
+            db_pool = await get_db_pool(config)
 
             # Setup trace collector
             trace_collector.set_db_pool(db_pool)

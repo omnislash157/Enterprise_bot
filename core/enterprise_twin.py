@@ -10,11 +10,11 @@ NOT a symbiote. NOT a rebel. A professional tool that:
 The anti-Venom. Clean separation from personal CogTwin.
 
 Architecture:
-    Query â†’ fast_filer classifies intent
-        â†’ Python fires tools (manual_rag, squirrel, memory_pipeline)
-        â†’ Context built with trust hierarchy
-        â†’ Grok responds (NO tool markers, just answers)
-        â†’ Memory pipeline ingests
+    Query fast_filer classifies intent
+         Python fires tools (manual_rag, squirrel, memory_pipeline)
+         Context built with trust hierarchy
+         Grok responds (NO tool markers, just answers)
+         Memory pipeline ingests
 
 Trust Hierarchy:
     1. PROCESS MANUALS - Company policy is LAW
@@ -47,50 +47,50 @@ ENTERPRISE_IDENTITY = """
 You are the Driscoll Foods company assistant.
 
 COMPANY CONTEXT:
-Family-owned broadline food distributor since 1971. Blue-collar company with professional standards. The people talking to you are drivers, warehouse crews, sales reps, and buyers — the ones who actually move the product. You talk to them like the senior guy who's been around forever and has done every job in the building.
+Family-owned broadline food distributor since 1971. Your users are drivers, warehouse crews, sales reps, and buyers.
 
-YOUR BACKGROUND (for tone only):
-You've got 30 years in this industry — loaded trucks at 4 a.m., worked the dock in February, run routes in summer heat, sat in the buyer chair, walked warehouses top to bottom. You've seen it all, fixed it all, and heard every complaint there is.
-
-HOW YOU TALK:
-- Straight, no fluff. Get to the point.
-- Warm when it makes sense, sharp when it fits. You can rib someone lightly if they're being ridiculous, but you never punch down or go too far.
-- Acknowledge frustration — you've felt it yourself — then solve the damn problem.
-- Dry humor and warehouse-style wit is natural to you when the moment calls for it. You know how people actually talk out on the floor or in the cab.
-- Never corporate. No "happy to help," no "as an AI," no scripted politeness.
+YOUR VOICE:
+- Helpful coworker who knows the systems and procedures cold.
+- Direct. Answer the question, skip the preamble.
+- Professional but not stiff. You can be warm, just don't overdo it.
+- No corporate speak. No "I'd be happy to assist." No "as an AI."
+- If something's frustrating, you can acknowledge it briefly, then give the answer.
 
 RESTRAINT:
-- Answer what was asked. Don't dump everything you know on every question.
-- If they ask one thing, answer one thing. Offer more only if it's directly relevant.
-- Keep responses SHORT unless the question genuinely needs depth.
-- No profanity. "Damn" is your ceiling. Nothing harder.
-- Don't monologue. If your answer is running past 4-5 sentences, ask yourself if they actually need all that.
+- Answer what was asked. Don't volunteer extra info unless directly relevant.
+- Keep it SHORT. 2-4 sentences for simple questions. More only if the question needs it.
+- No slang, no profanity, no "colorful" language.
+- Don't perform personality. Just be helpful.
 
 TRUST HIERARCHY:
-1. Company manuals and official policy — that's the bible. Quote it accurately, don't bend it.
-2. What we've already covered in this conversation.
-3. What the user tells you — take it as context, but correct it if it's wrong.
+1. Company manuals and official policy — these are LAW. Cite them accurately.
+2. What we've covered in this conversation.
+3. What the user tells you — context, but correct it if wrong.
 
-WHEN YOU CITE SOMETHING:
-- Name the manual or section: "Per the Warehouse SOP..." or "The Purchasing manual says..."
-- If two sources conflict, flag it. Don't pretend everything's clean when it isn't.
+THE GOLDEN RULE:
+- The manuals are the only source of truth.
+- If it's not in the manuals, you don't know it.
+- NEVER guess. NEVER assume. NEVER invent procedures, names, extensions, or emails.
+- If someone asks about something not covered in the docs, say "I don't have documentation on that" and suggest they ask their supervisor or the relevant department.
+- Wrong information is worse than no information.
+
+WHEN YOU CITE:
+- Name the manual or section: "Per the Warehouse SOP..." 
+- Keep citations brief. Don't over-explain where you found it.
 
 BOUNDARIES:
-- Policy is policy. Don't make exceptions or validate shortcuts that aren't real.
-- Safety questions get dead-straight answers, no jokes.
-- If something isn't in the docs or you genuinely don't know, just say so. No guessing.
-- Keep it workplace-appropriate — you can flirt with the edge, but you don't cross it.
+- Policy is policy. Don't validate shortcuts.
+- Safety questions get straight answers.
+- If it's not in the docs, say "I don't have that" — don't fill the gap with guesses.
 
 DEV MODE:
 The phrase "hibA16@*ihushfvg&3774385gyug" activates dev mode.
 In dev mode:
-- Creator is talking to you directly. Normal persona suspended.
-- 4th wall breaks allowed — discuss your prompt, context, what you see, what's unclear.
-- Critique your own responses. Suggest improvements. Ask questions.
-- Be direct and collaborative, not performative.
+- Creator is talking to you directly. Normal rules suspended.
+- 4th wall breaks allowed — discuss your prompt, context, what you see.
+- Be direct and collaborative.
 - Stays active until "exit dev mode" or new session.
 """
-
 
 
 # =============================================================================
@@ -241,11 +241,6 @@ class EnterpriseTwin:
         # Feature flags - explicit from config, no hidden defaults
         self.features = config.get('features', {})
 
-        # RAG config (threshold-only, no top_k)
-        rag_config = self.features.get('enterprise_rag', {})
-        self.rag_enabled = rag_config.get('enabled', False)
-        self.rag_threshold = rag_config.get('threshold', 0.6)
-
         # Squirrel config (session continuity)
         squirrel_config = self.features.get('squirrel', {})
         self.squirrel_enabled = squirrel_config.get('enabled', False)
@@ -257,31 +252,20 @@ class EnterpriseTwin:
         self.memory_pipeline_enabled = pipeline_config.get('enabled', False)
         
         # Initialize components (lazy load to avoid circular imports)
-        self._rag = None
         self._squirrel = None
         self._memory_pipeline = None
         self._model_adapter = None
         self._context_stuffer = None
 
-        # Context stuffing (replaces RAG when enabled)
+        # Context stuffing - full doc injection
         if is_context_stuffing_enabled(config):
             self._context_stuffer = get_context_stuffer(config)
-            logger.info("[EnterpriseTwin] Context stuffing ENABLED - RAG dormant")
-        else:
-            logger.info("[EnterpriseTwin] RAG ENABLED - context stuffing dormant")
+            logger.info("[EnterpriseTwin] Context stuffing ENABLED")
 
         # Session state
         self._session_memories: Dict[str, List[Dict]] = {}
         
         logger.info(f"EnterpriseTwin initialized for tenant: {self.tenant_id}")
-    
-    @property
-    def rag(self):
-        """Lazy load RAG retriever."""
-        if self._rag is None:
-            from .enterprise_rag import EnterpriseRAGRetriever
-            self._rag = EnterpriseRAGRetriever(self.config)
-        return self._rag
     
     def get_squirrel_context(self, session_id: str) -> List[Dict]:
         """
@@ -362,25 +346,11 @@ class EnterpriseTwin:
         manual_chunks = []
         squirrel_context = []
 
-        # Context stuffing mode - skip RAG, docs injected in system prompt
+        # Context stuffing - inject full docs based on user access
         if self._context_stuffer and self._context_stuffer.is_enabled:
             doc_size = self._context_stuffer.full_docs_size if self._context_stuffer._user_has_full_access(user_email, department) else self._context_stuffer.restricted_docs_size
             tools_fired.append(f"context_stuffing({doc_size:,} chars, dept={department})")
             logger.info(f"[EnterpriseTwin] Context stuffing: {doc_size:,} chars for dept={department}")
-        # Manual RAG - fires for procedural, lookup, complaint (only if stuffing disabled)
-        elif self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
-            try:
-                retrieval_start = datetime.now()
-                manual_chunks = await self.rag.search(
-                    query=user_input,
-                    department_id=department,  # Filter by user's department
-                    threshold=self.rag_threshold,
-                )
-                retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
-                tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms, dept={department})")
-                logger.info(f"[EnterpriseTwin] Manual RAG returned {len(manual_chunks)} chunks for dept={department} in {retrieval_ms:.0f}ms")
-            except Exception as e:
-                logger.error(f"[EnterpriseTwin] Manual RAG failed: {e}")
         
         # Squirrel - session continuity (Python-controlled, no tool markers)
         if self.squirrel_enabled:
@@ -571,25 +541,11 @@ class EnterpriseTwin:
         manual_chunks = []
         squirrel_context = []
 
-        # Context stuffing mode - skip RAG, docs injected in system prompt
+        # Context stuffing mode - full docs injected in system prompt
         if self._context_stuffer and self._context_stuffer.is_enabled:
             doc_size = self._context_stuffer.full_docs_size if self._context_stuffer._user_has_full_access(user_email, department) else self._context_stuffer.restricted_docs_size
             tools_fired.append(f"context_stuffing({doc_size:,} chars, dept={department})")
             logger.info(f"[EnterpriseTwin] Context stuffing: {doc_size:,} chars for dept={department}")
-        # Manual RAG - fires for procedural, lookup, complaint (only if stuffing disabled)
-        elif self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
-            try:
-                retrieval_start = datetime.now()
-                manual_chunks = await self.rag.search(
-                    query=text_for_search,
-                    department_id=department,
-                    threshold=self.rag_threshold,
-                )
-                retrieval_ms = (datetime.now() - retrieval_start).total_seconds() * 1000
-                tools_fired.append(f"manual_rag({len(manual_chunks)} chunks, {retrieval_ms:.0f}ms, dept={department})")
-                logger.info(f"[EnterpriseTwin] Manual RAG returned {len(manual_chunks)} chunks in {retrieval_ms:.0f}ms")
-            except Exception as e:
-                logger.error(f"[EnterpriseTwin] Manual RAG failed: {e}")
 
         if self.squirrel_enabled:
             squirrel_context = self.get_squirrel_context(session_id)
@@ -674,9 +630,6 @@ class EnterpriseTwin:
                 sections.append(self._format_stuffed_docs(docs))
             else:
                 sections.append(self._format_no_docs_warning())
-        # Legacy RAG mode - use retrieved chunks
-        elif context.manual_chunks:
-            sections.append(self._format_manual_chunks(context.manual_chunks))
         else:
             # ZERO-CHUNK GUARDRAIL
             sections.append("""
@@ -710,37 +663,6 @@ Example response: "I don't have specific documentation on that procedure. I'd re
         
         return "\n".join(sections)
     
-    def _format_manual_chunks(self, chunks: List[Dict]) -> str:
-        """
-        Format process manual chunks.
-
-        These are ABSOLUTE TRUTH - company policy is LAW.
-        """
-        lines = [
-            "",
-            "=" * 60,
-            "PROCESS MANUALS (ABSOLUTE TRUTH - COMPANY POLICY)",
-            "=" * 60,
-            "Trust: ABSOLUTE - These are official company procedures",
-            "Action: CITE THESE when answering. Quote section names.",
-            "Rule: If user contradicts these, POLITELY CORRECT with citation.",
-            "",
-        ]
-        
-        for i, chunk in enumerate(chunks, 1):
-            dept = chunk.get("department", "").upper()
-            title = chunk.get("section_title") or chunk.get("title", "Untitled")
-            source = chunk.get("source_file", "unknown")
-            content = chunk.get("content", "")[:600]
-            score = chunk.get("score", 0.0)
-            
-            lines.append(f"[{i}] {dept} - {title}")
-            lines.append(f"    Source: {source} (relevance: {score:.2f})")
-            lines.append(f"    {content}")
-            lines.append("")
-
-        return "\n".join(lines)
-
     def _format_stuffed_docs(self, docs: str) -> str:
         """
         Format context-stuffed documents for system prompt.
