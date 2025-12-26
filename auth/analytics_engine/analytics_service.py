@@ -32,6 +32,18 @@ load_dotenv()
 
 logger = logging.getLogger(__name__)
 
+# Import heuristics engines (Phase 2 integration)
+try:
+    from .query_heuristics import (
+        QueryComplexityAnalyzer,
+        DepartmentContextAnalyzer,
+        QueryPatternDetector
+    )
+    HEURISTICS_AVAILABLE = True
+except ImportError:
+    HEURISTICS_AVAILABLE = False
+    logger.warning("[ANALYTICS] query_heuristics module not available - running without enhanced analytics")
+
 
 # =============================================================================
 # CONNECTION POOL (Module-level singleton)
@@ -187,6 +199,18 @@ class AnalyticsService:
     def __init__(self):
         self._session_cache = {}  # session_id -> {last_query_time, query_count}
 
+        # Initialize heuristics engines (Phase 2 integration)
+        if HEURISTICS_AVAILABLE:
+            self.complexity_analyzer = QueryComplexityAnalyzer()
+            self.dept_context_analyzer = DepartmentContextAnalyzer()
+            self.pattern_detector = QueryPatternDetector(get_pool())
+            logger.info("[ANALYTICS] Heuristics engines initialized successfully")
+        else:
+            self.complexity_analyzer = None
+            self.dept_context_analyzer = None
+            self.pattern_detector = None
+            logger.info("[ANALYTICS] Running without heuristics engines")
+
     @contextmanager
     def _get_connection(self):
         """Get connection from pool instead of creating new one."""
@@ -288,13 +312,46 @@ class AnalyticsService:
         user_id: Optional[str] = None,
     ) -> str:
         """
-        Log a query with classification.
+        Log a query with classification and enhanced heuristics.
         Returns the query_log ID.
         """
-        # Classify
+        # Existing classification
         category, keywords = self.classify_query(query_text)
         frustration = self.detect_frustration(query_text)
         is_repeat, repeat_of = self.is_repeat_question(user_email, query_text)
+
+        # NEW: Deep heuristics analysis (Phase 2)
+        complexity_score = None
+        intent_type = None
+        specificity_score = None
+        temporal_urgency = None
+        is_multi_part = None
+        department_context_inferred = None
+        department_context_scores = None
+        session_pattern = None
+
+        if HEURISTICS_AVAILABLE and self.complexity_analyzer:
+            try:
+                # Analyze query complexity
+                complexity = self.complexity_analyzer.analyze(query_text)
+                complexity_score = complexity.get('complexity_score')
+                intent_type = complexity.get('intent_type')
+                specificity_score = complexity.get('specificity_score')
+                temporal_urgency = complexity.get('temporal_indicator')
+                is_multi_part = complexity.get('multi_part')
+
+                # Infer department context from query content
+                dept_context = self.dept_context_analyzer.infer_department_context(query_text, keywords)
+                department_context_inferred = self.dept_context_analyzer.get_primary_department(query_text, keywords)
+                department_context_scores = dept_context
+
+                # Detect session patterns
+                pattern_result = self.pattern_detector.detect_query_sequence_pattern(user_email, session_id)
+                session_pattern = pattern_result.get('pattern_type') if pattern_result else None
+
+                logger.debug(f"[ANALYTICS] Heuristics: complexity={complexity_score:.2f}, dept={department_context_inferred}, intent={intent_type}")
+            except Exception as e:
+                logger.error(f"[ANALYTICS] Error running heuristics: {e}", exc_info=True)
 
         # Session tracking
         session_data = self._session_cache.get(session_id, {"query_count": 0, "last_query_time": None})
@@ -319,14 +376,20 @@ class AnalyticsService:
                     query_category, query_keywords,
                     frustration_signals, is_repeat_question, repeat_of_query_id,
                     response_time_ms, response_length, tokens_input, tokens_output, model_used,
-                    query_position_in_session, time_since_last_query_ms
+                    query_position_in_session, time_since_last_query_ms,
+                    complexity_score, intent_type, specificity_score, temporal_urgency,
+                    is_multi_part, department_context_inferred, department_context_scores,
+                    session_pattern
                 ) VALUES (
                     %s, %s, %s, %s,
                     %s, %s, %s,
                     %s, %s,
                     %s, %s, %s,
                     %s, %s, %s, %s, %s,
-                    %s, %s
+                    %s, %s,
+                    %s, %s, %s, %s,
+                    %s, %s, %s,
+                    %s
                 )
                 RETURNING id
             """, (
@@ -335,13 +398,23 @@ class AnalyticsService:
                 category, keywords,
                 frustration if frustration else None, is_repeat, repeat_of,
                 response_time_ms, response_length, tokens_input, tokens_output, model_used,
-                query_position, time_since_last
+                query_position, time_since_last,
+                # NEW HEURISTICS VALUES
+                complexity_score, intent_type, specificity_score, temporal_urgency,
+                is_multi_part, department_context_inferred,
+                json.dumps(department_context_scores) if department_context_scores else None,
+                session_pattern
             ))
 
             result = cur.fetchone()
             query_id = str(result['id'])
 
-            logger.info(f"[ANALYTICS] Query logged: {category} | {response_time_ms}ms | session={session_id}")
+            # Enhanced logging with heuristics
+            if HEURISTICS_AVAILABLE and complexity_score is not None:
+                logger.info(f"[ANALYTICS] Query logged: {category} | complexity={complexity_score:.2f} | inferred_dept={department_context_inferred} | {response_time_ms}ms")
+            else:
+                logger.info(f"[ANALYTICS] Query logged: {category} | {response_time_ms}ms | session={session_id}")
+
             return query_id
 
     def log_event(
@@ -580,6 +653,135 @@ class AnalyticsService:
             } for row in cur.fetchall()]
 
     # -------------------------------------------------------------------------
+    # NEW DASHBOARD METHODS (Phase 2: Heuristics-based analytics)
+    # -------------------------------------------------------------------------
+
+    @timed
+    def get_department_usage_by_content(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """
+        Get department usage based on INFERRED content, not dropdown selection.
+        Groups by department_context_inferred column.
+        """
+        with self._get_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    department_context_inferred as department,
+                    COUNT(*) as query_count,
+                    COUNT(DISTINCT user_email) as unique_users,
+                    AVG(complexity_score) as avg_complexity,
+                    AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '{hours} hours'
+                  AND department_context_inferred IS NOT NULL
+                GROUP BY department_context_inferred
+                ORDER BY query_count DESC
+            """)
+
+            return [{
+                "department": row['department'],
+                "query_count": row['query_count'],
+                "unique_users": row['unique_users'],
+                "avg_complexity": round(row['avg_complexity'] or 0, 2),
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
+            } for row in cur.fetchall()]
+
+    @timed
+    def get_query_intent_breakdown(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """
+        Get breakdown by query intent type.
+        Groups by intent_type column (INFORMATION_SEEKING, ACTION_ORIENTED, etc.).
+        """
+        with self._get_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    intent_type,
+                    COUNT(*) as count,
+                    AVG(complexity_score) as avg_complexity,
+                    AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '{hours} hours'
+                  AND intent_type IS NOT NULL
+                GROUP BY intent_type
+                ORDER BY count DESC
+            """)
+
+            return [{
+                "intent": row['intent_type'],
+                "count": row['count'],
+                "avg_complexity": round(row['avg_complexity'] or 0, 2),
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
+            } for row in cur.fetchall()]
+
+    @timed
+    def get_complexity_distribution(self, hours: int = 24) -> List[Dict[str, Any]]:
+        """
+        Get distribution of query complexity scores.
+        Bins complexity scores into ranges: 0-0.3 (simple), 0.3-0.6 (medium), 0.6-1.0 (complex).
+        """
+        with self._get_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    CASE
+                        WHEN complexity_score < 0.3 THEN 'simple'
+                        WHEN complexity_score < 0.6 THEN 'medium'
+                        ELSE 'complex'
+                    END as complexity_bin,
+                    COUNT(*) as count,
+                    AVG(response_time_ms) as avg_response_time,
+                    AVG(complexity_score) as avg_score
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '{hours} hours'
+                  AND complexity_score IS NOT NULL
+                GROUP BY complexity_bin
+                ORDER BY
+                    CASE complexity_bin
+                        WHEN 'simple' THEN 1
+                        WHEN 'medium' THEN 2
+                        WHEN 'complex' THEN 3
+                    END
+            """)
+
+            return [{
+                "complexity_bin": row['complexity_bin'],
+                "count": row['count'],
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0),
+                "avg_score": round(row['avg_score'] or 0, 2)
+            } for row in cur.fetchall()]
+
+    @timed
+    def get_temporal_urgency_distribution(self, hours: int = 24) -> Dict[str, int]:
+        """
+        Get distribution of query urgency levels.
+        Returns counts for LOW, MEDIUM, HIGH, URGENT.
+        """
+        with self._get_cursor() as cur:
+            cur.execute(f"""
+                SELECT
+                    temporal_urgency,
+                    COUNT(*) as count
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '{hours} hours'
+                  AND temporal_urgency IS NOT NULL
+                GROUP BY temporal_urgency
+                ORDER BY
+                    CASE temporal_urgency
+                        WHEN 'LOW' THEN 1
+                        WHEN 'MEDIUM' THEN 2
+                        WHEN 'HIGH' THEN 3
+                        WHEN 'URGENT' THEN 4
+                    END
+            """)
+
+            result = {row['temporal_urgency']: row['count'] for row in cur.fetchall()}
+
+            # Ensure all urgency levels are present (even if zero)
+            for level in ['LOW', 'MEDIUM', 'HIGH', 'URGENT']:
+                if level not in result:
+                    result[level] = 0
+
+            return result
+
+    # -------------------------------------------------------------------------
     # COMBINED DASHBOARD (Single connection for all queries)
     # -------------------------------------------------------------------------
 
@@ -739,6 +941,119 @@ class AnalyticsService:
                 "query_count": row['query_count'],
                 "last_activity": str(row['last_activity'])
             } for row in cur.fetchall()]
+
+    # -------------------------------------------------------------------------
+    # NEW COMBINED DASHBOARD METHODS (Phase 2: _with_conn versions)
+    # -------------------------------------------------------------------------
+
+    def _get_department_usage_by_content_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get department usage by content using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    department_context_inferred as department,
+                    COUNT(*) as query_count,
+                    COUNT(DISTINCT user_email) as unique_users,
+                    AVG(complexity_score) as avg_complexity,
+                    AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                  AND department_context_inferred IS NOT NULL
+                GROUP BY department_context_inferred
+                ORDER BY query_count DESC
+            """, (hours,))
+
+            return [{
+                "department": row['department'],
+                "query_count": row['query_count'],
+                "unique_users": row['unique_users'],
+                "avg_complexity": round(row['avg_complexity'] or 0, 2),
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
+            } for row in cur.fetchall()]
+
+    def _get_query_intent_breakdown_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get query intent breakdown using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    intent_type,
+                    COUNT(*) as count,
+                    AVG(complexity_score) as avg_complexity,
+                    AVG(response_time_ms) as avg_response_time
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                  AND intent_type IS NOT NULL
+                GROUP BY intent_type
+                ORDER BY count DESC
+            """, (hours,))
+
+            return [{
+                "intent": row['intent_type'],
+                "count": row['count'],
+                "avg_complexity": round(row['avg_complexity'] or 0, 2),
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0)
+            } for row in cur.fetchall()]
+
+    def _get_complexity_distribution_with_conn(self, conn, hours: int) -> List[Dict[str, Any]]:
+        """Get complexity distribution using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    CASE
+                        WHEN complexity_score < 0.3 THEN 'simple'
+                        WHEN complexity_score < 0.6 THEN 'medium'
+                        ELSE 'complex'
+                    END as complexity_bin,
+                    COUNT(*) as count,
+                    AVG(response_time_ms) as avg_response_time,
+                    AVG(complexity_score) as avg_score
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                  AND complexity_score IS NOT NULL
+                GROUP BY complexity_bin
+                ORDER BY
+                    CASE complexity_bin
+                        WHEN 'simple' THEN 1
+                        WHEN 'medium' THEN 2
+                        WHEN 'complex' THEN 3
+                    END
+            """, (hours,))
+
+            return [{
+                "complexity_bin": row['complexity_bin'],
+                "count": row['count'],
+                "avg_response_time_ms": round(row['avg_response_time'] or 0, 0),
+                "avg_score": round(row['avg_score'] or 0, 2)
+            } for row in cur.fetchall()]
+
+    def _get_temporal_urgency_distribution_with_conn(self, conn, hours: int) -> Dict[str, int]:
+        """Get temporal urgency distribution using provided connection."""
+        with self._get_cursor(conn) as cur:
+            cur.execute(f"""
+                SELECT
+                    temporal_urgency,
+                    COUNT(*) as count
+                FROM {SCHEMA}.query_log
+                WHERE created_at > NOW() - INTERVAL '1 hour' * %s
+                  AND temporal_urgency IS NOT NULL
+                GROUP BY temporal_urgency
+                ORDER BY
+                    CASE temporal_urgency
+                        WHEN 'LOW' THEN 1
+                        WHEN 'MEDIUM' THEN 2
+                        WHEN 'HIGH' THEN 3
+                        WHEN 'URGENT' THEN 4
+                    END
+            """, (hours,))
+
+            result = {row['temporal_urgency']: row['count'] for row in cur.fetchall()}
+
+            # Ensure all urgency levels are present (even if zero)
+            for level in ['LOW', 'MEDIUM', 'HIGH', 'URGENT']:
+                if level not in result:
+                    result[level] = 0
+
+            return result
 
     # -------------------------------------------------------------------------
     # DEBUG HELPERS
