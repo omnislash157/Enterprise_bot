@@ -1,11 +1,11 @@
 """
-Redis Cache Client - Embedding and RAG result caching
-
-Reduces repeat query latency from 8s to 200ms.
+Redis Cache Client - Embedding caching
 
 Cache Keys:
 - emb:{query_hash}         -> embedding vector (24h TTL)
-- rag:{query_hash}:{dept}  -> RAG results JSON (5m TTL)
+
+Note: RAG caching removed - using context stuffing instead.
+The RAG cache methods are commented out but preserved for reference.
 
 Usage:
     from .cache import get_cache
@@ -16,12 +16,6 @@ Usage:
     if not embedding:
         embedding = await generate_embedding(query)
         await cache.set_embedding(query, embedding)
-
-    # RAG cache
-    chunks = await cache.get_rag_results(query, dept)
-    if not chunks:
-        chunks = await rag.search(query, dept)
-        await cache.set_rag_results(query, dept, chunks)
 
 Version: 1.0.0
 """
@@ -39,11 +33,11 @@ _cache_instance = None
 
 
 class RedisCache:
-    """Async Redis cache for embeddings and RAG results."""
+    """Async Redis cache for embeddings."""
 
     # TTLs
     EMBEDDING_TTL = 86400  # 24 hours
-    RAG_TTL = 300          # 5 minutes
+    # RAG_TTL = 300        # RAG removed - using context stuffing
 
     def __init__(self, redis_url: str):
         self.redis_url = redis_url
@@ -121,43 +115,42 @@ class RedisCache:
             return False
 
     # =========================================================================
-    # RAG RESULTS CACHE
+    # RAG RESULTS CACHE - REMOVED (using context stuffing instead)
     # =========================================================================
-
-    async def get_rag_results(self, query: str, department: str) -> Optional[List[Dict]]:
-        """Get cached RAG results for query + department."""
-        if not self._client:
-            return None
-
-        try:
-            key = f"rag:{self._hash_query(query)}:{department}"
-            data = await self._client.get(key)
-            if data:
-                logger.info(f"[Cache] RAG HIT: {key}")
-                return json.loads(data)
-            logger.debug(f"[Cache] RAG MISS: {key}")
-            return None
-        except Exception as e:
-            logger.warning(f"[Cache] RAG get failed: {e}")
-            return None
-
-    async def set_rag_results(self, query: str, department: str, results: List[Dict]) -> bool:
-        """Cache RAG results for query + department."""
-        if not self._client:
-            return False
-
-        try:
-            key = f"rag:{self._hash_query(query)}:{department}"
-            await self._client.setex(
-                key,
-                self.RAG_TTL,
-                json.dumps(results)
-            )
-            logger.info(f"[Cache] RAG SET: {key} ({len(results)} chunks)")
-            return True
-        except Exception as e:
-            logger.warning(f"[Cache] RAG set failed: {e}")
-            return False
+    # async def get_rag_results(self, query: str, department: str) -> Optional[List[Dict]]:
+    #     """Get cached RAG results for query + department."""
+    #     if not self._client:
+    #         return None
+    #
+    #     try:
+    #         key = f"rag:{self._hash_query(query)}:{department}"
+    #         data = await self._client.get(key)
+    #         if data:
+    #             logger.info(f"[Cache] RAG HIT: {key}")
+    #             return json.loads(data)
+    #         logger.debug(f"[Cache] RAG MISS: {key}")
+    #         return None
+    #     except Exception as e:
+    #         logger.warning(f"[Cache] RAG get failed: {e}")
+    #         return None
+    #
+    # async def set_rag_results(self, query: str, department: str, results: List[Dict]) -> bool:
+    #     """Cache RAG results for query + department."""
+    #     if not self._client:
+    #         return False
+    #
+    #     try:
+    #         key = f"rag:{self._hash_query(query)}:{department}"
+    #         await self._client.setex(
+    #             key,
+    #             self.RAG_TTL,
+    #             json.dumps(results)
+    #         )
+    #         logger.info(f"[Cache] RAG SET: {key} ({len(results)} chunks)")
+    #         return True
+    #     except Exception as e:
+    #         logger.warning(f"[Cache] RAG set failed: {e}")
+    #         return False
 
     # =========================================================================
     # STATS
@@ -186,8 +179,9 @@ class NoOpCache:
     async def close(self): pass
     async def get_embedding(self, query: str) -> None: return None
     async def set_embedding(self, query: str, embedding: List[float]) -> bool: return False
-    async def get_rag_results(self, query: str, department: str) -> None: return None
-    async def set_rag_results(self, query: str, department: str, results: List[Dict]) -> bool: return False
+    # RAG cache methods removed - using context stuffing
+    # async def get_rag_results(self, query: str, department: str) -> None: return None
+    # async def set_rag_results(self, query: str, department: str, results: List[Dict]) -> bool: return False
     async def get_stats(self) -> Dict: return {"connected": False, "type": "noop"}
 
 

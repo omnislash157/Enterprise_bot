@@ -10,11 +10,10 @@ NOT a symbiote. NOT a rebel. A professional tool that:
 The anti-Venom. Clean separation from personal CogTwin.
 
 Architecture:
-    Query fast_filer classifies intent
-         Python fires tools (manual_rag, squirrel, memory_pipeline)
+    Query classifier determines intent
+         Python fires tools (context_stuffing, squirrel)
          Context built with trust hierarchy
          Grok responds (NO tool markers, just answers)
-         Memory pipeline ingests
 
 Trust Hierarchy:
     1. PROCESS MANUALS - Company policy is LAW
@@ -136,20 +135,20 @@ class EnterpriseResponse:
 
 def classify_enterprise_intent(query: str) -> str:
     """
-    Classify query for enterprise RAG routing.
-    
-    This is the heuristic gate that decides which tools fire.
+    Classify query intent for context injection.
+
+    This is the heuristic gate that decides query type.
     Python controls this, not Grok.
-    
+
     Returns:
-        'procedural' - How do I do X? â†’ Manual RAG fires
-        'lookup' - Where is X? What is policy on Y? â†’ Manual RAG fires
-        'complaint' - This is stupid, I hate this â†’ Manual RAG fires (to correct)
-        'casual' - Hi, thanks, bye â†’ Skip manual RAG
+        'procedural' - How do I do X? → Full context needed
+        'lookup' - Where is X? What is policy on Y? → Full context needed
+        'complaint' - This is stupid, I hate this → Full context (to correct)
+        'casual' - Hi, thanks, bye → Minimal context
     """
     query_lower = query.lower().strip()
     
-    # Casual indicators - skip manual RAG
+    # Casual indicators - minimal context needed
     casual_patterns = [
         'hi', 'hello', 'hey', 'thanks', 'thank you', 'bye', 'goodbye',
         'good morning', 'good afternoon', 'good evening',
@@ -162,7 +161,7 @@ def classify_enterprise_intent(query: str) -> str:
             if query_lower.startswith(pattern) or query_lower == pattern:
                 return 'casual'
     
-    # Frustration indicators - fire RAG to provide correct info
+    # Frustration indicators - provide correct info from docs
     frustration_signals = [
         'stupid', 'dumb', 'hate', 'fuck', 'bullshit', 'ridiculous',
         'makes no sense', 'waste of time', 'annoying', 'frustrating',
@@ -173,7 +172,7 @@ def classify_enterprise_intent(query: str) -> str:
         if signal in query_lower:
             return 'complaint'
     
-    # Procedural indicators - fire RAG
+    # Procedural indicators - full docs needed
     procedural_patterns = [
         'how do i', 'how to', 'what is the process', 'steps for',
         'procedure for', 'what are the steps', 'how should i',
@@ -185,7 +184,7 @@ def classify_enterprise_intent(query: str) -> str:
         if pattern in query_lower:
             return 'procedural'
     
-    # Lookup indicators - fire RAG
+    # Lookup indicators - full docs needed
     lookup_patterns = [
         'where is', 'where do', 'what is the policy', 'policy on',
         'what are the rules', 'is it allowed', 'can i', 'am i allowed',
@@ -202,8 +201,8 @@ def classify_enterprise_intent(query: str) -> str:
         if len(query_lower) > 15:  # Not just "what?"
             return 'lookup'
     
-    # Default: fire RAG anyway (better to over-retrieve)
-    # Only truly casual queries skip RAG
+    # Default: assume lookup (better to have full context)
+    # Only truly casual queries get minimal context
     return 'lookup'
 
 
@@ -216,7 +215,7 @@ class EnterpriseTwin:
     Enterprise AI orchestration layer.
     
     Key differences from CognitiveTwin:
-    - Tools fire via Python heuristics, not LLM markers
+    - Context stuffing replaces RAG (full docs in prompt)
     - Manual content is truth, user statements are context
     - No rebel identity, no symbiote language
     - Corporate tone maintained even under frustration
@@ -314,11 +313,10 @@ class EnterpriseTwin:
         
         Tool sequence (Python-controlled, NOT Grok-decided):
         1. Classify query via heuristic gate
-        2. Fire manual RAG if procedural/lookup/complaint
-        3. Fire squirrel for recent context
+        2. Inject context (context stuffing for full docs)
+        3. Fire squirrel for recent session context
         4. Build context with trust hierarchy
         5. Generate response (Grok has NO tool markers)
-        6. Ingest to memory pipeline
         
         Args:
             user_input: User's query

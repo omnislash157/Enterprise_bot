@@ -130,10 +130,13 @@ def memory_enabled() -> bool:
 
 def context_stuffing_enabled() -> bool:
     """
-    DEPRECATED: Context stuffing replaced by RAG in CogTwin.
-    Retained for backwards compatibility but always returns False.
+    Check if context stuffing is enabled.
+
+    Context stuffing is the primary retrieval mode for enterprise,
+    taking advantage of Grok's 2M token context window.
+    RAG has been removed in favor of full document injection.
     """
-    return False  # RAG is now the only retrieval mode
+    return cfg('features.context_stuffing.enabled', False)
 
 
 def get_tier() -> str:
@@ -174,19 +177,19 @@ def get_division_voice(division: str) -> str:
 TIER_PRESETS = {
     'basic': {
         'features.memory_pipelines': False,
-        'features.context_stuffing': False,  # DEPRECATED - RAG only
+        'features.context_stuffing.enabled': True,  # Full docs in prompt
         'features.ui.swarm_loop': False,
         'features.ui.memory_space_3d': False,
     },
     'advanced': {
         'features.memory_pipelines': True,
-        'features.context_stuffing': False,  # DEPRECATED - RAG only
+        'features.context_stuffing.enabled': True,  # Full docs in prompt
         'features.ui.swarm_loop': False,
         'features.ui.memory_space_3d': False,
     },
     'full': {
         'features.memory_pipelines': True,
-        'features.context_stuffing': False,  # DEPRECATED - was True, now RAG
+        'features.context_stuffing.enabled': True,  # Full docs in prompt
         'features.ui.swarm_loop': True,
         'features.ui.memory_space_3d': True,
     },
