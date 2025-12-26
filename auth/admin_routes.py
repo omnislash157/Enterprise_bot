@@ -838,7 +838,7 @@ async def list_all_departments(
         {"slug": "sales", "name": "Sales Department", "description": "Sales operations"},
         {"slug": "warehouse", "name": "Warehouse", "description": "Warehouse operations"},
         {"slug": "accounting", "name": "Accounting", "description": "Financial operations"},
-        {"slug": "hr", "name": "Human Resources", "description": "HR operations"},
+        {"slug": "purchasing", "name": "Purchasing", "description": "Purchasing operations"},
         {"slug": "it", "name": "IT Department", "description": "Technology operations"},
     ]
     return APIResponse(success=True, data={"departments": departments})

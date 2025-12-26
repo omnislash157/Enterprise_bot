@@ -374,10 +374,10 @@ logger.info("[STARTUP] Metrics routes loaded at /api/metrics")
 
 # Include observability routers
 if OBSERVABILITY_LOADED:
-    app.include_router(tracing_router, prefix="/api/admin/traces", tags=["observability"])
-    app.include_router(logging_router, prefix="/api/admin/logs", tags=["observability"])
-    app.include_router(alerting_router, prefix="/api/admin/alerts", tags=["observability"])
-    logger.info("[STARTUP] Observability routes loaded at /api/admin")
+    app.include_router(tracing_router, prefix="/api/observability/traces", tags=["observability"])
+    app.include_router(logging_router, prefix="/api/observability/logs", tags=["observability"])
+    app.include_router(alerting_router, prefix="/api/observability/alerts", tags=["observability"])
+    logger.info("[STARTUP] Observability routes loaded at /api/observability")
 
 # Global engine instance
 engine: Optional[CogTwin] = None
