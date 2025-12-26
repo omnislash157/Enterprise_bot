@@ -272,16 +272,17 @@ class MetricsCollector:
                 'messages_out': self.ws_messages_out,
             },
 
-            # RAG metrics removed - using context stuffing instead
-            # 'rag': {
-            #     'total_queries': self.rag_total,
-            #     'latency_avg_ms': round(self.rag_latency.avg(), 1),
-            #     'latency_p95_ms': round(self.rag_latency.percentile(0.95), 1),
-            #     'embedding_avg_ms': round(self.rag_embedding_latency.avg(), 1),
-            #     'search_avg_ms': round(self.rag_search_latency.avg(), 1),
-            #     'avg_chunks': round(self.rag_chunks.avg(), 1),
-            #     'zero_chunk_rate': round(self.rag_zero_chunks / self.rag_total * 100, 1) if self.rag_total > 0 else 0,
-            # },
+            # RAG metrics - stub values (RAG removed, using context stuffing)
+            # Kept for frontend compatibility
+            'rag': {
+                'total_queries': 0,
+                'latency_avg_ms': 0,
+                'latency_p95_ms': 0,
+                'embedding_avg_ms': 0,
+                'search_avg_ms': 0,
+                'avg_chunks': 0,
+                'zero_chunk_rate': 0,
+            },
 
             'cache': {
                 'rag_hit_rate': round(cache_hit_rate, 1),

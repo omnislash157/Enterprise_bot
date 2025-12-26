@@ -7,7 +7,10 @@
 <script lang="ts">
     import { metricsSnapshot, systemHealth } from '$lib/stores/metrics';
 
-    $: system = $metricsSnapshot?.system;
+    $: systemRaw = $metricsSnapshot?.system;
+    // Handle case where system metrics return an error object
+    $: system = systemRaw && !systemRaw.error ? systemRaw : null;
+    $: systemError = systemRaw?.error || null;
     $: health = $systemHealth;
 
     function getHealthColor(status: string): string {
@@ -88,6 +91,8 @@
                 <span class="stat-label">GB Used</span>
             </div>
         </div>
+    {:else if systemError}
+        <div class="error">System metrics unavailable: {systemError}</div>
     {:else}
         <div class="loading">Loading system metrics...</div>
     {/if}
@@ -203,5 +208,12 @@
         color: #666;
         text-align: center;
         padding: 20px;
+    }
+
+    .error {
+        color: #ff8c00;
+        text-align: center;
+        padding: 20px;
+        font-size: 12px;
     }
 </style>
