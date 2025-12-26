@@ -1,0 +1,2035 @@
+============================================================
+DRISCOLL FOODS - COMPLETE MANUAL SET
+============================================================
+Access Level: FULL (Purchasing + Sales + Warehouse)
+Generated: 2025-01-26
+============================================================
+
+================================================================================
+MANUAL: SALES - STANDARD OPERATING PROCEDURES (TELNET)
+================================================================================
+
+QUICK REFERENCE - EMAIL CONTACTS
+---------------------------------
+Credits (Wayne & PA DSMs)         credits@driscollfoods.com
+Operational Errors                opserrors@driscollfoods.com
+Pick Up Requests                  pickuprequest@driscollfoods.com
+Class Bid Requests                classbidrequest@driscollfoods.com
+PCM Requests (Category Margins)   pcmrequest@driscollfoods.com
+Order Date Change/Cancellation    orderchanges@driscollfoods.com
+Routing Requests (Wayne)          routingrequest@driscollfoods.com
+NCA Requests (New Customer Alert) ncarequests@driscollfoods.com
+CAR Requests (Critical Attention) carrequests@driscollfoods.com
+Bill To Ship To Requests          billtoshiptorequests@driscollfoods.com
+Forced Pick Ups                   forcedpickups@driscollfoods.com
+Employee Purchases (Wayne)        employeepurchases@driscollfoods.com
+
+QUICK REFERENCE - KEYBOARD SHORTCUTS
+-------------------------------------
+Arrow Key Equivalents:
+  Up Arrow    = F3
+  +/-         = F1
+  ?           = F2
+  !           = F4
+
+Common Commands:
+  A           = Add (when in order, quote or bid)
+  C           = Change/Maintain
+  -           = Hide Margin % when in an open order
+  RUN"CTL"    = Return to Main Sales Menu (if stuck)
+  SLS         = Go to Main Sales Screen Menu (after login)
+  R           = Log Off Telnet (from Main Sales Screen)
+
+================================================================================
+EMAIL REQUEST PROCEDURES
+================================================================================
+
+CREDITS (credits@driscollfoods.com)
+-----------------------------------
+Credits must be submitted by district manager to inside sales.
+
+Include:
+- Completed credit form
+- Pictures of product (as many as possible)
+- Pick labels, manufacturer codes, identifying materials
+- Signed invoice (via archive)
+- Operational error email if applicable
+
+OPERATIONAL ERRORS (opserrors@driscollfoods.com)
+------------------------------------------------
+Subject line: customer # ; issue
+
+Include: Customer name/#, Order#, Date, Item code, Route#, Stop#, Reason, Pictures if applicable
+
+PICK UP REQUESTS (pickuprequest@driscollfoods.com)
+--------------------------------------------------
+Rules:
+- NO perishable items ordered in error (must refuse at delivery)
+- Perishable meat for quality issues: will pick up for inspection
+- Dry and chemical items: pick up within 2 weeks of invoice date
+
+Include:
+- Completed pick up form
+- Customer#, Invoice#, Original date
+- Item#, Item description, Case count
+- Total credit amount, Reason for pick up
+- Order# to attach pick up request to
+- For driver: contact name, key drop info, product location
+
+CLASS BID REQUESTS (classbidrequest@driscollfoods.com)
+------------------------------------------------------
+- Inside sales sets up the class bid
+- Sales person maintains the bid
+- Class bids can hold multiple customers
+- Provide customer name and number
+
+PCM REQUESTS (pcmrequest@driscollfoods.com)
+-------------------------------------------
+Product Category Margin request assigns pricing header by category.
+- Drill into subcategory and assign margins over sales cost
+- MANDATORY for customers on Cut & Dry (online ordering system)
+
+ORDER DATE CHANGE/CANCELLATION (orderchanges@driscollfoods.com)
+---------------------------------------------------------------
+Include: Customer name, Customer# (account#), Order#, New order date
+
+Note: If canceling just-in-time items (cutshop & fishery), communicate with those departments.
+
+NCA REQUEST - NEW CUSTOMER ALERT (ncarequests@driscollfoods.com)
+----------------------------------------------------------------
+Send when opening order to alert operations.
+
+Include: Customer#, Customer name, Order#, Delivery day, Time window, Applicable notes
+
+This flags the system for special care for 60 days. Critical to get delivery days and time window precise.
+
+CAR REQUEST - CRITICAL ATTENTION (carrequests@driscollfoods.com)
+----------------------------------------------------------------
+Alerts routing and operations to flag account for special care (one-time, case-by-case basis).
+
+Include: Customer#, Name, Order#, Delivery day, Time window, Applicable notes
+
+BILL TO SHIP TO REQUEST (billtoshiptorequests@driscollfoods.com)
+----------------------------------------------------------------
+Include: Bill to customer account#, Ship to customer#, Delivery day, Order# if applicable
+
+Important: Make sure ship to customer knows they will receive product THAT IS NOT THEIRS.
+
+================================================================================
+OPTION 1: ORDER ENTRY
+================================================================================
+
+Path: Main Sales Menu > Option 1
+
+Use for: Entering NEW orders for next-day delivery (except Friday-Saturday deliveries)
+
+1. Enter Operator number (assigned by Credit department)
+2. Enter Customer number, or type customer name to search
+3. If multiple Ship To addresses: enter "?", press ENTER to cycle through, press F4 to accept
+4. Enter PO in "Reference Number" field if required, otherwise press ENTER to skip
+5. Select delivery date using left/right arrows (follow Transportation delivery day guidelines)
+6. Enter products using one of these methods:
+   - Enter Product# directly
+   - Enter "A" for Alpha search (new items)
+   - Enter "L" for Look Up (customer order history)
+
+Product Selection:
+- In Look Up: Spacebar searches within history, "X" or down arrow exits
+- In Alpha Search: items in BLUE were previously purchased by customer
+- Enter line number to select item, then enter case count (ENTER = 1 case)
+- Left arrow splits a case
+- F1 after item selection shows stock status (up arrow = incoming orders, down arrow = committed qty)
+
+Editing Lines:
+- Up arrow undoes price, quantity, or item
+- F4 enters Change mode, then "D" deletes item
+- F4 again returns to Add mode
+
+Order Management:
+- Order number appears at top right when first item accepted (write it down)
+- "R" redisplays all items
+- F2 shows Detail History (full customer order history)
+- Up arrow exits order and shows Net Income, GP%, GP$, case count, splits
+
+Printing:
+- Y = Yes (line version), N = No
+- U = Uniform (customer version), E = Excel version
+
+================================================================================
+OPTION 2: INVOICE ENTRY (ONE STEP)
+================================================================================
+
+Path: Main Sales Menu > Option 2
+
+Use for: Same-day Cash & Carry pickups OR invoicing customers for received product
+
+Same process as Order Entry with these differences:
+
+1. System prompts for pickup time (enter as 12:30 or 12.30)
+2. Invoice number appears below order number once items are added
+
+Printing for Cash & Carry:
+1. Enter "Y" for Yes to print
+2. Enter "T" for Temperature Zone (helps warehouse pickers)
+3. Enter "29" for Cash & Carry printer
+4. Enter "N" for GP (don't show Gross Profit)
+5. Enter "Y" to show prices
+
+Note: If only invoicing a customer, no need to send to printer.
+
+================================================================================
+OPTION 3: ORDER/INVOICE INQUIRY/CORRECTION
+================================================================================
+
+Path: Main Sales Menu > Option 3
+
+Use for: Returning to previously entered orders
+
+Note: Shipped orders from last 48 hours are view-only.
+
+Finding Orders:
+- Enter order number directly, OR
+- Enter "C" to search by Customer number
+- Enter "I" to search by Invoice number
+- Enter "P" to search by Purchase Order number
+- Up arrow or F3 cycles through multiple orders
+- Down arrow exits to Main Sales screen
+
+Editing (from last page of order):
+- ENTER = View totals
+- A = Add items
+- C = Change quantity/price (then "D" to delete)
+- F3 = View next open order for customer
+- R = Review order (by item number)
+- L = Review order (by entry order)
+
+Reducing Quantity:
+1. DELETE the item (Change mode > "D")
+2. Switch to Add mode (down arrow)
+3. Re-enter item with correct case count
+
+Warning: Reducing quantity without delete/add causes shortages on customer invoice.
+
+================================================================================
+OPTION 4: ORDER/INVOICE HEADER CORRECTION
+================================================================================
+
+Path: Main Sales Menu > Option 4
+
+Use for: Adjusting information on OPEN orders (not yet invoiced/shipped)
+
+1. Enter Order number
+2. Enter line number to adjust (e.g., #17 for PO Number)
+3. Make adjustment, press ENTER, then "Y" to confirm
+
+Additional Remarks:
+- Lines 22, 23, 24 = Remarks that print on invoice (e.g., "Driver Pick Up Check")
+
+Note: Date change requests MUST go to Routing & Customer Service Supervisor.
+
+Always verify changes using Option 3.
+
+================================================================================
+OPTION 5: CALL SHEET INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 5
+
+Use for: Viewing customer product history
+
+1. Enter customer number
+2. Press ENTER to search all items
+3. View order history with previous pricing and last order date
+
+Options (from last page):
+- ENTER = Return to Main Sales Menu
+- Enter Item# = Delete product from history
+- COPY = Copy call sheet to a Bid (Option 27)
+- P = Print Call Sheet
+
+================================================================================
+OPTION 6: STOCK STATUS INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 6
+
+Use for: Checking product stock, prices, manufacturer numbers
+
+1. Enter Product# if known, OR
+2. Enter "A" for Alpha search (search by product name, brand, vendor, description, manufacturer#)
+
+Search Tips:
+- Maximum 2 words per search
+- Check spelling carefully
+- Products listed 1-10 on left side of screen
+
+Stock Status Screen Fields:
+- Line Item#, Product Item#
+- (S) = Splittable Item
+- Kosher Grade
+- Product Description, Brand Name
+- Manufacturer#
+- Physical Cases/Pieces Available
+- Temperature Zone (R=Refrigerated, D=Dry, F=Frozen)
+- Base Cost$
+- Warehouse (01=Clifton, 02=Amsterdam)
+- Slot#, Weight, Pack Size
+- QTY AVAILABLE = Available for sale
+- QTY ON-ORDER = Ordered by Purchasing
+- Numbers with "P" = Individual pieces (split cases)
+
+Navigation:
+- F3 or Up Arrow = View incoming Purchase Orders
+- F4 or Down Arrow = View open customer orders (enter line# to go to order)
+- F10 = Toggle Amsterdam/Clifton product info
+- Left Arrow or F2 = Additional info page (Manufacturer#, Vendor, etc.)
+- Type "BUYER" = Find buyer contact information
+
+Extra Information Available:
+- ETA = Arrival date of incoming product
+- AVG COST = Average cost (#17)
+- SPLIT CASE = Whether case splits (#42)
+- TAXABLE = If item is taxable (#26)
+- VENDOR = Product vendor (#38)
+- CS/PAL = Cases per pallet (#27)
+- NET WEIGHT & GROSS WEIGHT = #10 & #11
+
+================================================================================
+OPTION 7: A/R INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 7
+
+Use for: Viewing customer invoices, credits, paid checks
+
+1. Enter Customer number
+2. Press ENTER for all invoices (open and closed), OR
+3. Enter "O" for open invoices only
+
+Display Fields:
+- Invoice Date = Ship date
+- Invoice Number
+- Debits = Order amount after invoice returned to office
+- Credits = Submitted credits
+- Line Balance = Invoice Debit - Credits
+- Running Balance = Total amount owed
+
+Options:
+- H = Print A/R information
+- C = View submitted payment checks
+- L = Lookup invoice information & credits
+
+================================================================================
+OPTION 8: DO WE SELL THIS CUSTOMER?
+================================================================================
+
+Path: Main Sales Menu > Option 8
+
+Use for: Checking if customer has an account and last delivery date
+
+Search by: Name, Phone Number, City, State, or Zip Code
+
+Results show:
+- Account name and number (if opened)
+- Last delivery date (far right)
+
+For account details, use Options 7 and 11.
+
+================================================================================
+OPTION 9: CALL SHEET PRINT
+================================================================================
+
+Path: Main Sales Menu > Option 9
+
+Use for: Printing call sheet with last purchase date and quantity
+
+Standard Print:
+1. Enter "C" for Customer (or "E" to email)
+2. Enter "C" for Category
+3. Enter date range (e.g., 100113 for 10/01/2013) or ENTER for all
+4. Enter "S" for Selection
+5. Enter Customer Account number
+6. Press ENTER (skip second customer)
+7. Enter Printer# (100 = email to yourself)
+8. Enter "M" for Monthly, "W" for Weekly, or "N" for None
+9. Enter "A" for All Items
+10. Y/N for Print Prices
+11. Y/N for Bid Prices
+12. Y/N for Market item prices
+13. Y/N for items on Order Guide but Never Sold
+
+Email as Order Guide:
+1. Enter "E" for email
+2. Select C1 or C2 (columns)
+3. Y/N for Print Prices
+4. Enter Customer Number
+5. Enter your email address
+6. Y/N for Show Brand
+7. PDF sent to email
+
+================================================================================
+OPTION 11: CUSTOMER FILE MAINTENANCE
+================================================================================
+
+Path: Main Sales Menu > Option 11
+
+Use for: Viewing Customer Master File (address, phone, salesperson, terms, Class Bid, delivery window)
+
+1. Enter Customer number, OR
+2. Enter "A" for Alpha search (by name), OR
+3. Enter "P" for phone number search
+
+Function Keys:
+- F1 = A/R
+- F2 = Graph
+- F3 = Sales movement
+- F4 = Second screen (permanent remarks in #57, #58 print in Special Instructions box)
+
+Note: Delivery window changes require email to Phil Carson & Routing.
+
+================================================================================
+OPTION 12: MODIFY CALL SHEET RECORDS
+================================================================================
+
+Path: Main Sales Menu > Option 12
+
+Use for: Adding or deleting items from customer Order Guide (Call Sheet)
+
+1. Enter Customer number
+2. Enter Product number to add or delete
+
+If product previously purchased:
+- "D" = Delete
+- "C" = Change price
+
+If product is new to customer: Enter price when prompted.
+
+================================================================================
+OPTION 13: SALESMAN MANIFEST
+================================================================================
+
+Path: Main Sales Menu > Option 13
+
+Use for: Printing daily delivery manifest (normally emailed each morning)
+
+1. Enter date (e.g., 060114 for 6/1/2014)
+2. Enter Printer# (100 = email to yourself)
+
+================================================================================
+OPTION 14: DAILY SALESMAN ORDER REPORT
+================================================================================
+
+Path: Main Sales Menu > Option 14
+
+Use for: Viewing daily order reports
+
+1. Enter date (e.g., 060114 for 6/1/2014)
+2. Enter Salesman number (only needed once)
+3. Enter Printer# (100 = email to yourself)
+4. Press ENTER to final line, follow prompts (1=send, 2=cancel, 3=change info)
+
+================================================================================
+OPTION 15: PICK UP SLIP
+================================================================================
+
+Path: Main Sales Menu > Option 15
+
+Use for: Entering product returns to warehouse
+
+Important: Enter pickups AFTER starting an order so pickup attaches to order number. Drivers require pickup slips.
+
+OPTION 1 - ENTER PICKUP:
+1. Enter Customer number
+2. Select Option 1 for "Enter Pickup"
+3. Enter Invoice# where item was delivered
+4. Enter Invoice Date
+5. Enter Dollar amount to be credited
+   - If unknown or multiple pickups: enter "X" for Invoice
+6. Enter Product number
+7. Enter case count (F2 for split case)
+8. Press ENTER (item disappears, enter another or ENTER again for Notes)
+9. Enter reason in NOTES (e.g., "mispick", "wrong item", "product dented")
+10. Enter "Y" to post
+11. Enter order number to attach pickup (appears at top)
+
+OPTION 2 - PICKUPS ON FILE:
+- View entered pickups (alphabetical by Account#)
+- Press ENTER to scroll
+- Select by Line number
+
+Display: Line#, Customer#, Name, City, Time Entered, Date Entered, Order# Assigned
+
+OPTION 3 - PICK UP STATUS INQUIRY:
+Shows: Customer#, Name, Delivery Date, Queued/Date Entered, Printed by Routing, Route
+
+================================================================================
+OPTION 16: QUOTES
+================================================================================
+
+Path: Main Sales Menu > Option 16
+
+Use for: Creating "faux" orders to price out potential or existing customers
+
+Setup:
+- If customer has account: use Customer number
+- If customer has NO account: use your Quote Account number (from A/R)
+- ALWAYS set quote for Sunday delivery
+
+Options:
+- Option 1: Enter quote (same as Order Entry)
+- Option 2: Quote Changes (modify existing)
+- Option 3: Quote Deletion/Change Date (adjust info or delete)
+- Option 4: Quotes on File (view all)
+
+Copy Quote to Bid:
+1. At end of quote, enter "COPY"
+2. Enter Customer number
+
+================================================================================
+OPTION 27: BIDS AND PRICE BOOKS
+================================================================================
+
+Path: Main Sales Menu > Option 27 > Option 1
+
+Use for: Creating, maintaining, and locking bid pricing
+
+ACCESSING A BID:
+1. Select Current or Future bid: C (current) or F (future)
+2. Enter Type: CL (class bid) or CU (customer bid)
+3. Enter Bid Number
+4. Press Down Arrow or F4 for toolbar
+
+TOOLBAR OPTIONS:
+- A = Add new item to bid
+- C = Maintain (update current item pricing)
+- R = Rev Lock (reserve bid lock - useful for weekly produce pricing updates)
+- L = Lock (lock in pricing for that week or future dates)
+- U = Update (apply updated pricing to already-entered orders for future dates)
+
+Notes:
+- If bid is NOT locked, pricing updates automatically when buyers update
+- Items on bid appear BLUE with red "B" in Alpha search while in order
+
+COPYING A BID:
+1. Path: Option 27 > Option 1
+2. Current or Future: C
+3. Type: CL
+4. Enter source bid number
+5. Press F4 to go to end of bid
+6. Type "COPY"
+7. Enter destination customer number or bid number
+
+COPYING CALL SHEET TO BID:
+1. Path: Option 27 > Option 1
+2. Current or Future: C
+3. Type: CU
+4. Enter Customer Number
+5. Press Enter, then Down Arrow
+6. Type "COPY"
+7. Enter new customer/class bid number
+
+================================================================================
+OPTION 32: DOWNLOAD BID INTO EXCEL (BY ITEM)
+================================================================================
+
+Path: Main Sales Menu > Option 32
+
+Use for: Emailing Bid in Excel format organized by Item number
+
+1. Enter "B" for Bid
+2. Enter date range start (e.g., 060114) or ENTER to skip
+3. Y/N for showing pricing
+4. A/U for All Items or Usage Only
+5. Enter "I" for Individual Customer
+6. Y/N for 2nd Line Description
+7. Y/N for Category or Group
+8. L/S for Long or Short version
+9. Enter Customer number
+10. Press ENTER
+11. Bid sent to email
+
+================================================================================
+OPTION 33: DOWNLOAD BID INTO EXCEL (BY LINE)
+================================================================================
+
+Path: Main Sales Menu > Option 33
+
+Use for: Emailing Bid in Excel format organized by Line Item
+
+Same steps as Option 32.
+
+================================================================================
+OPTION 34: BACK ORDER ENTRY
+================================================================================
+
+Path: Main Sales Menu > Option 34
+
+Use for: Next-day delivery of shorted/mispicked product (small quantity without affecting margin)
+
+1. Enter Operator Number
+2. Enter Customer Number
+3. Reference Number = ORDER# from previous order
+4. First item MUST be from the previous order
+5. Continue as normal order
+
+Note: Saturday back orders require approval from John Levatino.
+
+================================================================================
+SEAFOOD NOTES ON ORDERS
+================================================================================
+
+Use for: SEAFOOD ONLY - when customer requests non-standard pack size
+Example: Customer wants 18 pieces of 8oz salmon (standard pack is 20)
+
+Contact Donnie N. if unsure whether item can be split.
+
+1. Enter line normally
+2. BEFORE final ENTER to accept: press F1
+3. Notes line appears at bottom
+4. Enter special specs
+5. Press ENTER to accept
+
+Note: Info prints on seafood labels only, not invoice. Extended price may be incorrect - warehouse adjusts cut weight before shipping.
+
+================================================================================
+SPECIAL ORDER PROCESS
+================================================================================
+
+Path: Main Sales Menu > SLS screen
+
+For Sales Rep:
+1. Start order with customer number
+2. Enter item number
+3. Enter "Y" to place special order (or "N" to cancel)
+4. Enter requested delivery date
+5. Enter cancel date (latest customer will accept)
+6. Exit order
+
+System creates allocation (shaded in system). Buyers cannot add to PO without allocation.
+
+Daily Reports:
+- Each buyer receives Excel spreadsheet of all special orders
+- Each sales rep receives spreadsheet of their allocations
+- Fields: Item#, Quantity, Customer#, Sales Rep, Date Requested, Date Needed, Cancel Date, PO#
+
+Removing Special Orders (only if not yet ordered by Purchasing):
+- Process from SLS screen
+- Buyer receives email notification of removal
+
+Communication:
+- Buyer responsibility: Notify sales if item discontinued or unavailable within dates
+- Sales responsibility: Manage special order list, remove if customer closed/on credit hold
+
+================================================================================
+REFERENCE - DRISCOLL CUT SHOP ALPHA SEARCH TIPS
+================================================================================
+
+STEAKS (search term):
+  Filet Steaks        = FILET STK
+  Strip Steaks        = STRIP STK
+  Cowboy Steaks       = COWBOY (bone-in ribeye, frenched bone)
+  Rib Steaks          = RIB STK (bone not frenched)
+  T-Bone Steaks       = T-BONE (small filet)
+  Porterhouse Steaks  = PORTERHOUSE (bigger filet)
+  Ribeye Steaks       = RIBEYE STK
+  Skirt Steaks        = SKIRT STK
+
+CHOPS (search term):
+  Lamb Chops          = LAMB RACK / LAMB SHOULDER / LAMB LOIN
+  Veal Chops          = VEAL RACK / VEAL LOIN
+  Pork Chops          = PORK LOIN / PORK RACK
+
+WHOLE PIECES/LOINS (search term):
+  Whole Filet Mignon  = PSMO
+  Whole Strip Loin    = STRIP LOIN
+  Whole Ribeyes       = RIBEYE BNLS
+  Export Rib (B/I)    = EXPORT RIB
+  Short Loin          = SHORT LOIN (filet/strip together)
+  Rib                 = 109 RIB
+
+OTHER CUTS (search by name):
+  TERES MAJOR, FLATIRON, HANGER, FLANK
+
+================================================================================
+REFERENCE - PRODUCT ABBREVIATIONS
+================================================================================
+
+BRD    = Breaded                    NTB    = Not Breaded
+BNLS   = Boneless                   OB     = Opportunity Buy
+BTR    = Battered                   OGC    = Organically Grown Company
+CAB    = Certified Angus Beef       OU     = Orthodox Union (Kosher)
+CN     = Child Nutrition            OVN    = Ovenable
+CLF    = Cholesterol Free           PARVE  = Prepped without meat/milk/derivatives
+CKD    = Cooked                     PB     = Par Baked
+CND    = Canned                     PC     = Portion Control
+CVP    = Controlled Vacuum Pack     PCK    = Pre-Cooked
+FC     = Fully Cooked               PET    = Plastic (Polyethylene terephthalate)
+FFR    = Fat Free                   PIJ    = Packed In Juice
+G&S    = Grated and Stamped         PIW    = Packed In Water
+GM     = Gram                       PSMO   = Peeled Side Muscle On
+GRL    = Grill                      PM     = Part Skim
+GTF    = Gluten Free                RDC    = Reduced Calorie
+HFCS   = High Fructose Corn Syrup   RDF    = Reduced Fat
+IQF    = Instant Quick Freeze       RTC    = Ready To Cook
+IVP    = Ind. Vacuum Packed         SGF    = Sugar Free
+IW     = Ind. Wrapped               SNA    = Salt Not Added
+JJP    = 100% Juice                 UHT    = Ultra High Temp (Shelf Milk)
+LFT    = Low Fat                    UNB    = Unbaked
+LRS    = Low Sodium                 USD    = Upside Down
+LSR    = Low Sugar                  VGT    = Vegetarian
+LT     = Lite                       WGR    = Whole Grain
+LTF    = Lactose Free               WM     = Whole Milk
+LTS    = Lite Syrup                 WW     = Whole Wheat
+MTG    = Multi-Grain                ZTF    = Zero Trans Fat
+NS     = No Sodium
+NSA    = No Sugar Added
+
+================================================================================
+REFERENCE - KOSHER GRADES
+================================================================================
+
+CODE   DESCRIPTION                  CODE   DESCRIPTION
+----   -----------                  ----   -----------
+(D     Half Moon K Dairy            LH     Lishkas Hakashrus
+(K     Half Moon K Dairy            LK     London Beth Din
+(P     Half Moon K Parve            LV     Louisville Vaad
+*D     Star K Dairy                 M      Multiple K, OU, OU Dairy
+*K     Star K                       M1     Multiple OU and Star K
+*P     Star K Parve                 MK     Montreal Vaad
+D      K or Kosher Dairy            ML     Unger Machon L'Kashrus
+_K     K or Kosher                  MP     Montreal Vaad Parve
+P      K or Kosher Parve            N      Not Kosher
+1K     KSA                          NA     N/A
+1P     KSA Parve                    NS     New Square Kashrus
+2D     K in a Square Dairy          OC     OK Cholov Yisroel
+2K     K in a Square                OD     OK Dairy
+AP     Cape Town Parve              OE     OK Dairy Equipment
+BC     British Columbia K           OK     OK
+BD     Tablet K Dairy               OP     OK Parve
+BK     Tablet K Dairy               OU     OU
+BY     OU Beit Yosef                OV     Saint Louis OV
+CD     CRC Dairy                    PG     Technical Konsultant Parve
+CG     CRC Glatt                    PB     Brussels Parve
+CK     CRC                          PJ     KAJ Parve
+D9     Technical Konsultants        PK     Beth Din de Paris
+DV     KVH New England Dairy        PM     Machon L'Kashrus Parve
+FD     Flame K Dairy                PV     KVH New England Parve
+HK     Heart K                      RK     COR
+K1     China KS KS                  SD     Scroll K Dairy
+K2     Kosher Italy                 TD     Triangle K Dairy
+K3     Peru K                       TK     Triangle K
+K4     OKS                          TP     Triangle K Parve
+K5     United Mehadrin              U1     OU Parve Pas Yisroel Yoshon
+K6     Turkey Kof K                 U2     OU Parve Pas Yisroel
+K7     ORC K (San Francisco)        UC     OU Cholov Yisroel
+K8     Kay Kosher                   UD     OU Dairy
+K9     Vaad Hakashrut de Bogota     UE     OU Dairy Equipment
+KA     Australia                    UF     OU Fish
+KD     Kof K Dairy                  UG     OU Glatt
+KF     Kof K Fish                   UM     OU Meat
+KJ     KAJ                          UP     OU Parve
+
+================================================================================
+REFERENCE - PHONE EXTENSIONS
+================================================================================
+
+OPERATIONS
+----------
+Tim Driscoll, President                          211
+Ron Pereen, Executive Vice President             181
+Steve Donnelly, Senior VP Sales/Purchasing/Mktg  180
+George Williams, Chief Performance Officer       137
+John Levatino, Vice President of Sales           288
+Patty Volk, Sales Project Coordinator            139
+Richard Kemo, Director Multi-Unit Account        ---
+Helder Coelho, Operations Manager                ---
+Sara Kenyon, Director of Transportation          ---
+Michael Palma, Transportation Manager            ---
+
+CUSTOMER SERVICE / INSIDE SALES
+-------------------------------
+Hailey Singh, Supervisor                      ---
+Rosa Torres                                      ---
+
+MULTI-UNIT SALES
+Matt Hartigan, director
+James Afflerbach, lead associate
+
+BID DEPARTMENT
+--------------
+Matt Wasserman, bid director                              ---
+Chris Caselnova, bid lead - start here first                                 ---
+
+FINANCE DEPARTMENT
+------------------
+Carolina Ortega, Accounting Manager              172
+
+ACCOUNTS PAYABLE
+----------------
+Nicole Abudeye, Supervisor                       220
+
+A/R & COLLECTIONS
+-----------------
+Carolina O                                       102
+
+NYC SCHOOLS ACCOUNTING
+----------------------
+James Hartman                                    101
+
+INVENTORY CONTROL
+-----------------
+Bill Lulack                                      123
+James Serrago                                    179
+Jacob Veeren                                     153
+
+HUMAN RESOURCES
+---------------
+Carolina Ortega, HR Manager                      172
+Natasha Driscoll                                 120
+Alexandra Narrea, Payroll & Benefits             222
+
+RECEPTIONIST
+------------
+Ashley Rodriguez                                 100
+
+IT AND LOSS PREVENTION
+----------------------
+Shamar Basu, Manager                             973-464-3894
+Cathy Cioce                                      ---
+Yeraldy Duran                                    ---
+
+CASH & CARRY
+------------
+Mike Tighe                                       ---
+Edward Blaskewicz                                ---
+
+MEAL PRODUCTION
+---------------
+Frank Ryan                                       ---
+
+CUT SHOP
+--------
+Vito Scardigno, Director of Production           ---
+Frank Ryan                                       ---
+Dan Roth                                         ---
+
+PURCHASING / MARKETING
+----------------------
+Priscilla Keller, purchasing head   ---
+Chris Driscoll, Director of Purchasing           ---
+
+================================================================================
+END OF SALES MANUAL
+================================================================================
+
+
+================================================================================
+MANUAL: PURCHASING DEPARTMENT - STANDARD OPERATING PROCEDURES
+================================================================================
+
+WAREHOUSE CODES
+---------------
+01 - Wayne (Primary)
+02 - Amsterdam (NY)
+05 - Stroudsburg (PA)
+09 - 5th Street
+
+DAILY RESPONSIBILITIES
+----------------------
+- Review Lost Sales Report every morning (sent by reports@driscollfoods.com)
+- Target fill rate: 99.5%
+- Adjust ETA dates daily
+- Address PO discrepancies immediately
+- Confirm POs at least two days prior to delivery
+
+================================================================================
+PURCHASE ORDER ENTRY
+================================================================================
+
+Path: 9-Purchasing > 1-Purchase Order Entry
+
+1. Enter operator number (first order of session only)
+2. Enter vendor number or "A" to search vendors
+3. Pick Up order? Y/N
+   - If Y: Select M (Managed) or B (Backhaul)
+   - If Managed: Enter pickup date, then arrival date
+4. Enter PO date (format: MMDDYY, e.g., 011924 for Jan 19, 2024)
+5. Use left/right arrows to select ETA based on lead time
+6. Dropship defaults to N
+7. Warehouse defaults to 01 (Wayne)
+   - Press F4 to change: 02 (Amsterdam) or 05 (Stroudsburg)
+8. Enter item numbers and quantities
+9. Enter through until Print (Y/N) - enter Y
+10. Select P/F/E (Print, Fax, Email) - enter E
+11. Confirm email address and CC
+12. Add message if needed
+13. Select 1=Send to transmit order
+
+================================================================================
+PO MAINTENANCE & LOOKUP
+================================================================================
+
+PO On File Screen
+-----------------
+Path: 9-Purchasing > 21-Purchase Orders on File
+Enter warehouse and buyer/analyst number
+
+PO History Lookup
+-----------------
+Path: 9-Purchasing > 30-Look Up PO History
+- Enter PO# directly, OR
+- Enter V + vendor number
+- On vendor 28 screen, press H for full history
+
+================================================================================
+STOCK STATUS REPORT
+================================================================================
+
+Path: 5-Inventory Control > 15-Stock Status Menu > 2-Stock Status by Vendor
+
+Settings:
+- Version: S (Short)
+- Day: D (specific day) or S (select vendor)
+- If Day: Enter M, T, W, R, or F
+- Enter buyer code
+- Enter printer number
+- Warehouse: 01 (Wayne)
+- Print secondary vendors: N
+- Show other warehouse: Y
+- Print flagged items: N (or Y for lockouts/special orders)
+- Enter through to print
+
+================================================================================
+SCHOOL REPORT
+================================================================================
+
+Path: 2-Order Processing > 14-Projection Reports > 4-School Vendor Projection
+
+1. Press Enter
+2. Enter next school day
+3. Enter date 10 school days out (exclude weekends)
+4. Enter buyer number
+5. Press Enter x3
+6. Enter printer number
+
+Reading the Report:
+- Lists items by vendor for NYC Schools
+- ITALICIZED items = potential shorts within 10 days (action required)
+- Options: Place new order, increase existing order, or expedite PO
+
+Note: Email version loses italics formatting.
+
+================================================================================
+INTERCOMPANY TRANSFERS
+================================================================================
+
+Path: 31-Transfer Entry
+
+Transfer Vendor Codes:
+----------------------
+AMSTERDAM TRANSFERS:
+  222111 - Amsterdam Internal (Dry)
+  222112 - Amsterdam Internal (Cooler)
+  222113 - Amsterdam Internal (Freezer)
+
+WAYNE TRANSFERS:
+  898989 - Wayne Internal (Dry)
+  899898 - Wayne Internal (Cooler)
+  899999 - Wayne Internal (Freezer)
+
+CROSS-WAREHOUSE:
+  104807 - Wayne to NY (1-2)
+  111111 - NY to Wayne (2-1)
+  666666 - Wayne to PA (1-5)
+  555555 - PA to Wayne (5-1)
+  104809 - Wayne to 5th Street (1-9)
+  999111 - 5th Street to Wayne (9-1)
+
+================================================================================
+NEW ITEM SETUP
+================================================================================
+
+APPROVAL REQUIRED: All new items must be approved by a manager. Sales requests
+require DSM approval.
+
+Required Specifications:
+- Pack size
+- Net weight & Gross weight
+- Case cube
+- Manufacturer number
+- Item number
+- UPC
+- TI/HI
+- Billing type
+- Shelf life & Guaranteed shelf life
+
+Setup Procedure:
+----------------
+1. Search for similar items (keep item numbers grouped)
+2. Select similar item number, note it
+3. Return to empty item screen
+4. Press F1, enter the reference number
+5. Select from populated numbers
+6. Enter A to begin
+
+Key Fields:
+-----------
+Field 2 - Item Description:
+  Format: Category first, then specifics
+  Example: "CHIP POTATO BBQ" (not "BBQ Potato Chip")
+  Example: "DRESSING ITALIAN HOMESTYLE" (not "Homestyle Italian Dressing")
+
+Field 6 - Billing Type:
+  1 = By case
+  2 = By weight (LB, OZ)
+  3 = Catchweight (variable weight per delivery)
+
+Field 8 - Pieces Per Case:
+  Enter split quantity, or 1 if no split
+  Note: Avoid splits except for sturdy self-contained items (gallon jugs, etc.)
+
+Field 10/11 - Net and Gross Weight
+Field 14 - Case Cube
+Field 17 - Landed Cost
+Field 20 - Unit type (bag, box, bottle) if applicable
+Field 21 - Manufacturer and item number
+Field 22 - Temperature zone
+Field 27 - TI/HI
+Field 28 - UPC
+Field 32 - Category number (enter ? then spacebar to search)
+Field 38 - Vendor number
+Field 40 - Alpha name (search term for sales reps)
+Field 41 - Brand name
+
+Lockout Options (Field 43):
+---------------------------
+X = Cannot key out until back in stock or on order (ETA-based release)
+Y = Locked to everyone unless inventory on hand
+S = Locked to BOE only
+D = Locked to street sales only
+
+Other Flags:
+------------
+Field 45 - Taxable: Y for non-food items only
+Field 46 - DWO (Done When Out): Item discontinued
+Field 47 - Special Order: Y if one-time purchase, N if stocked
+Field 53 - Exclude Special: Y to keep special order flag permanent
+
+================================================================================
+CLOSE CODING AN ITEM
+================================================================================
+
+Path: 5-Inventory Control > 1-Inventory File Maintenance
+
+1. Enter item number
+2. Left arrow to movement screen
+3. Press F8
+4. Enter salesman number OR 6-digit customer number
+5. Confirm "Ok to add this salesman" - Y
+
+Warehouse Close Codes:
+- C = Wayne
+- P = Stroudsburg
+- Type DIV, Enter, A, Enter = Amsterdam
+
+Note: Close coding restricts item to specific salesman/customer. Different from
+lockout (Field 43) which blocks all sales.
+
+================================================================================
+CATEGORY BURDEN LOOKUP
+================================================================================
+
+Path: 5-Inventory Control > 8-Inventory Group File Maintenance
+Press ? for dropdown list
+
+================================================================================
+SALES COST CALCULATOR
+================================================================================
+
+From Telnet home screen, type: SLSCOST
+
+1. Enter landed cost (include freight)
+2. Select category from dropdown
+3. Enter if special order (Y/N)
+4. Enter cost basis (case or pound)
+
+Results:
+- SLS Cost = Base cost for sales rep markup
+- MKT Price = Target price (~7% margin for profit goals)
+
+================================================================================
+VENDOR ALLOWANCES & CHARGES
+================================================================================
+
+Path: 9-Purchasing > 28-Vendor Master File Maintenance > AL (Allowance Maintenance)
+
+Header Setup (Select H):
+------------------------
+- Affect Totals: Y (deduct from invoice) or N (no effect)
+- COG: Y (deduct from cost of goods) or N (no effect)
+- Total PO: 0 for item-level allowances, or negative amount for PO-wide
+
+Item Allowances (Select C):
+---------------------------
+1. Enter 6-digit item number
+2. Select: 1=Allowance or 3=Charge
+3. Select basis: Case price, Net weight, Catch weight, Percentage, or Gross weight
+4. Select: 2=Add allowance value or 4=Add charge value
+5. Up arrow, then Y to save
+
+Note: Allowances reduce COG. Charges add to COG.
+To apply to open PO: Enter the PO and tab through items.
+
+================================================================================
+FREIGHT FIELDS
+================================================================================
+
+Freight Allowance 1: Pickup allowance - nets down on invoice
+Freight Allowance 2: Pickup allowance - NO invoice effect (for billbacks)
+Freight Charge 1: Delivery freight - affects PO (delivery orders only)
+Freight Charge 2: Delivery freight - NO invoice effect
+
+IMPORTANT: Review PO freight screen before confirming. Contact manager if unsure.
+
+Minimum backhaul freight: $200
+
+================================================================================
+TRUCKING SPECIFICATIONS
+================================================================================
+
+Straight Truck:
+- Max Pallets: 12
+- Max Weight: 2,400 lbs
+- Max Cube: 700
+
+Tractor Trailer (53'):
+- Max Pallets: 24-25
+- Max Weight: 42,500 lbs (dry) / 43,500 lbs (reefer)
+- Max Cube: 1,400
+
+================================================================================
+DOT SCHEDULE
+================================================================================
+
+Cutoff: Noon
+
+Wayne: Monday for Friday, Thursday for Wednesday
+NY: Monday for Friday
+PA: Thursday for Wednesday
+
+DOT Website: https://www.dotfoods.com/shop/
+
+================================================================================
+UNIPRO FOODSERVICE
+================================================================================
+
+Driscoll Foods is a member of Unipro Foodservice - the largest foodservice
+cooperative in the US with 850+ distributor members.
+
+Allowance Types:
+----------------
+UPA1 (EDA) - Earned Distributor Allowance:
+  Monthly rebate from suppliers (percentage or dollar amount)
+
+UPA2 (SPA) - Supplier Pooled Allowance:
+  Periodic deals offered through Unipro
+
+Unipro Website Resources:
+- Payment terms
+- Vendor contacts (email, phone)
+- Broker information
+- FOB locations
+- Shipping minimums
+- Letters of Guarantee
+
+================================================================================
+END OF PURCHASING MANUAL
+================================================================================
+
+
+================================================================================
+MANUAL: WAREHOUSE - COMPLETE OPERATIONS MANUAL
+================================================================================
+
+================================================================================
+NIGHT SHIFT OPERATIONS
+================================================================================
+
+QUICK REFERENCE - SHIFT SCHEDULE
+---------------------------------
+Start Time:      4:00 PM or 5:00 PM (Clerk prep starts 3:00 PM)
+End Time:        3:30 AM - 4:30 AM (varies by volume)
+Grace Period:    10 minutes for arrival
+
+Breaks (all positions):
+  - Two 15-minute breaks
+  - One 30-minute lunch break
+  - NO breaks in machine room or on warehouse floor
+  - Clerks stagger breaks to maintain 3 at window
+
+QUICK REFERENCE - TEMPERATURE ZONES
+------------------------------------
+Dry (D):      No weight entry required
+Cooler (R):   Weight entry required (determines billing)
+Freezer (F):  Weight entry required (determines billing)
+
+QUICK REFERENCE - SAFETY REQUIREMENTS
+--------------------------------------
+Footwear:     Steel-toe shoes above ankle (mandatory)
+Equipment:    Electric jacks are powerful - maintain awareness
+Prohibited:   Taking any product (security cameras monitor all areas)
+              Eating on floor or in machine room
+
+================================================================================
+PICKING
+================================================================================
+
+Role: Retrieve products from warehouse slots and build pallets for delivery
+
+WORKFLOW:
+1. Clock in, change in locker room, get jack from machine room
+2. Report to window - clerk enters employee ID
+3. Receive list of labels from clerk
+4. Jennifer voice system directs to slot locations
+5. Pick cases, verify case matches label and slot
+6. Build pallet (heavy cases bottom, light cases top)
+7. Wrap pallet in saran wrap when complete
+8. Deliver to designated door for loaders
+9. Return to window for next label set
+
+PRODUCTIVITY TIPS:
+- Keep 10-12 extra pallets nearby for efficiency
+- Review labels before starting to plan logical route
+- Minimize unnecessary movement and pallet reorganization
+- Most picks on first level slots (jack accessible)
+- Request hi-lo operator for out-of-reach slots
+
+WEIGHT ENTRY (Cooler/Freezer only):
+- Collect product weights during picking
+- Weight data determines company billing for temperature-controlled items
+- Dry zone does not require weights
+
+PERFORMANCE:
+- Paid hourly with incentive bonuses above 100% productivity
+- Mispicks negatively impact company and individual bonuses
+- Approximately 95,000 cases processed nightly
+- Faster/accurate completion = earlier shift end
+
+================================================================================
+CHECKING
+================================================================================
+
+Role: Last quality control before orders leave warehouse
+
+WORKFLOW:
+1. Receive order sheets from clerks at check window
+2. Review orders pallet by pallet, case by case
+3. Verify physical product matches printed order (not just labels)
+4. Mark missing, incorrect, or extra items on sheet
+5. Report discrepancies to clerks immediately
+6. Clear checked pallets for loaders
+
+PRIORITY ORDERS:
+1. Connecticut (CT) Routes - checked first (earliest morning departure)
+2. VIP Orders - approximately 130 per night
+   - Schools: check thoroughly (wrong/missing cases = fines)
+   - High-priority customers
+
+ACCURACY REQUIREMENTS:
+- Check physical product AND label (label errors occur)
+- Errors cause customer dissatisfaction, returns, fines
+- Checkers are last line of defense before delivery
+
+EFFICIENCY:
+- Loaders depend on checkers to clear pallets quickly
+- Slow checking congests floor and delays entire shift
+
+================================================================================
+LOADING
+================================================================================
+
+Role: Load checked pallets onto trucks in correct sequence
+
+WORKFLOW:
+1. Clock in, go to window for loading sheets
+2. Clerk assigns next available truck door
+3. Verify all pallets for order are present at door
+4. Check route and stop information on labels
+
+LOADING SEQUENCE:
+- Last stops (furthest on route) -> NOSE of truck
+- First stops (earliest on route) -> TAIL of truck (near door)
+- This enables efficient driver unloading
+
+SAFETY AND STABILITY:
+- Pallets several feet tall: MUST strap down in truck
+- Single-layer pallets: no strapping required
+- Rewrap any insecure pallets before loading
+
+EXECUTION:
+1. Use jack to move pallets into truck following stop sequence
+2. Verify all pallets on sheet are loaded
+3. Do NOT mix routes - each truck contains only its assigned deliveries
+4. Return paperwork to clerk when complete
+5. Receive next loading assignment
+
+PERFORMANCE:
+- Paid per pallet loaded
+- Misloads negatively impact pay and company performance
+- Balance speed with precision
+
+FLOOR FLOW:
+- Slow loading congests floor with pallets
+- Staying on schedule keeps workflow smooth for all positions
+
+================================================================================
+HI-LO OPERATION
+================================================================================
+
+Role: Replenish products and retrieve items for pickers
+
+CORE RESPONSIBILITIES:
+1. Operate Hi-Lo safely throughout warehouse
+2. Bring products down from higher slots for pickers
+3. Replenish empty/low slots to maintain stock
+4. Visit clerks regularly for short sheets
+5. Search for "short" items (ghost pallets, misplaced cases)
+6. Find and assign substitutions in system when required
+7. Scan slots and update counts for inventory accuracy
+
+SHORT SHEETS:
+- Lists of items pickers could not find or marked missing
+- Obtained from clerks at window
+- Search for and retrieve these items
+- May be ghost pallets or misplaced cases
+
+EFFICIENCY:
+- Pickers rely on Hi-Lo operators for prompt product retrieval
+- Speed and accuracy affect entire picking team productivity
+- Be proactive and organized to prevent delays
+
+SAFETY (highest priority):
+- Maintain awareness of pedestrians, jacks, other Hi-Lo operators
+- Ensure pallets are secure and stable before lifting/lowering
+- Never exceed capacity limits
+- Never lift unbalanced loads
+- Use proper lighting and visibility checks between aisles
+
+================================================================================
+CLERKS
+================================================================================
+
+Role: Central coordinators of warehouse operations
+
+SHIFT TIMING:
+- One clerk starts 3:00 PM for label prep
+- Others start 4:00 PM or 5:00 PM
+- Minimum 3 clerks at window at all times
+
+SPECIALIZED ROLES:
+
+Weight Entry Clerk:
+- Input weights from pickers into Telnet
+- Weight determines billing - errors cause revenue loss
+- Coordinate with pickers to verify weights
+
+Distribution Clerk:
+- Print and distribute labels/orders to pickers
+- Memorize picker IDs for faster data entry
+- Connect picker IDs to APT for real-time tracking
+- Ensure labels scanned and tracked properly
+
+Label Preparation Clerk:
+- Print labels and split pallet by pallet
+- Match labels to correct orders (prevents mispicks/shorts)
+- Maintain organization for distribution
+
+Workflow Tracking Clerk:
+- Monitor shift progress
+- Update spreadsheet reports
+- Keep shift on pace
+- Coordinate with other clerks
+
+KEY RESPONSIBILITIES:
+- Communicate with pickers and hi-lo operators about shorts
+- Update and verify system data (inventory, weights, orders)
+- Label management: print, split, distribute correctly
+
+BEST PRACTICES:
+- Stagger breaks to maintain 3 clerks at window
+- Double-check label strings before distributing
+- Communicate immediately about shorts/missing items
+- Maintain organized spreadsheets and real-time tracking
+- Memorize picker IDs and routes
+- Verify Telnet weight entries carefully
+
+================================================================================
+SUPERVISORS
+================================================================================
+
+Role: Team leaders responsible for productivity, accuracy, and compliance
+
+ZONE ASSIGNMENT:
+- Each temperature zone (dry, cooler, freezer) has dedicated supervisor
+- Picker/Checker Supervisor oversees picking and checking operations
+
+CORE RESPONSIBILITIES:
+1. Monitor team productivity and provide direction
+2. Catch and address mistakes per company policy
+3. Administer write-ups, suspensions (consult Kudjoe for termination)
+4. Check crew attendance - report missing/late employees to Kudjoe
+   - Note whether employee notified supervisor or not
+5. Inspect break rooms, locker rooms, machine rooms for unauthorized breaks
+6. Assist team with tasks (hi-lo operation, replenishment) when needed
+
+TEAM MANAGEMENT:
+- Communicate expectations, productivity standards, safety
+- Provide feedback so employees understand performance requirements
+- Maintain visible presence on floor for accountability
+
+SAFETY ENFORCEMENT:
+- Enforce all safety protocols
+- Proper equipment use, warehouse traffic awareness, PPE compliance
+- Model proper procedures for employees
+
+BEST PRACTICES:
+- Walk floor constantly to observe activity
+- Address productivity issues promptly and constructively
+- Assist team members to maintain shift speed
+- Monitor attendance and break compliance carefully
+- Communicate with Kudjoe on staffing, performance, incidents
+
+================================================================================
+SWITCHERS
+================================================================================
+
+Role: Move trucks between dock doors and parking lot
+
+CORE RESPONSIBILITIES:
+1. Move trucks into dock doors for loading (per transportation schedule)
+2. Move trucks to parking lot when loading complete
+3. Prioritize EVEN-numbered doors first, then ODD-numbered
+4. Monitor door lights to know when trucks ready to move
+5. Track all truck locations for morning driver access
+6. Memorize truck-to-route assignments (drivers prefer same truck daily)
+
+WORKFLOW:
+- Trucks cannot move until fully loaded and door closed
+- Work continuously outside regardless of weather
+- Keep truck flow smooth to prevent floor congestion
+
+DOOR LIGHT SYSTEM:
+- Light indicates truck fully loaded and ready to move
+- Monitor constantly to keep dock operations flowing
+
+EFFICIENCY:
+- Constant movement prevents floor congestion
+- Efficient truck movement keeps pickers/loaders on schedule
+- Drivers need quick access to assigned trucks in morning
+
+BEST PRACTICES:
+- Follow transportation department door and route sheets
+- Even doors first, then odd doors
+- Monitor dock lights closely
+- Track truck locations and route assignments
+- Communicate with drivers and warehouse staff
+- Remain vigilant in adverse weather
+
+================================================================================
+NIGHTLY VOLUME AND PERFORMANCE
+================================================================================
+
+Cases Processed:     ~95,000 per night
+VIP Orders:          ~130 per night (includes schools)
+CT Routes:           First priority (earliest departure)
+
+Performance directly impacts:
+- Shift end time (3:30 AM - 4:30 AM range)
+- Individual pay and bonuses
+- Customer satisfaction
+- Company efficiency
+
+================================================================================
+DAY OPERATIONS
+================================================================================
+
+QUICK REFERENCE - DEPARTMENT CONTACTS
+--------------------------------------
+Transportation Manager:     Mike Palma
+Schools Supervisor:         Delareese Delgado
+Street Routes Supervisor:   Patrick Brown (alpha routes), Victor Polanco (letter/CT routes)
+Backhauls/Hotshots:         Chun Ng
+Equipment/Reporting:        Bernie
+Inventory Control Lead:     Billy (recalls), Jose (error correction)
+
+QUICK REFERENCE - ROUTE ID PREFIXES
+------------------------------------
+Wayne IDs:    02-98, A-F, H-M, Q, T-U
+PA IDs:       P, R, S, N, O
+NY IDs:       G, W, Y, X, Z
+01:           Pickups/Will Calls (all divisions)
+78:           Holding pattern for unrouted orders
+99:           Pick and stage route (Wayne)
+
+QUICK REFERENCE - TELNET COMMANDS
+----------------------------------
+Reprint live invoice:       2, 25, printer# 3
+Reprint closed invoice:     7, 1, 7, 1, I, invoice#, printer 3
+Find older credits:         7, 5, customer#
+Inventory adjustments:      5, 1, 2, item#, T, X (all), A (adjustments)
+Find errors:                DUG71
+Stock status:               5, 12, item#
+PO history:                 9, 30 or 9, 3
+Picker lookup:              27, 36, 4, date, route#, customer name
+VIP report:                 30, 21, tomorrow's date
+Live mispicks:              276
+
+================================================================================
+RECEIVING
+================================================================================
+
+Role: Accept, verify, label, and document incoming deliveries
+
+WORKFLOW:
+1. Truck arrives, driver places paperwork in dock door bin
+2. Unload all pallets using pallet jack
+3. Line up pallets near assigned dock door
+4. Retrieve PO paperwork, verify case counts against driver's sheet
+5. Note any shortages on PO
+6. Print labels via Telnet for each product
+7. Apply labels to cases (for multi-layer pallets, place labels halfway down to signal break points)
+8. Verify MANU# and product description match before scanning
+9. Scan product into system, enter expiration date
+10. Review PO to confirm all products received
+11. Note shortages, overages, or damages on PO
+12. Sign and date PO (record truck cleanliness, product temp, issues)
+13. Complete same process for Bill of Lading (BOL)
+14. Deliver PO and BOL to front desk (Raul or Josh)
+
+TEMPERATURE CHECKS (Cooler/Freezer):
+- Check and record product temperature using approved instruments
+- Critical for food safety compliance and audits
+
+REFUSAL CRITERIA:
+- Damaged cases
+- Past or near expiration date
+- Spoiled produce
+
+================================================================================
+PUTAWAY
+================================================================================
+
+Role: Transfer received products to storage slots
+
+WORKFLOW:
+1. Receiving stages pallets by temperature zone (Dry, Cooler, Freezer)
+2. Pallet jack operators move pallets to zone staging lanes
+3. Hi-Lo operators slot products based on:
+   - Weight/velocity: Heavy, fast-moving items in lower aisles (A-C)
+   - Light/slow items in higher aisles (Q-S)
+   - Similar items near but NOT adjacent (prevents mispicks)
+   - FIFO rotation: New inventory above/behind older stock
+
+SCANNING PROCESS:
+1. Scan slot barcode
+2. Scan product barcode on pallet
+3. Confirm product and location on screen
+4. Complete transaction
+
+This updates: Inventory levels, slot locations, purchasing/sales visibility
+
+SAFETY:
+- Inspect slots for clearance and stability
+- Labels face outward for identification
+- Double-check slot numbers
+- Report damaged pallets, missing labels, unsafe racking
+
+================================================================================
+REPLENISHMENT
+================================================================================
+
+Role: Keep pick slots stocked for night pickers
+
+Each operator manages 3-4 aisles.
+
+WORKFLOW:
+1. Monitor aisles visually and via WMS system
+2. Red-highlighted slots = below minimum threshold (must replenish)
+3. Pull from reserve inventory (higher rack levels)
+4. Fill to satisfactory level without exceeding max capacity
+5. If no reserves: use Pick Ready Inventory (PRI) when appropriate
+6. Update system via scanner after each replenishment
+
+AISLE MAINTENANCE:
+- Flatten empty pallets for clean appearance
+- Keep floor free of debris
+- Verify product matches slot description
+- Communicate discrepancies to Inventory Control
+
+================================================================================
+INVENTORY CONTROL
+================================================================================
+
+Role: Ensure system quantities match physical stock
+
+DAILY TASKS:
+- Cycle counts for perishables (milk, eggs, bread)
+- Verify and adjust item quantities
+- Identify unscanned products or date entry errors
+- Email shorts/discrepancies to relevant departments
+- Advise zone managers on available slotting space
+- Support night picking with accurate data
+
+TELNET COMMANDS:
+- 5, 12, item# -> QTY O/H, Committed, Physically Available
+- PHY, 22 -> Adjust quantities
+- 9, 30 -> PO history, scan tracking
+- PHY, 29, W, aisle, date -> Velocity report
+- BIN, 01, slot# -> Slot lookup
+- PHY, 1, 01, aisle, A, D (or C, F), A -> Check empty slots
+
+TEAM ROLES:
+- Jose: Reviews and corrects data errors
+- Billy (Lead): Overall accuracy, manages product recalls
+
+YEAR-END:
+- Company-wide cycle count for audits and financial reporting
+
+================================================================================
+UPC COLLECTION
+================================================================================
+
+Role: Link physical products to system via UPC scanning
+
+SCANNING PROCESS:
+1. Obtain scan gun connected to WMS
+2. Go to product slot
+3. Scan slot location
+4. Scan case UPC
+5. Open case if needed, scan individual piece
+6. Confirm system updates correctly
+
+COMMON ISSUES:
+- Products not scanned during receiving/putaway
+- Incorrect or outdated UPCs
+- Mismatched item descriptions
+- Broken/unreadable barcodes
+
+RESOLUTION:
+- Rescan and update proper information
+- Communicate recurring issues to Inventory Control
+
+================================================================================
+ROUTING
+================================================================================
+
+Role: Create delivery routes for all customer orders
+
+Systems: RNA (RoadNet Anywhere), DispatchTrack
+Volume: ~2,000 customers per day
+
+SCHOOL ROUTING (5 days in advance):
+1. Telnet: 21, 1, date (5 days ahead)
+2. Double-click "Send Orders to RoadNet" on desktop
+3. In Telnet: Create Route, drag routing day to box
+4. Build routes in RNA
+
+STREET ROUTING (daily at 5:15 PM):
+- Same process, occurs after 5:00 PM order cutoff
+- Up to 12 stops per route
+- Prioritize higher-graded customers (A+, A, A-, B+, etc.)
+
+BUILDING ROUTES IN RNA:
+1. Click "Create New Route"
+2. Label by zone (Bronx Schools, Manhattan Schools, etc.)
+3. Divide total cube by 600 = number of trucks needed
+4. Drag stops into routes in horseshoe pattern
+5. Review arrival/departure times and customer notes
+6. Assign drivers
+7. Check helper box for school routes
+
+ROUTE LIMITS (straight trucks):
+- Max case cube: 600
+- Max stops: 10 (schools), 12 (streets)
+
+DISPATCHTRACK ROUTING:
+1. Telnet: 35, 1, date
+2. Double-click "Send to DispatchTrack"
+3. Rename file ORDERS.R to ORDERS1.CSV
+4. Import in DispatchTrack, build routes
+5. Save routes manually (no auto-save)
+
+ZONES:
+01=Long Island, 02=Queens, 03=Brooklyn, 04=Bronx, 05=Westchester, 06=Dutchess, 10=Jails
+
+BACKHAULS:
+- Every truck should leave full, return full
+- Chun schedules backhaul pickups
+- View in Telnet: 9, 3, PO#
+
+================================================================================
+DISPATCHING
+================================================================================
+
+Role: Prepare routes and process drivers at shift start
+
+Shift starts: ~2:00 AM
+
+SETUP:
+1. Organize invoices, stop paperwork, loading sheets
+2. Mark route IDs on documents
+3. Retrieve keydrop keys from key wall (AA-ZZ, 01-99 order)
+
+EARLY DRIVERS (3:00-4:00 AM):
+- Distribute paperwork
+- Assign helpers if needed
+- Provide e-jack batteries
+- Track on Dispatch Sheet
+
+MAIN RUSH (4:00-5:30 AM):
+- Work one driver at a time to avoid mistakes
+- Distribute paperwork with keydrop forms
+- Manage available drivers without routes
+
+EQUIPMENT:
+- Distribute correctly labeled e-jack batteries
+- Drivers collect personal handtrucks
+- Track battery distribution for end-of-day accounting
+
+OMNITRACS:
+- Enter truck numbers for each route
+- Accuracy critical for tracking and compliance
+
+HELPERS:
+- Assign based on stop count, case volume, route difficulty
+- Available drivers without routes become helpers
+
+END OF SETUP:
+- Review Dispatch Sheet for accuracy
+- Send to transportation leadership
+
+================================================================================
+DRIVERS
+================================================================================
+
+DRIVER TYPES:
+- Street Drivers: NYC and surrounding areas
+- School Drivers: Strict schedules, fines for errors ($500/case)
+- Helper Drivers: Assist with loading/unloading
+- Tractor-Trailer Drivers: Long-haul, transfers, backhauls (CDL A required)
+
+SHIFT TIMES:
+- Street (NYC): Manhattan 3:00 AM, others 5:00 AM
+- School: 2:30-3:00 AM
+- End when all deliveries, backhauls, paperwork complete
+
+PRE-ROUTE:
+1. Clock in at waiting area
+2. Obtain documents from dispatcher (loading sheets, invoices, keydrop forms, keys, batteries)
+3. Review loading report (cases per stop, temp zones, special instructions)
+4. Verify truck/trailer and route ID in Omnitracs
+5. Inspect vehicle and equipment
+6. Confirm DOT hours available
+
+LOADING TRUCK:
+- Last stops -> nose of truck
+- First stops -> tail (near door)
+- Separate refrigerated, frozen, dry
+- Strap tall pallets
+- Helper takes refrigerated/frozen, driver takes dry
+
+DELIVERY:
+- Verify labels AND case product names
+- Mark delivered items on invoice front sheet
+- Keydrop: follow codes, lock doors, photograph for proof
+- Follow time windows
+
+SCHOOL DELIVERIES:
+- Must complete by 2:00 PM deadline
+- $500 fine per missing case
+- Verify with staff, mark invoices
+
+END OF SHIFT:
+1. Return to warehouse
+2. Park at designated door
+3. Return equipment (handtrucks, batteries, straps, blankets)
+4. Complete paperwork (undelivered cases, damages, mispicks)
+5. Clock out
+
+SAFETY:
+- DOT hours of service, rest breaks, ELD logging
+- Seatbelts, traffic laws, defensive driving
+- Netradyne cameras monitor behavior (speeding, hard braking, drowsiness)
+
+================================================================================
+DRIVER CHECK-IN
+================================================================================
+
+Role: Process returning drivers, collect documentation and returns
+
+RESPONSIBILITIES:
+1. Bring every truck in as drivers return
+2. Ensure drivers clean truck backs
+3. Remove and organize pallets
+4. Collect paperwork (invoices, Driver Return Forms, Pickup Forms)
+5. Verify returned cases match stated reasons
+6. Sort returns by zone:
+   - Behind team: Refused cases
+   - Left side: Meat, poultry, fish, eggs, produce
+   - Front: Vendor returns and customer pickups
+7. Track trucks in/out
+8. Deliver invoices to Invoice Cleaning when cart full
+9. Stack pallets uniformly (13 high) for night shift
+10. Place straps/blankets in proper containers
+
+DRIVER RETURN FORM FIELDS:
+- Driver name, Route#, Helper name, Straps/blanket count, Signature
+- Returned cases: Customer, Order#, Item description, Item#, Reason code
+
+FORM COLORS:
+- Green = School drivers
+- White = All others
+
+RETURN REASON CODES:
+1 = Mispick
+2 = Short on Load
+3 = Short/Found on Truck
+4 = Sales Error
+5 = Product Quality/Temperature Issue
+6 = Product/Case Damaged
+7 = NYC DOE Refused (Schools only)
+8 = Product Over
+
+CUSTOMER PICK-UP REPORT:
+- Review and mark off daily
+- Confirms pickup requests fulfilled
+- Prevents missed credits
+
+END OF DAY:
+- Remain until transportation clears all drivers
+- All pallets, equipment, paperwork accounted for
+
+================================================================================
+TRANSPORTATION
+================================================================================
+
+Role: Ensure drivers complete deliveries safely and on time
+
+TEAM:
+- Mike Palma: Manager
+- Delareese Delgado: Schools (deliveries by 2 PM)
+- Patrick Brown: Alpha route IDs
+- Victor Polanco: Letter IDs, CT routes, trucks, fuel, cameras, safety
+- Chun Ng: Backhauls, hotshots
+- Bernie: Equipment tracking, reporting
+
+DAILY WORKFLOW:
+
+Start (2:00 AM):
+- Organize invoices, loading sheets, route documents
+- Assign drivers to routes
+- Verify route IDs, keydrop docs, e-jack batteries
+- Track equipment
+
+Driver Monitoring:
+- Track via IntelliShift
+- Log remaining stops at 10 AM, 12 PM, 2 PM, 4 PM
+- School deliveries must complete by 2 PM
+- Redistribute stops if driver falling behind
+
+Issue Handling:
+- Breakdowns: Contact Allegiance or Penske, use in-house mechanics if possible
+- Report truck issues in Telnet: 30, 18, date, route ID, E, 100, message, driver, location, follow, 1, enter
+- Customer issues: Merge calls with sales, resolve errors, verify keydrops
+- Safety: Monitor Netradyne for speeding, hard braking, drowsiness, distracted driving
+
+SYSTEMS:
+- IntelliShift: Truck location, driver, stops, completion
+- Netradyne: Driving behavior monitoring
+- Telnet: Log issues, communicate internally
+
+================================================================================
+INVOICE CLEANING
+================================================================================
+
+Role: Process, release, and archive invoices from all warehouses
+
+TEAM:
+- Sandra: Street accounts, Stroudsburg
+- Mikayla: Street accounts, Stroudsburg
+- Alexa: Scans invoices, daily sales report
+- Corinna: Remaining invoices, Customer Pick-Up Report
+
+DAILY TIMELINE:
+- 9:00-10:00 AM: Alexa completes Sales Report
+- 10:30-11:00 AM: Other warehouses send invoices via Revver
+- 11:00 AM-3:00 PM: Process previous day's invoices
+- Morning priority: Transfer invoices first
+- ~3:00 PM: Complete daily work, prep for next day
+
+SYSTEMS:
+- Revver: Receives invoices from non-Wayne warehouses
+- Telnet: Releasing, deleting, printing barcodes
+- UnForm Archive: Stores released invoices, displays credits
+
+TRANSFER INVOICES (process first):
+1. Telnet: S, X, 'transfer'
+2. Delete: 2, 2, Order#, Password: del69
+3. Save barcodes for 1 week
+
+SAME-DAY RELEASE GROUPS:
+- Einstein Bagels: S, Z, E+
+- Massachusetts: S, Z, MA
+- Harvest Group: S, Z, C*7
+- Sage: S, Z, =W
+- Williams College: S, Z, W
+
+RELEASING TO ARCHIVE:
+1. Telnet: 14, 3, INV, Enter, Enter, Date
+2. Alexa scans barcodes to UnForm Archive
+3. Credits created from archived documentation
+
+PRINTING BARCODES:
+- Telnet: 14, 5, M (or printer#)
+
+DELETING FROM TELNET:
+- Telnet: 14, 6, Y, Printer#, Y, Enter
+
+CUSTOMER PICK-UP REPORT:
+- Corinna creates daily
+- Shows items for driver pickup
+- Confirms requests fulfilled
+
+================================================================================
+DRIVER HOTLINE & OPERATIONS SUPPORT
+================================================================================
+
+Role: Central communication hub between drivers, ops, inventory, sales, credit
+
+EMAIL: Driver Hotline inbox
+
+RESPONSIBILITIES:
+- Monitor inbox continuously
+- Forward to appropriate department (Sales, Inventory, Transportation, Credit)
+- Log weight changes, wait times, credits
+- Generate VIP reports daily at 5 PM
+
+WEIGHT CHANGES (Telnet):
+1. Change weight: 2, 3, order#, C, update weight
+2. Reprint invoice: 2, 25, M, order#, printer#
+
+CREDITS ENTRY (Telnet):
+- General: 8, DRIS, 1, operator ID, customer#, invoice#
+- Weight credits: Start with "X"
+- Expired invoices (15+ months): Use X in invoice field, item 444444
+
+VIP REPORT:
+1. Telnet: 30, 21, tomorrow's date
+2. Copy to VIP template, remove duplicates
+3. Include CAR requests, New Customer Alerts, Special Requests
+4. Send to night clerks by 5 PM
+
+PICKER LOOKUP:
+- Telnet: 27, 36, 4, date, route#, customer name
+
+DRIVER WAIT TIME:
+- Log in spreadsheet: Route ID, Driver, Stop, Wait time
+- Verify via IntelliShift
+- Send to Samantha Cuesta for payment approval
+
+OPS ERRORS HANDLING:
+1. Mispick: Forward to Inventory Control, ask to check slot
+2. If slotted correctly: "Product slotted correctly. This was a mispick."
+3. If slotted incorrectly: "Items slotted incorrectly, it has since been fixed."
+4. Damage/Quality/Expiration: Forward to Inventory Control and Produce (if applicable)
+
+SHORTS INVESTIGATION:
+1. Check Lucas/Lucas pick report for item confirmation
+2. Check Driver Return Forms (V:\Route Return sheets)
+3. Check invoice archive for check-off and signature
+4. Report findings to sales rep with screenshots
+
+================================================================================
+OPS ADMIN - DAILY REPORT SCHEDULE
+================================================================================
+
+DAILY (all days):
+- APT Report
+- Lucas Picks
+- VIP Check
+- Loader Report
+- Daily Ops Stats
+- Catch weight changes
+- Device tracker
+- Shorts & Mispicks (J&I, DSM, checker errors)
+- Lucas Batch not called in (excluding NY/PA)
+- Lucas No PIR 3 above
+- Checker Report
+- APT Selector batch start/end time
+
+MONDAY ADDITIONS:
+- APT Report (Friday, Sunday, Weekly)
+- Lucas Picks (Saturday, Monday)
+- Loader Report (Friday Old, Sunday New, Weekly)
+- Mena Inventory (3:00 PM)
+
+TUESDAY ADDITIONS:
+- Bids Credits
+
+WEDNESDAY ADDITIONS:
+- Selector Progression Chart
+- Night KPIs (1:00 PM)
+- Transportation KPI (1:00 PM)
+
+THURSDAY ADDITIONS:
+- Driver Overview
+- Weekly Ops Performance by Division
+
+APT REPORT PROCESS:
+1. APT by agent folder > Login > Reports > Department Reports > Associate Summary
+2. Sort by Percent Performance, select date, Payroll-Actual, Hours format
+3. Export to Excel, convert to numbers
+4. Paste into APT template (O:\Ops\Night reports\APT Daily and Weekly\2025)
+5. Email to Night Ops, CC supervisors
+
+LUCAS PICKS PROCESS:
+1. Open Lucas > Picklines > Filter by ship date
+2. Export Excel, copy to layout template
+3. Use CONCAT formula for columns D, E, F
+4. Format Column S as numbers (0 decimals)
+5. Save and email to Transportation
+
+VIP REPORT PROCESS:
+1. Start ~5 PM, Telnet: 30, 21, tomorrow's date
+2. Open VIP + Audits template
+3. Add VIP Alert, VIP Orders, CAR requests, New Customer Alerts
+4. Email with PDF and attachments to night clerks
+
+CATCH WEIGHT UPDATES:
+1. James sends catch weight report
+2. Update weights in Telnet
+3. Check Lucas for individual case weights if needed
+4. Print updated invoice, send to sales rep for customer
+
+================================================================================
+OPS ADMIN - TELNET QUICK REFERENCE
+================================================================================
+
+Reprint live invoice:           2, 25, printer 3
+Reprint closed invoice:         7, 1, 7, 1, I, invoice#, printer 3
+Find older credits:             7, 5, customer#
+Inventory adjustments:          5, 1, 2, item#, T, X, A
+Find errors:                    DUG71
+Item lookup:                    51, item#
+Customer salesperson:           31, customer#
+Shorts by reason:               DUG71VDT, X
+Inbound cases/pallets:          DUG14, warehouse 01
+Outbound cases/routes:          DUG16
+
+================================================================================
+END OF WAREHOUSE MANUAL
+================================================================================
+
+============================================================
+END OF COMPLETE MANUAL SET
+============================================================

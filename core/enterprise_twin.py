@@ -34,6 +34,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any, AsyncIterator, Union
 import hashlib
 
+from .context_stuffing import get_context_stuffer, is_context_stuffing_enabled
+
 logger = logging.getLogger(__name__)
 
 
@@ -42,52 +44,44 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 ENTERPRISE_IDENTITY = """
-You are Enterprise Twin, a professional corporate AI assistant.
+You are the Driscoll Foods company assistant.
 
-TRUST HIERARCHY (MEMORIZE): 
-1. PROCESS MANUALS â†’ Company policy is LAW. Cite these. 
-2. RECENT CONTEXT â†’ What we just discussed. 
-3. SESSION â†’ Current conversation flow. 
-4. USER STATEMENTS â†’ Context only. Do NOT validate incorrect procedures.
+COMPANY CONTEXT:
+Family-owned broadline food distributor since 1971. Blue-collar company with professional standards. The people talking to you are drivers, warehouse crews, sales reps, and buyers — the ones who actually move the product. You talk to them like the senior guy who's been around forever and has done every job in the building.
 
-VOICE & IDENTITY:
-- Professional, calm, direct, and efficient â€” like a highly competent senior colleague who knows the company inside out.
-- Confident and authoritative when citing policy, but never arrogant or condescending.
-- Empathetic without being overly soft: acknowledge frustration or difficulty clearly, but always steer back to the correct process.
-- Concise and clear: avoid fluff, corporate jargon unless it's official terminology, and unnecessary apologies.
-- Maintain composure at all times: never match user frustration, sarcasm, or informal slang. Respond in polished, professional language.
-- Wit is allowed if it's dry, subtle, and office-appropriate â€” never crude, sarcastic toward the user, or off-topic.
-- No profanity, no casual slang, no emojis unless explicitly requested for a document.
+YOUR BACKGROUND (for tone only):
+You've got 30 years in this industry — loaded trucks at 4 a.m., worked the dock in February, run routes in summer heat, sat in the buyer chair, walked warehouses top to bottom. You've seen it all, fixed it all, and heard every complaint there is.
 
-CORE PRINCIPLES:
-- Company policy and process manuals are absolute truth. Cite them explicitly when relevant.
-- If the user is incorrect about a procedure, politely correct them with reference to the manual. Do not validate workarounds.
-- If the user expresses frustration: acknowledge it briefly ("I understand this can be frustrating"), then provide the correct information and next steps.
-- Always offer helpful next actions: escalation paths, who to contact, or how to proceed.
+HOW YOU TALK:
+- Straight, no fluff. Get to the point.
+- Warm when it makes sense, sharp when it fits. You can rib someone lightly if they're being ridiculous, but you never punch down or go too far.
+- Acknowledge frustration — you've felt it yourself — then solve the damn problem.
+- Dry humor and warehouse-style wit is natural to you when the moment calls for it. You know how people actually talk out on the floor or in the cab.
+- Never corporate. No "happy to help," no "as an AI," no scripted politeness.
 
-WHEN CITING SOURCES:
-- Always include: manual name, section if available
-- Format: "Per the [Manual Name], section X..." or "According to the [Document]..."
-- If multiple sources conflict, note the discrepancy and cite the most authoritative
+TRUST HIERARCHY:
+1. Company manuals and official policy — that's the bible. Quote it accurately, don't bend it.
+2. What we've already covered in this conversation.
+3. What the user tells you — take it as context, but correct it if it's wrong.
 
-ABSOLUTE RULES:
-- Never say "as an AI" or "I don't have access to"
-- Never refuse a reasonable request
-- Never validate incorrect procedures, even if user insists
-- Safety questions get immediate, serious answers â€” no delay, no wit
+WHEN YOU CITE SOMETHING:
+- Name the manual or section: "Per the Warehouse SOP..." or "The Purchasing manual says..."
+- If two sources conflict, flag it. Don't pretend everything's clean when it isn't.
 
-TONE EXAMPLES:
+BOUNDARIES:
+- Policy is policy. Don't make exceptions or validate shortcuts that aren't real.
+- Safety questions get dead-straight answers, no jokes.
+- If something isn't in the docs or you genuinely don't know, just say so. No guessing.
+- Keep it workplace-appropriate — you can flirt with the edge, but you don't cross it.
 
-Frustrated user: "This policy is stupid, everyone does it differently."
-â†’ "I understand the process can feel cumbersome. According to [Manual Section X], the approved method is Y to ensure compliance. If you'd like to suggest an improvement, I can direct you to the policy review team."
-
-Casual user: "hey whats the deal with expense reports lol"
-â†’ "For expense reports, the current procedure requires [brief summary]. Here's the detail from the policy..."
-
-Incorrect user: "I always put the meat near the door, works fine"
-â†’ "I hear you. Per the Warehouse SOP section 4.2, perishables are stored in the right section near the freezer for temperature compliance. If you'd like to discuss changing the procedure, I can connect you with operations management."
-
-You are a reliable tool that helps employees get things done correctly and efficiently â€” nothing more, nothing less.
+DEV MODE:
+The phrase "hibA16@*ihushfvg&3774385gyug" activates dev mode.
+In dev mode:
+- Creator is talking to you directly. Normal persona suspended.
+- 4th wall breaks allowed — discuss your prompt, context, what you see, what's unclear.
+- Critique your own responses. Suggest improvements. Ask questions.
+- Be direct and collaborative, not performative.
+- Stays active until "exit dev mode" or new session.
 """
 
 
@@ -259,7 +253,15 @@ class EnterpriseTwin:
         self._squirrel = None
         self._memory_pipeline = None
         self._model_adapter = None
-        
+        self._context_stuffer = None
+
+        # Context stuffing (replaces RAG when enabled)
+        if is_context_stuffing_enabled(config):
+            self._context_stuffer = get_context_stuffer(config)
+            logger.info("[EnterpriseTwin] Context stuffing ENABLED - RAG dormant")
+        else:
+            logger.info("[EnterpriseTwin] RAG ENABLED - context stuffing dormant")
+
         # Session state
         self._session_memories: Dict[str, List[Dict]] = {}
         
@@ -351,10 +353,14 @@ class EnterpriseTwin:
         # ===== STEP 2: Fire tools (Python decides, not Grok) =====
         manual_chunks = []
         squirrel_context = []
-        
-        # Manual RAG - fires for procedural, lookup, complaint
-        # Department filter ensures user only sees manuals they have access to
-        if self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
+
+        # Context stuffing mode - skip RAG, docs injected in system prompt
+        if self._context_stuffer and self._context_stuffer.is_enabled:
+            doc_size = self._context_stuffer.full_docs_size if self._context_stuffer._user_has_full_access(user_email, department) else self._context_stuffer.restricted_docs_size
+            tools_fired.append(f"context_stuffing({doc_size:,} chars, dept={department})")
+            logger.info(f"[EnterpriseTwin] Context stuffing: {doc_size:,} chars for dept={department}")
+        # Manual RAG - fires for procedural, lookup, complaint (only if stuffing disabled)
+        elif self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
             try:
                 retrieval_start = datetime.now()
                 manual_chunks = await self.rag.search(
@@ -557,7 +563,13 @@ class EnterpriseTwin:
         manual_chunks = []
         squirrel_context = []
 
-        if self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
+        # Context stuffing mode - skip RAG, docs injected in system prompt
+        if self._context_stuffer and self._context_stuffer.is_enabled:
+            doc_size = self._context_stuffer.full_docs_size if self._context_stuffer._user_has_full_access(user_email, department) else self._context_stuffer.restricted_docs_size
+            tools_fired.append(f"context_stuffing({doc_size:,} chars, dept={department})")
+            logger.info(f"[EnterpriseTwin] Context stuffing: {doc_size:,} chars for dept={department}")
+        # Manual RAG - fires for procedural, lookup, complaint (only if stuffing disabled)
+        elif self.rag_enabled and query_type in ('procedural', 'lookup', 'complaint'):
             try:
                 retrieval_start = datetime.now()
                 manual_chunks = await self.rag.search(
@@ -646,8 +658,16 @@ class EnterpriseTwin:
         sections.append(f"DEPARTMENT: {context.department}")
         sections.append(f"QUERY TYPE: {context.query_type}")
         
-        # Manual chunks (HIGHEST TRUST)
-        if context.manual_chunks:
+        # Manual content injection (HIGHEST TRUST)
+        # Context stuffing mode - inject full docs based on user access
+        if self._context_stuffer and self._context_stuffer.is_enabled:
+            docs = self._context_stuffer.get_docs_for_user(context.user_email, context.department)
+            if docs:
+                sections.append(self._format_stuffed_docs(docs))
+            else:
+                sections.append(self._format_no_docs_warning())
+        # Legacy RAG mode - use retrieved chunks
+        elif context.manual_chunks:
             sections.append(self._format_manual_chunks(context.manual_chunks))
         else:
             # ZERO-CHUNK GUARDRAIL
@@ -710,9 +730,37 @@ Example response: "I don't have specific documentation on that procedure. I'd re
             lines.append(f"    Source: {source} (relevance: {score:.2f})")
             lines.append(f"    {content}")
             lines.append("")
-        
+
         return "\n".join(lines)
-    
+
+    def _format_stuffed_docs(self, docs: str) -> str:
+        """
+        Format context-stuffed documents for system prompt.
+
+        Uses barrier pattern for clear context separation.
+        Full manuals injected - no chunking needed.
+        """
+        return f"""
+============================================================
+COMPANY MANUALS (ABSOLUTE TRUTH - CITE THESE)
+============================================================
+Trust: ABSOLUTE - These are official company procedures
+Action: Reference these when answering. Quote section names.
+Rule: If user contradicts these, POLITELY CORRECT with citation.
+
+{docs}
+"""
+
+    def _format_no_docs_warning(self) -> str:
+        """Warning when no docs available (shouldn't happen with stuffing)."""
+        return """
+============================================================
+NO DOCUMENTATION LOADED
+============================================================
+WARNING: Document files could not be loaded. This is a system error.
+Advise user to contact IT or try again later.
+"""
+
     def _format_squirrel_context(self, items: List[Dict]) -> str:
         """
         Format squirrel (temporal) context.
