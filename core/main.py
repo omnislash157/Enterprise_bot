@@ -1179,6 +1179,18 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     # Track query start time for analytics
                     query_start_time = time.perf_counter()
 
+                    # Start trace for observability
+                    from core.tracing import TraceContext, trace_collector
+                    trace_ctx = TraceContext(
+                        trace_id=request_id + uuid.uuid4().hex[:24],  # Combine request_id + random for trace
+                        entry_point='websocket',
+                        endpoint='/ws/message',
+                        method='WS',
+                        session_id=session_id,
+                        user_email=user_email,
+                        department=effective_division,
+                    )
+
                     # SECURITY: Honeypot detection
                     if message_division and message_division.lower() in HONEYPOT_DIVISIONS:
                         logger.critical(f"[HONEYPOT] [{request_id}] User {user_email} (IP: {client_ip}) attempted access to honeypot division: {message_division}")
@@ -1306,6 +1318,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             logger.info(f"[ANALYTICS] Query logged: {query_id}")
                         except Exception as ae:
                             logger.warning(f"[ANALYTICS] Failed to log query: {ae}")
+
+                    # Complete and log trace
+                    trace_ctx.finish()
+                    await trace_collector.add_trace(trace_ctx)
 
                 else:
                     # CogTwin: streams AsyncIterator[str]

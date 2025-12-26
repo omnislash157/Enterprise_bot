@@ -128,9 +128,32 @@ class DatabaseLogHandler(logging.Handler):
     def _flush_loop(self):
         """Background thread that flushes logs to database."""
         import asyncio
+        import asyncpg
+        import os
 
+        # Create a NEW connection pool for this thread's event loop
+        # (asyncpg pools are bound to their creating event loop)
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
+
+        # Build connection string from environment
+        db_url = os.environ.get('DATABASE_URL') or os.environ.get('AZURE_PG_CONNECTION_STRING')
+        if not db_url:
+            host = os.environ.get('AZURE_PG_HOST', 'localhost')
+            port = os.environ.get('AZURE_PG_PORT', '5432')
+            user = os.environ.get('AZURE_PG_USER', 'postgres')
+            password = os.environ.get('AZURE_PG_PASSWORD', '')
+            database = os.environ.get('AZURE_PG_DATABASE', 'postgres')
+            sslmode = os.environ.get('AZURE_PG_SSLMODE', 'prefer')
+            db_url = f"postgresql://{user}:{password}@{host}:{port}/{database}?sslmode={sslmode}"
+
+        # Create dedicated pool for logging thread
+        thread_pool = None
+        try:
+            thread_pool = loop.run_until_complete(asyncpg.create_pool(db_url, min_size=1, max_size=2))
+            print("[StructuredLogging] Thread pool created successfully")
+        except Exception as e:
+            print(f"[StructuredLogging] Failed to create thread pool: {e}")
 
         while self._running:
             try:
@@ -142,8 +165,8 @@ class DatabaseLogHandler(logging.Handler):
                     except:
                         break
 
-                if records and self._db_pool:
-                    loop.run_until_complete(self._write_records(records))
+                if records and thread_pool:
+                    loop.run_until_complete(self._write_records_with_pool(records, thread_pool))
 
                 # Sleep between flushes
                 import time
@@ -152,10 +175,20 @@ class DatabaseLogHandler(logging.Handler):
             except Exception as e:
                 print(f"[StructuredLogging] Flush error: {e}")
 
+        # Cleanup
+        if thread_pool:
+            loop.run_until_complete(thread_pool.close())
+
     async def _write_records(self, records: List[LogRecord]):
-        """Write log records to database."""
+        """Write log records to database (uses main pool - deprecated)."""
+        await self._write_records_with_pool(records, self._db_pool)
+
+    async def _write_records_with_pool(self, records: List[LogRecord], pool):
+        """Write log records to database using specified pool."""
+        if not pool:
+            return
         try:
-            async with self._db_pool.acquire() as conn:
+            async with pool.acquire() as conn:
                 await conn.executemany("""
                     INSERT INTO enterprise.structured_logs
                     (timestamp, level, logger_name, message, trace_id, span_id,
