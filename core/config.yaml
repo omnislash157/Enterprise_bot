@@ -25,12 +25,18 @@ tenant:
 # FEATURE FLAGS - THE MASTER SWITCHES
 # =============================================================================
 features:
-  # ENTERPRISE RAG - Vector search over process manuals
-  # DISABLED - Using context stuffing instead for Grok 2M window
-  enterprise_rag:
-    enabled: false           # KILL SWITCH - RAG dormant
-    threshold: 0.6           # Return EVERYTHING above this score
-    # NOTE: No top_k - threshold-only retrieval by design
+  # ==========================================================================
+  # ENTERPRISE RAG - REMOVED
+  # ==========================================================================
+  # RAG has been replaced by context stuffing for Grok's 2M token window.
+  # The RAG infrastructure (smart_tagger.py, smart_retrieval.py, embedder.py)
+  # remains in the codebase but is dormant.
+  # Database schema (enterprise.documents) is preserved but not used.
+  #
+  # enterprise_rag:
+  #   enabled: false
+  #   threshold: 0.6
+  # ==========================================================================
 
   # CONTEXT STUFFING - Full manual injection (replaces RAG)
   # Takes advantage of Grok's 2M token context window

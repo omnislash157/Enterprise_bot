@@ -98,13 +98,14 @@ class MetricsCollector:
         self.request_counts: Dict[str, int] = {}
         self.request_errors: Dict[str, int] = {}
 
-        # RAG metrics
-        self.rag_latency = RingBuffer(maxlen=500)
-        self.rag_embedding_latency = RingBuffer(maxlen=500)
-        self.rag_search_latency = RingBuffer(maxlen=500)
-        self.rag_chunks = RingBuffer(maxlen=500)
-        self.rag_total = 0
-        self.rag_zero_chunks = 0
+        # RAG metrics - DISABLED (RAG removed, using context stuffing)
+        # Kept for backwards compatibility but not actively used
+        # self.rag_latency = RingBuffer(maxlen=500)
+        # self.rag_embedding_latency = RingBuffer(maxlen=500)
+        # self.rag_search_latency = RingBuffer(maxlen=500)
+        # self.rag_chunks = RingBuffer(maxlen=500)
+        # self.rag_total = 0
+        # self.rag_zero_chunks = 0
 
         # Cache metrics (counters)
         self.cache_hits = 0
@@ -164,35 +165,35 @@ class MetricsCollector:
             if error:
                 self.request_errors[endpoint] += 1
 
-    def record_rag_query(
-        self,
-        total_ms: float,
-        embedding_ms: float = 0,
-        search_ms: float = 0,
-        chunks: int = 0,
-        cache_hit: bool = False,
-        embedding_cache_hit: bool = False
-    ):
-        """Record RAG pipeline metrics."""
-        with self._lock:
-            self.rag_latency.append(total_ms)
-            self.rag_embedding_latency.append(embedding_ms)
-            self.rag_search_latency.append(search_ms)
-            self.rag_chunks.append(chunks)
-            self.rag_total += 1
-
-            if chunks == 0:
-                self.rag_zero_chunks += 1
-
-            if cache_hit:
-                self.cache_hits += 1
-            else:
-                self.cache_misses += 1
-
-            if embedding_cache_hit:
-                self.embedding_cache_hits += 1
-            else:
-                self.embedding_cache_misses += 1
+    # def record_rag_query(
+    #     self,
+    #     total_ms: float,
+    #     embedding_ms: float = 0,
+    #     search_ms: float = 0,
+    #     chunks: int = 0,
+    #     cache_hit: bool = False,
+    #     embedding_cache_hit: bool = False
+    # ):
+    #     """Record RAG pipeline metrics - DISABLED (RAG removed)."""
+    #     with self._lock:
+    #         self.rag_latency.append(total_ms)
+    #         self.rag_embedding_latency.append(embedding_ms)
+    #         self.rag_search_latency.append(search_ms)
+    #         self.rag_chunks.append(chunks)
+    #         self.rag_total += 1
+    #
+    #         if chunks == 0:
+    #             self.rag_zero_chunks += 1
+    #
+    #         if cache_hit:
+    #             self.cache_hits += 1
+    #         else:
+    #             self.cache_misses += 1
+    #
+    #         if embedding_cache_hit:
+    #             self.embedding_cache_hits += 1
+    #         else:
+    #             self.embedding_cache_misses += 1
 
     def record_llm_call(
         self,
@@ -271,15 +272,16 @@ class MetricsCollector:
                 'messages_out': self.ws_messages_out,
             },
 
-            'rag': {
-                'total_queries': self.rag_total,
-                'latency_avg_ms': round(self.rag_latency.avg(), 1),
-                'latency_p95_ms': round(self.rag_latency.percentile(0.95), 1),
-                'embedding_avg_ms': round(self.rag_embedding_latency.avg(), 1),
-                'search_avg_ms': round(self.rag_search_latency.avg(), 1),
-                'avg_chunks': round(self.rag_chunks.avg(), 1),
-                'zero_chunk_rate': round(self.rag_zero_chunks / self.rag_total * 100, 1) if self.rag_total > 0 else 0,
-            },
+            # RAG metrics removed - using context stuffing instead
+            # 'rag': {
+            #     'total_queries': self.rag_total,
+            #     'latency_avg_ms': round(self.rag_latency.avg(), 1),
+            #     'latency_p95_ms': round(self.rag_latency.percentile(0.95), 1),
+            #     'embedding_avg_ms': round(self.rag_embedding_latency.avg(), 1),
+            #     'search_avg_ms': round(self.rag_search_latency.avg(), 1),
+            #     'avg_chunks': round(self.rag_chunks.avg(), 1),
+            #     'zero_chunk_rate': round(self.rag_zero_chunks / self.rag_total * 100, 1) if self.rag_total > 0 else 0,
+            # },
 
             'cache': {
                 'rag_hit_rate': round(cache_hit_rate, 1),
