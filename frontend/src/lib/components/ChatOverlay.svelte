@@ -197,14 +197,14 @@
 					.trim();
 				if (cleanText) {
 					const lang = $userLanguage;
-					queueSentenceAudio(cleanText, () => {
-						voiceSyncedText += remainingText;
-					}, lang);
+					// Don't update voiceSyncedText - message is already committed to $session.messages
+					queueSentenceAudio(cleanText, undefined, lang);
 				}
 			}
 			// Reset for next message
 			sentenceBuffer = '';
 			previousStreamLength = 0;
+			voiceSyncedText = '';  // Clear synced text since message is now committed
 		}
 		wasStreaming = $session.isStreaming;
 	}
@@ -451,7 +451,7 @@
 						<div class="cheeky-thinking">
 							<CheekyLoader category={cheekyCategory} spinnerType="food" size="sm" />
 						</div>
-					{:else if $session.currentStream || (voiceMode && voiceSyncedText)}
+					{:else if $session.isStreaming && ($session.currentStream || (voiceMode && voiceSyncedText))}
 							<div class="message assistant streaming">
 								<div class="message-content">
 									{#if voiceMode}
