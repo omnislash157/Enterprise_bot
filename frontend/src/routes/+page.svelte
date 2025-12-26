@@ -6,7 +6,7 @@
 	import ChatOverlay from '$lib/components/ChatOverlay.svelte';
 	import Scene from '$lib/threlte/Scene.svelte';
 	import CoreBrain from '$lib/threlte/CoreBrain.svelte';
-	import AmbientStream from '$lib/threlte/AmbientStream.svelte';
+	import AmbientStream from '$lib/threlte/Ambientstream.svelte';
 	import { get } from 'svelte/store';
 
 	// Persist sessionId across navigations within the same browser tab
