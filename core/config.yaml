@@ -26,10 +26,21 @@ tenant:
 # =============================================================================
 features:
   # ENTERPRISE RAG - Vector search over process manuals
+  # DISABLED - Using context stuffing instead for Grok 2M window
   enterprise_rag:
-    enabled: true
+    enabled: false           # KILL SWITCH - RAG dormant
     threshold: 0.6           # Return EVERYTHING above this score
     # NOTE: No top_k - threshold-only retrieval by design
+
+  # CONTEXT STUFFING - Full manual injection (replaces RAG)
+  # Takes advantage of Grok's 2M token context window
+  context_stuffing:
+    enabled: true
+    doc_path: "./docs/driscoll"
+    full_access_file: "all_manuals.txt"      # ~14.5k tokens (Sales+Purchasing+Warehouse)
+    restricted_file: "sales_warehouse.txt"    # ~12k tokens (no purchasing)
+    full_access_departments: ["purchasing"]   # These depts see ALL manuals
+    cache_on_startup: true                    # Pre-load docs at boot
 
   # SQUIRREL - Session continuity (last hour awareness)
   # Gives Grok personality - "bro you asked that 5 times already"

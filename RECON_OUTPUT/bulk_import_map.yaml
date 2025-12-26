@@ -1,0 +1,668 @@
+# ==============================================================================
+# TASK 4: BULK USER IMPORT RECON
+# ==============================================================================
+# Mission: Map CSV import infrastructure and batch user creation wiring
+
+bulk_import_recon:
+  backend:
+    import_endpoint: "STUBBED - Returns 501 Not Implemented"
+
+    endpoint_location: "auth/admin_routes.py:L776-793"
+
+    stub_code: |
+      ```python
+      @admin_router.post("/users/batch", response_model=APIResponse)
+      async def batch_create_users(
+          request: BatchCreateRequest,
+          x_user_email: str = Header(None, alias="X-User-Email"),
+      ):
+          """
+          Batch create multiple users.
+
+          TODO: The auth.batch_create_users() method doesn't exist anymore.
+          Need to loop and call get_or_create_user() + grant_department_access().
+
+          STUB: Returns 501 Not Implemented until admin portal is redesigned.
+          """
+          raise HTTPException(
+              501,
+              "Batch user creation pending redesign for 2-table schema. "
+              "See MIGRATION_001_COMPLETE.md for details."
+          )
+      ```
+
+    request_model_exists: true
+
+    request_model_location: "auth/admin_routes.py:L735-747"
+
+    request_schema: |
+      ```python
+      class BatchUserEntry(BaseModel):
+          """Single entry in batch user creation."""
+          email: str
+          display_name: Optional[str] = None
+          department: Optional[str] = None
+
+      class BatchCreateRequest(BaseModel):
+          """Request for batch user creation."""
+          users: List[BatchUserEntry]
+          default_department: str = "warehouse"
+          reason: Optional[str] = None
+      ```
+
+    csv_parsing: "FRONTEND - JavaScript in BatchImportModal.svelte"
+
+    batch_create_method: "DOES NOT EXIST - Need to implement"
+
+    auth_service_methods_available:
+      - get_or_create_user(email, display_name, azure_oid): |
+          Location: auth/auth_service.py:L285-360
+          Returns: User object or None
+          Auto-creates user with NO department access
+          Must call grant_department_access() separately
+
+      - grant_department_access(granter, target_email, department): |
+          Location: auth/auth_service.py:L394-435
+          Returns: bool (success)
+          Requires granter to have permission for department
+
+      - get_user_by_email(email): |
+          Location: auth/auth_service.py:L169-211
+          Returns: User object or None
+          Check if user already exists before creating
+
+    validation:
+      email_format:
+        location: "auth_service.py:L308 (basic check)"
+        code: |
+          if "@" not in email_lower:
+              return None
+
+      domain_whitelist:
+        location: "auth_service.py:L312-326"
+        method: |
+          Checks if domain exists in enterprise.tenants table:
+          - Gets tenant_id by domain
+          - If no matching tenant, returns None
+          - Only driscollfoods.com domain exists by default
+
+      department_validation:
+        location: "NONE - Uses static list"
+        hardcoded_departments: |
+          From main.py:L561-568:
+          - sales
+          - purchasing
+          - warehouse
+          - credit
+          - accounting
+          - it
+
+      duplicate_detection:
+        method: "get_or_create_user() handles this"
+        behavior: "Returns existing user if email exists, doesn't error"
+
+  frontend:
+    modal_status: "FUNCTIONAL - Full UI implemented"
+
+    modal_location: "frontend/src/lib/components/admin/BatchImportModal.svelte"
+
+    modal_features:
+      csv_parsing: |
+        Location: L40-69 (parseInput function)
+
+        Supported formats:
+        - email@domain.com
+        - email@domain.com, Display Name
+        - email@domain.com, Display Name, department
+
+        Parser logic:
+        1. Split by newlines
+        2. Filter empty lines
+        3. Split each line by comma
+        4. parts[0] = email (required)
+        5. parts[1] = display_name (optional)
+        6. parts[2] = department (optional)
+
+      file_upload: |
+        Location: L107-118, L149-154
+
+        Features:
+        - Accept .csv and .txt files
+        - FileReader API reads as text
+        - Populates textarea with file contents
+        - User can edit before submitting
+
+      ui_elements:
+        - Textarea for paste/edit (L158-165)
+        - File upload button (L149-154)
+        - Default department dropdown (L169-175)
+        - Reason text field (L178-184)
+        - Submit button (L195-202)
+
+      validation_frontend:
+        - Requires at least one entry (L74)
+        - Shows error message if empty (L75)
+        - Disables submit if textarea empty (L198)
+
+      results_display: |
+        Location: L204-244
+
+        Shows three categories:
+        - Created (success - green)
+        - Already Existed (warning - orange)
+        - Failed (error - red with reason)
+
+        Each category shows count and list of emails
+
+      error_handling: |
+        - Parse errors shown in error div (L187-189)
+        - API errors shown in error message (L103)
+        - Failed imports shown in results with reason (L235-239)
+
+    csv_parsing_library: "NONE - Native JavaScript split()"
+
+    preview_ui: "NO - Direct submission after parse"
+
+    error_display: "YES - Multi-section results view"
+
+    admin_store_integration: |
+      Location: Imported from '$lib/stores/admin'
+
+      Method called: adminStore.batchCreateUsers(request)
+      Location of call: L83-87
+
+      Request format:
+      ```typescript
+      {
+          users: Array<{
+              email: string;
+              display_name?: string;
+              department?: string;
+          }>,
+          default_department: string,
+          reason: string
+      }
+      ```
+
+      Expected response:
+      ```typescript
+      {
+          success: boolean;
+          data?: {
+              created: string[];           // Emails successfully created
+              already_existed: string[];   // Emails that already existed
+              failed: Array<{              // Failed imports with reasons
+                  email: string;
+                  error: string;
+              }>;
+              failed_count: number;
+          };
+          error?: string;
+      }
+      ```
+
+  expected_csv_format:
+    columns: |
+      Three-column format (all optional except email):
+      1. email (required)
+      2. display_name (optional)
+      3. department (optional)
+
+    example_valid: |
+      jdoe@driscollfoods.com, John Doe, warehouse
+      jsmith@driscollfoods.com, Jane Smith, sales
+      bob@driscollfoods.com
+      alice@driscollfoods.com, Alice Williams
+
+    example_with_defaults: |
+      If default_department = "warehouse":
+
+      Input:
+        jdoe@driscollfoods.com
+        jsmith@driscollfoods.com, Jane Smith, sales
+
+      Result:
+        - jdoe gets warehouse (from default)
+        - jsmith gets sales (from CSV override)
+
+    notes: |
+      - No header row expected (raw data only)
+      - Commas separate fields
+      - Extra whitespace trimmed
+      - Blank lines ignored
+
+  integration_points:
+    implement_backend_endpoint:
+      location: "auth/admin_routes.py:L776-793"
+
+      replace_stub_with: |
+        ```python
+        @admin_router.post("/users/batch", response_model=APIResponse)
+        async def batch_create_users(
+            request: BatchCreateRequest,
+            x_user_email: str = Header(None, alias="X-User-Email"),
+        ):
+            """
+            Batch create multiple users.
+
+            Creates users and grants department access in one operation.
+            Returns counts of created, already_existed, and failed.
+            """
+            if not x_user_email:
+                raise HTTPException(401, "X-User-Email header required")
+
+            auth = get_auth_service()
+            requester = auth.get_user_by_email(x_user_email)
+
+            if not requester:
+                raise HTTPException(401, "User not found")
+
+            # Check admin access
+            if not requester.is_super_user and not requester.dept_head_for:
+                raise HTTPException(403, "Admin access required")
+
+            # Track results
+            created = []
+            already_existed = []
+            failed = []
+
+            for entry in request.users:
+                try:
+                    # Determine department
+                    dept = entry.department or request.default_department
+
+                    # Check if requester can grant access to this department
+                    if not requester.is_super_user and dept not in (requester.dept_head_for or []):
+                        failed.append({
+                            "email": entry.email,
+                            "error": f"No permission to grant {dept} access"
+                        })
+                        continue
+
+                    # Check if user exists
+                    existing = auth.get_user_by_email(entry.email)
+
+                    if existing:
+                        # User exists - optionally add department if not already there
+                        if dept not in existing.department_access:
+                            auth.grant_department_access(requester, entry.email, dept)
+                            created.append(entry.email)  # Granted new access
+                        else:
+                            already_existed.append(entry.email)
+                    else:
+                        # Create new user
+                        new_user = auth.get_or_create_user(
+                            email=entry.email,
+                            display_name=entry.display_name
+                        )
+
+                        if not new_user:
+                            failed.append({
+                                "email": entry.email,
+                                "error": "Domain not allowed"
+                            })
+                            continue
+
+                        # Grant department access
+                        auth.grant_department_access(requester, entry.email, dept)
+                        created.append(entry.email)
+
+                    # Optional: Log to audit
+                    if AUDIT_LOGGING_ENABLED:
+                        audit = get_audit_service()
+                        audit.log_event(
+                            action="user_batch_import",
+                            actor_email=requester.email,
+                            target_email=entry.email,
+                            department_slug=dept,
+                            reason=request.reason
+                        )
+
+                except Exception as e:
+                    logger.error(f"Failed to import {entry.email}: {e}")
+                    failed.append({
+                        "email": entry.email,
+                        "error": str(e)
+                    })
+
+            logger.info(
+                f"[Admin] {requester.email} batch imported: "
+                f"{len(created)} created, {len(already_existed)} existed, {len(failed)} failed"
+            )
+
+            return APIResponse(
+                success=True,
+                data={
+                    "created": created,
+                    "already_existed": already_existed,
+                    "failed": failed,
+                    "total": len(request.users),
+                    "created_count": len(created),
+                    "already_existed_count": len(already_existed),
+                    "failed_count": len(failed),
+                },
+            )
+        ```
+
+    validation_improvements:
+      email_validation: |
+        Add regex validation in endpoint:
+        ```python
+        import re
+        EMAIL_REGEX = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+
+        if not EMAIL_REGEX.match(entry.email):
+            failed.append({
+                "email": entry.email,
+                "error": "Invalid email format"
+            })
+            continue
+        ```
+
+      department_validation: |
+        Validate against static list:
+        ```python
+        VALID_DEPARTMENTS = ["sales", "purchasing", "warehouse", "credit", "accounting", "it"]
+
+        dept = entry.department or request.default_department
+        if dept not in VALID_DEPARTMENTS:
+            failed.append({
+                "email": entry.email,
+                "error": f"Invalid department: {dept}"
+            })
+            continue
+        ```
+
+      rate_limiting: |
+        Add max batch size:
+        ```python
+        MAX_BATCH_SIZE = 100
+
+        if len(request.users) > MAX_BATCH_SIZE:
+            raise HTTPException(
+                400,
+                f"Batch size {len(request.users)} exceeds maximum {MAX_BATCH_SIZE}"
+            )
+        ```
+
+    transaction_handling: |
+      Wrap in database transaction for atomicity:
+
+      ```python
+      from auth.auth_service import get_db_connection
+
+      with get_db_connection() as conn:
+          cur = conn.cursor()
+          try:
+              for entry in request.users:
+                  # ... user creation logic using cur
+
+              conn.commit()
+          except Exception as e:
+              conn.rollback()
+              raise
+          finally:
+              cur.close()
+      ```
+
+      Note: Current auth_service methods auto-commit.
+      Would need to refactor to support transaction context.
+
+  performance_considerations:
+    current_approach: "Loop + individual inserts"
+
+    optimization_bulk_insert: |
+      For large batches (100+ users), use COPY or bulk INSERT:
+
+      ```python
+      # Batch insert users
+      user_values = [
+          (email, display_name, tenant_id, azure_oid, '{}', '{}', False, True)
+          for email, display_name in user_data
+      ]
+
+      cur.executemany(
+          f"""
+          INSERT INTO {SCHEMA}.users
+              (email, display_name, tenant_id, azure_oid,
+               department_access, dept_head_for, is_super_user, is_active)
+          VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+          ON CONFLICT (email) DO NOTHING
+          """,
+          user_values
+      )
+
+      # Batch grant department access
+      access_grants = [
+          (dept, email) for email in emails
+      ]
+
+      cur.executemany(
+          f"""
+          UPDATE {SCHEMA}.users
+          SET department_access = array_append(department_access, %s)
+          WHERE email = %s AND NOT (%s = ANY(department_access))
+          """,
+          access_grants
+      )
+      ```
+
+    async_processing: |
+      For very large imports (1000+), use background task:
+
+      1. Accept CSV, return job_id immediately
+      2. Process in background worker
+      3. Frontend polls /api/admin/jobs/{job_id} for status
+      4. Display progress bar
+
+      Requires: job queue (Celery, RQ, or simple DB table)
+
+  security_considerations:
+    permission_checks: |
+      CRITICAL: Verify requester can grant to ALL departments in batch
+
+      Current implementation: Checks per-user in loop (good)
+
+      Additional check before loop:
+      ```python
+      # Collect all departments that will be granted
+      all_depts = set()
+      for entry in request.users:
+          dept = entry.department or request.default_department
+          all_depts.add(dept)
+
+      # Verify requester can grant to ALL of them
+      if not requester.is_super_user:
+          unauthorized = all_depts - set(requester.dept_head_for or [])
+          if unauthorized:
+              raise HTTPException(
+                  403,
+                  f"Cannot grant access to departments: {', '.join(unauthorized)}"
+              )
+      ```
+
+    injection_prevention: |
+      Parameterized queries used: SAFE
+      auth_service.py uses %s placeholders (psycopg2 handles escaping)
+
+    dos_prevention: |
+      Add rate limiting:
+      - Max 100 users per batch (configurable)
+      - Max 10 batches per hour per admin (via rate limiter)
+      - Timeout after 30 seconds (fail remaining)
+
+  error_handling_strategy:
+    partial_success: |
+      Current design: Continue on failure (best approach)
+
+      Alternatives:
+      1. All-or-nothing (transaction rollback) - NOT recommended for imports
+      2. Stop on first error - NOT recommended
+      3. Continue with error tracking - CURRENT (correct)
+
+    error_categorization: |
+      Return specific error types for frontend:
+
+      ```python
+      failed.append({
+          "email": entry.email,
+          "error": "Invalid email format",
+          "error_code": "INVALID_EMAIL"  # Machine-readable
+      })
+      ```
+
+      Error codes:
+      - INVALID_EMAIL: Format validation failed
+      - DOMAIN_NOT_ALLOWED: Not in tenant domains
+      - PERMISSION_DENIED: Admin lacks dept access
+      - DUPLICATE_USER: User exists with same dept
+      - DATABASE_ERROR: Transient failure (can retry)
+
+  testing_strategy:
+    unit_tests: |
+      Test cases needed:
+      - All users created successfully
+      - Some users already exist
+      - Invalid email formats
+      - Unauthorized departments
+      - Empty batch
+      - Max batch size exceeded
+      - Mixed success/failure
+
+    integration_tests: |
+      Test with real database:
+      - Verify users created in enterprise.users
+      - Verify department_access array populated
+      - Verify audit logs written (if enabled)
+
+    ui_tests: |
+      - CSV file upload
+      - Manual text entry
+      - Results display (all three categories)
+      - Error messages
+
+  dependencies_and_blockers:
+    none_blocking: |
+      All infrastructure exists. Frontend complete. Backend is straightforward.
+
+    optional_enhancements:
+      - Audit logging (integrate audit_service if implemented)
+      - Background job queue (for large imports)
+      - Email notifications (notify users they've been added)
+      - Preview step (show parsed data before submit)
+
+  estimated_complexity:
+    backend_implementation: |
+      - Replace stub with working endpoint: 2-3 hours
+      - Add validation logic: 1 hour
+      - Error handling + categorization: 1 hour
+      - Testing with real data: 1-2 hours
+      Total: 5-7 hours
+
+    frontend_work: |
+      - Already complete (0 hours)
+      - Optional: Add preview step: 2 hours
+      - Optional: Progress bar for large imports: 2 hours
+
+    database_changes: |
+      NONE - Uses existing enterprise.users table
+
+    testing_effort: |
+      - Unit tests: 2 hours
+      - Integration tests: 2 hours
+      - Manual testing: 1 hour
+      Total: 5 hours
+
+    total_basic: "5-7 hours for working bulk import"
+    total_production: "10-14 hours with enhancements"
+
+  recommended_implementation:
+    phase_1_mvp: |
+      - Implement endpoint with basic loop logic
+      - Email validation
+      - Department permission checks
+      - Return created/existed/failed
+
+    phase_2_polish: |
+      - Add transaction handling
+      - Add audit logging integration
+      - Add rate limiting
+      - Better error messages
+
+    phase_3_scale: |
+      - Bulk SQL operations for performance
+      - Background job queue for large imports
+      - Progress tracking
+      - Email notifications
+
+  example_test_cases:
+    test_successful_import: |
+      Input:
+      ```json
+      {
+        "users": [
+          {"email": "alice@driscollfoods.com", "display_name": "Alice", "department": "sales"},
+          {"email": "bob@driscollfoods.com", "display_name": "Bob"}
+        ],
+        "default_department": "warehouse",
+        "reason": "Q1 onboarding"
+      }
+      ```
+
+      Expected:
+      - alice created with sales access
+      - bob created with warehouse access
+      - Both returned in "created" list
+
+    test_duplicate_handling: |
+      Setup: alice@driscollfoods.com already exists with sales access
+
+      Input:
+      ```json
+      {
+        "users": [
+          {"email": "alice@driscollfoods.com", "department": "sales"}
+        ],
+        "default_department": "warehouse"
+      }
+      ```
+
+      Expected:
+      - alice returned in "already_existed" list
+      - No error, no duplicate created
+
+    test_unauthorized_department: |
+      Setup: Requester is dept_head for sales only
+
+      Input:
+      ```json
+      {
+        "users": [
+          {"email": "charlie@driscollfoods.com", "department": "it"}
+        ],
+        "default_department": "warehouse"
+      }
+      ```
+
+      Expected:
+      - charlie returned in "failed" list
+      - Error: "No permission to grant it access"
+
+    test_invalid_email: |
+      Input:
+      ```json
+      {
+        "users": [
+          {"email": "not-an-email", "department": "sales"}
+        ],
+        "default_department": "warehouse"
+      }
+      ```
+
+      Expected:
+      - Returned in "failed" list
+      - Error: "Invalid email format"
+
+no_frontend_changes_needed: |
+  Frontend is FULLY IMPLEMENTED. Just wire the backend endpoint.
+  Modal works, parsing works, UI works. Backend is the only missing piece.

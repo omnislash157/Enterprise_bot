@@ -1,0 +1,816 @@
+================================================================================
+SALES - STANDARD OPERATING PROCEDURES (TELNET)
+================================================================================
+
+QUICK REFERENCE - EMAIL CONTACTS
+---------------------------------
+Credits (Wayne & PA DSMs)         credits@driscollfoods.com
+Operational Errors                opserrors@driscollfoods.com
+Pick Up Requests                  pickuprequest@driscollfoods.com
+Class Bid Requests                classbidrequest@driscollfoods.com
+PCM Requests (Category Margins)   pcmrequest@driscollfoods.com
+Order Date Change/Cancellation    orderchanges@driscollfoods.com
+Routing Requests (Wayne)          routingrequest@driscollfoods.com
+NCA Requests (New Customer Alert) ncarequests@driscollfoods.com
+CAR Requests (Critical Attention) carrequests@driscollfoods.com
+Bill To Ship To Requests          billtoshiptorequests@driscollfoods.com
+Forced Pick Ups                   forcedpickups@driscollfoods.com
+Employee Purchases (Wayne)        employeepurchases@driscollfoods.com
+
+QUICK REFERENCE - KEYBOARD SHORTCUTS
+-------------------------------------
+Arrow Key Equivalents:
+  Up Arrow    = F3
+  +/-         = F1
+  ?           = F2
+  !           = F4
+
+Common Commands:
+  A           = Add (when in order, quote or bid)
+  C           = Change/Maintain
+  -           = Hide Margin % when in an open order
+  RUN"CTL"    = Return to Main Sales Menu (if stuck)
+  SLS         = Go to Main Sales Screen Menu (after login)
+  R           = Log Off Telnet (from Main Sales Screen)
+
+================================================================================
+EMAIL REQUEST PROCEDURES
+================================================================================
+
+CREDITS (credits@driscollfoods.com)
+-----------------------------------
+Credits must be submitted by district manager to inside sales.
+
+Include:
+- Completed credit form
+- Pictures of product (as many as possible)
+- Pick labels, manufacturer codes, identifying materials
+- Signed invoice (via archive)
+- Operational error email if applicable
+
+OPERATIONAL ERRORS (opserrors@driscollfoods.com)
+------------------------------------------------
+Subject line: customer # ; issue
+
+Include: Customer name/#, Order#, Date, Item code, Route#, Stop#, Reason, Pictures if applicable
+
+PICK UP REQUESTS (pickuprequest@driscollfoods.com)
+--------------------------------------------------
+Rules:
+- NO perishable items ordered in error (must refuse at delivery)
+- Perishable meat for quality issues: will pick up for inspection
+- Dry and chemical items: pick up within 2 weeks of invoice date
+
+Include:
+- Completed pick up form
+- Customer#, Invoice#, Original date
+- Item#, Item description, Case count
+- Total credit amount, Reason for pick up
+- Order# to attach pick up request to
+- For driver: contact name, key drop info, product location
+
+CLASS BID REQUESTS (classbidrequest@driscollfoods.com)
+------------------------------------------------------
+- Inside sales sets up the class bid
+- Sales person maintains the bid
+- Class bids can hold multiple customers
+- Provide customer name and number
+
+PCM REQUESTS (pcmrequest@driscollfoods.com)
+-------------------------------------------
+Product Category Margin request assigns pricing header by category.
+- Drill into subcategory and assign margins over sales cost
+- MANDATORY for customers on Cut & Dry (online ordering system)
+
+ORDER DATE CHANGE/CANCELLATION (orderchanges@driscollfoods.com)
+---------------------------------------------------------------
+Include: Customer name, Customer# (account#), Order#, New order date
+
+Note: If canceling just-in-time items (cutshop & fishery), communicate with those departments.
+
+NCA REQUEST - NEW CUSTOMER ALERT (ncarequests@driscollfoods.com)
+----------------------------------------------------------------
+Send when opening order to alert operations.
+
+Include: Customer#, Customer name, Order#, Delivery day, Time window, Applicable notes
+
+This flags the system for special care for 60 days. Critical to get delivery days and time window precise.
+
+CAR REQUEST - CRITICAL ATTENTION (carrequests@driscollfoods.com)
+----------------------------------------------------------------
+Alerts routing and operations to flag account for special care (one-time, case-by-case basis).
+
+Include: Customer#, Name, Order#, Delivery day, Time window, Applicable notes
+
+BILL TO SHIP TO REQUEST (billtoshiptorequests@driscollfoods.com)
+----------------------------------------------------------------
+Include: Bill to customer account#, Ship to customer#, Delivery day, Order# if applicable
+
+Important: Make sure ship to customer knows they will receive product THAT IS NOT THEIRS.
+
+================================================================================
+OPTION 1: ORDER ENTRY
+================================================================================
+
+Path: Main Sales Menu > Option 1
+
+Use for: Entering NEW orders for next-day delivery (except Friday-Saturday deliveries)
+
+1. Enter Operator number (assigned by Credit department)
+2. Enter Customer number, or type customer name to search
+3. If multiple Ship To addresses: enter "?", press ENTER to cycle through, press F4 to accept
+4. Enter PO in "Reference Number" field if required, otherwise press ENTER to skip
+5. Select delivery date using left/right arrows (follow Transportation delivery day guidelines)
+6. Enter products using one of these methods:
+   - Enter Product# directly
+   - Enter "A" for Alpha search (new items)
+   - Enter "L" for Look Up (customer order history)
+
+Product Selection:
+- In Look Up: Spacebar searches within history, "X" or down arrow exits
+- In Alpha Search: items in BLUE were previously purchased by customer
+- Enter line number to select item, then enter case count (ENTER = 1 case)
+- Left arrow splits a case
+- F1 after item selection shows stock status (up arrow = incoming orders, down arrow = committed qty)
+
+Editing Lines:
+- Up arrow undoes price, quantity, or item
+- F4 enters Change mode, then "D" deletes item
+- F4 again returns to Add mode
+
+Order Management:
+- Order number appears at top right when first item accepted (write it down)
+- "R" redisplays all items
+- F2 shows Detail History (full customer order history)
+- Up arrow exits order and shows Net Income, GP%, GP$, case count, splits
+
+Printing:
+- Y = Yes (line version), N = No
+- U = Uniform (customer version), E = Excel version
+
+================================================================================
+OPTION 2: INVOICE ENTRY (ONE STEP)
+================================================================================
+
+Path: Main Sales Menu > Option 2
+
+Use for: Same-day Cash & Carry pickups OR invoicing customers for received product
+
+Same process as Order Entry with these differences:
+
+1. System prompts for pickup time (enter as 12:30 or 12.30)
+2. Invoice number appears below order number once items are added
+
+Printing for Cash & Carry:
+1. Enter "Y" for Yes to print
+2. Enter "T" for Temperature Zone (helps warehouse pickers)
+3. Enter "29" for Cash & Carry printer
+4. Enter "N" for GP (don't show Gross Profit)
+5. Enter "Y" to show prices
+
+Note: If only invoicing a customer, no need to send to printer.
+
+================================================================================
+OPTION 3: ORDER/INVOICE INQUIRY/CORRECTION
+================================================================================
+
+Path: Main Sales Menu > Option 3
+
+Use for: Returning to previously entered orders
+
+Note: Shipped orders from last 48 hours are view-only.
+
+Finding Orders:
+- Enter order number directly, OR
+- Enter "C" to search by Customer number
+- Enter "I" to search by Invoice number
+- Enter "P" to search by Purchase Order number
+- Up arrow or F3 cycles through multiple orders
+- Down arrow exits to Main Sales screen
+
+Editing (from last page of order):
+- ENTER = View totals
+- A = Add items
+- C = Change quantity/price (then "D" to delete)
+- F3 = View next open order for customer
+- R = Review order (by item number)
+- L = Review order (by entry order)
+
+Reducing Quantity:
+1. DELETE the item (Change mode > "D")
+2. Switch to Add mode (down arrow)
+3. Re-enter item with correct case count
+
+Warning: Reducing quantity without delete/add causes shortages on customer invoice.
+
+================================================================================
+OPTION 4: ORDER/INVOICE HEADER CORRECTION
+================================================================================
+
+Path: Main Sales Menu > Option 4
+
+Use for: Adjusting information on OPEN orders (not yet invoiced/shipped)
+
+1. Enter Order number
+2. Enter line number to adjust (e.g., #17 for PO Number)
+3. Make adjustment, press ENTER, then "Y" to confirm
+
+Additional Remarks:
+- Lines 22, 23, 24 = Remarks that print on invoice (e.g., "Driver Pick Up Check")
+
+Note: Date change requests MUST go to Routing & Customer Service Supervisor.
+
+Always verify changes using Option 3.
+
+================================================================================
+OPTION 5: CALL SHEET INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 5
+
+Use for: Viewing customer product history
+
+1. Enter customer number
+2. Press ENTER to search all items
+3. View order history with previous pricing and last order date
+
+Options (from last page):
+- ENTER = Return to Main Sales Menu
+- Enter Item# = Delete product from history
+- COPY = Copy call sheet to a Bid (Option 27)
+- P = Print Call Sheet
+
+================================================================================
+OPTION 6: STOCK STATUS INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 6
+
+Use for: Checking product stock, prices, manufacturer numbers
+
+1. Enter Product# if known, OR
+2. Enter "A" for Alpha search (search by product name, brand, vendor, description, manufacturer#)
+
+Search Tips:
+- Maximum 2 words per search
+- Check spelling carefully
+- Products listed 1-10 on left side of screen
+
+Stock Status Screen Fields:
+- Line Item#, Product Item#
+- (S) = Splittable Item
+- Kosher Grade
+- Product Description, Brand Name
+- Manufacturer#
+- Physical Cases/Pieces Available
+- Temperature Zone (R=Refrigerated, D=Dry, F=Frozen)
+- Base Cost$
+- Warehouse (01=Clifton, 02=Amsterdam)
+- Slot#, Weight, Pack Size
+- QTY AVAILABLE = Available for sale
+- QTY ON-ORDER = Ordered by Purchasing
+- Numbers with "P" = Individual pieces (split cases)
+
+Navigation:
+- F3 or Up Arrow = View incoming Purchase Orders
+- F4 or Down Arrow = View open customer orders (enter line# to go to order)
+- F10 = Toggle Amsterdam/Clifton product info
+- Left Arrow or F2 = Additional info page (Manufacturer#, Vendor, etc.)
+- Type "BUYER" = Find buyer contact information
+
+Extra Information Available:
+- ETA = Arrival date of incoming product
+- AVG COST = Average cost (#17)
+- SPLIT CASE = Whether case splits (#42)
+- TAXABLE = If item is taxable (#26)
+- VENDOR = Product vendor (#38)
+- CS/PAL = Cases per pallet (#27)
+- NET WEIGHT & GROSS WEIGHT = #10 & #11
+
+================================================================================
+OPTION 7: A/R INQUIRY
+================================================================================
+
+Path: Main Sales Menu > Option 7
+
+Use for: Viewing customer invoices, credits, paid checks
+
+1. Enter Customer number
+2. Press ENTER for all invoices (open and closed), OR
+3. Enter "O" for open invoices only
+
+Display Fields:
+- Invoice Date = Ship date
+- Invoice Number
+- Debits = Order amount after invoice returned to office
+- Credits = Submitted credits
+- Line Balance = Invoice Debit - Credits
+- Running Balance = Total amount owed
+
+Options:
+- H = Print A/R information
+- C = View submitted payment checks
+- L = Lookup invoice information & credits
+
+================================================================================
+OPTION 8: DO WE SELL THIS CUSTOMER?
+================================================================================
+
+Path: Main Sales Menu > Option 8
+
+Use for: Checking if customer has an account and last delivery date
+
+Search by: Name, Phone Number, City, State, or Zip Code
+
+Results show:
+- Account name and number (if opened)
+- Last delivery date (far right)
+
+For account details, use Options 7 and 11.
+
+================================================================================
+OPTION 9: CALL SHEET PRINT
+================================================================================
+
+Path: Main Sales Menu > Option 9
+
+Use for: Printing call sheet with last purchase date and quantity
+
+Standard Print:
+1. Enter "C" for Customer (or "E" to email)
+2. Enter "C" for Category
+3. Enter date range (e.g., 100113 for 10/01/2013) or ENTER for all
+4. Enter "S" for Selection
+5. Enter Customer Account number
+6. Press ENTER (skip second customer)
+7. Enter Printer# (100 = email to yourself)
+8. Enter "M" for Monthly, "W" for Weekly, or "N" for None
+9. Enter "A" for All Items
+10. Y/N for Print Prices
+11. Y/N for Bid Prices
+12. Y/N for Market item prices
+13. Y/N for items on Order Guide but Never Sold
+
+Email as Order Guide:
+1. Enter "E" for email
+2. Select C1 or C2 (columns)
+3. Y/N for Print Prices
+4. Enter Customer Number
+5. Enter your email address
+6. Y/N for Show Brand
+7. PDF sent to email
+
+================================================================================
+OPTION 11: CUSTOMER FILE MAINTENANCE
+================================================================================
+
+Path: Main Sales Menu > Option 11
+
+Use for: Viewing Customer Master File (address, phone, salesperson, terms, Class Bid, delivery window)
+
+1. Enter Customer number, OR
+2. Enter "A" for Alpha search (by name), OR
+3. Enter "P" for phone number search
+
+Function Keys:
+- F1 = A/R
+- F2 = Graph
+- F3 = Sales movement
+- F4 = Second screen (permanent remarks in #57, #58 print in Special Instructions box)
+
+Note: Delivery window changes require email to Phil Carson & Routing.
+
+================================================================================
+OPTION 12: MODIFY CALL SHEET RECORDS
+================================================================================
+
+Path: Main Sales Menu > Option 12
+
+Use for: Adding or deleting items from customer Order Guide (Call Sheet)
+
+1. Enter Customer number
+2. Enter Product number to add or delete
+
+If product previously purchased:
+- "D" = Delete
+- "C" = Change price
+
+If product is new to customer: Enter price when prompted.
+
+================================================================================
+OPTION 13: SALESMAN MANIFEST
+================================================================================
+
+Path: Main Sales Menu > Option 13
+
+Use for: Printing daily delivery manifest (normally emailed each morning)
+
+1. Enter date (e.g., 060114 for 6/1/2014)
+2. Enter Printer# (100 = email to yourself)
+
+================================================================================
+OPTION 14: DAILY SALESMAN ORDER REPORT
+================================================================================
+
+Path: Main Sales Menu > Option 14
+
+Use for: Viewing daily order reports
+
+1. Enter date (e.g., 060114 for 6/1/2014)
+2. Enter Salesman number (only needed once)
+3. Enter Printer# (100 = email to yourself)
+4. Press ENTER to final line, follow prompts (1=send, 2=cancel, 3=change info)
+
+================================================================================
+OPTION 15: PICK UP SLIP
+================================================================================
+
+Path: Main Sales Menu > Option 15
+
+Use for: Entering product returns to warehouse
+
+Important: Enter pickups AFTER starting an order so pickup attaches to order number. Drivers require pickup slips.
+
+OPTION 1 - ENTER PICKUP:
+1. Enter Customer number
+2. Select Option 1 for "Enter Pickup"
+3. Enter Invoice# where item was delivered
+4. Enter Invoice Date
+5. Enter Dollar amount to be credited
+   - If unknown or multiple pickups: enter "X" for Invoice
+6. Enter Product number
+7. Enter case count (F2 for split case)
+8. Press ENTER (item disappears, enter another or ENTER again for Notes)
+9. Enter reason in NOTES (e.g., "mispick", "wrong item", "product dented")
+10. Enter "Y" to post
+11. Enter order number to attach pickup (appears at top)
+
+OPTION 2 - PICKUPS ON FILE:
+- View entered pickups (alphabetical by Account#)
+- Press ENTER to scroll
+- Select by Line number
+
+Display: Line#, Customer#, Name, City, Time Entered, Date Entered, Order# Assigned
+
+OPTION 3 - PICK UP STATUS INQUIRY:
+Shows: Customer#, Name, Delivery Date, Queued/Date Entered, Printed by Routing, Route
+
+================================================================================
+OPTION 16: QUOTES
+================================================================================
+
+Path: Main Sales Menu > Option 16
+
+Use for: Creating "faux" orders to price out potential or existing customers
+
+Setup:
+- If customer has account: use Customer number
+- If customer has NO account: use your Quote Account number (from A/R)
+- ALWAYS set quote for Sunday delivery
+
+Options:
+- Option 1: Enter quote (same as Order Entry)
+- Option 2: Quote Changes (modify existing)
+- Option 3: Quote Deletion/Change Date (adjust info or delete)
+- Option 4: Quotes on File (view all)
+
+Copy Quote to Bid:
+1. At end of quote, enter "COPY"
+2. Enter Customer number
+
+================================================================================
+OPTION 27: BIDS AND PRICE BOOKS
+================================================================================
+
+Path: Main Sales Menu > Option 27 > Option 1
+
+Use for: Creating, maintaining, and locking bid pricing
+
+ACCESSING A BID:
+1. Select Current or Future bid: C (current) or F (future)
+2. Enter Type: CL (class bid) or CU (customer bid)
+3. Enter Bid Number
+4. Press Down Arrow or F4 for toolbar
+
+TOOLBAR OPTIONS:
+- A = Add new item to bid
+- C = Maintain (update current item pricing)
+- R = Rev Lock (reserve bid lock - useful for weekly produce pricing updates)
+- L = Lock (lock in pricing for that week or future dates)
+- U = Update (apply updated pricing to already-entered orders for future dates)
+
+Notes:
+- If bid is NOT locked, pricing updates automatically when buyers update
+- Items on bid appear BLUE with red "B" in Alpha search while in order
+
+COPYING A BID:
+1. Path: Option 27 > Option 1
+2. Current or Future: C
+3. Type: CL
+4. Enter source bid number
+5. Press F4 to go to end of bid
+6. Type "COPY"
+7. Enter destination customer number or bid number
+
+COPYING CALL SHEET TO BID:
+1. Path: Option 27 > Option 1
+2. Current or Future: C
+3. Type: CU
+4. Enter Customer Number
+5. Press Enter, then Down Arrow
+6. Type "COPY"
+7. Enter new customer/class bid number
+
+================================================================================
+OPTION 32: DOWNLOAD BID INTO EXCEL (BY ITEM)
+================================================================================
+
+Path: Main Sales Menu > Option 32
+
+Use for: Emailing Bid in Excel format organized by Item number
+
+1. Enter "B" for Bid
+2. Enter date range start (e.g., 060114) or ENTER to skip
+3. Y/N for showing pricing
+4. A/U for All Items or Usage Only
+5. Enter "I" for Individual Customer
+6. Y/N for 2nd Line Description
+7. Y/N for Category or Group
+8. L/S for Long or Short version
+9. Enter Customer number
+10. Press ENTER
+11. Bid sent to email
+
+================================================================================
+OPTION 33: DOWNLOAD BID INTO EXCEL (BY LINE)
+================================================================================
+
+Path: Main Sales Menu > Option 33
+
+Use for: Emailing Bid in Excel format organized by Line Item
+
+Same steps as Option 32.
+
+================================================================================
+OPTION 34: BACK ORDER ENTRY
+================================================================================
+
+Path: Main Sales Menu > Option 34
+
+Use for: Next-day delivery of shorted/mispicked product (small quantity without affecting margin)
+
+1. Enter Operator Number
+2. Enter Customer Number
+3. Reference Number = ORDER# from previous order
+4. First item MUST be from the previous order
+5. Continue as normal order
+
+Note: Saturday back orders require approval from John Levatino.
+
+================================================================================
+SEAFOOD NOTES ON ORDERS
+================================================================================
+
+Use for: SEAFOOD ONLY - when customer requests non-standard pack size
+Example: Customer wants 18 pieces of 8oz salmon (standard pack is 20)
+
+Contact Donnie N. if unsure whether item can be split.
+
+1. Enter line normally
+2. BEFORE final ENTER to accept: press F1
+3. Notes line appears at bottom
+4. Enter special specs
+5. Press ENTER to accept
+
+Note: Info prints on seafood labels only, not invoice. Extended price may be incorrect - warehouse adjusts cut weight before shipping.
+
+================================================================================
+SPECIAL ORDER PROCESS
+================================================================================
+
+Path: Main Sales Menu > SLS screen
+
+For Sales Rep:
+1. Start order with customer number
+2. Enter item number
+3. Enter "Y" to place special order (or "N" to cancel)
+4. Enter requested delivery date
+5. Enter cancel date (latest customer will accept)
+6. Exit order
+
+System creates allocation (shaded in system). Buyers cannot add to PO without allocation.
+
+Daily Reports:
+- Each buyer receives Excel spreadsheet of all special orders
+- Each sales rep receives spreadsheet of their allocations
+- Fields: Item#, Quantity, Customer#, Sales Rep, Date Requested, Date Needed, Cancel Date, PO#
+
+Removing Special Orders (only if not yet ordered by Purchasing):
+- Process from SLS screen
+- Buyer receives email notification of removal
+
+Communication:
+- Buyer responsibility: Notify sales if item discontinued or unavailable within dates
+- Sales responsibility: Manage special order list, remove if customer closed/on credit hold
+
+================================================================================
+REFERENCE - DRISCOLL CUT SHOP ALPHA SEARCH TIPS
+================================================================================
+
+STEAKS (search term):
+  Filet Steaks        = FILET STK
+  Strip Steaks        = STRIP STK
+  Cowboy Steaks       = COWBOY (bone-in ribeye, frenched bone)
+  Rib Steaks          = RIB STK (bone not frenched)
+  T-Bone Steaks       = T-BONE (small filet)
+  Porterhouse Steaks  = PORTERHOUSE (bigger filet)
+  Ribeye Steaks       = RIBEYE STK
+  Skirt Steaks        = SKIRT STK
+
+CHOPS (search term):
+  Lamb Chops          = LAMB RACK / LAMB SHOULDER / LAMB LOIN
+  Veal Chops          = VEAL RACK / VEAL LOIN
+  Pork Chops          = PORK LOIN / PORK RACK
+
+WHOLE PIECES/LOINS (search term):
+  Whole Filet Mignon  = PSMO
+  Whole Strip Loin    = STRIP LOIN
+  Whole Ribeyes       = RIBEYE BNLS
+  Export Rib (B/I)    = EXPORT RIB
+  Short Loin          = SHORT LOIN (filet/strip together)
+  Rib                 = 109 RIB
+
+OTHER CUTS (search by name):
+  TERES MAJOR, FLATIRON, HANGER, FLANK
+
+================================================================================
+REFERENCE - PRODUCT ABBREVIATIONS
+================================================================================
+
+BRD    = Breaded                    NTB    = Not Breaded
+BNLS   = Boneless                   OB     = Opportunity Buy
+BTR    = Battered                   OGC    = Organically Grown Company
+CAB    = Certified Angus Beef       OU     = Orthodox Union (Kosher)
+CN     = Child Nutrition            OVN    = Ovenable
+CLF    = Cholesterol Free           PARVE  = Prepped without meat/milk/derivatives
+CKD    = Cooked                     PB     = Par Baked
+CND    = Canned                     PC     = Portion Control
+CVP    = Controlled Vacuum Pack     PCK    = Pre-Cooked
+FC     = Fully Cooked               PET    = Plastic (Polyethylene terephthalate)
+FFR    = Fat Free                   PIJ    = Packed In Juice
+G&S    = Grated and Stamped         PIW    = Packed In Water
+GM     = Gram                       PSMO   = Peeled Side Muscle On
+GRL    = Grill                      PM     = Part Skim
+GTF    = Gluten Free                RDC    = Reduced Calorie
+HFCS   = High Fructose Corn Syrup   RDF    = Reduced Fat
+IQF    = Instant Quick Freeze       RTC    = Ready To Cook
+IVP    = Ind. Vacuum Packed         SGF    = Sugar Free
+IW     = Ind. Wrapped               SNA    = Salt Not Added
+JJP    = 100% Juice                 UHT    = Ultra High Temp (Shelf Milk)
+LFT    = Low Fat                    UNB    = Unbaked
+LRS    = Low Sodium                 USD    = Upside Down
+LSR    = Low Sugar                  VGT    = Vegetarian
+LT     = Lite                       WGR    = Whole Grain
+LTF    = Lactose Free               WM     = Whole Milk
+LTS    = Lite Syrup                 WW     = Whole Wheat
+MTG    = Multi-Grain                ZTF    = Zero Trans Fat
+NS     = No Sodium
+NSA    = No Sugar Added
+
+================================================================================
+REFERENCE - KOSHER GRADES
+================================================================================
+
+CODE   DESCRIPTION                  CODE   DESCRIPTION
+----   -----------                  ----   -----------
+(D     Half Moon K Dairy            LH     Lishkas Hakashrus
+(K     Half Moon K Dairy            LK     London Beth Din
+(P     Half Moon K Parve            LV     Louisville Vaad
+*D     Star K Dairy                 M      Multiple K, OU, OU Dairy
+*K     Star K                       M1     Multiple OU and Star K
+*P     Star K Parve                 MK     Montreal Vaad
+D      K or Kosher Dairy            ML     Unger Machon L'Kashrus
+_K     K or Kosher                  MP     Montreal Vaad Parve
+P      K or Kosher Parve            N      Not Kosher
+1K     KSA                          NA     N/A
+1P     KSA Parve                    NS     New Square Kashrus
+2D     K in a Square Dairy          OC     OK Cholov Yisroel
+2K     K in a Square                OD     OK Dairy
+AP     Cape Town Parve              OE     OK Dairy Equipment
+BC     British Columbia K           OK     OK
+BD     Tablet K Dairy               OP     OK Parve
+BK     Tablet K Dairy               OU     OU
+BY     OU Beit Yosef                OV     Saint Louis OV
+CD     CRC Dairy                    PG     Technical Konsultant Parve
+CG     CRC Glatt                    PB     Brussels Parve
+CK     CRC                          PJ     KAJ Parve
+D9     Technical Konsultants        PK     Beth Din de Paris
+DV     KVH New England Dairy        PM     Machon L'Kashrus Parve
+FD     Flame K Dairy                PV     KVH New England Parve
+HK     Heart K                      RK     COR
+K1     China KS KS                  SD     Scroll K Dairy
+K2     Kosher Italy                 TD     Triangle K Dairy
+K3     Peru K                       TK     Triangle K
+K4     OKS                          TP     Triangle K Parve
+K5     United Mehadrin              U1     OU Parve Pas Yisroel Yoshon
+K6     Turkey Kof K                 U2     OU Parve Pas Yisroel
+K7     ORC K (San Francisco)        UC     OU Cholov Yisroel
+K8     Kay Kosher                   UD     OU Dairy
+K9     Vaad Hakashrut de Bogota     UE     OU Dairy Equipment
+KA     Australia                    UF     OU Fish
+KD     Kof K Dairy                  UG     OU Glatt
+KF     Kof K Fish                   UM     OU Meat
+KJ     KAJ                          UP     OU Parve
+
+================================================================================
+REFERENCE - PHONE EXTENSIONS
+================================================================================
+
+OPERATIONS
+----------
+Tim Driscoll, President                          211
+Ron Pereen, Executive Vice President             181
+Steve Donnelly, Senior VP Sales/Purchasing/Mktg  180
+George Williams, Chief Performance Officer       137
+John Levatino, Vice President of Sales           288
+Patty Volk, Sales Project Coordinator            139
+Richard Kemo, Director Multi-Unit Account        ---
+Helder Coelho, Operations Manager                ---
+Sara Kenyon, Director of Transportation          ---
+Michael Palma, Transportation Manager            ---
+
+CUSTOMER SERVICE / INSIDE SALES
+-------------------------------
+Hailey Singh, Supervisor                      ---
+Rosa Torres                                      ---
+
+MULTI-UNIT SALES
+Matt Hartigan, director
+James Afflerbach, lead associate
+
+BID DEPARTMENT
+--------------
+Matt Wasserman, bid director                              ---
+Chris Caselnova, bid lead - start here first                                 ---
+
+FINANCE DEPARTMENT
+------------------
+Carolina Ortega, Accounting Manager              172
+
+ACCOUNTS PAYABLE
+----------------
+Nicole Abudeye, Supervisor                       220
+
+A/R & COLLECTIONS
+-----------------
+Carolina O                                       102
+
+NYC SCHOOLS ACCOUNTING
+----------------------
+James Hartman                                    101
+
+INVENTORY CONTROL
+-----------------
+Bill Lulack                                      123
+James Serrago                                    179
+Jacob Veeren                                     153
+
+HUMAN RESOURCES
+---------------
+Carolina Ortega, HR Manager                      172
+Natasha Driscoll                                 120
+Alexandra Narrea, Payroll & Benefits             222
+
+RECEPTIONIST
+------------
+Ashley Rodriguez                                 100
+
+IT AND LOSS PREVENTION
+----------------------
+Shamar Basu, Manager                             973-464-3894
+Cathy Cioce                                      ---
+Yeraldy Duran                                    ---
+
+CASH & CARRY
+------------
+Mike Tighe                                       ---
+Edward Blaskewicz                                ---
+
+MEAL PRODUCTION
+---------------
+Frank Ryan                                       ---
+
+CUT SHOP
+--------
+Vito Scardigno, Director of Production           ---
+Frank Ryan                                       ---
+Dan Roth                                         ---
+
+PURCHASING / MARKETING
+----------------------
+Priscilla Keller, purchasing head   ---
+Chris Driscoll, Director of Purchasing           ---
+
+================================================================================
+END OF DOCUMENT
+================================================================================
