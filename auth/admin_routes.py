@@ -834,7 +834,7 @@ async def list_all_departments(
     Returns the static list of 6 departments.
     """
     # Static departments after 2-table schema migration
-    STATIC_DEPARTMENTS = [
+    departments = [
         {"slug": "credit", "name": "Credit Department", "description": "Credit and collections"},
         {"slug": "sales", "name": "Sales Department", "description": "Sales operations"},
         {"slug": "warehouse", "name": "Warehouse", "description": "Warehouse operations"},
@@ -842,7 +842,7 @@ async def list_all_departments(
         {"slug": "hr", "name": "Human Resources", "description": "HR operations"},
         {"slug": "it", "name": "IT Department", "description": "Technology operations"},
     ]
-    return {"departments": STATIC_DEPARTMENTS}
+    return APIResponse(success=True, data={"departments": departments})
 
 
 # =============================================================================
