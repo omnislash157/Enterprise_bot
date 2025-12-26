@@ -248,6 +248,37 @@ async def get_user_detail(
         if not visible_depts.intersection(target_depts):
             raise HTTPException(403, "Cannot view this user")
 
+    # Build structured department list for frontend
+    dept_head_set = set(target.dept_head_for or [])
+    departments_list = [
+        {
+            "slug": dept,
+            "name": next((d["name"] for d in [
+                {"slug": "credit", "name": "Credit Department"},
+                {"slug": "sales", "name": "Sales Department"},
+                {"slug": "warehouse", "name": "Warehouse"},
+                {"slug": "accounting", "name": "Accounting"},
+                {"slug": "purchasing", "name": "Purchasing"},
+                {"slug": "it", "name": "IT Department"},
+            ] if d["slug"] == dept), dept.title()),
+            "access_level": "admin" if dept in dept_head_set else "read",
+            "is_dept_head": dept in dept_head_set,
+            "granted_at": None  # Not tracked in current schema
+        }
+        for dept in (target.department_access or [])
+    ]
+
+    # Compute role/tier for display
+    if target.is_super_user:
+        role = "super_user"
+        tier = "SUPER_USER"
+    elif target.dept_head_for:
+        role = "dept_head"
+        tier = "DEPT_HEAD"
+    else:
+        role = "user"
+        tier = "USER"
+
     return APIResponse(
         success=True,
         data={
@@ -255,10 +286,13 @@ async def get_user_detail(
                 "id": target.id,
                 "email": target.email,
                 "display_name": target.display_name,
-                "departments": target.department_access,  # Standardized naming for frontend
+                "employee_id": getattr(target, 'employee_id', None),
+                "departments": departments_list,  # Structured for frontend
                 "dept_head_for": target.dept_head_for,
                 "is_super_user": target.is_super_user,
                 "is_active": target.is_active,
+                "role": role,
+                "tier": tier,
                 "created_at": target.created_at.isoformat() if target.created_at else None,
                 "last_login_at": target.last_login_at.isoformat() if target.last_login_at else None,
             }
@@ -855,7 +889,11 @@ class CreateUserRequest(BaseModel):
     """Request to create a single user."""
     email: str
     display_name: Optional[str] = None
-    department: Optional[str] = None  # Single department to grant access to
+    employee_id: Optional[str] = None
+    role: Optional[str] = None  # 'user', 'dept_head', 'super_user'
+    primary_department: Optional[str] = None  # Primary department
+    department: Optional[str] = None  # Single department (legacy)
+    department_access: Optional[List[str]] = None  # Multiple departments
     reason: Optional[str] = None
 
 
@@ -886,13 +924,14 @@ async def create_user(
     x_user_email: str = Header(None, alias="X-User-Email"),
 ):
     """
-    Create a single user with optional department access.
+    Create a single user with optional department access and role.
 
     Flow:
     1. Validate requester is admin (super_user or dept_head)
-    2. Validate department if provided
+    2. Validate departments if provided
     3. Create user via get_or_create_user()
-    4. Grant department access if specified
+    4. Grant department access for all specified departments
+    5. Handle role (dept_head requires primary_department, super_user requires super_user)
     """
     auth = get_auth_service()
     requester = auth.get_user_by_email(x_user_email)
@@ -904,15 +943,35 @@ async def create_user(
     if not requester.is_super_user and not requester.dept_head_for:
         raise HTTPException(403, "Only admins can create users")
 
-    # Validate department if provided
-    department = request.department
     valid_slugs = [d.slug for d in STATIC_DEPARTMENTS]
-    if department and department not in valid_slugs:
-        raise HTTPException(400, f"Invalid department: {department}. Valid: {valid_slugs}")
 
-    # Check permission to grant this department
-    if department and not requester.can_grant_access(department):
-        raise HTTPException(403, f"You cannot grant access to {department}")
+    # Collect all departments to grant (from department_access, department, or primary_department)
+    departments_to_grant = set()
+
+    if request.department_access:
+        for dept in request.department_access:
+            if dept not in valid_slugs:
+                raise HTTPException(400, f"Invalid department: {dept}. Valid: {valid_slugs}")
+            if not requester.can_grant_access(dept):
+                raise HTTPException(403, f"You cannot grant access to {dept}")
+            departments_to_grant.add(dept)
+
+    if request.department and request.department in valid_slugs:
+        if not requester.can_grant_access(request.department):
+            raise HTTPException(403, f"You cannot grant access to {request.department}")
+        departments_to_grant.add(request.department)
+
+    if request.primary_department and request.primary_department in valid_slugs:
+        if not requester.can_grant_access(request.primary_department):
+            raise HTTPException(403, f"You cannot grant access to {request.primary_department}")
+        departments_to_grant.add(request.primary_department)
+
+    # Role validation
+    role = request.role or 'user'
+    if role == 'super_user' and not requester.is_super_user:
+        raise HTTPException(403, "Only super users can create super users")
+    if role == 'dept_head' and not requester.is_super_user:
+        raise HTTPException(403, "Only super users can create department heads")
 
     try:
         # Create user (no access by default)
@@ -924,21 +983,35 @@ async def create_user(
         if not user:
             raise HTTPException(400, f"Could not create user: {request.email}")
 
-        # Grant department access if specified
-        if department:
-            auth.grant_department_access(requester, request.email, department)
+        # Grant department access for all specified departments
+        granted_depts = []
+        for dept in departments_to_grant:
+            auth.grant_department_access(requester, request.email, dept)
+            granted_depts.append(dept)
 
-        logger.info(f"[Admin] {x_user_email} created user {request.email} with department={department}")
+        # Handle role promotion
+        if role == 'super_user':
+            auth.make_super_user(requester, request.email)
+        elif role == 'dept_head' and request.primary_department:
+            # Make them dept head for their primary department
+            auth.promote_to_dept_head(requester, request.email, request.primary_department)
+
+        logger.info(f"[Admin] {x_user_email} created user {request.email} with departments={granted_depts}, role={role}")
+
+        # Fetch updated user to get final state
+        final_user = auth.get_user_by_email(request.email)
 
         return APIResponse(
             success=True,
             data={
                 "user": {
-                    "id": str(user.id),
-                    "email": user.email,
-                    "display_name": user.display_name,
-                    "departments": user.department_access + ([department] if department else []),
-                    "is_active": user.is_active
+                    "id": str(final_user.id if final_user else user.id),
+                    "email": final_user.email if final_user else user.email,
+                    "display_name": final_user.display_name if final_user else user.display_name,
+                    "departments": final_user.department_access if final_user else granted_depts,
+                    "dept_head_for": final_user.dept_head_for if final_user else [],
+                    "is_super_user": final_user.is_super_user if final_user else False,
+                    "is_active": final_user.is_active if final_user else True
                 }
             }
         )

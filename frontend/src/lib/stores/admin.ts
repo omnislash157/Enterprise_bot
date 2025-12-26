@@ -288,29 +288,110 @@ function createAdminStore() {
         // =====================================================================
         // ROLE MANAGEMENT
         // =====================================================================
-        
+
         async changeUserRole(
             userId: string,
             newRole: string,
-            reason?: string
+            reason?: string,
+            primaryDepartment?: string
         ): Promise<{ success: boolean; error?: string }> {
-            const result = await apiCall<{ message: string }>(
-                `/api/admin/users/${userId}/role`,
-                {
-                    method: 'PUT',
-                    body: JSON.stringify({ new_role: newRole, reason }),
+            // Get the user's email first
+            const state = get({ subscribe });
+            const user = state.users.find(u => u.id === userId);
+            if (!user) {
+                return { success: false, error: 'User not found' };
+            }
+            const targetEmail = user.email;
+
+            // Determine current role
+            const currentRole = user.is_super_user ? 'super_user' :
+                (user.dept_head_for && user.dept_head_for.length > 0) ? 'dept_head' : 'user';
+
+            // If no change, just return success
+            if (currentRole === newRole) {
+                return { success: true };
+            }
+
+            let result: { success: boolean; error?: string } = { success: false };
+
+            // Handle role transitions
+            if (newRole === 'super_user') {
+                // Promote to super user
+                result = await apiCall<{ message: string }>(
+                    '/api/admin/super-user/promote',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({ target_email: targetEmail }),
+                    }
+                );
+            } else if (newRole === 'dept_head') {
+                // Promote to dept head (needs a department)
+                const deptToHead = primaryDepartment ||
+                    (user.departments && user.departments.length > 0 ? user.departments[0] : null);
+
+                if (!deptToHead) {
+                    return { success: false, error: 'User needs department access to become dept head' };
                 }
-            );
-            
+
+                // First revoke super user if they were one
+                if (currentRole === 'super_user') {
+                    await apiCall<{ message: string }>(
+                        '/api/admin/super-user/revoke',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({ target_email: targetEmail }),
+                        }
+                    );
+                }
+
+                result = await apiCall<{ message: string }>(
+                    '/api/admin/dept-head/promote',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            target_email: targetEmail,
+                            department: deptToHead
+                        }),
+                    }
+                );
+            } else {
+                // Demote to regular user
+                // Revoke super user first if applicable
+                if (currentRole === 'super_user') {
+                    result = await apiCall<{ message: string }>(
+                        '/api/admin/super-user/revoke',
+                        {
+                            method: 'POST',
+                            body: JSON.stringify({ target_email: targetEmail }),
+                        }
+                    );
+                }
+                // Revoke all dept head positions
+                if (currentRole === 'dept_head' && user.dept_head_for) {
+                    for (const dept of user.dept_head_for) {
+                        await apiCall<{ message: string }>(
+                            '/api/admin/dept-head/revoke',
+                            {
+                                method: 'POST',
+                                body: JSON.stringify({
+                                    target_email: targetEmail,
+                                    department: dept
+                                }),
+                            }
+                        );
+                    }
+                    result = { success: true };
+                }
+            }
+
             if (result.success) {
                 // Refresh the user list and detail
-                const state = get({ subscribe });
                 await this.loadUsers(state.departmentFilter || undefined);
                 if (state.selectedUser?.id === userId) {
                     await this.loadUserDetail(userId);
                 }
             }
-            
+
             return result;
         },
         
