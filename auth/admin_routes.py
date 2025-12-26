@@ -798,23 +798,26 @@ async def get_admin_stats(
                 WHERE created_at > NOW() - INTERVAL '24 hours'
             """)
 
-            return {
-                "users": {
-                    "total": total_users,
-                    "active": active_users,
-                    "super_users": super_users,
-                    "recent_logins_24h": recent_logins
-                },
-                "audit": {
-                    "events_24h": audit_today
-                },
-                "departments": {
-                    "count": 6  # Static post-migration
+            return APIResponse(
+                success=True,
+                data={
+                    "users": {
+                        "total": total_users,
+                        "active": active_users,
+                        "super_users": super_users,
+                        "recent_logins_24h": recent_logins
+                    },
+                    "audit": {
+                        "events_24h": audit_today
+                    },
+                    "departments": {
+                        "count": 6  # Static post-migration
+                    }
                 }
-            }
+            )
     except Exception as e:
         logger.error(f"[Admin] Stats error: {e}")
-        return {"error": str(e), "users": {"total": 0}, "audit": {"events_24h": 0}}
+        return APIResponse(success=False, error=str(e))
 
 
 # =============================================================================
