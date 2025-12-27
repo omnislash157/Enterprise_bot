@@ -15,7 +15,7 @@
   
     interface Particle {
       x: number;
-      y: number;
+      y: number; 
       z: number;
       baseScale: number;
       phase: number;      // offset for oscillation
