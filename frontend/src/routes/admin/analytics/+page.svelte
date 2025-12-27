@@ -37,20 +37,20 @@
       let refreshInterval: ReturnType<typeof setInterval> | null = null;
   
       // Transform query intents for donut chart
-      $: intentChartData = ($queryIntents || []).map(i => ({
+      $: intentChartData = ($memoryGraphData?.intents || []).map(i => ({
           category: formatIntentLabel(i.intent),
           count: i.count
       }));
   
       // Transform inferred departments for bar chart
-      $: inferredDeptChartData = ($departmentUsageInferred || []).map(d => ({
+      $: inferredDeptChartData = ($memoryGraphData?.departments || []).map(d => ({
           department: d.department,
           query_count: d.query_count,
           avg_complexity: d.avg_complexity
       }));
   
       // Calculate complexity distribution from inferred data
-      $: complexityDistribution = calculateComplexityDistribution($departmentUsageInferred || []);
+      $: complexityDistribution = calculateComplexityDistribution($memoryGraphData?.departments || []);
   
       function formatIntentLabel(intent: string): string {
           return intent
