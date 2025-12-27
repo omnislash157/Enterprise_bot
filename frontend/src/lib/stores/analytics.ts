@@ -56,7 +56,8 @@ export interface DepartmentUsageInferred {
 export interface QueryIntent {
     intent: string;
     count: number;
-    complexity: number;
+    avg_complexity: number;
+    avg_response_time_ms: number;
 }
 
 export interface MemoryGraphData {
@@ -282,15 +283,20 @@ function createAnalyticsStore() {
             }));
         },
 
+        // =====================================================================
+        // NEW HEURISTICS ENDPOINTS - FIXED: Extract .data from response wrapper
+        // =====================================================================
+
         async loadDepartmentUsageInferred() {
             update(s => ({ ...s, departmentUsageInferredLoading: true }));
             try {
-                const data = await fetchJson<DepartmentUsageInferred[]>(
+                const response = await fetchJson<{ data: DepartmentUsageInferred[] }>(
                     `/api/admin/analytics/department-usage-inferred?hours=${currentPeriodHours}`
                 );
+                // Extract .data from response wrapper
                 update(s => ({
                     ...s,
-                    departmentUsageInferred: data || [],
+                    departmentUsageInferred: response?.data || [],
                     departmentUsageInferredLoading: false,
                 }));
             } catch (err) {
@@ -306,12 +312,13 @@ function createAnalyticsStore() {
         async loadQueryIntents() {
             update(s => ({ ...s, queryIntentsLoading: true }));
             try {
-                const data = await fetchJson<QueryIntent[]>(
+                const response = await fetchJson<{ data: QueryIntent[] }>(
                     `/api/admin/analytics/query-intents?hours=${currentPeriodHours}`
                 );
+                // Extract .data from response wrapper
                 update(s => ({
                     ...s,
-                    queryIntents: data || [],
+                    queryIntents: response?.data || [],
                     queryIntentsLoading: false,
                 }));
             } catch (err) {
@@ -327,6 +334,7 @@ function createAnalyticsStore() {
         async loadMemoryGraphData() {
             update(s => ({ ...s, memoryGraphDataLoading: true }));
             try {
+                // memory-graph-data returns the full object directly (not wrapped in .data)
                 const data = await fetchJson<MemoryGraphData>(
                     `/api/admin/analytics/memory-graph-data?hours=${currentPeriodHours}`
                 );
@@ -397,6 +405,8 @@ function createAnalyticsStore() {
             refreshTimer = setInterval(() => {
                 store.loadOverview();
                 store.loadRealtime();
+                // Also refresh heuristics data periodically
+                store.loadMemoryGraphData();
             }, initialState.refreshInterval);
         },
 
@@ -441,7 +451,7 @@ export const realtimeSessions = derived(analyticsStore, $s => $s.realtimeSession
 
 export const isLoading = derived(
     analyticsStore,
-    $s => $s.overviewLoading || $s.queriesByHourLoading || $s.categoriesLoading
+    $s => $s.overviewLoading || $s.queriesByHourLoading || $s.categoriesLoading || $s.memoryGraphDataLoading
 );
 
 export const periodHours = derived(analyticsStore, $s => $s.periodHours);
