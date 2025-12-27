@@ -6,6 +6,7 @@
     end: [x, y, z] end position
     color: hex color
     activity: 0-1 data flow intensity
+    dashed: whether to use dashed line (for flow connections)
 -->
 
 <script lang="ts">
@@ -16,6 +17,7 @@
     export let end: [number, number, number] = [1, 1, 1];
     export let color: string = '#00ff41';
     export let activity: number = 0.3;
+    export let dashed: boolean = false;
 
     // Create curved line
     const curve = new THREE.QuadraticBezierCurve3(
@@ -53,9 +55,15 @@
     });
 </script>
 
-<T.Line {geometry}>
-    <T.LineBasicMaterial {color} transparent {opacity} linewidth={1} />
-</T.Line>
+{#if dashed}
+    <T.Line {geometry}>
+        <T.LineDashedMaterial {color} transparent {opacity} dashSize={0.3} gapSize={0.2} />
+    </T.Line>
+{:else}
+    <T.Line {geometry}>
+        <T.LineBasicMaterial {color} transparent {opacity} linewidth={1} />
+    </T.Line>
+{/if}
 
 <!-- Data packet traveling along synapse -->
 {#if activity > 0.2}

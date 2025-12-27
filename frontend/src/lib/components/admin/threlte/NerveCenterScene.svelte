@@ -5,17 +5,21 @@
   - Neural network visualization
   - Ambient particles
   - Cyberpunk lighting
+  - Rotating memory graph with department usage
 -->
 
 <script lang="ts">
     import { T, useTask } from '@threlte/core';
     import { OrbitControls } from '@threlte/extras';
     import NeuralNetwork from './NeuralNetwork.svelte';
-    import type { CategoryData } from '$lib/stores/analytics';
+    import type { CategoryData, DepartmentStats } from '$lib/stores/analytics';
 
     export let categories: CategoryData[] = [];
     export let totalQueries: number = 0;
     export let activeUsers: number = 0;
+    export let departmentUsage: Array<{ department: string; query_count: number; avg_complexity: number }> = [];
+    export let queryIntents: Array<{ intent: string; count: number; complexity: number }> = [];
+    export let temporalPatterns: any = null;
 
     // Background particles
     const particleCount = 100;
@@ -79,7 +83,14 @@
 </T.Mesh>
 
 <!-- Neural Network -->
-<NeuralNetwork {categories} {totalQueries} {activeUsers} />
+<NeuralNetwork
+    {categories}
+    {totalQueries}
+    {activeUsers}
+    {departmentUsage}
+    {queryIntents}
+    {temporalPatterns}
+/>
 
 <!-- Ambient floating particles -->
 {#each particles as particle}
