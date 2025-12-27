@@ -1,11 +1,17 @@
 """
-Metrics API Routes - Observability endpoints
+Metrics Routes - System Health & Performance Endpoints
 
-All routes require admin access.
+Provides real-time system metrics via:
+- /api/metrics/snapshot - HTTP endpoint for on-demand metrics
+- /api/metrics/health - Simple health check
+- /api/metrics/stream - WebSocket for real-time streaming (5s interval)
+
+Uses the centralized MetricsCollector singleton for all data.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
-from typing import Optional
+from fastapi import APIRouter, WebSocket, WebSocketDisconnect, Header, HTTPException
+from typing import Optional, Set
+from datetime import datetime
 import asyncio
 import logging
 
@@ -15,108 +21,105 @@ logger = logging.getLogger(__name__)
 
 metrics_router = APIRouter()
 
+# Track active WebSocket connections for metrics streaming
+_active_stream_connections: Set[WebSocket] = set()
+
+# Metrics streaming interval (seconds)
+STREAM_INTERVAL = 5
+
+
+# =============================================================================
+# HTTP ENDPOINTS
+# =============================================================================
 
 @metrics_router.get("/snapshot")
-async def get_metrics_snapshot():
-    """Get full metrics snapshot."""
-    return metrics_collector.get_snapshot()
+async def get_metrics_snapshot(
+    x_user_email: Optional[str] = Header(None, alias="X-User-Email"),
+):
+    """
+    Get current metrics snapshot.
+
+    Returns system health, RAG performance, cache stats, LLM costs.
+    """
+    try:
+        snapshot = metrics_collector.get_snapshot()
+        return snapshot
+    except Exception as e:
+        logger.error(f"Error building metrics snapshot: {e}")
+        raise HTTPException(500, f"Error collecting metrics: {str(e)}")
 
 
 @metrics_router.get("/health")
-async def get_health():
-    """
-    Health check endpoint for uptime monitoring.
-    No auth required - used by load balancers/monitors.
-    """
-    return metrics_collector.get_health()
-
-
-@metrics_router.get("/system")
-async def get_system_metrics():
-    """Get system resource metrics only."""
-    return metrics_collector.get_system_metrics()
-
-
-@metrics_router.get("/rag")
-async def get_rag_metrics():
-    """Get RAG pipeline metrics only."""
-    snapshot = metrics_collector.get_snapshot()
-    return {
-        'rag': snapshot['rag'],
-        'cache': snapshot['cache'],
-    }
-
-
-@metrics_router.get("/llm")
-async def get_llm_metrics():
-    """Get LLM/AI metrics only."""
-    snapshot = metrics_collector.get_snapshot()
-    return snapshot['llm']
+async def health_check():
+    """Simple health check endpoint."""
+    try:
+        health = metrics_collector.get_health()
+        return health
+    except Exception as e:
+        logger.error(f"Error getting health: {e}")
+        return {
+            "status": "unknown",
+            "timestamp": datetime.utcnow().isoformat(),
+            "error": str(e),
+        }
 
 
 # =============================================================================
 # WEBSOCKET STREAMING
 # =============================================================================
 
-class MetricsStreamManager:
-    """Manages WebSocket connections for metrics streaming."""
-
-    def __init__(self):
-        self.connections: list[WebSocket] = []
-
-    async def connect(self, websocket: WebSocket):
-        await websocket.accept()
-        self.connections.append(websocket)
-        logger.info(f"[Metrics WS] Client connected. Total: {len(self.connections)}")
-
-    def disconnect(self, websocket: WebSocket):
-        if websocket in self.connections:
-            self.connections.remove(websocket)
-        logger.info(f"[Metrics WS] Client disconnected. Total: {len(self.connections)}")
-
-    async def broadcast(self, data: dict):
-        """Send metrics to all connected clients."""
-        disconnected = []
-        for ws in self.connections:
-            try:
-                await ws.send_json(data)
-            except Exception:
-                disconnected.append(ws)
-
-        # Clean up disconnected clients
-        for ws in disconnected:
-            self.disconnect(ws)
-
-
-metrics_stream_manager = MetricsStreamManager()
-
-
 @metrics_router.websocket("/stream")
 async def metrics_stream(websocket: WebSocket):
     """
     WebSocket endpoint for real-time metrics streaming.
-    Sends snapshot every 5 seconds.
 
-    Connect: ws://host/api/metrics/stream
+    Sends metrics_snapshot every STREAM_INTERVAL seconds.
+    Message format: { "type": "metrics_snapshot", "data": {...} }
     """
-    await metrics_stream_manager.connect(websocket)
+    await websocket.accept()
+    _active_stream_connections.add(websocket)
+    logger.info(f"[Metrics WS] Client connected. Total: {len(_active_stream_connections)}")
 
     try:
-        # Send initial snapshot immediately
-        await websocket.send_json({
-            'type': 'metrics_snapshot',
-            'data': metrics_collector.get_snapshot()
-        })
-
-        # Stream updates every 5 seconds
         while True:
-            await asyncio.sleep(5)
+            # Get snapshot from centralized collector
+            snapshot = metrics_collector.get_snapshot()
             await websocket.send_json({
-                'type': 'metrics_snapshot',
-                'data': metrics_collector.get_snapshot()
+                "type": "metrics_snapshot",
+                "data": snapshot
             })
+
+            # Wait before next update
+            await asyncio.sleep(STREAM_INTERVAL)
+
     except WebSocketDisconnect:
-        metrics_stream_manager.disconnect(websocket)
+        logger.info("[Metrics WS] Client disconnected normally")
     except Exception as e:
         logger.error(f"[Metrics WS] Error: {e}")
-        metrics_stream_manager.disconnect(websocket)
+    finally:
+        _active_stream_connections.discard(websocket)
+        logger.info(f"[Metrics WS] Client removed. Remaining: {len(_active_stream_connections)}")
+
+
+# =============================================================================
+# BROADCAST UTILITY (for external triggers)
+# =============================================================================
+
+async def broadcast_metrics():
+    """Broadcast current metrics to all connected clients."""
+    if not _active_stream_connections:
+        return
+
+    snapshot = metrics_collector.get_snapshot()
+    message = {"type": "metrics_snapshot", "data": snapshot}
+
+    disconnected = set()
+    for ws in _active_stream_connections:
+        try:
+            await ws.send_json(message)
+        except Exception:
+            disconnected.add(ws)
+
+    # Clean up disconnected clients
+    for ws in disconnected:
+        _active_stream_connections.discard(ws)
