@@ -12,8 +12,8 @@
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import ConnectionStatus from '$lib/components/ConnectionStatus.svelte';
 	
-	// Static import - Svelte will handle SSR correctly
-	import AmbientBackground from '$lib/threlte/AmbientBackground.svelte';
+	// NO static import of AmbientBackground - it contains Canvas which breaks SSR
+	let AmbientBackground: any = null;
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
@@ -21,8 +21,8 @@
 	// Track route changes for transitions
 	$: key = $page.url.pathname;
 
-	// Show ambient only when authenticated and in browser
-	$: showAmbient = browser && $isAuthenticated;
+	// Show ambient only when component loaded and authenticated
+	$: showAmbient = AmbientBackground && $isAuthenticated;
 
 	onMount(async () => {
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -33,12 +33,22 @@
 		} else {
 			auth.markInitialized();
 		}
+
+		// Dynamic import ONLY in browser - prevents SSR crash
+		if (browser) {
+			try {
+				const module = await import('$lib/threlte/AmbientBackground.svelte');
+				AmbientBackground = module.default;
+			} catch (err) {
+				console.warn('[Layout] Failed to load AmbientBackground:', err);
+			}
+		}
 	});
 </script>
 
-<!-- Persistent Ambient Background Layer - only in browser when authenticated -->
+<!-- Persistent Ambient Background Layer - dynamically loaded, SSR-safe -->
 {#if showAmbient}
-	<AmbientBackground />
+	<svelte:component this={AmbientBackground} />
 {/if}
 
 {#if isAuthCallback}
@@ -107,6 +117,4 @@
 	@keyframes spin {
 		to { transform: rotate(360deg); }
 	}
-
-	/* Normie mode - handled in AmbientBackground if needed */
 </style>
