@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '../app.css';
 	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
 	import { fade } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { theme } from '$lib/stores/theme';
@@ -10,12 +11,18 @@
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import ConnectionStatus from '$lib/components/ConnectionStatus.svelte';
+	
+	// Static import - Svelte will handle SSR correctly
+	import AmbientBackground from '$lib/threlte/AmbientBackground.svelte';
 
 	// Allow callback page to render without auth
 	$: isAuthCallback = $page.url.pathname.startsWith('/auth/');
 
 	// Track route changes for transitions
 	$: key = $page.url.pathname;
+
+	// Show ambient only when authenticated and in browser
+	$: showAmbient = browser && $isAuthenticated;
 
 	onMount(async () => {
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
@@ -28,6 +35,11 @@
 		}
 	});
 </script>
+
+<!-- Persistent Ambient Background Layer - only in browser when authenticated -->
+{#if showAmbient}
+	<AmbientBackground />
+{/if}
 
 {#if isAuthCallback}
 	<slot />
@@ -58,7 +70,10 @@
 {/if}
 
 <style>
+	/* Ensure content is above ambient layer */
 	.app-shell {
+		position: relative;
+		z-index: 1;
 		min-height: 100vh;
 	}
 
@@ -92,4 +107,6 @@
 	@keyframes spin {
 		to { transform: rotate(360deg); }
 	}
+
+	/* Normie mode - handled in AmbientBackground if needed */
 </style>
