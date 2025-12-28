@@ -7,6 +7,7 @@
 	import { theme } from '$lib/stores/theme';
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
+	import { tenant, tenantLoading } from '$lib/stores/tenant';
 	import Login from '$lib/components/Login.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
@@ -26,6 +27,11 @@
 
 	onMount(async () => {
 		const apiBase = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
+		// Load tenant first (determines auth config)
+		await tenant.load();
+
+		// Then load config and init auth
 		loadConfig(apiBase).catch(console.warn);
 
 		if (!isAuthCallback) {
@@ -53,10 +59,10 @@
 
 {#if isAuthCallback}
 	<slot />
-{:else if $configLoading || !$authInitialized}
+{:else if $tenantLoading || $configLoading || !$authInitialized}
 	<div class="loading-screen">
 		<div class="spinner"></div>
-		<p>{$authLoading ? 'Authenticating...' : 'Loading...'}</p>
+		<p>{$tenantLoading ? 'Loading tenant...' : $authLoading ? 'Authenticating...' : 'Loading...'}</p>
 	</div>
 {:else if !$isAuthenticated}
 	<Login />

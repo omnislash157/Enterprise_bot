@@ -277,3 +277,30 @@ async def provision_user(azure_user: AzureUser):
         )
 
     return user
+
+
+# =============================================================================
+# TENANT ENDPOINT
+# =============================================================================
+
+@router.get("/tenant")
+async def get_tenant(request: Request):
+    """
+    Return current tenant info based on domain.
+    Used by frontend to load tenant context on app startup.
+    """
+    from core.tenant_middleware import get_optional_tenant
+
+    tenant = get_optional_tenant(request)
+
+    if not tenant:
+        raise HTTPException(status_code=400, detail="Unknown tenant domain")
+
+    return {
+        "tenant_id": tenant.tenant_id,
+        "slug": tenant.slug,
+        "name": tenant.name,
+        "domain": tenant.domain,
+        "branding": tenant.branding,
+        "has_azure_sso": tenant.has_azure_sso,
+    }

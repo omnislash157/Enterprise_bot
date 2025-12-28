@@ -337,6 +337,14 @@ app.add_middleware(
 # Gzip compression for responses > 500 bytes
 app.add_middleware(GZipMiddleware, minimum_size=500)
 
+# Tenant resolution middleware (must come before timing middleware)
+try:
+    from .tenant_middleware import tenant_middleware
+    app.middleware("http")(tenant_middleware)
+    logger.info("[STARTUP] Tenant middleware registered")
+except ImportError as e:
+    logger.warning(f"Tenant middleware not loaded: {e}")
+
 
 @app.middleware("http")
 async def add_timing_header(request: Request, call_next):
@@ -429,10 +437,12 @@ async def startup_event():
     if CONFIG_LOADED and is_enterprise_mode():
         logger.info("[STARTUP] Warming database connection pool...")
         try:
-            from .database import init_db_pool
+            from .database import init_db_pool, get_db_pool
             config = get_config()
             await init_db_pool(config)
-            logger.info("[STARTUP] Database pool initialized")
+            # Store DB pool in app state for tenant middleware
+            app.state.db_pool = await get_db_pool(config)
+            logger.info("[STARTUP] Database pool initialized and stored in app state")
         except Exception as e:
             logger.warning(f"[STARTUP] Database pool init failed: {e}")
 

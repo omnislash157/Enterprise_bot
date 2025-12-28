@@ -41,10 +41,10 @@ from datetime import datetime
 class TenantContext:
     """
     Request context for enterprise mode.
-    
+
     Carries tenant/department/user info through the request lifecycle.
     Created from authenticated request, passed to EnterpriseTwin.
-    
+
     Auth and access control are NOT handled here - that's:
     - Entra ID for authentication
     - RLS policies for data access
@@ -53,16 +53,24 @@ class TenantContext:
     # Required
     tenant_id: str                          # Company ID (e.g., "driscoll")
     department: str                         # User's primary department
-    
+
     # User info (from auth)
     user_email: Optional[str] = None
     user_id: Optional[str] = None           # UUID from users table
     display_name: Optional[str] = None
-    
+
     # Access info (from database)
     role: str = "user"                      # user | dept_head | admin | super_user
     departments: List[str] = field(default_factory=list)  # All accessible depts
-    
+
+    # Multi-tenant fields (from tenants table)
+    slug: Optional[str] = None              # Tenant slug (e.g., "driscoll")
+    name: Optional[str] = None              # Tenant display name
+    domain: Optional[str] = None            # Domain (e.g., "driscollintel.com")
+    azure_tenant_id: Optional[str] = None   # Azure AD Tenant ID for SSO
+    azure_client_id: Optional[str] = None   # Azure AD Client ID for SSO
+    branding: Dict[str, Any] = field(default_factory=dict)  # Logo, colors, etc.
+
     # Session
     session_id: Optional[str] = None
     created_at: datetime = field(default_factory=datetime.now)
@@ -80,15 +88,20 @@ class TenantContext:
         }
     
     @property
+    def has_azure_sso(self) -> bool:
+        """Check if tenant has Azure SSO configured."""
+        return bool(self.azure_tenant_id and self.azure_client_id)
+
+    @property
     def is_admin(self) -> bool:
         """Check if user has admin privileges."""
         return self.role in ("admin", "super_user")
-    
+
     @property
     def is_dept_head(self) -> bool:
         """Check if user is a department head."""
         return self.role in ("dept_head", "admin", "super_user")
-    
+
     def can_access_department(self, dept: str) -> bool:
         """Check if user can access a specific department."""
         if self.is_admin:

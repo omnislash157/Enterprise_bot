@@ -1,5 +1,18 @@
 # CogTwin Development Changelog
 
+## [2025-12-28 19:00] - Multi-Tenant Domain Routing Implementation
+### Files Modified
+- migration_tenant_multitenant.py - Created database migration script (215 lines)
+- core/tenant_middleware.py - Created tenant resolution middleware with domain matching (113 lines)
+- core/enterprise_tenant.py - Extended TenantContext with Azure AD and branding fields
+- core/main.py - Registered tenant middleware and stored DB pool in app.state
+- auth/sso_routes.py - Added GET /api/auth/tenant endpoint for frontend
+- frontend/src/lib/stores/tenant.ts - Created tenant store with derived stores (82 lines)
+- frontend/src/routes/+layout.svelte - Load tenant before auth initialization
+- IMPLEMENTATION_SUMMARY.md - Created comprehensive implementation documentation (550+ lines)
+### Summary
+**MULTI-TENANT DOMAIN ROUTING COMPLETE**: Implemented domain-based multi-tenancy allowing single Railway deployment to serve multiple customers. Database schema extended with azure_tenant_id, azure_client_id, azure_client_secret_ref, branding (JSONB), and is_active fields. Created tenant middleware that resolves domain → tenant via exact match or wildcard subdomain (*.entintel.com). Middleware injects TenantContext into request.state for downstream handlers. Frontend loads tenant on app startup via new /api/auth/tenant endpoint. TenantContext extended with slug, name, domain, azure_tenant_id, azure_client_id, branding, and has_azure_sso property. Migration seeded Driscoll tenant with existing Azure credentials and linked all users. Fully backward compatible - existing deployments continue working. Current tenants: driscoll (driscollintel.com, SSO enabled) and platform (entintel.com, no SSO). System ready for production testing with actual domains. Future phases: query scoping by tenant_id, multi-tenant Azure AD with tenant-specific credentials, tenant admin UI.
+
 ## [2025-12-26 23:45] - Query Analytics Redesign Phase 1: Heuristics Engine
 ### Files Modified
 - auth/analytics_engine/query_heuristics.py - Created 982-line heuristics engine with 3 analyzer classes
