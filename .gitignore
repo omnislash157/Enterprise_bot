@@ -39,3 +39,14 @@ logs/
 dist/
 build/
 *.egg-info/
+
+# SvelteKit
+.svelte-kit/
+build/
+.vercel/
+.netlify/
+node_modules/
+dist/
+.env
+.env.*
+!.env.example

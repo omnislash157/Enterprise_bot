@@ -1,5 +1,7 @@
 /**
- * Observability Store - Tracing, Logging, Alerts
+ * Observability Store - Tracing, Logging, Alerts, Query Log
+ * 
+ * Merged: Original observability + Query Log viewer functionality
  */
 
 import { writable, derived } from 'svelte/store';
@@ -72,6 +74,36 @@ export interface AlertInstance {
     message: string;
 }
 
+// NEW: Query Log types
+export interface QueryLogEntry {
+    id: string;
+    session_id: string;
+    user_email: string;
+    department: string | null;
+    inferred_department: string | null;
+    query_text: string;
+    response_text: string;
+    response_time_ms: number;
+    chunks_used: number;
+    complexity_score: number;
+    intent_type: string | null;
+    urgency: string | null;
+    query_category: string | null;
+    trace_id: string | null;
+    created_at: string;
+}
+
+export interface QueryLogStats {
+    total_queries: number;
+    unique_users: number;
+    departments_used: number;
+    avg_response_time_ms: number;
+    avg_complexity: number;
+    avg_chunks_used: number;
+    by_department: Array<{ department: string; count: number }>;
+    by_intent: Array<{ intent: string; count: number }>;
+}
+
 // =============================================================================
 // STORE
 // =============================================================================
@@ -80,6 +112,7 @@ function createObservabilityStore() {
     const { subscribe, set, update } = writable({
         // Traces
         traces: [] as Trace[],
+        tracesTotal: 0,
         tracesLoading: false,
         selectedTrace: null as (Trace & { spans: Span[] }) | null,
 
@@ -92,6 +125,13 @@ function createObservabilityStore() {
         alertRules: [] as AlertRule[],
         alertInstances: [] as AlertInstance[],
         alertsLoading: false,
+
+        // Query Log (NEW)
+        queries: [] as QueryLogEntry[],
+        queriesTotal: 0,
+        queriesLoading: false,
+        queryStats: null as QueryLogStats | null,
+        selectedQuery: null as QueryLogEntry | null,
     });
 
     let logWs: WebSocket | null = null;
@@ -137,6 +177,7 @@ function createObservabilityStore() {
                 update(s => ({
                     ...s,
                     traces: data.traces || [],
+                    tracesTotal: data.total || 0,
                     tracesLoading: false,
                 }));
             } catch (e) {
@@ -241,6 +282,95 @@ function createObservabilityStore() {
         },
 
         // =================================================================
+        // QUERY LOG (NEW)
+        // =================================================================
+
+        async loadQueries(filters: {
+            hours?: number;
+            department?: string;
+            user_email?: string;
+            search?: string;
+            min_response_time?: number;
+            limit?: number;
+            offset?: number;
+        } = {}) {
+            update(s => ({ ...s, queriesLoading: true }));
+
+            try {
+                const params = new URLSearchParams();
+                if (filters.hours) params.set('hours', String(filters.hours));
+                if (filters.department) params.set('department', filters.department);
+                if (filters.user_email) params.set('user_email', filters.user_email);
+                if (filters.search) params.set('search', filters.search);
+                if (filters.min_response_time) params.set('min_response_time', String(filters.min_response_time));
+                if (filters.limit) params.set('limit', String(filters.limit));
+                if (filters.offset) params.set('offset', String(filters.offset));
+
+                const res = await fetch(`${getApiBase()}/api/admin/queries?${params}`, {
+                    headers: getHeaders()
+                });
+
+                if (!res.ok) {
+                    console.error('[Observability] Queries fetch failed:', res.status);
+                    update(s => ({ ...s, queriesLoading: false }));
+                    return;
+                }
+
+                const data = await res.json();
+
+                update(s => ({
+                    ...s,
+                    queries: data.queries || [],
+                    queriesTotal: data.total || 0,
+                    queriesLoading: false,
+                }));
+            } catch (e) {
+                console.error('[Observability] Load queries error:', e);
+                update(s => ({ ...s, queriesLoading: false }));
+            }
+        },
+
+        async loadQueryStats(hours: number = 24) {
+            try {
+                const res = await fetch(`${getApiBase()}/api/admin/queries/stats?hours=${hours}`, {
+                    headers: getHeaders()
+                });
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+                update(s => ({ ...s, queryStats: data }));
+            } catch (e) {
+                console.error('[Observability] Load query stats error:', e);
+            }
+        },
+
+        async loadQueryDetail(queryId: string) {
+            try {
+                const res = await fetch(`${getApiBase()}/api/admin/queries/${queryId}`, {
+                    headers: getHeaders()
+                });
+
+                if (!res.ok) return;
+
+                const data = await res.json();
+                update(s => ({ ...s, selectedQuery: data }));
+            } catch (e) {
+                console.error('[Observability] Load query detail error:', e);
+            }
+        },
+
+        clearSelectedQuery() {
+            update(s => ({ ...s, selectedQuery: null }));
+        },
+
+        getQueryExportUrl(hours: number = 24, department?: string): string {
+            const params = new URLSearchParams({ hours: String(hours) });
+            if (department) params.set('department', department);
+            return `${getApiBase()}/api/admin/queries/export/csv?${params}`;
+        },
+
+        // =================================================================
         // ALERTS
         // =================================================================
 
@@ -327,6 +457,7 @@ function createObservabilityStore() {
             store.disconnectLogStream();
             set({
                 traces: [],
+                tracesTotal: 0,
                 tracesLoading: false,
                 selectedTrace: null,
                 logs: [],
@@ -335,6 +466,11 @@ function createObservabilityStore() {
                 alertRules: [],
                 alertInstances: [],
                 alertsLoading: false,
+                queries: [],
+                queriesTotal: 0,
+                queriesLoading: false,
+                queryStats: null,
+                selectedQuery: null,
             });
         },
     };
@@ -344,8 +480,9 @@ function createObservabilityStore() {
 
 export const observabilityStore = createObservabilityStore();
 
-// Derived stores
+// Derived stores - Original
 export const traces = derived(observabilityStore, $s => $s.traces);
+export const tracesTotal = derived(observabilityStore, $s => $s.tracesTotal);
 export const selectedTrace = derived(observabilityStore, $s => $s.selectedTrace);
 export const logs = derived(observabilityStore, $s => $s.logs);
 export const alertRules = derived(observabilityStore, $s => $s.alertRules);
@@ -353,3 +490,9 @@ export const alertInstances = derived(observabilityStore, $s => $s.alertInstance
 export const firingAlerts = derived(observabilityStore, $s =>
     $s.alertInstances.filter(a => a.status === 'firing')
 );
+
+// Derived stores - Query Log (NEW)
+export const queries = derived(observabilityStore, $s => $s.queries);
+export const queriesTotal = derived(observabilityStore, $s => $s.queriesTotal);
+export const queryStats = derived(observabilityStore, $s => $s.queryStats);
+export const selectedQuery = derived(observabilityStore, $s => $s.selectedQuery);
