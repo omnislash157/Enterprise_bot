@@ -1,0 +1,226 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\putaway_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:43:56.322278",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_putaway_introduction_0",
+      "content": "Putaway Manual\n\nPutaway Workflow\n\nReceiving and Staging\n\nProducts arrive from vendors or backhauls and are verified by the Receiving Team. Once verified, pallets are labeled and staged by temperature zone: Dry Zone, Cooler Zone, and Freezer Zone. Each staged pallet is ready for transfer to its respective zone by a pallet jack operator.\n\nZone Transfer\n\nPallet jack operators move pallets from the dock to their assigned zones. Pallets are dropped in staging lanes or designated drop points within each zone for the Putaway Team (Hi-Lo Operators).\n\nSlotting Strategy\n\nSlotting decisions are based on:\n- Product type and size: Heavier, high-velocity items are placed in lower aisles (e.g., A\u2013C). Slower-moving or lighter items are placed in higher aisles (e.g., Q\u2013S).\n- Product similarity: Similar items are placed near each other but not adjacent to avoid mispicks (e.g., tomatoes from Company ABC should not be directly next to tomatoes from Company XYZ).\n- FIFO rotation: New inventory is slotted above or behind older stock to maintain proper product rotation.\n- Accessibility: High-volume items are stored in easily accessible areas for efficient picking.\n\nScanning and System Update\n\nEach pallet must be accurately scanned to ensure system accuracy:\n1.Scan the slot barcode using the handheld scanner.\n2. Scan the product barcode on the pallet.\n3. Confirm the product and location on the scanner screen before completing the transaction.\n\nThis process records the product as physically available in the system, updating inventory levels, slot locations, and purchasing/sales visibility.\n\nSafety and Accuracy\n\nAlways inspect slots for clearance and product stability before putting away. Ensure all product labels face outward for easy identification. Double-check slot numbers to prevent misplacement. Report any damaged pallets, missing labels, or unsafe racking conditions to a supervisor immediately.\n\nWhy Putaway Matters",
+      "content_hash": "b0057d99d48f14de",
+      "section_title": "putaway",
+      "source_file": "putaway_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 375,
+      "_original": {
+        "keywords": [
+          "product",
+          "zone",
+          "pallet",
+          "putaway",
+          "pallets",
+          "items",
+          "placed",
+          "system",
+          "slot",
+          "receiving"
+        ],
+        "email": "",
+        "category": "putaway",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "arrive",
+        "verify",
+        "label",
+        "stage",
+        "transfer",
+        "move",
+        "drop",
+        "place",
+        "slot",
+        "scan",
+        "confirm",
+        "complete",
+        "inspect",
+        "ensure",
+        "double-check",
+        "report"
+      ],
+      "entities": [
+        "pallet",
+        "product",
+        "vendor",
+        "backhaul",
+        "temperature_zone",
+        "dock",
+        "staging_lane",
+        "drop_point",
+        "slot",
+        "barcode",
+        "inventory",
+        "racking"
+      ],
+      "actors": [
+        "Receiving Team",
+        "pallet jack operator",
+        "Putaway Team",
+        "Hi-Lo Operators",
+        "supervisor"
+      ],
+      "conditions": [
+        "verified",
+        "temperature_zone",
+        "product_type",
+        "product_size",
+        "high-velocity",
+        "slower-moving",
+        "lighter",
+        "product_similarity",
+        "FIFO_rotation",
+        "high-volume",
+        "damaged_pallets",
+        "missing_labels",
+        "unsafe_racking"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do we stage pallets after they're verified in receiving?",
+        "What's the slotting strategy for high-velocity products?",
+        "Why shouldn't I slot similar items like tomatoes from different companies right next to each other?",
+        "The scanner confirmed but inventory isn't updating\u2014what am I doing wrong?",
+        "How does FIFO rotation work when slotting new pallets?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 4,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core warehouse putaway process essential for inventory accuracy and safety; detailed, step-by-step guidance with slotting rules and scanning procedures; self-contained for operators with basic training.",
+      "acronyms": {
+        "FIFO": "First In, First Out"
+      },
+      "jargon": {
+        "backhauls": "Return shipments or loads transported by vendors on their return trip",
+        "pallet jack": "Manual hydraulic equipment for lifting and moving pallets",
+        "Hi-Lo Operators": "Forklift (high-low lift truck) operators responsible for putaway",
+        "slotting": "Process of assigning optimal storage locations based on product characteristics",
+        "high-velocity items": "Fast-moving, high-demand products that require frequent access",
+        "mispicks": "Errors in picking the wrong product due to similarity in appearance or location",
+        "staging lanes": "Designated temporary holding areas within zones for pallets",
+        "drop points": "Specific locations in zones where pallets are placed for putaway"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_putaway_introduction_1",
+      "content": "Putaway is a foundational warehouse operation. Its accuracy affects:\n- Picking efficiency: Pickers rely on correct slot information.\n- Inventory control: Prevents shrink, miscounts, and lost product.\n- Customer satisfaction: Ensures correct, on-time deliveries.\n- Operational flow: Keeps aisles organized and reduces congestion.\n\nWithout timely and accurate putaway, the warehouse cannot operate smoothly \u2014 leading to picking delays, mispicks, and inaccurate inventory.\n\nWhat you do:\n\n\u2022 Complete putaways as soon as possible after receiving.\n\n\u2022 Maintain clean and organized aisles at all times.\n\n\u2022 Use FIFO rotation diligently.\n\n\u2022 Follow all warehouse safety procedures.\n\n\u2022 Communicate with Inventory Control if discrepancies occur.",
+      "content_hash": "f6424fbb4baed3d4",
+      "section_title": "putaway",
+      "source_file": "putaway_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 132,
+      "_original": {
+        "keywords": [
+          "warehouse",
+          "inventory",
+          "putaway",
+          "picking",
+          "correct",
+          "control",
+          "aisles",
+          "organized",
+          "foundational",
+          "operation"
+        ],
+        "email": "",
+        "category": "putaway",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "training",
+        "compliance"
+      ],
+      "verbs": [
+        "complete",
+        "maintain",
+        "use",
+        "follow",
+        "communicate",
+        "receive"
+      ],
+      "entities": [
+        "warehouse",
+        "aisles",
+        "inventory",
+        "product",
+        "slot"
+      ],
+      "actors": [
+        "picker",
+        "receiver",
+        "Inventory Control"
+      ],
+      "conditions": [
+        "discrepancies"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Why is putaway such a big deal in the warehouse?",
+        "What do I have to do right after receiving to keep putaway on track?",
+        "How does sloppy putaway screw up picking efficiency and cause shrink?",
+        "What if I find a discrepancy while doing putaway?",
+        "Putaway is always delayed and now aisles are jammed \u2013 how do I fix this mess?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 9,
+      "specificity": 2,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core warehouse process critical to operations; broad overview with clear actionable steps; self-contained for putaway basics, accessible to trained staff",
+      "acronyms": {
+        "FIFO": "First In, First Out"
+      },
+      "jargon": {
+        "putaway": "Placing received goods into designated storage locations in the warehouse",
+        "picking": "Retrieving products from storage locations to fulfill customer orders",
+        "slot": "Specific storage location for inventory",
+        "shrink": "Inventory loss due to theft, damage, miscounts, or other discrepancies",
+        "mispicks": "Incorrect selection of items during picking",
+        "receiving": "Process of accepting and inspecting incoming shipments",
+        "aisles": "Designated pathways in the warehouse for movement and access"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

@@ -45,3 +45,7 @@ numpy>=1.24.0  # required by FAISS
 
 # Observability (Phase 1)
 psutil>=5.9.0
+
+# Credit Module (PDF generation, SQL Server)
+reportlab>=4.0.0
+pyodbc>=5.0.0

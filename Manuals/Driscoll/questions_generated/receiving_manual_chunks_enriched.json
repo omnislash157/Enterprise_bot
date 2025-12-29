@@ -1,0 +1,348 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\receiving_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:44:24.632007",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_receiving_introduction_0",
+      "content": "Receiving Manual\n\nPurpose\n\nThe purpose of the Receiving process is to accurately and efficiently accept incoming deliveries from vendors and backhauls. Receiving ensures that all products entering the warehouse are verified, labeled, and recorded correctly in the system, maintaining inventory integrity and ensuring product quality and safety from the moment it arrives.\n\nOverview\n\nReceiving takes place on the warehouse floor, at the loading docks. When delivery trucks arrive, receivers are responsible for unloading, verifying, labeling, and documenting all inbound products. The process connects directly to inventory management, purchasing, and putaway operations, making accuracy in receiving essential for the entire warehouse workflow.\n\nReceiving Workflow\n\nTruck Arrival and Documentation\n\nWhen a delivery truck arrives, the driver brings the delivery paperwork and places it into the bin located at their assigned dock door. Truckers often wait in their vehicles until receiving is completed unless they are responsible for unloading their own truck. Each dock door has an indicator light that shows when a truck is parked and ready for unloading.\n\nUnloading the Truck\n\nReceivers use pallet jacks to unload all pallets from the truck. Pallets are lined up neatly inside near the dock door they were unloaded from to keep track of which shipment belongs to which truck.\n\nPaperwork Verification\n\nReceivers retrieve the purchase order (PO) paperwork and confirm that the total number of cases on the PO matches the quantities listed on the driver's product sheet. If the counts differ, receivers note that there may be a shortage. Accurate verification ensures the warehouse records match what was actually delivered.\n\nLabel Printing and Application",
+      "content_hash": "dcc529609e0f2d21",
+      "section_title": "receiving",
+      "source_file": "receiving_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 339,
+      "_original": {
+        "keywords": [
+          "receiving",
+          "truck",
+          "warehouse",
+          "receivers",
+          "unloading",
+          "delivery",
+          "paperwork",
+          "their",
+          "dock",
+          "door"
+        ],
+        "email": "",
+        "category": "receiving",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "accept",
+        "verify",
+        "label",
+        "record",
+        "unload",
+        "document",
+        "bring",
+        "place",
+        "retrieve",
+        "confirm",
+        "match",
+        "note",
+        "line_up",
+        "print",
+        "apply"
+      ],
+      "entities": [
+        "purchase_order",
+        "pallet",
+        "truck",
+        "dock_door",
+        "indicator_light",
+        "product_sheet",
+        "shipment",
+        "warehouse",
+        "inventory"
+      ],
+      "actors": [
+        "receiver",
+        "driver",
+        "trucker",
+        "vendor"
+      ],
+      "conditions": [
+        "shortage"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "Where does the truck driver put the delivery paperwork when they arrive?",
+        "How do I unload pallets from a delivery truck using pallet jacks?",
+        "What if the total cases on the PO don't match the driver's product sheet?",
+        "The pallets from this truck got mixed up with the last one\u2014how do I keep track?",
+        "Walk me through PO verification during receiving\u2014I'm messing it up every time!"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core warehouse receiving process critical for inventory accuracy and safety; detailed, actionable steps for common scenario but chunk cuts off mid-workflow, reducing completeness",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "backhauls": "Return trips by vendor trucks carrying goods to the warehouse",
+        "receivers": "Warehouse personnel responsible for unloading, verifying, and documenting inbound products",
+        "pallet jacks": "Manual equipment used to unload and move pallets from delivery trucks",
+        "dock door": "Specific bay at the loading dock where trucks park for unloading",
+        "putaway operations": "Warehouse process of storing received goods in designated locations",
+        "inbound products": "Goods arriving from vendors or backhauls",
+        "driver's product sheet": "Document provided by the truck driver listing delivered quantities",
+        "indicator light": "Light at each dock door signaling a truck is parked and ready for unloading",
+        "shortage": "Discrepancy where delivered quantities are less than ordered on the PO"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_receiving_introduction_1",
+      "content": "Labels are printed using the Telnet system. Each label corresponds to a product and identifies its storage location in the warehouse. When a pallet contains only one product, receivers simply apply the label(s) to the correct number of cases as indicated (for example, 30 cases per label). If a pallet has multiple layers or quantities, additional labels are placed halfway down the stack to signal lumpers where to break down the pallet.\n\nProduct Matching and Scanning\n\nReceivers ensure that the label is applied to the correct product by checking the manufacturer numbers (MANU#) and product descriptions. After confirming accuracy, the receiver scans the product into the system and enters its expiration date. This allows the warehouse management system to track product dates and availability.\n\nCompletion of Truck Receiving\n\nOnce all pallets from a truck have been labeled, scanned, and verified, the receiver reviews the PO again to confirm that all ordered products were received. Any shortages, overages, or damages are noted directly on the PO.\n\nDocumentation and Sign-Off\n\nThe receiver signs and dates the PO, recording details such as truck cleanliness, product temperature, and any issues observed. The same process is followed for the driver\u2019s Bill of Lading (BOL). Both documents provide visibility and historical accuracy for inventory and audits.\n\nTemperature Checks (Cooler/Freezer Docks)\n\nFor perishable or frozen items, receivers must check and record the temperature of the products using company-approved instruments. Accurate temperature recording is critical for food safety compliance and audit requirements.\n\nSubmission of Documents\n\nAfter completing all paperwork and verification, receivers deliver both the PO and BOL to the front desk (Raul or Josh) for processing. They then proceed to receive the next scheduled truck.\n\nPotential Refusals\n\nReceivers can refuse products and send them back on the truck if the cases are damaged, product is past or close to its expiration date, or if the produce might be spoiled",
+      "content_hash": "d013857d1b4e7ffb",
+      "section_title": "receiving",
+      "source_file": "receiving_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 405,
+      "_original": {
+        "keywords": [
+          "product",
+          "receivers",
+          "truck",
+          "label",
+          "temperature",
+          "system",
+          "its",
+          "pallet",
+          "cases",
+          "receiver"
+        ],
+        "email": "",
+        "category": "receiving",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "print",
+        "apply",
+        "place",
+        "check",
+        "confirm",
+        "scan",
+        "enter",
+        "review",
+        "note",
+        "sign",
+        "date",
+        "record",
+        "deliver",
+        "proceed",
+        "refuse"
+      ],
+      "entities": [
+        "label",
+        "product",
+        "pallet",
+        "case",
+        "purchase_order",
+        "BOL",
+        "truck",
+        "warehouse"
+      ],
+      "actors": [
+        "receiver",
+        "lumper",
+        "driver",
+        "front_desk"
+      ],
+      "conditions": [
+        "single_product_pallet",
+        "multiple_layers_quantities",
+        "shortage",
+        "overage",
+        "damage",
+        "past_expiration",
+        "close_expiration",
+        "spoiled",
+        "perishable",
+        "frozen",
+        "temperature_violation"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I apply labels to pallets using the Telnet system?",
+        "What if a pallet has multiple layers or quantities, where do the extra labels go?",
+        "How do I match the product to the label with the MANU# and description before scanning?",
+        "I unloaded the truck but found some spoiled produce now - can I refuse it and send back?",
+        "What's the complete process for temp checks, noting issues on PO/BOL, and submitting docs?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core warehouse receiving process essential for operations, inventory accuracy, and food safety compliance; detailed, step-by-step procedures that are actionable with basic training, mostly self-contained.",
+      "acronyms": {
+        "PO": "Purchase Order",
+        "BOL": "Bill of Lading",
+        "MANU#": "manufacturer numbers"
+      },
+      "jargon": {
+        "lumpers": "warehouse workers who break down pallets",
+        "pallets": "stackable platforms for storing and transporting goods",
+        "cases": "individual boxes or cartons of product",
+        "receivers": "warehouse staff responsible for incoming shipments",
+        "warehouse management system": "software for tracking inventory, dates, and availability",
+        "cooler/freezer docks": "receiving areas for temperature-controlled products",
+        "Telnet system": "system used for printing labels",
+        "Bill of Lading": "shipping document signed by receiver and driver",
+        "break down the pallet": "process of separating pallet contents for storage"
+      },
+      "numeric_thresholds": {
+        "cases_per_label": {
+          "value": 30,
+          "unit": "cases",
+          "context": "example of cases per label when pallet contains only one product"
+        }
+      }
+    },
+    {
+      "id": "warehouse_receiving_introduction_2",
+      "content": "Why Receiving Matters\n\nThe Receiving department is the first line of defense for product accuracy, food safety, and inventory integrity. Mistakes at this stage can lead to shortages, mispicks, and compliance issues downstream. Proper receiving ensures:\n\n- The company only accepts and pays for what was actually delivered.\n- Inventory is tracked accurately from the moment it enters the building.\n- Product freshness and safety standards are met.\n- Smooth transitions to putaway and replenishment operations.\n\nWhat you do:\n\n\u2022 Verify paperwork thoroughly before labeling or scanning any product.\n\n\u2022 Always check MANU#s and product names to ensure accurate labeling.\n\n\u2022 Record all product temperatures accurately, especially for cooler and freezer deliveries.\n\n\u2022 Keep the dock area clean and organized during and after unloading.\n\n\u2022 Report any discrepancies or product issues immediately to supervisors.\n\n\u2022 Handle all paperwork carefully and ensure it is signed, dated, and delivered promptly.\n\n\u2022 Never mix products from different trucks until verification is complete.",
+      "content_hash": "f2d2f74a737d0555",
+      "section_title": "receiving",
+      "source_file": "receiving_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 206,
+      "_original": {
+        "keywords": [
+          "product",
+          "receiving",
+          "safety",
+          "inventory",
+          "issues",
+          "delivered",
+          "accurately",
+          "paperwork",
+          "labeling",
+          "any"
+        ],
+        "email": "",
+        "category": "receiving",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "verify",
+        "check",
+        "record",
+        "keep",
+        "report",
+        "handle",
+        "ensure",
+        "sign",
+        "date",
+        "deliver",
+        "label",
+        "scan",
+        "accept",
+        "track",
+        "meet"
+      ],
+      "entities": [
+        "product",
+        "inventory",
+        "paperwork",
+        "dock",
+        "truck",
+        "shipment",
+        "warehouse"
+      ],
+      "actors": [
+        "receiver",
+        "supervisor"
+      ],
+      "conditions": [
+        "discrepancy",
+        "product_issue",
+        "temperature_violation",
+        "shortage",
+        "mispick"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Why does receiving matter so much?",
+        "What do I need to verify before labeling or scanning any product?",
+        "How do I make sure MANU#s and product names match for accurate labeling?",
+        "What if I spot a discrepancy or issue during unloading?",
+        "Drivers are rushing me and want to mix products from different trucks\u2014what do I do?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 10,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Compliance-critical for food safety and inventory; bounded to receiving procedures; basic training needed; self-contained with clear steps",
+      "acronyms": {
+        "MANU#s": "Manufacturer numbers"
+      },
+      "jargon": {
+        "mispicks": "Picking the wrong products due to receiving errors",
+        "putaway": "Process of storing received goods in designated locations",
+        "replenishment operations": "Restocking pick locations from bulk or reserve storage",
+        "dock area": "Loading and unloading zone for trucks",
+        "discrepancies": "Differences between ordered and delivered products"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

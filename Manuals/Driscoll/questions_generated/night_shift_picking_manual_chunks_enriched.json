@@ -1,0 +1,351 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_picking_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:41:15.497959",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_picking_introduction_0",
+      "content": "Night Shift Picking Manual\n\nOverview\n\nPicking is a vital role in the night shift operation. The job typically begins at 4:00 PM for some workers and 5:00 PM for others, continuing until the shift is usually around 4:00 AM. Employees are paid hourly and could earn incentives and bonuses if their productivity exceeds 100%.",
+      "content_hash": "cd5ee6a5ec0054f7",
+      "section_title": "night_shift_picking",
+      "source_file": "night_shift_picking_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 70,
+      "_original": {
+        "keywords": [
+          "shift",
+          "night",
+          "picking",
+          "manual",
+          "overview",
+          "vital",
+          "role",
+          "operation",
+          "job",
+          "typically"
+        ],
+        "email": "",
+        "category": "night_shift_picking",
+        "subcategory": ""
+      },
+      "query_types": [
+        "definition",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "picking",
+        "begins",
+        "continuing",
+        "earn",
+        "exceeds"
+      ],
+      "entities": [
+        "warehouse"
+      ],
+      "actors": [
+        "employees",
+        "workers"
+      ],
+      "conditions": [
+        "productivity exceeds 100%",
+        "shift starts at 4:00 PM",
+        "shift starts at 5:00 PM",
+        "shift ends around 4:00 AM"
+      ],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time does night shift picking start?",
+        "When does the night shift picking usually end?",
+        "How do I qualify for productivity incentives on night shift picking?",
+        "I'm new and confused\u2014why do some pickers start at 4 PM and others at 5 PM on night shift?",
+        "What if my picking productivity exceeds 100%\u2014do I get bonuses?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 7,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 8,
+      "actionability_score": 7,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core info for night shift picking role including times and pay incentives; straightforward, self-contained overview, directly useful for scheduling and motivation.",
+      "acronyms": {},
+      "jargon": {
+        "picking": "Process of selecting and gathering items from warehouse locations to fulfill customer orders"
+      },
+      "numeric_thresholds": {
+        "productivity_threshold": {
+          "value": 100,
+          "unit": "%",
+          "context": "Exceeding this earns incentives and bonuses"
+        },
+        "shift_start_early": {
+          "value": "4:00 PM",
+          "unit": "time",
+          "context": "Start time for some workers"
+        },
+        "shift_start_late": {
+          "value": "5:00 PM",
+          "unit": "time",
+          "context": "Start time for others"
+        },
+        "shift_end": {
+          "value": "4:00 AM",
+          "unit": "time",
+          "context": "Shift usually ends around this time"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_picking_introduction_1",
+      "content": "Picking Workflow and Tips\n\nAt the beginning of the shift, pickers clock in, put on their required clothing in the locker room, and head to the machine room to get their jack. There is a 10-minute grace period for arrival. At 4:00 or 5:00 PM, pickers report to the window where a clerk enters their employee ID and provides a list of labels. Using the Jennifer voice system, pickers receive directions to specific warehouse locations to retrieve the necessary products.\n\nMost picks are located on the first level of slots, allowing easy access by jack. Pickers must ensure that the case and label match the designated slot to avoid mispicks, as errors negatively impact both company performance and individual bonuses. When a slot is out of picking range, pickers must request assistance from a hi-lo operator.\n\nPicking success depends on productivity, speed, and accuracy. After completing a pallet, pickers deliver it to the designated door where loaders take over. They then return to the window to receive their next list of labels. Many experienced pickers keep 10\u201312 extra pallets nearby for efficiency. Jennifer directs pickers through slots, but proper pallet organization is essential\u2014heavier cases must go on the bottom, and lighter ones on top to prevent damage.\n\nNavigation and planning are key to being an efficient picker. Skilled pickers quickly review their labels to form a fast and logical route based on case weight and location, minimizing unnecessary movement and pallet reorganization. This job is crucial since approximately 95,000 cases are processed nightly. The faster and more accurately pickers complete their tasks, the earlier the shift can finish.\n\nNight shift pickers receive two 15-minute breaks and one 30-minute lunch break. Eating is not allowed in the machine room or on the floor. Pickers are strictly prohibited from taking any product security cameras monitoring all areas. Safety is paramount since electric jacks are powerful machines. Awareness of surroundings and other workers is critical.\n\nThere are three temperature zones in the warehouse. Most pickers primarily work in one zone, but those in the cooler and freezer must also collect product weights, as this data determines how the company is paid for temperature-controlled items. In the dry zone, weights are not required.",
+      "content_hash": "4e99085c759b6f7f",
+      "section_title": "night_shift_picking",
+      "source_file": "night_shift_picking_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 479,
+      "_original": {
+        "keywords": [
+          "pickers",
+          "their",
+          "picking",
+          "shift",
+          "room",
+          "minute",
+          "labels",
+          "receive",
+          "pallet",
+          "required"
+        ],
+        "email": "",
+        "category": "night_shift_picking",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "training"
+      ],
+      "verbs": [
+        "clock in",
+        "put on",
+        "get",
+        "report",
+        "enter",
+        "provide",
+        "receive",
+        "retrieve",
+        "ensure",
+        "match",
+        "request",
+        "complete",
+        "deliver",
+        "return",
+        "keep",
+        "review",
+        "plan",
+        "organize",
+        "minimize"
+      ],
+      "entities": [
+        "pallet",
+        "jack",
+        "labels",
+        "employee ID",
+        "products",
+        "cases",
+        "slot",
+        "warehouse",
+        "route",
+        "door"
+      ],
+      "actors": [
+        "picker",
+        "clerk",
+        "hi-lo operator",
+        "loader"
+      ],
+      "conditions": [
+        "grace period",
+        "out of picking range",
+        "mispick",
+        "breaks",
+        "lunch break",
+        "no eating",
+        "security cameras",
+        "safety awareness",
+        "temperature zones",
+        "collect weights"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I clock in and get my jack and labels at the start of night shift?",
+        "What if a slot is out of reach for my jack?",
+        "How does the Jennifer voice system direct me during picking?",
+        "I'm messing up mispicks and losing my bonus\u2014what am I doing wrong?",
+        "How do experienced pickers plan efficient routes from their labels to maximize speed?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse picking process with safety, efficiency tips, and procedures; highly actionable and mostly self-contained for night shift pickers, requires basic warehouse familiarity.",
+      "acronyms": {},
+      "jargon": {
+        "jack": "electric pallet jack used by pickers to move pallets",
+        "Jennifer voice system": "voice-directed system that provides navigation directions to pickers",
+        "slots": "designated storage locations in warehouse racking",
+        "mispicks": "picking errors where case and label do not match",
+        "hi-lo operator": "forklift operator who assists with out-of-reach slots",
+        "pallet": "stacked load of cases built by pickers for delivery to loaders",
+        "loaders": "warehouse workers who take completed pallets to shipping doors",
+        "dry zone": "ambient temperature warehouse area (no product weights required)",
+        "cooler": "refrigerated temperature zone (product weights required)",
+        "freezer": "frozen temperature zone (product weights required)",
+        "machine room": "area where pickers obtain their jacks"
+      },
+      "numeric_thresholds": {
+        "arrival_grace_period": {
+          "value": 10,
+          "unit": "minutes",
+          "context": "grace period for picker arrival at start of shift"
+        },
+        "nightly_cases_processed": {
+          "value": 95000,
+          "unit": "cases",
+          "context": "approximately processed per night shift"
+        },
+        "short_breaks": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "two per night shift for pickers"
+        },
+        "lunch_break": {
+          "value": 30,
+          "unit": "minutes",
+          "context": "one per night shift for pickers"
+        },
+        "extra_pallets": {
+          "value": "10\u201312",
+          "unit": "",
+          "context": "kept nearby by experienced pickers for efficiency"
+        },
+        "temperature_zones": {
+          "value": 3,
+          "unit": "",
+          "context": "zones in the warehouse (dry, cooler, freezer)"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_picking_introduction_2",
+      "content": "Steel toe shoes above the ankle or necessary given company policy.\n\nOnce you have finished your pick and before you go back to the window you must wrap the pallet in the saran wrap for the stability of the pallet when the truck goes into transport.\n\nWhy Picking Matters\n\nNight shift picking is a demanding but rewarding role for those who value hard work, accuracy, and efficiency. It is a job that directly contributes to the success of the entire warehouse operation. If picking does not happen, then deliveries do not happen, and customers do not get their product leading to the company not making money. Picking is an essential and tedious job that is impactful to the company.",
+      "content_hash": "b3a4e3c266676fbf",
+      "section_title": "night_shift_picking",
+      "source_file": "night_shift_picking_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 154,
+      "_original": {
+        "keywords": [
+          "picking",
+          "company",
+          "wrap",
+          "pallet",
+          "job",
+          "happen",
+          "steel",
+          "toe",
+          "shoes",
+          "above"
+        ],
+        "email": "",
+        "category": "night_shift_picking",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "training"
+      ],
+      "verbs": [
+        "pick",
+        "wrap",
+        "finish",
+        "go"
+      ],
+      "entities": [
+        "pallet",
+        "truck",
+        "warehouse",
+        "product",
+        "customer"
+      ],
+      "actors": [
+        "picker",
+        "customer"
+      ],
+      "conditions": [
+        "company policy",
+        "after finishing pick",
+        "before returning to window",
+        "pallet stability during transport"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Do I need to wear steel toe shoes that go above the ankle for night shift?",
+        "After finishing my pick, what do I have to do before going back to the window?",
+        "Why do we have to wrap the pallet in saran wrap every time?",
+        "These above-the-ankle steel toes are killing me\u2014 is that really company policy?",
+        "How does night shift picking directly impact company revenue if deliveries don't happen?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 6,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Covers safety policy (steel toe shoes), core picking procedure (pallet wrapping), and motivational overview; critical for warehouse ops but first sentence fragmentary and assumes picking context.",
+      "acronyms": {},
+      "jargon": {
+        "steel toe shoes": "Safety footwear with reinforced toes to protect against impacts, required above the ankle per policy",
+        "pick": "Process of selecting and gathering items from warehouse storage to fulfill orders",
+        "pallet": "Portable platform for stacking, storing, and transporting goods",
+        "saran wrap": "Stretch wrap or plastic film used to secure and stabilize loads on pallets for transport",
+        "night shift picking": "Order picking performed during the overnight shift in a warehouse",
+        "window": "Designated station or drop-off point for returning completed picks"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_inventory_control_manual",
+  "version": "1.0",
+  "description": "Warehouse inventory processes and procedures",
+  "source_file": "Inventory Control Manual.docx",
+  "file_hash": "f5717c9c2c6ae1228ce5456bb21471aec284ef2f05e0c51ca956b78962b14f91",
+  "chunks": [
+    {
+      "id": "warehouse_inventory_introduction_0",
+      "category": "inventory",
+      "section_title": "Introduction",
+      "keywords": [
+        "inventory",
+        "control",
+        "system",
+        "data",
+        "item",
+        "quantities",
+        "daily",
+        "departments",
+        "warehouse",
+        "sales"
+      ],
+      "content": "Inventory Control Manual\n\nOverview\n\nInventory Control is one of the most essential departments at Driscoll Foods. It ensures that all item quantities in the warehouse management system accurately reflect the true stock levels. Without precise inventory data, the company’s operations—from purchasing to sales—would be disrupted. The team performs continuous cycle counts, verifies scanned data, corrects errors, and maintains full transparency for audits, financial records, and operational efficiency.\n\nPurpose and Importance\n\nThe purpose of Inventory Control is to ensure data integrity within the warehouse system. This allows the Purchasing and Sales departments to make informed decisions based on accurate quantities of available products. By performing daily counts and system checks, the team prevents discrepancies that could lead to product shortages, overstocking, or missed sales opportunities.\n\nDaily Responsibilities\n\nInventory Control performs several key daily tasks, including:\n\nConducting daily cycle counts for perishable items such as milk, eggs, and bread.\n\nVerifying item quantities and adjusting records for accuracy.\n\nIdentifying unscanned products or incorrect date entries made by warehouse workers.\n\nCommunicating product shorts and discrepancies to relevant departments via email.\n\nProviding zone managers with insight on where space is available for slotting\n\nSupporting the nightly picking operations by ensuring accurate product data.\n\nTelnet Functions and Commands\n\nInventory Control uses the Telnet system extensively to manage and verify data. Below are some of the primary Telnet commands and their functions:\n\n5, 12, and then Item Number – Displays key information such as Quantity On-Hand (QTY O/H), Quantity Committed, and Physically Available.\n\nPHY, 22 – Used to adjust item quantities in the system.\n\n9, 30 – Shows Purchase Order (PO) history and allows tracking of where items were scanned away\n\nPHY, 29, W, aisle (DO000000–D0999999), date – Runs a velocity report to analyze movement speed of products.",
+      "chunk_token_count": 495
+    },
+    {
+      "id": "warehouse_inventory_introduction_1",
+      "category": "inventory",
+      "section_title": "Introduction",
+      "keywords": [
+        "team",
+        "inventory",
+        "control",
+        "warehouse",
+        "accuracy",
+        "product",
+        "company",
+        "slot",
+        "products",
+        "aisle"
+      ],
+      "content": "BIN, 01, slot# – Looks up slot locations and their associated products\n\nPHY, 1, 01, aisle (DO000000–DO999999), A, D (or C, F), A – Checks for empty slots in a given aisle.\n\nTeam Roles and Collaboration\n\nThe Inventory Control team works closely with multiple departments including Warehouse Operations, Purchasing, Sales, and Quality Assurance. Team members play vital roles in maintaining accuracy and order across all systems:\n\nJose – Constantly reviews and corrects errors made by others, ensuring that item data is accurate and reliable.\n\n- Billy (Head of Team) – Oversees overall inventory accuracy and is responsible for managing item recalls. In the event of a product recall, such as one caused by contamination (e.g., salmonella), Billy uses system tracking to determine where the affected product has been distributed internally and externally.\n\nYear-End and Audit Importance\n\nInventory Control plays a crucial role in the annual company-wide cycle count conducted at the end of the calendar year. These counts are essential for company audits and financial reporting to banks and other stakeholders. Accurate numbers during this process ensure compliance and transparency.\n\nWhy Inventory control matters:\n\nWithout Inventory Control, the accuracy of the warehouse management system would degrade over time, leading to missing pallets, expired products, and incorrect sales availability. The team’s vigilance ensures that every case in the warehouse is accounted for and that company operations continue smoothly and efficiently.\n\nWhat you do:\n\nCycle counts\n\nFix others’ mistakes\n\nCheck dates\n\nLocate product in the warehouses\n\nHelp decide whether something needs more or less",
+      "chunk_token_count": 409
+    }
+  ]
+}

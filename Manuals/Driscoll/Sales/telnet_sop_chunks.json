@@ -1,0 +1,368 @@
+{
+  "knowledge_base": "driscoll_foods_telnet_sop",
+  "version": "1.0",
+  "description": "Complete Telnet system standard operating procedures for sales operations",
+  "chunks": [
+    {
+      "id": "order_entry_basics",
+      "category": "order_entry",
+      "subcategory": "navigation",
+      "menu_option": "Option 1",
+      "keywords": ["enter order", "new order", "start order", "option 1", "next day delivery"],
+      "content": "Order Entry (Option 1) is for NEW orders with next day delivery (except Friday-Saturday). Enter operator number, then customer number (or type name to search). For multiple ship-to addresses, enter '?' and hit Enter to cycle through, press F4 to accept. Enter PO in Reference Number field if required, or Enter to skip. Use arrow keys to select delivery date per transportation guidelines."
+    },
+    {
+      "id": "order_entry_product_search",
+      "category": "order_entry",
+      "subcategory": "product_lookup",
+      "keywords": ["find product", "alpha search", "product history", "lookup", "L", "A"],
+      "content": "In an open order: 'L' + Enter = Look Up (customer's order history). Spacebar searches within history, sorted by last order date. 'X' or down arrow exits history. 'A' + Enter = Alpha search for all products (new items). In Alpha: enter line number to select item. Blue highlighted items = previously purchased by customer."
+    },
+    {
+      "id": "order_entry_quantity_splits",
+      "category": "order_entry",
+      "subcategory": "quantities",
+      "keywords": ["case count", "split case", "quantity", "how to split", "left arrow"],
+      "content": "After selecting item, enter case count (or Enter for 1 case). To SPLIT a case: enter quantity, then press LEFT ARROW key. F1 after item selection (before qty) shows stock status. Up arrow in stock status shows incoming orders/transfers from Amsterdam. Down arrow shows committed quantity."
+    },
+    {
+      "id": "order_entry_corrections",
+      "category": "order_entry",
+      "subcategory": "editing",
+      "keywords": ["undo", "delete item", "wrong item", "fix order", "F4", "change mode"],
+      "content": "To UNDO price, quantity, or item: press UP ARROW to go back. To DELETE wrong item: press F4 (change mode), enter 'D' on qty line, press F4 again to return to ADD mode. Order number appears at top right after first item accepted - always write it down."
+    },
+    {
+      "id": "order_entry_review_exit",
+      "category": "order_entry",
+      "subcategory": "completion",
+      "keywords": ["review order", "exit order", "print order", "redisplay", "R", "F2"],
+      "content": "In order: 'R' = redisplay all items. F2 = Detail History (full customer order history). UP ARROW exits order and shows Net Income, GP%, GP$, cases, splits. At print prompt: Y=Yes (line version), N=No, U=Uniform (customer version), E=Excel version."
+    },
+    {
+      "id": "invoice_entry_overview",
+      "category": "invoice_entry",
+      "subcategory": "process",
+      "menu_option": "Invoice Entry (One Step)",
+      "keywords": ["invoice entry", "cash and carry", "same day", "pickup", "food depot"],
+      "content": "Invoice Entry is for same-day Cash & Carry pickups OR invoicing customers for received product. Same steps as Option 1 with extras: prompted for pickup time (enter as 12:30 or 12.30). Both order number AND invoice number appear. Used to send order to Food Depot for picking."
+    },
+    {
+      "id": "invoice_entry_printing",
+      "category": "invoice_entry",
+      "subcategory": "printing",
+      "keywords": ["print invoice", "cash carry printer", "printer 29", "temperature zone"],
+      "content": "Invoice Entry print sequence: Y=Yes to print, T=Temperature Zone (helps warehouse efficiency), 29=Cash & Carry printer, N=don't show GP, Y=show prices. This sends order to Cash & Carry. If only invoicing (no pickup), no need to send to printer."
+    },
+    {
+      "id": "order_inquiry_correction",
+      "category": "order_management",
+      "subcategory": "inquiry",
+      "menu_option": "Option 3",
+      "keywords": ["find order", "order inquiry", "correction", "option 3", "change order", "shipped orders"],
+      "content": "Order/Invoice Inquiry/Correction (Option 3) returns to previously entered orders. Shipped orders from last 48 hours are viewable but NOT changeable. Enter order number, or 'C' to search by customer number, 'I' for invoice number, 'P' for PO number. Up arrow/F3 cycles through multiple orders."
+    },
+    {
+      "id": "order_inquiry_editing",
+      "category": "order_management",
+      "subcategory": "editing",
+      "keywords": ["change quantity", "reduce cases", "delete add", "order correction"],
+      "content": "In Order Inquiry: Enter=totals, A=add items, C=change (qty/price) or Delete, F3=next open order, R=review/update order, L=review in entry order. IMPORTANT: To reduce case count, you MUST delete the item then re-add with correct count. Reducing without delete/add causes shortage on invoice."
+    },
+    {
+      "id": "order_header_correction",
+      "category": "order_management",
+      "subcategory": "header",
+      "menu_option": "Option 4",
+      "keywords": ["header correction", "change PO", "add remarks", "option 4", "invoice remarks"],
+      "content": "Order/Invoice Header Correction (Option 4) adjusts OPEN order info (not yet invoiced/shipped). Enter order number, then line number to adjust (e.g., #17 for PO Number). Lines 22-24 add remarks that show on invoice (e.g., 'Driver Pick Up Check'). DATE CHANGES must go to Routing & Customer Service Supervisor."
+    },
+    {
+      "id": "call_sheet_inquiry",
+      "category": "customer_data",
+      "subcategory": "history",
+      "menu_option": "Option 5",
+      "keywords": ["call sheet", "order history", "product history", "option 5", "customer history"],
+      "content": "Call Sheet Inquiry (Option 5) shows customer product history. Enter customer number, Enter to search all items. Shows order history with pricing and last order date. End options: Enter=return to menu, enter item number to delete from history, 'COPY' to copy to bid (Option 27), 'P' to print."
+    },
+    {
+      "id": "stock_status_navigation",
+      "category": "inventory",
+      "subcategory": "lookup",
+      "menu_option": "Option 6",
+      "keywords": ["stock status", "check inventory", "option 6", "product availability", "alpha search"],
+      "content": "Stock Status Inquiry (Option 6) shows product availability, prices, manufacturer numbers. Enter product number if known, or 'A' for Alpha search. Search by product name, brand, vendor, description, manufacturer number - max 2 words, watch spelling. Products listed 1-10, enter line number to view details."
+    },
+    {
+      "id": "stock_status_details",
+      "category": "inventory",
+      "subcategory": "product_info",
+      "keywords": ["stock details", "qty available", "qty on order", "amsterdam", "warehouse"],
+      "content": "Stock Status screen shows: Item#, (S)=splittable, Kosher grade, description, brand, manufacturer#, physical cases/pieces available, temp zone, base cost, zone (R=Refrigerated, D=Dry, F=Frozen), warehouse (01=Clifton, 02=Amsterdam), slot#, weight, pack size, buyer. 'QTY AVAILABLE'=for sale, 'QTY ON-ORDER'=ordered by purchasing. Numbers with 'P'=individual pieces."
+    },
+    {
+      "id": "stock_status_actions",
+      "category": "inventory",
+      "subcategory": "navigation",
+      "keywords": ["incoming product", "purchase orders", "F3", "F4", "F10", "buyer contact"],
+      "content": "Stock Status actions: F3/up arrow=view incoming POs, F4/down arrow=view open customer orders (enter line# to go to order), F10=Amsterdam product info (F10 again returns to Clifton). LEFT ARROW/F2=additional info page (manufacturer#, vendor for special orders). Type 'BUYER' for buyer contact info."
+    },
+    {
+      "id": "stock_status_extra_fields",
+      "category": "inventory",
+      "subcategory": "fields",
+      "keywords": ["ETA", "average cost", "split case", "taxable", "vendor", "cases per pallet"],
+      "content": "Stock Status extra fields: ETA=arrival date incoming product, AVG COST=#17, SPLIT CASE=#42 (whether case splits), TAXABLE=#26, VENDOR=#38 (for special order forms), CS/PAL=#27 (cases per pallet), NET WEIGHT=#10, GROSS WEIGHT=#11."
+    },
+    {
+      "id": "ar_inquiry",
+      "category": "accounts_receivable",
+      "subcategory": "lookup",
+      "menu_option": "Option 7",
+      "keywords": ["AR", "accounts receivable", "invoices", "option 7", "unpaid invoices", "credits", "balance"],
+      "content": "A/R Inquiry (Option 7) shows all customer invoices (paid & unpaid), credits, checks. Enter customer number, Enter for ALL invoices (from account opening), or 'O' for OPEN invoices only. Shows: invoice date, invoice#, debits (order amount), credits (submitted), line balance, running balance (total owed), time frame."
+    },
+    {
+      "id": "ar_inquiry_options",
+      "category": "accounts_receivable",
+      "subcategory": "actions",
+      "keywords": ["print AR", "view checks", "lookup invoice", "H", "C", "L"],
+      "content": "A/R Inquiry options: H=print A/R info, C=view submitted payment checks, L=lookup invoice info & credits. Options N, U-S not used."
+    },
+    {
+      "id": "customer_search",
+      "category": "customer_data",
+      "subcategory": "search",
+      "menu_option": "Option 8",
+      "keywords": ["find customer", "customer search", "do we sell", "option 8", "last delivery"],
+      "content": "Customer Search (Option 8) - 'Do We Sell This Customer?' Search by name, phone, city, state, or zip code. Shows account name/number if opened, plus last delivery date on far right. View full account info in Options 7 and 11."
+    },
+    {
+      "id": "call_sheet_print",
+      "category": "customer_data",
+      "subcategory": "printing",
+      "menu_option": "Option 9",
+      "keywords": ["print call sheet", "order guide", "option 9", "email order guide"],
+      "content": "Call Sheet Print (Option 9) prints customer call sheet with last purchase date/qty. Enter C=Customer (or E=email to self), C=Category, date range or Enter for all, S=Selection, customer#, Enter, printer# (100=email). Choose M=Monthly/W=Weekly/N=None usage, A=All items, Y/N for prices, bid prices, market prices, never-sold items."
+    },
+    {
+      "id": "call_sheet_email_guide",
+      "category": "customer_data",
+      "subcategory": "order_guide",
+      "keywords": ["email order guide", "PDF order guide", "send order guide"],
+      "content": "To email Order Guide as PDF: Enter E for email, select C1 or C2 columns, Y/N for prices, enter customer number, enter your email address, Y/N to show brand. PDF sent to email entered."
+    },
+    {
+      "id": "customer_file_maintenance",
+      "category": "customer_data",
+      "subcategory": "master_file",
+      "menu_option": "Option 11",
+      "keywords": ["customer master", "customer info", "option 11", "delivery window", "customer file"],
+      "content": "Customer File Maintenance (Option 11) shows Customer Master File: address, phone, salesperson, terms, class bid, delivery window. Enter customer# or A=Alpha search by name, P=phone search. To change delivery window, email Phil Carson & Routing. F1=A/R, F2=Graph, F3=Sales movement, F4=Second screen for permanent invoice remarks (#57, #58)."
+    },
+    {
+      "id": "modify_call_sheet",
+      "category": "customer_data",
+      "subcategory": "editing",
+      "menu_option": "Option 12",
+      "keywords": ["modify call sheet", "add item", "delete item", "option 12", "order guide edit"],
+      "content": "Modify Call Sheet Records (Option 12) adds/deletes items from customer Order Guide. Enter customer#, then product# (must know item# - print call sheet from Option 5 first). If item exists: D=Delete or C=Change price. If NEW item: prompted to submit price."
+    },
+    {
+      "id": "salesman_manifest",
+      "category": "reports",
+      "subcategory": "delivery",
+      "menu_option": "Option 13",
+      "keywords": ["manifest", "delivery report", "option 13", "daily deliveries"],
+      "content": "Salesman Manifest (Option 13) - Telnet emails manifest report each morning showing all deliveries for the day. Use this option if email not received. Enter date (060114 format), printer# (100=email to self)."
+    },
+    {
+      "id": "daily_order_report",
+      "category": "reports",
+      "subcategory": "orders",
+      "menu_option": "Option 14",
+      "keywords": ["daily order report", "option 14", "order report"],
+      "content": "Daily Salesman Order Report (Option 14) views daily order reports. Enter date, salesman# (once only), printer 100=email. Press Enter to final line, follow prompts: 1=send, 2=cancel, 3=change info."
+    },
+    {
+      "id": "pickup_slip_overview",
+      "category": "pickups",
+      "subcategory": "entry",
+      "menu_option": "Option 15",
+      "keywords": ["pickup slip", "return product", "option 15", "enter pickup"],
+      "content": "Pick Up Slip (Option 15) enters pickups when customer returns product. CRITICAL: Only enter pickups AFTER an order exists to attach pickup to. Drivers won't do pickups without a slip. Option 1=Enter Pickup, Option 2=Pickups on File, Option 3=Pickup Status Inquiry."
+    },
+    {
+      "id": "pickup_slip_entry",
+      "category": "pickups",
+      "subcategory": "process",
+      "keywords": ["enter pickup", "pickup process", "credit amount", "pickup notes"],
+      "content": "Enter Pickup (Option 15-1): Enter customer#, select Option 1, enter invoice# (or X if unknown/multiple), invoice date, credit dollar amount, product#, case count (F2 for split). Enter reason in NOTES (mispick, wrong item, dented). Y to post, then enter order# to attach pickup to."
+    },
+    {
+      "id": "pickup_slip_inquiry",
+      "category": "pickups",
+      "subcategory": "lookup",
+      "keywords": ["pickups on file", "pickup status", "find pickup"],
+      "content": "Pickups on File (Option 15-2) shows entered pickups alphabetically by account#. Enter to scroll, select by line#. Shows: customer#, name, city, time/date entered, order# assigned. Pickup Status Inquiry (Option 15-3) shows: customer#, name, delivery date, queued/date entered, printed by routing, route picking up."
+    },
+    {
+      "id": "quotes_overview",
+      "category": "quotes",
+      "subcategory": "entry",
+      "menu_option": "Option 16",
+      "keywords": ["quote", "price quote", "option 16", "faux order", "prospect"],
+      "content": "Quotes (Option 16) enters 'faux' orders to price out potential or existing customers. If customer has account, use their customer#. If NO account, use your Quote Account# (from A/R). ALWAYS SET QUOTE FOR SUNDAY DELIVERY. Enter same as Option 1 order entry. Print follows prompts (auto-uniform/customer version)."
+    },
+    {
+      "id": "quotes_options",
+      "category": "quotes",
+      "subcategory": "management",
+      "keywords": ["change quote", "delete quote", "copy quote to bid"],
+      "content": "Quote options: Option 2=Quote Changes (modify existing), Option 3=Quote Deletion/Change Date (adjust info or delete), Option 4=Quotes on File (view all). Quotes can copy to bid: at end of quote, enter 'COPY', then customer#."
+    },
+    {
+      "id": "download_bid_excel_item",
+      "category": "bids",
+      "subcategory": "export",
+      "menu_option": "Option 32",
+      "keywords": ["download bid", "bid excel", "option 32", "export bid", "bid spreadsheet"],
+      "content": "Download Bid to Excel by Item (Option 32): B=Bid, enter date range or Enter to skip, Y/N show pricing, A/U all items or usage only, I=Individual customer, Y/N 2nd line description, Y/N category/group, L/S long or short version, customer#, Enter. Bid emailed."
+    },
+    {
+      "id": "download_bid_excel_line",
+      "category": "bids",
+      "subcategory": "export",
+      "menu_option": "Option 33",
+      "keywords": ["bid by line", "option 33", "line item bid"],
+      "content": "Download Bid to Excel by Line (Option 33) sends bid organized by line item. Same steps as Option 32."
+    },
+    {
+      "id": "back_order_entry",
+      "category": "order_entry",
+      "subcategory": "back_orders",
+      "menu_option": "Option 34",
+      "keywords": ["back order", "shorted", "mispick", "option 34", "next day backorder"],
+      "content": "Back Order Entry (Option 34) enters next-day delivery for shorted/mispicked product from current day's delivery. Allows small qty deliveries without affecting margin. Same as Option 1 but: Reference Number = previous ORDER#. FIRST item MUST be from previous order or system rejects. Saturday back orders require John Levatino approval."
+    },
+    {
+      "id": "cutshop_steaks_search",
+      "category": "product_search",
+      "subcategory": "cutshop",
+      "keywords": ["filet", "strip steak", "ribeye", "porterhouse", "t-bone", "steak search", "cut shop"],
+      "content": "Cut Shop steak search terms: FILET STK (filet steaks), STRIP STK (strip steaks), COWBOY (bone-in ribeyes frenched), RIB STK (bone not frenched), T-BONE (small filet), PORTERHOUSE (bigger filet), RIBEYE STK, SKIRT STK. Chops: LAMB RACK/SHOULDER/LOIN, VEAL RACK/LOIN, PORK LOIN/RACK."
+    },
+    {
+      "id": "cutshop_whole_pieces",
+      "category": "product_search",
+      "subcategory": "cutshop",
+      "keywords": ["whole filet", "PSMO", "strip loin", "export rib", "short loin", "primal"],
+      "content": "Cut Shop whole pieces search: PSMO (whole filet mignon), STRIP LOIN (whole), RIBEYE BNLS (whole ribeyes), EXPORT RIB (bone-in ribeye), SHORT LOIN (filet/strip together), 109 RIB. Other cuts searchable directly: TERES MAJOR, FLATIRON, HANGER, FLANK."
+    },
+    {
+      "id": "system_recovery",
+      "category": "navigation",
+      "subcategory": "troubleshooting",
+      "keywords": ["stuck", "frozen", "escape", "log off", "RUN CTL", "SLS"],
+      "content": "If stuck in any option: enter RUN\"CTL\" to return to main Sales menu. After login: enter SLS to go to Main Sales Screen. To log off Telnet: enter 'R' on Main Sales Screen."
+    },
+    {
+      "id": "arrow_key_mapping",
+      "category": "navigation",
+      "subcategory": "keys",
+      "keywords": ["arrow keys", "function keys", "F1", "F2", "F3", "F4", "keyboard"],
+      "content": "Arrow key equivalents in order entry: Up arrow = F3, Down arrow = F1, Left arrow = F2, Right arrow = F4. Extra codes: A=Add (order/quote/bid), C=Change/Maintain, hide margin % in open order."
+    },
+    {
+      "id": "abbreviations_food",
+      "category": "reference",
+      "subcategory": "codes",
+      "keywords": ["abbreviation", "code", "BRD", "BNLS", "IQF", "FC", "product code"],
+      "content": "Common product abbreviations: BRD=Breaded, NTB=Not Breaded, BNLS=Boneless, BTR=Battered, CAB=Certified Angus Beef, CKD=Cooked, FC=Fully Cooked, IQF=Instant Quick Freeze, IVP=Ind Vacuum Packed, IW=Ind Wrapped, PC=Portion Control, PCK=Pre-Cooked, RTC=Ready to Cook."
+    },
+    {
+      "id": "abbreviations_dietary",
+      "category": "reference",
+      "subcategory": "codes",
+      "keywords": ["gluten free", "kosher", "low fat", "sugar free", "dietary codes"],
+      "content": "Dietary abbreviations: GTF=Gluten Free, LFT=Low Fat, LRS=Low Sodium, LSR=Low Sugar, SGF=Sugar Free, NSA=No Sugar Added, FFR=Fat Free, CLF=Cholesterol Free, LTF=Lactose Free, VGT=Vegetarian, WGR=Whole Grain, WW=Whole Wheat, ZTF=Zero Trans Fat, PARVE=no meat/milk/derivatives."
+    },
+    {
+      "id": "abbreviations_packaging",
+      "category": "reference",
+      "subcategory": "codes",
+      "keywords": ["CVP", "PIJ", "PIW", "UHT", "packaging codes"],
+      "content": "Packaging abbreviations: CVP=Controlled Vacuum Packaging, PIJ=Packed in Juice, PIW=Packed in Water, PET=Plastic, UHT=Ultra High Temp (shelf milk), PB=Par Baked, UNB=Unbaked, OVN=Ovenable, CN=Child Nutrition, OB=Opportunity Buy."
+    },
+    {
+      "id": "kosher_codes_common",
+      "category": "reference",
+      "subcategory": "kosher",
+      "keywords": ["OU", "kosher dairy", "kosher parve", "kosher grade", "orthodox union"],
+      "content": "Common Kosher codes: OU=Orthodox Union, UD=OU Dairy, UP=OU Parve, UG=OU Glatt, UC=OU Cholov Yisroel, UF=OU Fish, UM=OU Meat. K codes: D=Kosher Dairy, P=Kosher Parve. N=Not Kosher, NA=N/A."
+    },
+    {
+      "id": "phone_directory_executive",
+      "category": "contacts",
+      "subcategory": "leadership",
+      "keywords": ["Tim Driscoll", "Ron Pereen", "Steve Donnelly", "John Levatino", "executive", "president"],
+      "content": "Executive contacts: Tim Driscoll (President) x211, Ron Pereen (Exec VP) x181, Steve Donnelly (Sr VP Sales/Purchasing/Marketing) x180, George Williams (Chief Performance Officer) x137, John Levatino (VP Sales) x288."
+    },
+    {
+      "id": "phone_directory_operations",
+      "category": "contacts",
+      "subcategory": "operations",
+      "keywords": ["operations", "transportation", "routing", "customer service", "Helder", "Sara Kenyon"],
+      "content": "Operations contacts: Helder Coelho (Operations Manager), Sara Kenyon (Director of Transportation), Michael Palma (Transportation Manager). Customer Service: Kimberly Flores (Supervisor), Rosa Torres."
+    },
+    {
+      "id": "phone_directory_departments",
+      "category": "contacts",
+      "subcategory": "departments",
+      "keywords": ["bid department", "finance", "AP", "AR", "IT", "cut shop", "purchasing"],
+      "content": "Department contacts: Bid Dept - Nancy Cook (Manager), Grace Amecagelo. Finance - Carolina Ortega (Accounting Mgr) x172. A/P - Nicole Abudeye (Supervisor) x220. A/R - Carolina O x102. IT - Shamar Basu (Mgr) 973-464-3894. Cut Shop - Vito Scardigno (Director), Frank Ryan, Dan Roth. Purchasing - Paul Gillen (Director), Chris Driscoll (Director)."
+    },
+    {
+      "id": "phone_directory_other",
+      "category": "contacts",
+      "subcategory": "misc",
+      "keywords": ["HR", "payroll", "cash carry", "inventory", "receptionist"],
+      "content": "Other contacts: HR - Carolina Ortega x172, Natasha Driscoll x120, Alexandra Narrea (Payroll) x222. Cash & Carry - Mike Tighe, Edward Blaskewicz. Inventory - Bill Lulack x123, James Serrago x179, Jacob Veeren x153. Receptionist - Ashley Rodriguez x100. Meal Production - Frank Ryan. NYC Schools - James Hartman x101."
+    },
+    {
+      "id": "seafood_notes",
+      "category": "order_entry",
+      "subcategory": "seafood",
+      "keywords": ["seafood", "fish", "custom cut", "special specs", "F1 notes", "Donnie"],
+      "content": "Seafood special notes (SEAFOOD ONLY): Use when customer requests non-standard pack size (e.g., 18 pieces when pack is 20). Contact Donnie N. if unsure about splitting. Enter item normally, BEFORE final Enter hit F1 for notes line at bottom. Enter specs, Enter to accept. Notes print on seafood labels only (not invoice). Extended price may be incorrect - warehouse adjusts cut weight before shipping."
+    },
+    {
+      "id": "special_order_entry",
+      "category": "order_entry",
+      "subcategory": "special_orders",
+      "keywords": ["special order", "allocate", "cancel date", "buyer notification"],
+      "content": "Special Order process: Start order with customer#, enter item#, Y to place special order (N to cancel), enter requested receive date, enter cancel date (latest acceptable). Exit order. Item is now allocated - buyers can't add to PO unless allocated (shown shaded). Buyers receive daily Excel of all special orders. Sales reps get their allocations only."
+    },
+    {
+      "id": "special_order_management",
+      "category": "order_entry",
+      "subcategory": "special_orders",
+      "keywords": ["remove special order", "cancel special order", "discontinued item"],
+      "content": "Special Order management: Buyers must communicate if item discontinued or unavailable within dates. Sales reps manage their list - can remove items from SLS screen (only if not yet ordered by Purchasing). Buyer gets email notification when removed. Reasons to remove: customer out of business, credit hold, etc."
+    },
+    {
+      "id": "warehouse_locations",
+      "category": "reference",
+      "subcategory": "warehouses",
+      "keywords": ["Clifton", "Amsterdam", "warehouse 01", "warehouse 02", "transfer"],
+      "content": "Warehouse codes: 01=Clifton (primary), 02=Amsterdam. In stock status, F10 toggles between Clifton and Amsterdam info. Up arrow in stock status shows incoming orders and transfers from Amsterdam."
+    },
+    {
+      "id": "temperature_zones",
+      "category": "reference",
+      "subcategory": "storage",
+      "keywords": ["temperature zone", "refrigerated", "dry", "frozen", "R", "D", "F"],
+      "content": "Temperature zone codes: R=Refrigerated, D=Dry, F=Frozen. Temperature zone option (T) when printing helps warehouse pickers pull orders efficiently by grouping items."
+    }
+  ]
+}

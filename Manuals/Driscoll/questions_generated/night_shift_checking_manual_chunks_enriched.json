@@ -1,0 +1,263 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\night_shift_checking_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:39:41.606509",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_night_shift_checking_introduction_0",
+      "content": "Night Shift Checking Manual\n\nOverview\n\nChecking during the night shift is a critical part of the warehouse operation. The role ensures that all picked products are accurate, complete, and correctly labeled before being loaded onto trucks. This position directly impacts customer satisfaction and the overall accuracy of orders leaving the warehouse.\n\nNight shift checking typically begins at 4:00 PM or 5:00 PM and concludes when the shift\u2019s work is complete\u2014usually between 3:30 AM and 4:30 AM, depending on nightly volume and performance.\n\nShift Schedule and Breaks\n\nCheckers follow the same schedule as other night shift positions:\n\nTwo 15-minute breaks\n\nOne 30-minute lunch break\n\nBreaks cannot be taken in the machine room or on the warehouse floor.\n\nRole and Responsibilities\n\nThe main responsibility of a checker is to verify every product picked by the warehouse team before it is loaded for delivery. Each order must be reviewed carefully to ensure accuracy and quality control. Steel toe shoes above the ankle or necessary given company policy.\n\nCore duties include:\n\nReceiving order sheets from the clerks at the check window.\n\nReviewing orders pallet by pallet and case by case to verify correctness.\n\nChecking both the physical product and the printed label\u2014not relying solely on labels, since label errors may occur.\n\nEnsuring that each case matches what appears on the printed order list.\n\nMarking any missing, incorrect, or extra items on the sheet.\n\nReporting any discrepancies to the clerks immediately so the issue can be corrected.\n\nAccuracy and Productivity\n\nAs a checker, attention to detail and efficiency go hand in hand.\n\nThe loaders depend on checkers to clear pallets quickly so they can continue loading trucks.\n\nIf checking falls behind, the floor can become congested, which slows down the entire shift.\n\nAccuracy is critical\u2014errors can cause customer dissatisfaction, product returns, or fines, especially with school orders and VIP routes.\n\nOrder Priorities",
+      "content_hash": "86cadbe37bfccd86",
+      "section_title": "night_shift_checking",
+      "source_file": "night_shift_checking_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 399,
+      "_original": {
+        "keywords": [
+          "shift",
+          "checking",
+          "night",
+          "warehouse",
+          "accuracy",
+          "order",
+          "orders",
+          "breaks",
+          "product",
+          "case"
+        ],
+        "email": "",
+        "category": "night_shift_checking",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "training",
+        "compliance",
+        "reference"
+      ],
+      "verbs": [
+        "ensure",
+        "verify",
+        "review",
+        "check",
+        "match",
+        "mark",
+        "report",
+        "receive",
+        "load",
+        "pick"
+      ],
+      "entities": [
+        "pallet",
+        "case",
+        "product",
+        "order",
+        "label",
+        "order_sheet",
+        "truck",
+        "warehouse",
+        "route"
+      ],
+      "actors": [
+        "checker",
+        "warehouse_team",
+        "clerk",
+        "loader",
+        "customer"
+      ],
+      "conditions": [
+        "night_shift",
+        "high_volume",
+        "discrepancy",
+        "missing_item",
+        "incorrect_item",
+        "extra_item",
+        "label_error",
+        "congestion",
+        "school_order",
+        "vip_route"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time does night shift checking usually start and end?",
+        "Where can I take my breaks? I tried the warehouse floor and got yelled at.",
+        "How do I report discrepancies at the check window if something's missing pallet by pallet?",
+        "What are the main duties for checkers, like verifying orders case by case?",
+        "Why is accuracy so critical for school orders and VIP routes, and what happens if checking slows down the loaders?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse process for night shift checkers, clear duties and schedules, actionable steps, slightly incomplete due to cutoff and minor phrasing issues",
+      "acronyms": {},
+      "jargon": {
+        "checker": "Warehouse role responsible for verifying picked orders for accuracy",
+        "picked products": "Items selected from inventory by pickers for customer orders",
+        "check window": "Station where checkers receive order sheets from clerks",
+        "pallet": "Flat platform used for stacking and transporting multiple cases or products",
+        "case": "Individual box or container of products",
+        "loaders": "Warehouse team members who load verified pallets onto trucks",
+        "clerks": "Staff who prepare and distribute order sheets to checkers",
+        "discrepancies": "Differences between ordered items and actual picked products (e.g., missing, incorrect, or extra)",
+        "VIP routes": "High-priority delivery routes requiring utmost accuracy to avoid issues",
+        "school orders": "Deliveries to educational institutions, prone to fines if inaccurate",
+        "machine room": "Restricted area where breaks are not permitted",
+        "warehouse floor": "Main operational area of the warehouse where checking and loading occur"
+      },
+      "numeric_thresholds": {
+        "night_shift_start_1": {
+          "value": "4:00",
+          "unit": "PM",
+          "context": "One possible start time for night shift checking"
+        },
+        "night_shift_start_2": {
+          "value": "5:00",
+          "unit": "PM",
+          "context": "Alternative start time for night shift checking"
+        },
+        "shift_end_early": {
+          "value": "3:30",
+          "unit": "AM",
+          "context": "Earliest typical end time, depending on volume"
+        },
+        "shift_end_late": {
+          "value": "4:30",
+          "unit": "AM",
+          "context": "Latest typical end time, depending on volume and performance"
+        },
+        "short_break_duration": {
+          "value": 15,
+          "unit": "minutes",
+          "context": "Two 15-minute breaks per shift"
+        },
+        "lunch_break_duration": {
+          "value": 30,
+          "unit": "minutes",
+          "context": "One 30-minute lunch break per shift"
+        }
+      }
+    },
+    {
+      "id": "warehouse_night_shift_checking_introduction_1",
+      "content": "During the night shift, there are two key categories of orders that require special attention:\n\nConnecticut (CT) Routes: These are checked first since they go out earliest in the morning.\n\nVIP Orders: Roughly 130 orders each night, including schools and high-priority customers.\n\nSchool pallets must be checked thoroughly\u2014any wrong or missing case can result in fines or loss of customer trust.\n\nCommunication\n\nEffective communication is essential for success:\n\nNotify clerks immediately of any product errors, shortages, or damaged goods.\n\nCoordinate with loaders to ensure checked pallets are promptly cleared and loaded.\n\nWork closely with pickers and managers to maintain productivity and accuracy across the shift.\n\nImportance of the Role\n\nCheckers are the last line of defense before customer orders leave the warehouse. Mistakes caught here prevent issues at the customer\u2019s door. Being deliberate, precise, and efficient ensures that Driscoll Foods maintains its commitment to quality, reliability, and customer satisfaction.",
+      "content_hash": "1cd3252423840e7d",
+      "section_title": "night_shift_checking",
+      "source_file": "night_shift_checking_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 193,
+      "_original": {
+        "keywords": [
+          "orders",
+          "customer",
+          "checked",
+          "night",
+          "shift",
+          "pallets",
+          "any",
+          "communication",
+          "during",
+          "there"
+        ],
+        "email": "",
+        "category": "night_shift_checking",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "check",
+        "notify",
+        "coordinate",
+        "maintain",
+        "clear",
+        "load",
+        "verify",
+        "prevent"
+      ],
+      "entities": [
+        "route",
+        "order",
+        "pallet",
+        "warehouse",
+        "customer",
+        "inventory"
+      ],
+      "actors": [
+        "checker",
+        "clerk",
+        "loader",
+        "picker",
+        "manager"
+      ],
+      "conditions": [
+        "shortage",
+        "damage",
+        "high-priority",
+        "night_shift"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do I check first on night shift, CT Routes or VIP orders?",
+        "How do I communicate product errors or shortages to the team?",
+        "What if I find a missing case on a school pallet?",
+        "Loaders keep ignoring my checked pallets\u2014what do I do to get them loaded faster?",
+        "Why is being precise as a checker so critical for Driscoll Foods' reputation?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse process for night shift checkers, critical to prevent errors/fines; specific to role/shift scenarios like CT routes and VIP; simple to understand; self-contained overview with clear priorities and actions like notifying clerks and coordinating.",
+      "acronyms": {
+        "CT": "Connecticut"
+      },
+      "jargon": {
+        "CT Routes": "Routes prioritized first as they depart earliest in the morning",
+        "VIP Orders": "High-priority orders, approximately 130 per night including schools and key customers",
+        "School pallets": "Pallets designated for schools requiring thorough verification to avoid fines or loss of trust",
+        "checkers": "Warehouse role serving as the final quality check before orders ship",
+        "pickers": "Warehouse staff responsible for selecting items for orders",
+        "loaders": "Warehouse staff who load checked pallets onto transport",
+        "clerks": "Warehouse staff notified of errors, shortages, or damages"
+      },
+      "numeric_thresholds": {
+        "VIP orders per night": {
+          "value": 130,
+          "unit": "orders",
+          "context": "Roughly, including schools and high-priority customers"
+        }
+      }
+    }
+  ]
+}

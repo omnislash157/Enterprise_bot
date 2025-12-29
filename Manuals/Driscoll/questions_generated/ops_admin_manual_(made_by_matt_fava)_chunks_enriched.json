@@ -1,0 +1,2358 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\ops_admin_manual_(made_by_matt_fava)_chunks.json",
+  "enriched_at": "2025-12-22T10:43:36.579606",
+  "chunk_count": 16,
+  "chunks": [
+    {
+      "id": "warehouse_ops_admin_introduction_0",
+      "content": "Ops Admin\n\nMonday:\n\nAPT Report (Friday, Sunday, Weekly)\n\nLucas Picks(Saturday Monday)\n\nVIP Check\n\nLoader Report (Friday Old &Sunday New)\n\nLoader report(weekly)\n\nDaily Ops Stats\n\nCatch weight changes\n\nDevice tracker\n\nShorts & Mispicks J & I, DSM, checker errors, daily ops\n\nLucas Batch not called in not including NY and PA\n\nLucas No PIR 3 above\n\nChecker Report\n\nMena Inventory(3:00pm)\n\nAPT Selector batch start and end time\n\nTuesday:\n\nAPT Report\n\nLucas Picks\n\nVIP Check\n\nLoader Report\n\nDaily Ops Stats\n\nCatch weight changes\n\nDevice tracker\n\nBids Credits\n\nShorts & Mispicks J & I, DSM, checker errors, daily ops\n\nLucas Batch not called in not including NY and PA\n\nLucas No PIR 3 above\n\nChecker Report\n\nAPT Selector batch start and end time\n\nWednesday:\n\nAPT Report\n\nLucas Picks\n\nVIP Check\n\nLoader Report\n\nDaily Ops Stats\n\nDevice tracker\n\nCatch weight changes\n\nSelector Progression Chart\n\nNight kpis(1:00pm)\n\nTransportation KPI(1:00pm)\n\nShorts & Mispicks J & I, DSM, checker errors, daily ops\n\nLucas Batch not called in not including NY and PA\n\nLucas No PIR 3 above\n\nChecker Report\n\nAPT Selector batch start and end time\n\nThursday:\n\nAPT Report\n\nLucas Picks\n\nVIP Check\n\nLoader Report\n\nDaily Ops Stats\n\nCatch weight changes\n\nDevice tracker\n\nDriver Overview\n\nWeekly ops performance by division\n\nShorts & Mispicks J & I, DSM, checker errors, daily ops\n\nLucas Batch not called in not including NY and PA\n\nLucas No PIR 3 above\n\nChecker Report\n\nAPT Selector batch start and end time\n\nFriday:\n\nAPT Report\n\nLucas Picks\n\nVIP Check\n\nLoader Report\n\nDaily Ops Stats\n\nCatch weight changes\n\nDevice tracker\n\nShorts & Mispicks J & I, DSM, checker errors, daily ops\n\nLucas Batch not called in not including NY and PA\n\nLucas No PIR 3 above\n\nChecker Report\n\nAPT Selector batch start and end time\n\nShort answers\n\nReprinting a live invoice: telenet, 225 printer number is 3\n\nReprinting a closed invoice: telenet 7171 I invoice number printer 3\n\nFinding older credits: 75 cust number\n\nInv Adjustments 512item number T x for all A for adjustments\n\nFind errors DUG71\n\nRoutes per warehouse\n\nWayne IDs\n\n02-98\n\nA-F\n\nH-M\n\nQ\n\nT-U\n\nPA IDs\n\nP\n\nR\n\nS\n\nN\n\nO\n\nNY IDs\n\nG\n\nW\n\nY\n\nX\n\nZ\n\n01 - is for pick ups/will calls for all divisions",
+      "content_hash": "f4e4c895e039abe0",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 477,
+      "_original": {
+        "keywords": [
+          "report",
+          "lucas",
+          "ops",
+          "apt",
+          "daily",
+          "checker",
+          "batch",
+          "loader",
+          "errors",
+          "selector"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "lookup",
+        "training"
+      ],
+      "verbs": [
+        "check",
+        "generate",
+        "review",
+        "track",
+        "change",
+        "process",
+        "reprint",
+        "find",
+        "adjust",
+        "lookup",
+        "report",
+        "verify"
+      ],
+      "entities": [
+        "APT Report",
+        "Lucas Picks",
+        "VIP Check",
+        "Loader Report",
+        "Daily Ops Stats",
+        "Catch weight changes",
+        "Device tracker",
+        "Shorts & Mispicks",
+        "Lucas Batch",
+        "PIR",
+        "Checker Report",
+        "Mena Inventory",
+        "APT Selector batch",
+        "Bids Credits",
+        "Selector Progression Chart",
+        "Night KPIs",
+        "Transportation KPI",
+        "Driver Overview",
+        "Weekly ops performance",
+        "invoice",
+        "credits",
+        "customer",
+        "item",
+        "errors",
+        "routes",
+        "warehouse"
+      ],
+      "actors": [
+        "Ops Admin",
+        "Lucas",
+        "APT Selector",
+        "Loader",
+        "Checker",
+        "J & I",
+        "DSM",
+        "Mena",
+        "Driver",
+        "Selector"
+      ],
+      "conditions": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Friday Old & Sunday New",
+        "weekly",
+        "3:00pm",
+        "1:00pm",
+        "not including NY and PA",
+        "No PIR 3 above",
+        "live invoice",
+        "closed invoice",
+        "older credits"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What reports do I need to run for Ops Admin on Monday?",
+        "How do I reprint a live invoice?",
+        "What's the telenet command for a closed invoice reprint and which printer?",
+        "I can't find older credits\u2014what customer number do I use?",
+        "What are the Wayne IDs and what does 01 mean for routes?"
+      ],
+      "question_complexity": [
+        2,
+        1,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core daily checklist for Ops Admin role with specific reports per day and quick-reference commands; highly actionable for the role, assumes basic domain knowledge of acronyms, mostly self-contained.",
+      "acronyms": {
+        "KPI": "Key Performance Indicator",
+        "NY": "New York",
+        "PA": "Pennsylvania"
+      },
+      "jargon": {
+        "Lucas Picks": "Picks tracked or reported in the Lucas system",
+        "VIP Check": "Verification for high-priority (VIP) orders or items",
+        "Loader Report": "Performance or activity report for loaders (old on Friday, new on Sunday, weekly summary)",
+        "Catch weight changes": "Adjustments or updates for variable-weight (catch-weight) products",
+        "Shorts & Mispicks": "Order shortages and picking errors, categorized by J & I, DSM, checker errors, and daily operations",
+        "Checker Report": "Report on checker (order verifier) performance and errors",
+        "APT Selector": "Automated picking system selector batch start/end times",
+        "Selector Progression Chart": "Tracking chart for order selector (picker) productivity",
+        "telnet": "Terminal emulation command for system access (e.g., reprinting invoices, adjustments)",
+        "will calls": "Customer pickup orders"
+      },
+      "numeric_thresholds": {
+        "PIR_threshold": {
+          "value": 3,
+          "unit": "",
+          "context": "Lucas batches with No PIR above this level"
+        },
+        "Mena_Inventory_time": {
+          "value": "3:00",
+          "unit": "pm",
+          "context": "Daily check time for Mena Inventory"
+        },
+        "Night_KPIs_time": {
+          "value": "1:00",
+          "unit": "pm",
+          "context": "Wednesday check time for Night KPIs"
+        },
+        "Transportation_KPI_time": {
+          "value": "1:00",
+          "unit": "pm",
+          "context": "Wednesday check time for Transportation KPI"
+        },
+        "printer_number": {
+          "value": 3,
+          "unit": "",
+          "context": "Default printer for invoice reprints"
+        },
+        "older_credits_prefix": {
+          "value": 75,
+          "unit": "",
+          "context": "Command prefix followed by customer number"
+        },
+        "inv_adjustments_prefix": {
+          "value": 512,
+          "unit": "",
+          "context": "Command prefix followed by item number for adjustments"
+        },
+        "closed_invoice_command": {
+          "value": 7171,
+          "unit": "",
+          "context": "Telnet command prefix for reprinting closed invoices"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_1",
+      "content": "78 is a holding pattern for unrouted orders. All delivery orders are route 78 until they are assigned a route. Routing checks route 78 at the end of routing nightly to confirm there is nothing still in route 78 that needs to be assigned, because if so it will not be picked/delivered\n\n99 is a pick and stage route ID used in Wayne\n\n276 live mispicks report\n\nOPS error\n\nWeight call in issues\n\nIf there are issues, email Kudjoe Daniel White and Clauder\n\nMispick\n\nFWD message to Inventory Control CC ops error\n\nMsg:\n\nCan you check the slot for item #XXXXXXX\n\nWe sent Y\n\nExample\n\nTo get the item number and description log into Telenet 51type in the item number, copy and paste the description into the email\n\nIf the Item is slotted correctly\n\nForward the response from inventory to the sales rep CC ops errors\n\nMsg:\n\nProduct slotted correctly. This was a mispick and will be addressed.\n\nIf item is slotted correctly but slot is mixed, cc Samantha cuesta so the selector is not penalized for a mispick that\u2019s not his fault\n\nIn telenet 27364 put in the date, route, and item\n\nCopy the picker and item info for the next email\n\nThen forward the response from inventory to the corresponding night manager (dry, freezer, or cooler) CC Ops errors, phillip rodriguez, kudjoe larbi, and Daniel white\n\nMSG:\n\nWe picked x from slot a instead of y from slot b\n\nPaste the telenet info for the picker and item\n\nExample:\n\nIf the item is slotted incorrectly\n\nFWD the response from inventory to the sales rep CC ops errors\n\nItems slotted incorrectly, it has since been fixed.\n\nDamage/Quality/Expiration\n\nFWD Item to inventory control CC ops errors & produce (if it is a produce item)\n\nCustomer received (issue) products, can you please check item #(item number) for (issue)\n\nFWD their response to the sales associate with a brief summary of what happened.\n\nShorts\n\nUsually you can not follow up on shorts for a couple days after the delivery date as the invoices, and driver return forms need to be filed and uploaded to the system.",
+      "content_hash": "6fa02e9f45fd5fa5",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 460,
+      "_original": {
+        "keywords": [
+          "item",
+          "route",
+          "ops",
+          "inventory",
+          "slotted",
+          "fwd",
+          "slot",
+          "response",
+          "errors",
+          "email"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "definition",
+        "lookup",
+        "escalation",
+        "reference"
+      ],
+      "verbs": [
+        "check",
+        "confirm",
+        "assign",
+        "pick",
+        "deliver",
+        "email",
+        "forward",
+        "log in",
+        "type",
+        "copy",
+        "paste",
+        "address",
+        "penalize",
+        "fix",
+        "review",
+        "verify",
+        "notify"
+      ],
+      "entities": [
+        "route",
+        "order",
+        "delivery_order",
+        "report",
+        "item",
+        "slot",
+        "inventory",
+        "picker",
+        "invoice",
+        "driver_return_form",
+        "mispick"
+      ],
+      "actors": [
+        "sales_rep",
+        "inventory_control",
+        "night_manager",
+        "selector",
+        "picker",
+        "customer",
+        "Kudjoe Daniel White",
+        "Clauder",
+        "Samantha Cuesta",
+        "Phillip Rodriguez",
+        "Kudjoe Larbi",
+        "Daniel White"
+      ],
+      "conditions": [
+        "unrouted",
+        "mispick",
+        "ops_error",
+        "weight_call_in_issue",
+        "damage",
+        "quality",
+        "expiration",
+        "shorts",
+        "slotted_correctly",
+        "slotted_incorrectly",
+        "mixed_slot",
+        "produce_item"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is route 78 for in routing?",
+        "Who do I email about weight call-in issues?",
+        "How do I handle an OPS error for a mispick?",
+        "Inventory says the slot is mixed on this mispick\u2014what now so the picker isn't penalized?",
+        "Customer claims damage on produce item #12345, what's the process? I'm swamped here!"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational procedures for handling routing holds, mispicks, damages, and errors in a warehouse/delivery context; provides specific steps, messages, and contacts, assuming basic ops familiarity.",
+      "acronyms": {
+        "OPS": "Operations",
+        "FWD": "Forward",
+        "CC": "Carbon Copy"
+      },
+      "jargon": {
+        "holding pattern": "Temporary status for unrouted orders",
+        "route 78": "Holding route for unrouted delivery orders",
+        "pick and stage route": "Route ID 99 used for picking and staging in Wayne",
+        "mispicks report": "Live report numbered 276 for mispicks",
+        "mispick": "Incorrect item picked",
+        "slotted correctly": "Item placed in correct inventory slot",
+        "slot is mixed": "Slot contains multiple items",
+        "selector": "Employee who picks items",
+        "night manager": "Manager for dry, freezer, or cooler areas",
+        "shorts": "Short shipments or missing items on orders",
+        "Telenet": "Inventory lookup system",
+        "driver return forms": "Forms for items returned by drivers"
+      },
+      "numeric_thresholds": {
+        "route_78": {
+          "value": 78,
+          "context": "Holding pattern for unrouted orders, checked nightly by routing"
+        },
+        "route_99": {
+          "value": 99,
+          "context": "Pick and stage route ID used in Wayne"
+        },
+        "mispicks_report_276": {
+          "value": 276,
+          "context": "Live mispicks report"
+        },
+        "telenet_item_lookup_51": {
+          "value": 51,
+          "context": "Telenet code to look up item number and description"
+        },
+        "telenet_mispick_check_27364": {
+          "value": 27364,
+          "context": "Telenet code to input date, route, and item for mispick info"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_2",
+      "content": "First check Lucas/Lucas pick report to see if the item was confirmed picked. Use item & order number to confirm.\n\nNext check the driver return reports in V:\\Route Return sheets use the date and route number to find the form. If the email does not include the route number, use telecom to look up the route number with the order/invoice number 211order/invoice number example on next page(A). Last check the invoice to see if the item was checked off and signed for use the archive picker with the invoice number to see the invoice find the item in question and whether it was marked off. A small check usually denotes the item was checked off.\n\nEmail: you can reply to the sales rep letting them know if the item was confirmed picked in lucas, whether it was on the driver return report, and if it was checked off on the invoice. As well as screenshots of all 3 with the item in question highlighted.\n\nEX:\n\nAPT report\n\nDone Daily for the day before also done weekly for Sun-FRI of the week before\n\nOn Monday run for Friday, Sunday, and the week\n\nYou should have 6 daily and 1 weekly report per week\n\nAPT by agent folder on desktop\n\nLog in\n\nWayne\n\nTop left of screen Reports  reports menu\n\nDepartment Reports\n\nDepartment \u2013 Associate Summary\n\nSort by Percent Performance\n\nDate range: date you want to run done for the day before Ex: on the 27th you would run the 26th\n\nCosts from: 4.  Payroll \u2013 Actual\n\nTime format: 2. Hours\n\nGo to start report\n\nTo export report\n\nFormat:MS Excel 97-2000(data only)         Check off maintain column aligment\n\nSave the file on your desktop it will be deleted after it is used.\n\nHighlight column A (only numbers ignore the first two rows and last 2 rows)\n\nClick on the triangle and convert to numbers\n\nPaste these items as values into the template APT report located here(O:\\Ops\\Night reports\\APT Daily and Weekly\\2025) into the first 2 columns\n\nCopy col C to P ignoring the first and last 2 rows\n\nPaste into apt report starting Col D\n\nCopy row with dept #01 total from the report you ran into bottom of apt report\n\nName Tab in APT report with Weekday, Month Date\n\nSave As",
+      "content_hash": "2361ddf9f2328281",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 491,
+      "_original": {
+        "keywords": [
+          "report",
+          "item",
+          "number",
+          "apt",
+          "invoice",
+          "check",
+          "reports",
+          "off",
+          "first",
+          "use"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "lookup",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "check",
+        "confirm",
+        "use",
+        "find",
+        "lookup",
+        "reply",
+        "notify",
+        "highlight",
+        "run",
+        "log in",
+        "sort",
+        "export",
+        "save",
+        "convert",
+        "paste",
+        "copy",
+        "name"
+      ],
+      "entities": [
+        "item",
+        "order_number",
+        "pick_report",
+        "driver_return_report",
+        "route_number",
+        "invoice",
+        "archive_picker",
+        "APT_report",
+        "template"
+      ],
+      "actors": [
+        "sales_rep",
+        "driver"
+      ],
+      "conditions": [
+        "missing_route_number",
+        "date_range"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I check if an item was picked using the Lucas pick report?",
+        "What do I do if the sales rep's email doesn't include the route number for the driver return report?",
+        "Walk me through the full process to verify an item on Lucas pick report, V:\\Route Return sheets, and the invoice archive picker.",
+        "Argh, customer claims item missing but I can't find it anywhere - do I start with Lucas or the driver returns?",
+        "On Monday, what dates do I use for the APT daily and weekly reports, and how do I paste into the template?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 6,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core ops procedures for item verification and APT reporting, detailed actionable steps, minor external references like paths and examples.",
+      "acronyms": {},
+      "jargon": {
+        "Lucas pick report": "Report used to confirm if an item was picked, checked using item and order number",
+        "driver return reports": "Reports documenting items returned by drivers, accessed via V:\\Route Return sheets using date and route number",
+        "telecom": "Tool or system used to look up route numbers with order/invoice number",
+        "archive picker": "Tool to retrieve archived invoices using invoice number to check if item was marked off",
+        "APT report": "Daily (for day before) and weekly (Sun-FRI prior week) performance report generated from Department \u2013 Associate Summary, sorted by Percent Performance",
+        "Associate Summary": "Department report type under Reports menu, sorted by Percent Performance",
+        "Percent Performance": "Sorting metric for Associate Summary reports",
+        "Payroll \u2013 Actual": "Cost category (option 4) selected for APT report generation"
+      },
+      "numeric_thresholds": {
+        "daily_reports_per_week": {
+          "value": 6,
+          "context": "Expected number of daily APT reports per week"
+        },
+        "weekly_reports_per_week": {
+          "value": 1,
+          "context": "Expected number of weekly APT reports per week"
+        },
+        "rows_to_ignore_top": {
+          "value": 2,
+          "context": "Ignore first two rows when highlighting column A or copying columns C to P"
+        },
+        "rows_to_ignore_bottom": {
+          "value": 2,
+          "context": "Ignore last two rows when highlighting column A or copying columns C to P"
+        },
+        "costs_option": {
+          "value": 4,
+          "context": "Payroll \u2013 Actual selection for APT report"
+        },
+        "time_format_option": {
+          "value": 2,
+          "context": "Hours format selection for APT report"
+        },
+        "dept_number": {
+          "value": "01",
+          "context": "Department #01 total row to copy into bottom of APT report"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_3",
+      "content": "MMDDYY APT Report in the correct month folder\n\nEmail to Night ops\n\nCC Samantha Cuesta, Jarred Ferrer Phillip Rodriguez, Alejandro Texca, Kudjoe Larbi, Clauder Jimenez\n\nSubject: APT Report MMDDYY\n\nMsg\n\nPlease see attached for the APT report for Weekday, Date\n\nLucas Picks\n\nDaily\n\nOn Monday do for Saturday and Monday dates\n\nIf you load Lucas and get a Microsoft silverlite notification go to the browser settings and add lucas to the internet explorer mode pages\n\nLayout and saved files are in O:\\Ops\\Night reports\\Lucas saved files are in folder 2025(or whatever year it is)\n\nOpen lucas go to picklines\n\nMake sure all is unfiltered hit the unfilter button\n\nClick on Ship date filter then custom your start date will be the day before and your end date will be the day of the report being ran.\n\nOn Monday run for Saturday and Monday\n\nThe example below is being run for Tuesday, January 28, 2025\n\nExport excel\n\nButton in bottom right corner\n\nRecords from 1 to X round total records up to nearest 1000, number of records can be found below the export panel\n\nCopy all information below the header line into the layout folder use option on the right paste match destination formatting\n\nHighlight all information in col G below the header line and shift to the right\n\nHit insert, Shift cells right\n\nIn G2 use the concat formula to combine D2 E2 and F2 with spaces between.\n\n=CONCAT(D2,\" \",E2,\" \",F2)\n\nDrag formula down to bottom of col or double tap the square in the bottom right corner\n\nCopy all those cells and paste as values, clipboard with 123\n\nHide Col G, click on the G col right click and hit hide\n\nGo to Column S Highlight all below header line\n\nRight click go to format cells under category choose number and make sure there are 0 decimal places\n\nSave As follow formatting of the previous Date in folder labeled 2025(or whatever year it is)\n\nEmail to Transportation\n\nCC: Kathy taormina, Samantha Cuesta, Jarred Ferrer, Alejandro Texca, Andrea Cuesta, Andrew Herasimtschuk, Claduer Jimenez\n\nSubject Lucas Picks \u201cdates\u201d\n\nMsg:\n\nGood morning,\n\nPlease see attached for the lucas picks report for\n\nWeekday, Month day year\n\nVIP Report",
+      "content_hash": "534343834b86d6b3",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 3,
+      "token_count": 473,
+      "_original": {
+        "keywords": [
+          "lucas",
+          "right",
+          "report",
+          "date",
+          "below",
+          "folder",
+          "monday",
+          "click",
+          "col",
+          "apt"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "training"
+      ],
+      "verbs": [
+        "email",
+        "cc",
+        "open",
+        "unfilter",
+        "filter",
+        "export",
+        "copy",
+        "paste",
+        "highlight",
+        "shift",
+        "insert",
+        "concat",
+        "drag",
+        "hide",
+        "format",
+        "save",
+        "attach"
+      ],
+      "entities": [
+        "APT Report",
+        "Lucas Picks",
+        "picklines",
+        "Ship date filter",
+        "Excel",
+        "layout folder",
+        "saved files",
+        "report"
+      ],
+      "actors": [
+        "Night ops",
+        "Samantha Cuesta",
+        "Jarred Ferrer",
+        "Phillip Rodriguez",
+        "Alejandro Texca",
+        "Kudjoe Larbi",
+        "Clauder Jimenez",
+        "Transportation",
+        "Kathy Taormina",
+        "Andrea Cuesta",
+        "Andrew Herasimtschuk"
+      ],
+      "conditions": [
+        "Monday",
+        "Saturday and Monday dates",
+        "Microsoft silverlight notification",
+        "unfiltered",
+        "Ship date filter custom start and end",
+        "Tuesday example"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I generate and email the daily Lucas Picks report?",
+        "What dates do I filter for in Lucas picklines when running the report on Monday?",
+        "Lucas won't load because of a Microsoft Silverlight notification\u2014what do I do?",
+        "What's the process for formatting column G with the concat formula after exporting Lucas Picks to Excel?",
+        "Who gets CC'd on the APT Report email to Night Ops?"
+      ],
+      "question_complexity": [
+        2,
+        3,
+        1,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational procedure for generating and distributing daily/weekly reports (APT, Lucas Picks, VIP), frequently required; detailed, step-by-step instructions with tools, formulas, emails make it highly actionable and mostly self-contained, assumes basic familiarity with internal systems like Lucas and file paths.",
+      "acronyms": {},
+      "jargon": {
+        "APT Report": "Weekly operational report generated and emailed with specific formatting and date handling",
+        "Lucas": "Internal software system used for accessing picklines and generating pick reports",
+        "picklines": "Section or view in Lucas displaying pick orders or lines for fulfillment",
+        "Night ops": "Night operations team responsible for receiving reports",
+        "unfilter button": "Button in Lucas to remove all applied filters",
+        "Ship date filter": "Filter option in Lucas for selecting records by custom ship date range",
+        "Lucas Picks": "Daily report exported from Lucas showing pick data for specific dates",
+        "VIP Report": "Specific report type mentioned in the procedure, likely for VIP handling"
+      },
+      "numeric_thresholds": {
+        "records_rounding": {
+          "value": 1000,
+          "unit": "records",
+          "context": "Round total records up to the nearest 1000 for export labeling"
+        },
+        "decimal_places": {
+          "value": 0,
+          "unit": "places",
+          "context": "Format numbers in column S with 0 decimal places"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_4",
+      "content": "Start around 5pmish\n\nTelecom 3021 use tomorrows date, these reports are emailed to you\n\nVIP Alert\n\nVIP Orders\n\nOpen the VIP + Audits template in the corresponding year in O:\\Ops\\Audits\n\nSave with tomorrows date, change the date in the report\n\nVIP Alert copy and paste into report in 1 column paste special, text\n\nHover the first col go to data text to columns, fixed with take the 2nd col and put it in col G the other col in col H\n\nExtract the Customer code and order code from that info type in the next two columns the 2nd code is the customer code the 1st is the order code.\n\nCopy those two columns over to column G&H sort g&h az\n\nSelect A D G H use conditional formatting to duplicate. Delete any set of 2 codes that are not highlighted.\n\nIf a customer has multiple non duplicate orders add rows to the report and add those orders in copy all information\n\nDelete any of the special routes with no instructions.\n\nFor Jarreds sections open telenet 51 enter the Fry code. Left arrow down arrow, add the customer #, name, and order number\n\nCAR\n\nYou will receive CAR emails throughout the day from Ashley Rodriguez put the customer number name reason and order # to the report.\n\nIt will be the same process for new customer alerts\n\nSpecial cases can be added to the new customer alert section, add the customer # name, order number and notes, the reason will be special request Highlight and special requests.\n\nThere is a VIP Audits accounts email template in the folder O:\\Ops\\Audits double click this to open. Copy all the information from the audit report and paste it into the email. Save the VIP report as a PDF.  Attach the PDF, VIP Alerts, and VIP Orders files to the email.\n\nAttach all the Car, New customer, and Special alert emails to this email. If there are special requests draw attention to it in the email.\n\nEX:\n\nVIP CT Report\n\nAt 3:00pm run the VIP report route starts with an I\n\nTelecom 3021 use tomorrows date, these reports are emailed to you\n\nEmail the VIP Alert file to Night ops, Shaun smith, Sara Kenyon, Kudjoe, Daniel White, Phillip Rodriguez\n\nVIP CHECK",
+      "content_hash": "71a89756d040a294",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 4,
+      "token_count": 490,
+      "_original": {
+        "keywords": [
+          "vip",
+          "customer",
+          "report",
+          "special",
+          "code",
+          "email",
+          "alert",
+          "col",
+          "order",
+          "date"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "use",
+        "open",
+        "save",
+        "change",
+        "copy",
+        "paste",
+        "extract",
+        "type",
+        "sort",
+        "select",
+        "delete",
+        "add",
+        "enter",
+        "receive",
+        "put",
+        "run",
+        "email",
+        "attach",
+        "highlight",
+        "hover",
+        "go to"
+      ],
+      "entities": [
+        "Telecom 3021",
+        "VIP Alert",
+        "VIP Orders",
+        "VIP + Audits template",
+        "Customer code",
+        "order code",
+        "CAR",
+        "new customer alerts",
+        "special requests",
+        "VIP Audits accounts email template",
+        "PDF",
+        "VIP CT Report",
+        "route",
+        "report"
+      ],
+      "actors": [
+        "Ashley Rodriguez",
+        "Night ops",
+        "Shaun Smith",
+        "Sara Kenyon",
+        "Kudjoe",
+        "Daniel White",
+        "Phillip Rodriguez"
+      ],
+      "conditions": [
+        "VIP",
+        "special routes with no instructions",
+        "multiple non duplicate orders",
+        "special cases",
+        "special requests",
+        "new customer"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I run the VIP Alert and VIP Orders reports around 5pm?",
+        "What's the process for Telecom 3021 using tomorrow's date?",
+        "What if a customer has multiple non-duplicate orders in the VIP Alert data?",
+        "The text to columns on VIP Alert isn't splitting the codes right\u2014what am I doing wrong?",
+        "How do I prepare and send the full VIP Audits email with all attachments and special requests?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core daily ops process for VIP alerts, orders, and audits; detailed actionable steps with Excel manipulations and tool-specific instructions; assumes basic familiarity with internal systems like Telecom and Telenet.",
+      "acronyms": {
+        "VIP": "Very Important Person",
+        "CAR": "Customer Alert Report"
+      },
+      "jargon": {
+        "Telecom 3021": "Specific report run with tomorrow's date, emailed automatically",
+        "VIP Alert": "List of alerts for VIP customers",
+        "VIP Orders": "List of orders for VIP customers",
+        "VIP + Audits template": "Excel template in O:\\Ops\\Audits for compiling VIP data by year",
+        "paste special, text": "Excel paste option to import data as plain text",
+        "text to columns, fixed width": "Excel data tool to split text into columns using fixed-width delimiters",
+        "conditional formatting to duplicate": "Excel feature to highlight duplicate sets of customer and order codes",
+        "special routes": "Routes lacking instructions, to be deleted from report",
+        "Fry code": "Specific code entered in telenet 51 for Jarred's sections",
+        "telenet 51": "System or terminal session opened with command 51 for entering customer data",
+        "Night ops": "Night operations team",
+        "VIP CT Report": "VIP report for CT (likely Connecticut), filtered for routes starting with 'I'"
+      },
+      "numeric_thresholds": {
+        "process_start_time": {
+          "value": "5",
+          "unit": "PM",
+          "context": "Start around 5pmish"
+        },
+        "vip_ct_report_time": {
+          "value": "3:00",
+          "unit": "PM",
+          "context": "Run the VIP CT Report"
+        },
+        "telecom_report_code": {
+          "value": 3021,
+          "unit": "code",
+          "context": "Telecom 3021 report using tomorrow's date"
+        },
+        "telenet_session_code": {
+          "value": 51,
+          "unit": "code",
+          "context": "Open telenet 51 for Fry code sections"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_5",
+      "content": "After completing the APT and Lucas reports\n\nYou should have a pile of VIP sheets on your desk in the morning\n\nYou will mainly be checking for shorts and weighted items, when you see a weighted item you have to add all the individual weights together to make sure they add up to what\u2019s in telnet and what\u2019s on the VIP Sheet\n\nFor shorts you are just checking to make sure the item was adjusted in telnet the same as it was on the VIP sheet.\n\nOpen Telnet 23\n\nOrder number click left until you get this message at the bottom, ? enter type in the item number\n\nOnce you go through all the sheets, scan all the sheets into your computer. Save them with todays date Ex 02-03-2025\n\nYou save them in the VIP + Audits folder under the scans folder in the correct month\n\nLoader Report\n\nO:\\Ops Management\\Maintenance\\Night\\Loaders\\Loader Productivity\\Tracking Reports\n\nWeekly loading Reports  2025  loading report week template\n\nSave for the correct week, after saving rename each tab between the days of the week with the days of the week\n\nLoading report should be emailed from Night Clerk\n\nLoading report \u201cdate\u201d.xls\n\nOpen this report, go to the bottom cut and paste col B-E the extra notes at the bottom to the right of the page in col AD-AG\n\nMake sure every cel in col AB has the countif formula\n\nCopy and paste all the information from the loading report into the into the weekly loading report using paste values and formatting\n\nFor Fridays select all under the header in COL G, add two columns, and you will not need a checking sheet for the date tab\n\nSelect all the cells under Col V header LOT#, delete all and shift cells to the left\n\nIt should look like this at the top instead of blank cells\n\nCopy all the route numbers from Col A and paste it into the date tab col A as values only\n\nGet the pallet by summary route for the date, copy all and paste them into col G&H\n\nThe rest of the columns should automatically fill out\n\nMake sure Cols B, C, D, E have the formulas filled out\n\nGet the checking sheet from Night clerk (day before)",
+      "content_hash": "eb17589ff1176656",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 5,
+      "token_count": 486,
+      "_original": {
+        "keywords": [
+          "col",
+          "report",
+          "loading",
+          "into",
+          "date",
+          "paste",
+          "vip",
+          "checking",
+          "make",
+          "sure"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "training"
+      ],
+      "verbs": [
+        "complete",
+        "check",
+        "add",
+        "verify",
+        "open",
+        "click",
+        "enter",
+        "type",
+        "scan",
+        "save",
+        "cut",
+        "paste",
+        "rename",
+        "email",
+        "select",
+        "delete",
+        "shift",
+        "copy",
+        "get"
+      ],
+      "entities": [
+        "VIP_sheet",
+        "telnet",
+        "item_number",
+        "loader_report",
+        "weekly_loading_report",
+        "loading_report_week_template",
+        "checking_sheet",
+        "pallet",
+        "route",
+        "LOT#"
+      ],
+      "actors": [
+        "night_clerk",
+        "loader",
+        "warehouse_staff"
+      ],
+      "conditions": [
+        "shorts",
+        "weighted_items",
+        "fridays",
+        "after_APT_and_Lucas_reports"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "After finishing the APT and Lucas reports, what do I do with the pile of VIP sheets?",
+        "How do I use Telnet 23 to verify shorts and weighted items on the VIP sheets?",
+        "Where do I save the scanned VIP sheets and what filename do I use?",
+        "The weekly loading report columns aren't filling out right\u2014what am I missing with the Loader Report paste?",
+        "What are the Friday-specific steps for the loading report in the weekly template, including pallet summary?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational auditing and reporting process with detailed, step-by-step instructions; assumes basic familiarity with tools like Telnet and Excel but largely self-contained for the described workflow.",
+      "acronyms": {},
+      "jargon": {
+        "VIP sheets": "Sheets used for verifying shorts and weighted items against telnet data",
+        "shorts": "Inventory discrepancies or missing quantities requiring adjustment in telnet",
+        "weighted items": "Items with individual weights that must sum to the total listed in telnet and on the VIP sheet",
+        "telnet": "Inventory or order lookup system accessed via port 23",
+        "Loader Report": "Productivity report for loaders, saved as 'date.xls' and processed into weekly template",
+        "Night Clerk": "Role responsible for emailing loading reports and providing checking sheets",
+        "countif formula": "Excel formula used in column AB to count items",
+        "LOT#": "Lot number column header (column V)",
+        "pallet by summary route": "Report summarizing pallets by route, pasted into columns G and H",
+        "checking sheet": "Sheet obtained from Night Clerk (day before) for verification"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_6",
+      "content": "Put a filter on Row 7, filter name without blanks\n\nCopy all routes from col A and paste them into the date tab in the loading report weekly Col O\n\nHighlight col A and O and use conditional formatting duplicate cells\n\nSort col A by highlight color red up top\n\nAny rows that have Col A highlighted go to route E and if the value is 0 change it to a 1 and change the text color to red\n\nClick on the pivot table then go to the pivot table analyze and change data source, change it to col A-E, then filter and include all the numbers minus blanks, 0, and none\n\nLoader bonus tracker\n\nO:\\Ops Management\\Maintenance\\Night\\Loaders\\Loader Productivity\\Tracking Reports\\Loader Bonus\\2025\n\nUse template to create this weeks report save for the end of this week\n\nCopy id from the first col of the pivot table past into loader bonus sheet, employee should fill out\n\nCopy routes pallets and specials and paste into loader bonus sheet\n\nTake the IDs from the pivot table on the date tab and paste them into sheet 1 on the loader bonus sheet Put the day of the week next to it\n\nFind out what gets attached to the email\n\nSelector Progression Chart\n\nThis report will always be for the week that ended before\n\nAfter sending will be printed out give to phillip rodriguez or kudjoe you will get them back signed go through and scan them and put them into the folder of the day they are in\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Performance Productivity\\Night Warehouse\n\nOpen and save a new copy of each report in the year and month, with the new end of week\n\nOpen the errors file delete all info inside save as errors WE last weeks date\n\nO:\\Ops Management\\Maintenance\\Night\\Selector Incentive\\DF SI\\2025\n\nGo to the sheet that says Final\n\nGo to the Weekly totals tab, copy COL A,B,C,D( ID, employee name, temp zone, Hire date) and paste them into the Errors sheet\n\nCopy Col I,J,K(Shorts, mispicks, damages) from weekly totals tab and paste into errors sheet",
+      "content_hash": "c38d0432814db9d1",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 6,
+      "token_count": 443,
+      "_original": {
+        "keywords": [
+          "col",
+          "into",
+          "sheet",
+          "copy",
+          "them",
+          "loader",
+          "paste",
+          "bonus",
+          "date",
+          "tab"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "filter",
+        "copy",
+        "paste",
+        "highlight",
+        "sort",
+        "change",
+        "create",
+        "save",
+        "delete",
+        "open",
+        "click",
+        "go",
+        "use"
+      ],
+      "entities": [
+        "route",
+        "loading_report",
+        "pivot_table",
+        "loader_bonus_tracker",
+        "loader_bonus_sheet",
+        "employee",
+        "ID",
+        "pallet",
+        "specials",
+        "selector_progression_chart",
+        "errors_file",
+        "errors_sheet",
+        "shorts",
+        "mispicks",
+        "damages"
+      ],
+      "actors": [
+        "employee",
+        "Phillip Rodriguez",
+        "Kudjoe"
+      ],
+      "conditions": [
+        "without blanks",
+        "duplicates",
+        "highlighted red",
+        "value 0",
+        "blanks",
+        "0",
+        "none",
+        "end of week",
+        "last week"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I set up the filter on row 7 for filter names without blanks in the loading report?",
+        "What's the step-by-step for prepping this week's loader bonus tracker using the template?",
+        "The conditional formatting isn't catching duplicates between col A and col O \u2013 what am I missing?",
+        "How do I update the pivot table data source and filters to exclude blanks, zeros, and 'none' for the loader report?",
+        "In the selector incentive DF SI file, how do I populate the errors sheet from the weekly totals tab on Final?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core weekly ops admin processes involving specific Excel tasks and file paths; detailed steps but assumes access to templates and basic Excel/domain knowledge",
+      "acronyms": {
+        "Col": "Column",
+        "ID": "Employee ID",
+        "WE": "Week Ending",
+        "SI": "Selector Incentive"
+      },
+      "jargon": {
+        "conditional formatting": "Excel feature that formats cells based on specific rules or conditions, e.g., highlighting duplicates",
+        "pivot table": "Dynamic Excel table for summarizing and analyzing large datasets",
+        "Loader bonus tracker": "Weekly spreadsheet for tracking loader productivity and bonus eligibility",
+        "routes": "Delivery or loading routes assigned to loaders",
+        "pallets": "Unitized loads of goods for loading or transport",
+        "specials": "Special handling or non-standard orders",
+        "Selector Progression Chart": "Weekly performance report charting selector error rates and progression",
+        "Shorts": "Picking errors resulting in fewer items than ordered",
+        "Mispicks": "Picking errors where wrong items are selected",
+        "damages": "Picked items that are damaged",
+        "temp zone": "Temporary assignment zone for selectors",
+        "Night Warehouse": "Night shift warehouse operations"
+      },
+      "numeric_thresholds": {
+        "filter_row": {
+          "value": 7,
+          "unit": "row",
+          "context": "Put a filter on Row 7"
+        },
+        "data_source_range": {
+          "value": "A-E",
+          "unit": "columns",
+          "context": "Change pivot table data source to col A-E"
+        },
+        "exclude_zero": {
+          "value": 0,
+          "unit": "",
+          "context": "Filter pivot table to exclude blanks, 0, and none"
+        },
+        "route_e_change_threshold": {
+          "value": 0,
+          "unit": "",
+          "context": "In route E, change value of 0 to 1 and make text red"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_7",
+      "content": "Open weekly APT report, copy over ID, employee name, date of hire, temp zone, on standard hours, earned hours, and cases to the Progression APT sheet\n\nOn the Progression use a VLOOKUP for the shorts, mispicks, damages and temp zone\n\nHide col E through J, make sure COL D matches COL K if you change it make the text red\n\nDelete Rows where it says, Loader, Replen, or mentor\n\nThis sheet is done you can delete COL K and make sure all values are numbers and not formulas\n\nSelector Progression Sheet\n\nIf you have not already done save a new copy for this week\n\nAs you go through tab by tab copy the formulas over to the next week and input the info from the Progression sheet.\n\nWhen you are done with a selector highlight the name and go to the next on\n\nIf someone is not on the progression chart but is on the selector progression chat hide the tab\n\nIf someone is not on the selector progression chart but on the progression sheet unhide the tab\n\nIf a trainee is done with their entire sheet and there is no room to input more data, make a copy of the intermediate sheet next to their name input their personal info at the top delete the old tab and continue as normal. If there is a new hire, make a new tab using the Trainee tab.\n\nIf an intermediate or advanced tab is full and you need to add more data for this week, delete all info inside and continue as normal\n\nWhenever deleting info make sure the first col in each chart has the formulas in it\n\nDaily ops stats\n\nO:\\Ops Management\\Maintenance\\Reports\\KPIs\\2025\n\nOrange boxes are from the dispatch sheet\n\nO:\\Ops Management\\Maintenance\\Driver\\DF DI\\Dispatch Sheets\\Dispatch Sheets 2025\n\nRTs col\n\nHighlight all RTs in col A stop at transfer use count for total, subtract Double RTS and BHS from ops stats sheet\n\nBHs = BHS in ops stats\n\ntransfers\n\nFilter route descriptions to include descriptions that include transfer\n\nClear filter\n\nStraight trucks: Select all in Col H before transfers subtract Double STR in col B ops stats",
+      "content_hash": "21d92c92ed68d8e8",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 7,
+      "token_count": 461,
+      "_original": {
+        "keywords": [
+          "sheet",
+          "col",
+          "progression",
+          "tab",
+          "make",
+          "ops",
+          "copy",
+          "delete",
+          "done",
+          "selector"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "open",
+        "copy",
+        "vlookup",
+        "hide",
+        "verify",
+        "match",
+        "change",
+        "delete",
+        "save",
+        "input",
+        "highlight",
+        "unhide",
+        "make copy",
+        "continue",
+        "count",
+        "subtract",
+        "filter",
+        "clear",
+        "select"
+      ],
+      "entities": [
+        "APT report",
+        "Progression APT sheet",
+        "Selector Progression Sheet",
+        "tab",
+        "employee name",
+        "date of hire",
+        "temp zone",
+        "standard hours",
+        "earned hours",
+        "cases",
+        "shorts",
+        "mispicks",
+        "damages",
+        "Loader",
+        "Replen",
+        "mentor",
+        "progression chart",
+        "trainee",
+        "intermediate sheet",
+        "advanced tab",
+        "Daily ops stats",
+        "dispatch sheet",
+        "RTs",
+        "Double RTS",
+        "BHS",
+        "transfers",
+        "route descriptions",
+        "Straight trucks"
+      ],
+      "actors": [
+        "employee",
+        "selector",
+        "trainee",
+        "loader",
+        "replen",
+        "mentor",
+        "new hire"
+      ],
+      "conditions": [
+        "not on progression chart",
+        "not on selector progression chart",
+        "trainee sheet full no room",
+        "new hire",
+        "intermediate or advanced tab full",
+        "says Loader Replen or mentor",
+        "before transfers"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I copy data from the weekly APT report to the Progression APT sheet?",
+        "What do I use VLOOKUP for on the Progression sheet and what columns do I hide after?",
+        "The text in col D isn't turning red when it doesn't match col K \u2013 how do I fix that?",
+        "What if a trainee's entire sheet is full and there's no room for more data this week?",
+        "How do I calculate RTs column for daily ops stats from the dispatch sheet?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 6,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core weekly ops process for employee progression and stats tracking; specific Excel steps, actionable with basic training and sheet familiarity.",
+      "acronyms": {
+        "VLOOKUP": "Vertical Lookup",
+        "KPIs": "Key Performance Indicators",
+        "RTs": "Route Trips or Returns (in dispatch context)",
+        "BHS": "Belt Hours (in ops stats context)",
+        "STR": "Straight Trucks"
+      },
+      "jargon": {
+        "APT report": "Weekly associate performance tracking report",
+        "shorts": "Short picks or insufficient items selected",
+        "mispicks": "Incorrect item picks",
+        "damages": "Damaged cases or goods",
+        "temp zone": "Temperature-controlled or temporary assignment zone",
+        "Loader": "Warehouse loading role",
+        "Replen": "Replenishment role (restocking pick locations)",
+        "mentor": "Training mentor role",
+        "Selector": "Order selector or picker role",
+        "Progression sheet": "Employee performance and skill progression tracking sheet",
+        "trainee": "New hire in training phase",
+        "intermediate sheet": "Intermediate skill level tracking sheet",
+        "advanced tab": "Advanced skill level tracking sheet",
+        "ops stats": "Operations statistics",
+        "dispatch sheet": "Dispatch scheduling and route information sheet",
+        "transfers": "Inter-facility or route transfers",
+        "Straight trucks": "Non-articulated straight-body trucks"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_8",
+      "content": "TT Filter col H by numbers that start with 88,99, or include 5641, 2651,2654, count these and subtract the duplicates and the double TT\n\nDriver helper: Filter Col without blanks select all count\n\nDriver training: go down to the disability section of the dispatch sheet select all in col X tht have training in it\n\nDriver PTO: select anything with vacation or personal time PTO in col X\n\nSame for Call out and NCNS\n\nFor extra drivers anything that includes assistant, extra, inhouse\n\nDone with the dispatch sheet\n\nLight grey blue boxes\n\nOpen the APT report for the day before so for the 6th you open the APT report for the 5th\n\nAt the bottom of the APT report get total cases from col P and PM% from col M\n\nGreen Boxes\n\nUse Dug 14 to get inbound cases and pallets for the day warehouse 01\n\nPurple Boxes\n\nSent over from Frank Bedon Day warehouse attendance report\n\nUse the box in the middle towards the bottom\n\nUse Total here today for AM OPS headcount\n\nVacation + personal for AM PTO\n\nNCNS for AM NCNS\n\nLeft Early for AM Left early\n\nTerminate/Quit for AM terminate/quit\n\nYellow boxes\n\nEmail Nightshift Recap from Daniel White/Kudjoe\n\nUse Delivery Date on sheet to determine what row to put it in\n\nStops for orders Col H\n\nBatches for Col I\n\nSelects head count, total selectors col Z\n\nPM Trainers, total trainers\n\nPTO in scheduled time off, Count\n\nPM C/O, NCNS, S/H in sheet\n\nDark Blue boxes\n\nO:\\Ops Management\\Maintenance\\Driver\\DF DI\\Incentive Changes\\2025\n\nSelect the report for the Week end that your date falls into, filter by the date of the report look for red text if it says accident its for accident, any customer complaint counts for injuries\n\nGrey boxes\n\nFinal Reship log email\n\nGet the reships & voids here\n\nWhite boxes\n\nFuel\n\nPortal.restalloil.com, ULSD clear total\n\nMilage\n\nIntelishift\n\nDate & reports, on-demand reports, state mileage, select all trucks, select for the date go to the last page for total\n\nEmail template in folder: Daily Ops stats\n\nFor Saturdays a couple things change\n\nThe yellow boxes open the APT report highlight all the selector names for selector head count 0 out the rest",
+      "content_hash": "464e9b74c57eeb96",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 8,
+      "token_count": 474,
+      "_original": {
+        "keywords": [
+          "col",
+          "boxes",
+          "report",
+          "select",
+          "total",
+          "count",
+          "date",
+          "driver",
+          "sheet",
+          "pto"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "filter",
+        "select",
+        "count",
+        "subtract",
+        "open",
+        "get",
+        "use",
+        "highlight",
+        "navigate",
+        "determine"
+      ],
+      "entities": [
+        "dispatch_sheet",
+        "APT_report",
+        "warehouse_attendance_report",
+        "nightshift_recap",
+        "reship_log",
+        "fuel",
+        "mileage",
+        "cases",
+        "pallets",
+        "headcount",
+        "PTO",
+        "NCNS",
+        "stops",
+        "batches",
+        "selectors",
+        "trainers",
+        "reships",
+        "voids",
+        "driver"
+      ],
+      "actors": [
+        "driver",
+        "helper",
+        "trainer",
+        "selector",
+        "warehouse_ops",
+        "dispatch",
+        "Frank_Bedon",
+        "Daniel_White",
+        "Kudjoe"
+      ],
+      "conditions": [
+        "start_with_88",
+        "start_with_99",
+        "include_5641",
+        "include_2651",
+        "include_2654",
+        "no_blanks",
+        "contains_training",
+        "vacation",
+        "personal_time",
+        "PTO",
+        "contains_assistant",
+        "contains_extra",
+        "contains_inhouse",
+        "previous_day",
+        "warehouse_01",
+        "Saturdays",
+        "red_text",
+        "accident",
+        "customer_complaint"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I filter column H on the dispatch sheet for TTs starting with 88, 99, or including 5641, 2651, 2654?",
+        "What's the quickest way to count driver helpers from the dispatch sheet?",
+        "I'm lost on the purple boxes \u2013 where do I find Frank Bedon's Day warehouse attendance report and what to use for AM PTO?",
+        "For Saturdays, how does the yellow boxes process change with the APT report for selector headcount?",
+        "What if it's the 6th \u2013 which APT report do I open for the light grey blue boxes, and what columns for total cases and PM%?"
+      ],
+      "question_complexity": [
+        2,
+        1,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 6,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core daily ops reporting process, highly actionable with specific filters/tools/steps, requires basic familiarity with reports and access, mostly self-contained for the task.",
+      "acronyms": {
+        "TT": "Trailer Type (inferred from filtering context)",
+        "PTO": "Paid Time Off",
+        "NCNS": "No Call No Show",
+        "PM": "Post Meridiem (afternoon/evening shift)",
+        "AM": "Ante Meridiem (morning shift)",
+        "C/O": "Call Out",
+        "S/H": "Short Hours (inferred from attendance context)",
+        "ULSD": "Ultra Low Sulfur Diesel"
+      },
+      "jargon": {
+        "dispatch sheet": "Daily spreadsheet for driver assignments, training, PTO, and attendance tracking",
+        "headcount": "Count of personnel in specific categories like selectors, trainers, or OPS",
+        "selectors": "Warehouse workers responsible for picking and batching orders",
+        "reships": "Re-shipped orders or items from the final reship log",
+        "voids": "Cancelled or voided shipments from the reship log",
+        "TT Filter": "Filtering column H for specific numeric identifiers related to trailers or trucks, subtracting duplicates and double TT",
+        "APT report": "Daily attendance/productivity tracking report used for cases, PM%, and selector headcount",
+        "Dug 14": "System or report for retrieving inbound cases and pallets for warehouse 01",
+        "Intelishift": "Telematics platform for generating on-demand state mileage reports for all trucks"
+      },
+      "numeric_thresholds": {
+        "col_H_starts_with": {
+          "value": [
+            "88",
+            "99"
+          ],
+          "context": "TT Filter in column H"
+        },
+        "col_H_includes": {
+          "value": [
+            "5641",
+            "2651",
+            "2654"
+          ],
+          "context": "TT Filter in column H"
+        },
+        "APT_report_date_offset": {
+          "value": 1,
+          "unit": "day",
+          "context": "Open APT report for the previous day (e.g., 5th for 6th)"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_9",
+      "content": "Orders go to lucas picks report, highlight all Col create a pivot table, the recommended just hit okay. Order put in rows highlight all for total orders\n\nBatches uncheck orders check assignments highlight all to count\n\nNight KPIs\n\nO:\\Ops Management\\Maintenance\\Reports\\KPIs\n\nUse the Night ops KPIs report\n\nAPT Report, for the day before\n\nFor each section add together pick and school numbers to get the total\n\nGo to shorts & mispicks report\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Weekly\n\nGo to the week that the date you are doing is in\n\nIn the wayne by temp zone tab go to the pivot table uncheck picker names, click on date then ungroup\n\nThe table should look like this\n\nIn the recap Q and W tab you will put the hours that come across from the two emails together and put them in the correct week col\n\nYour Report Night Shift Driscoll KPI is ready\n\nYour Report Future Night KPI is ready\n\nFor total routes use the loading report highlight col A for the route count for that day\n\nO:\\Ops Management\\Maintenance\\Night\\Loaders\\Loader Productivity\\Tracking Reports\\Weekly Loading Report\n\nUse the loader bonus report to get the # of loaders per week and loading errors use the weekly totals tab\n\nUse the weekly APT report to get APT % use performance for the %\n\nTransportation KPIs\n\nO:\\Ops Management\\Maintenance\\Reports\\KPIs\n\nWeekly routing numbers report will come across from Andrew V,\n\nYou get the stops cases and reships from this report use the weekly totals\n\nShorts & mispicks report for short, short/found later, and damages\n\nDriver by supervisor tab, unselect driver name\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Weekly\\2025\\1. January 2025\n\nDriver hours\n\nDriver KPI email\n\nNight shift\n\nUse inteleshift for the week total miles\n\nData and reports  state mileage, select all, select the week (Sun-Sat) you are doing go to last page for total check if its total or adding certain things states together\n\nDevice Tracker\n\nO:\\Ops\\Device Tracker\n\nStart shift tab\n\nFormat and unprotect the Sheet, Password is 12345\n\nSort Assigned number smallest to largest\n\nUpdate any employee information",
+      "content_hash": "ba8de8b7a04196bc",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 9,
+      "token_count": 434,
+      "_original": {
+        "keywords": [
+          "report",
+          "use",
+          "ops",
+          "weekly",
+          "total",
+          "night",
+          "reports",
+          "kpis",
+          "management",
+          "maintenance"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "go",
+        "highlight",
+        "create",
+        "put",
+        "uncheck",
+        "check",
+        "add",
+        "use",
+        "click",
+        "ungroup",
+        "format",
+        "unprotect",
+        "sort",
+        "update",
+        "count"
+      ],
+      "entities": [
+        "orders",
+        "batches",
+        "assignments",
+        "pivot table",
+        "Night KPIs",
+        "APT Report",
+        "shorts & mispicks report",
+        "routes",
+        "loading report",
+        "loader bonus report",
+        "weekly APT report",
+        "Weekly routing numbers report",
+        "stops",
+        "cases",
+        "reships",
+        "shorts",
+        "mispicks",
+        "damages",
+        "total miles",
+        "Device Tracker"
+      ],
+      "actors": [
+        "lucas",
+        "wayne",
+        "picker",
+        "driver",
+        "supervisor",
+        "loader",
+        "employee",
+        "Andrew V"
+      ],
+      "conditions": [
+        "night shift",
+        "day before",
+        "specific week",
+        "Sun-Sat week"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I create a pivot table for total orders from the Lucas picks report?",
+        "Where's the Night ops KPIs report located, and how do I use the APT report for it?",
+        "In the shorts & mispicks report, how do I set up the pivot table in the Wayne by temp zone tab?",
+        "The Device Tracker start shift tab won't let me sort or update employee info\u2014what's the password and steps?",
+        "I'm lost on Night Shift KPIs\u2014how do I pull total routes, loader numbers, APT %, shorts/mispicks, driver miles from Inteleshift, and everything else?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 6,
+      "complexity": 6,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational process for generating KPI reports in ops admin, frequently used for management; specific to Excel-based workflows and file paths; requires basic Excel and domain familiarity; detailed steps but assumes access to shared drives; highly actionable with clear instructions.",
+      "acronyms": {
+        "KPI": "Key Performance Indicator",
+        "APT": "Average Pick Time"
+      },
+      "jargon": {
+        "lucas picks report": "Warehouse report detailing picked orders",
+        "pivot table": "Excel tool for summarizing and analyzing data",
+        "batches": "Groups of orders processed together",
+        "assignments": "Worker task allocations",
+        "shorts": "Missing items in shipments",
+        "mispicks": "Incorrectly picked items",
+        "temp zone": "Temperature-controlled storage or picking area (e.g., frozen, chilled)",
+        "reships": "Re-shipments due to delivery issues",
+        "inteleshift": "Fleet management software for tracking miles and vehicle data",
+        "Device Tracker": "Spreadsheet for monitoring employee-assigned devices"
+      },
+      "numeric_thresholds": {
+        "sheet_password": {
+          "value": 12345,
+          "context": "Password to format and unprotect the Device Tracker Start shift tab"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_10",
+      "content": "To get the information go to telenet 3020 use the ID to get the employees name so you can add it to the employee listing tab\n\nHighlight Cols C&D format check for duplicate values\n\nEnd shift tab\n\nUnprotect sheet\n\nSort assigned number smallest to largest\n\nCheck Col A for duplicates\n\nCheck total scanned on the start and end shift tabs\n\nFormat protect both tabs on the sheet\n\nDevice Sticker Replacement\n\nO:\\Ops\\Device Tracker\n\nThe Device Tracker TEMPLATE sheet has a hidden tab called devices\n\nUnhide the sheet\n\nWhen you need to put new stickers on the phones.\n\nYou can put either the number, barcode, or both stickers on the phone dependent on whats needed\n\nOn the phone open the Lucas Move app, hit the green button in the top right corner, make sure this number matches the number on the sheet if it does you can go ahead and print out your sticker\n\nFor the barcode on the label printer, create label FNgo to the bottom hit barcode then type the number in and print it out,\n\nFor the device number just go to create label and type the phone number in\n\nDriver overview\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Performance Productivity\\Drivers\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Weekly\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Performance Productivity\\Drivers\\2025\\Errors\n\nIn the shorts and mispcisk file use the wayne driver  error rate tab\n\nCopy ID RT Employee name, from shorts and mispicks sheet, paste into error sheet\n\nCopy hours damage, shorts, shorts found later, & total paste into error sheet\n\nO:\\Ops Management\\Maintenance\\Driver\\DF DI\\Incentive\\2025 incentive breakdown sheet use total weekly data tab\n\nUse a vlookup using RT as the lookup ID\n\nRT over for reships violations and complaints\n\nReship 89 violations 96 complaints 103\n\nSheet 2 has all the col numbers for the vlookup\n\nFor the overview copy the ID RT and employee name over to the overview along with all the other info needed from the errors sheet\n\nMake sure all the formulas are done for each row all the way to the bottom\n\nDone with the error sheet\n\nFor the Daily data tab",
+      "content_hash": "67adbff2e296576d",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 10,
+      "token_count": 443,
+      "_original": {
+        "keywords": [
+          "sheet",
+          "number",
+          "shorts",
+          "tab",
+          "ops",
+          "use",
+          "device",
+          "management",
+          "maintenance",
+          "mispicks"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "add",
+        "check",
+        "copy",
+        "create",
+        "format",
+        "get",
+        "highlight",
+        "hit",
+        "lookup",
+        "make sure",
+        "open",
+        "paste",
+        "print",
+        "protect",
+        "sort",
+        "type",
+        "unhide",
+        "unprotect",
+        "use",
+        "verify"
+      ],
+      "entities": [
+        "employee",
+        "driver",
+        "sheet",
+        "tab",
+        "phone",
+        "device",
+        "sticker",
+        "barcode",
+        "label",
+        "file"
+      ],
+      "actors": [
+        "employee",
+        "driver"
+      ],
+      "conditions": [
+        "duplicates",
+        "matches",
+        "damage",
+        "shorts",
+        "mispicks",
+        "violations",
+        "complaints"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I get an employee's name from telenet 3020 to add to the employee listing tab?",
+        "What's the process for replacing stickers on phones using the Device Tracker?",
+        "How do I use VLOOKUP with RT ID for reships, violations, and complaints in the incentive breakdown sheet?",
+        "I'm seeing duplicates in columns C&D and A on the end shift tab - how do I fix and sort this mess?",
+        "Where are the shorts and mispicks files, and how do I copy data to the Wayne driver error rate tab?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 6,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core ops admin processes like shift checks, device management, and driver reporting; specific procedural steps but fragmented across topics with typos and assumptions about files/tools.",
+      "acronyms": {},
+      "jargon": {
+        "telenet 3020": "Internal system or service used to retrieve employee names by ID",
+        "Lucas Move app": "Mobile application on phones for verifying device numbers before printing stickers",
+        "Device Tracker": "Excel workbook (TEMPLATE sheet with hidden 'devices' tab) for managing phone stickers and numbers, located at O:\\Ops\\Device Tracker",
+        "shorts and mispicks": "Reports tracking delivery errors such as shortages (shorts) and incorrect picks (mispicks), located at O:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks",
+        "wayne driver error rate tab": "Specific tab in shorts and mispicks file for analyzing driver error rates",
+        "RT": "Driver or route identifier used as lookup key (e.g., for VLOOKUP in error and incentive sheets)",
+        "vlookup": "Excel function to pull data (e.g., reships, violations, complaints) using RT as the lookup ID",
+        "reships": "Re-shipments due to delivery errors, violations, or complaints",
+        "unprotect sheet": "Remove Excel sheet protection to allow editing/sorting",
+        "label printer": "Printer used to generate barcode or device number stickers via 'create label' function"
+      },
+      "numeric_thresholds": {
+        "telenet_code": {
+          "value": 3020,
+          "unit": "",
+          "context": "Access code/service number for telenet to retrieve employee info"
+        },
+        "reship_column": {
+          "value": 89,
+          "unit": "Excel column index",
+          "context": "Column number for reship data in VLOOKUP sheet 2"
+        },
+        "violations_column": {
+          "value": 96,
+          "unit": "Excel column index",
+          "context": "Column number for violations in VLOOKUP sheet 2"
+        },
+        "complaints_column": {
+          "value": 103,
+          "unit": "Excel column index",
+          "context": "Column number for complaints in VLOOKUP sheet 2"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_11",
+      "content": "Copy & paste ID RT Employee name into daily data tab\n\nDFDI Dispatch sheets\n\nO:\\Ops Management\\Maintenance\\Driver\\DF DI\\Dispatch Sheets\n\nWeek ending sheet\n\nVlookup RT as the lookup ID, Start at Col B up to Col V on Dispatch sheet\n\nCases:19 Dock:18 Miles:21\n\nReplace all N/A with 0\n\nOn overview and daily data use email template\n\nDriver pickup credits\n\nEmail from Jhanfranco Bedon \u201cdate\u201d customer pick up report\n\nRed: there was no pick up no credit issued\n\nYellow: quantity is different use the # of cases on the report\n\nBlue: picked up without pickup slip, send email to the sales person asking for them to submit a credit for the item\n\nSubject: \u201ccustomer number\u201d driver pick up credit\n\nMSG:\n\nGood afternoon,\n\nCan you please submit a credit for the attached invoice the item was picked up without a pickup form\n\nThank you,\n\nTo check sales person in telenet use 31 customer number under sales person\n\nCredits no invoice:\n\nCatch weight updates\n\nJames will send out a catch weight report in the mornings\n\nThis report shows discrepancies, update the weights in telenet, to get exact weights on multiple case items go into Lucas for the day find the item on the order click on it and hit details at the top this should give you all the separate weights per case.\n\nAfter these are updated print the new updated invoice and send it to the sales rep so they can forward it onto the customer.\n\np\n\nGood morning,\n\nThe order below was adjusted according to the weights called into Lucas Picks, please send the updated invoice to the customer\n\nBlue bins\n\nGo to Lucas picks, Warehouse, products type in the product number, click on the item line and hit edit then put the instructions in the proper lines as seen below\n\nMake sure to pack this product in a blue bin with dry ice.\n\nFragile items\n\nIn Telnet go to 51 type in the item number go to page 3, type 3 hit enter, scroll down to fragile(Y/N) type in Y and hit enter.\n\nGo to Lucas picks, Warehouse, products type in the product number, click on the item line and hit edit then put the instructions in the proper lines as seen below\n\nWeekly Ops Performance by Division",
+      "content_hash": "41d4c29188e50ff1",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 11,
+      "token_count": 488,
+      "_original": {
+        "keywords": [
+          "item",
+          "customer",
+          "number",
+          "hit",
+          "type",
+          "report",
+          "credit",
+          "send",
+          "sales",
+          "invoice"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "copy",
+        "paste",
+        "vlookup",
+        "lookup",
+        "replace",
+        "use",
+        "send",
+        "submit",
+        "check",
+        "update",
+        "print",
+        "type",
+        "click",
+        "edit",
+        "scroll",
+        "hit"
+      ],
+      "entities": [
+        "dispatch_sheets",
+        "daily_data_tab",
+        "week_ending_sheet",
+        "RT",
+        "cases",
+        "dock",
+        "miles",
+        "email_template",
+        "driver_pickup_credits",
+        "customer_pick_up_report",
+        "invoice",
+        "credit",
+        "pickup_slip",
+        "catch_weight_report",
+        "order",
+        "product",
+        "blue_bin"
+      ],
+      "actors": [
+        "employee",
+        "driver",
+        "sales_rep",
+        "sales_person",
+        "customer",
+        "dispatch"
+      ],
+      "conditions": [
+        "no_pickup",
+        "quantity_different",
+        "picked_up_without_slip",
+        "N/A",
+        "discrepancies"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": true,
+      "synthetic_questions": [
+        "Where can I find the DFDI Dispatch sheets?",
+        "How do I VLOOKUP RT ID from the Dispatch sheet into the week ending sheet?",
+        "What do I do for a blue case on the driver pickup credits report?",
+        "I'm getting N/A all over my daily data tab after copying from dispatch \u2013 what now?",
+        "What's the step-by-step for handling James's catch weight report updates in Telenet and Lucas?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 6,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Covers core ops admin processes like credits, weights, packing instructions; specific steps with tools like VLOOKUP, Telenet, Lucas; assumes internal system familiarity but highly actionable for trained users.",
+      "acronyms": {},
+      "jargon": {
+        "RT": "Route identifier used with employee ID",
+        "DFDI": "Dispatch system or folder for driver dispatch sheets",
+        "Dispatch sheets": "Data sheets for dispatch operations located at O:\\Ops Management\\Maintenance\\Driver\\DF DI\\Dispatch Sheets",
+        "Week ending sheet": "Weekly summary sheet for operations data",
+        "Vlookup": "Excel lookup function to match RT ID from column B to V",
+        "Driver pickup credits": "Credits issued for driver-handled customer pickups",
+        "Pickup slip": "Required form documenting customer pickups",
+        "Telenet": "Internal system for customer and sales person data",
+        "Catch weight updates": "Adjustments to invoice weights based on actual weighed amounts from Lucas Picks",
+        "Lucas picks": "Warehouse picking and product management system",
+        "Blue bins": "Special packing bins for products requiring dry ice",
+        "Fragile items": "Items marked as fragile (Y/N) in Telenet for special handling instructions"
+      },
+      "numeric_thresholds": {
+        "cases_column": {
+          "value": 19,
+          "context": "Column position for cases data on dispatch sheet"
+        },
+        "dock_column": {
+          "value": 18,
+          "context": "Column position for dock data on dispatch sheet"
+        },
+        "miles_column": {
+          "value": 21,
+          "context": "Column position for miles data on dispatch sheet"
+        },
+        "vlookup_start_column": {
+          "value": "B",
+          "context": "Starting column for Vlookup on dispatch sheet"
+        },
+        "vlookup_end_column": {
+          "value": "V",
+          "context": "Ending column for Vlookup on dispatch sheet"
+        },
+        "salesperson_code": {
+          "value": 31,
+          "context": "Code to check salesperson in Telenet using customer number"
+        },
+        "fragile_page": {
+          "value": 3,
+          "context": "Page in Telenet item details to set fragile Y/N"
+        },
+        "fragile_edit_option": {
+          "value": 3,
+          "context": "Option to enter and edit fragile status in Telenet"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_12",
+      "content": "O:\\Ops Management\\Maintenance\\Reports\\KPIs\n\nUse DUG14 to get the inbound cases for all 3 divisions use sum for a total for the week\n\nUse DUG 16 to get the outbound cases and routes for all 3 divisions use sum for a total for the week\n\nO:\\Ops Management\\Maintenance\\Reports\\Shorts and Mispicks\\Weekly\n\nGo to shorts and mispicks report for this week, use AMS errors, PA errors, and wayne errors to get short, shorts found later, mispicks, and damages for all 3 divisions. Use filter to filter down between the 4 reasons. Copy the qty short col paste at the bottom and use the sum function to get the total errors for that reason.\n\nUse intellishift for the miles for NY and NJ\n\nData and reports, state milage\n\nUse generate report by branch\n\nRun once for each branch, use the date for SUN-SAT of the week you are running, go to the last page to get the total miles.\n\nInstructions for PA miles to be added later\n\nMisaligned Invoice\n\nCheck other invoices from the same customer to see if this was a repeat issue or was caused by another issue with a different invoice or the printer being misaligned.\n\nIf this seems to be a 1 time thing reprint and send the invoice.\n\nTwo main reasons causing invoices to be misaligned\n\nCustomer file not being filled out properly, go to 37 use customer number to look it up and 01 for the second input.\n\nIf everything on that page looks okay and it is not an issue with an item on that or another invoice send the info to programming with a couple examples of invoices asking them to look into it.\n\nDo the same thing if it looks like an item that is the issue\n\nCredits Bids/Cumulative credits\n\nDUG71VDT\n\nX on the reasons menu\n\nShorts by Reason report\n\nFilter the top row, filter COL Q by 03/MW/M8\n\nOpen Credits-CC file delete the last date on the report\n\nOn the shorts by reason report deleted dates up until the date deleted on the other report.\n\nRemove columns QTY short, reason code, RT Group description, Pickeremployee, buyerbuyer short, extended costorder number\n\nH, J, L-P, S-Z, AB-AF, AH-AJ",
+      "content_hash": "f915f3884c7cdf13",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 12,
+      "token_count": 468,
+      "_original": {
+        "keywords": [
+          "use",
+          "report",
+          "get",
+          "shorts",
+          "total",
+          "week",
+          "errors",
+          "short",
+          "filter",
+          "reason"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "reference"
+      ],
+      "verbs": [
+        "use",
+        "get",
+        "go",
+        "filter",
+        "copy",
+        "paste",
+        "sum",
+        "generate",
+        "run",
+        "check",
+        "reprint",
+        "send",
+        "lookup",
+        "delete",
+        "remove",
+        "open"
+      ],
+      "entities": [
+        "report",
+        "inbound_cases",
+        "outbound_cases",
+        "routes",
+        "shorts",
+        "mispicks",
+        "damages",
+        "miles",
+        "invoice",
+        "customer",
+        "customer_file",
+        "credits",
+        "Shorts_by_Reason_report",
+        "Open_Credits-CC_file"
+      ],
+      "actors": [
+        "customer",
+        "programmer",
+        "picker",
+        "buyer"
+      ],
+      "conditions": [
+        "misaligned_invoice",
+        "repeat_issue",
+        "printer_misaligned",
+        "customer_file_not_filled_properly",
+        "item_issue",
+        "one_time_issue",
+        "short_by_reason"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I get the total inbound cases for all three divisions for the week?",
+        "What do I do if a customer's invoice is misaligned?",
+        "How do I run the Shorts by Reason report for credits bids/cumulative credits using DUG71VDT?",
+        "I can't find PA miles in Intellishift\u2014what's the deal?",
+        "How do I pull shorts, mispicks, and damages totals from the weekly report for AMS, PA, and Wayne?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 7,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core ops processes for weekly KPIs, error tracking, miles, invoices, and credits; detailed procedural steps but assumes knowledge of internal tools like DUG screens and Intellishift; mostly self-contained despite minor gaps.",
+      "acronyms": {
+        "NY": "New York",
+        "NJ": "New Jersey",
+        "PA": "Pennsylvania",
+        "COL": "Column"
+      },
+      "jargon": {
+        "inbound cases": "incoming customer service cases handled by divisions",
+        "outbound cases": "outgoing customer service cases and routes handled by divisions",
+        "shorts": "missing items or quantities in customer shipments",
+        "shorts found later": "short/missing items discovered and recovered after initial shipment",
+        "mispicks": "incorrect items picked and shipped instead of ordered items",
+        "damages": "damaged items in shipments",
+        "qty short col": "column showing quantity of shorted/missing items",
+        "Intellishift": "fleet telematics software for generating mileage reports by branch",
+        "Misaligned Invoice": "customer invoice with printing alignment errors",
+        "Customer file": "customer master record accessed via system screen 37",
+        "Shorts by Reason report": "report categorizing shipment shortages by specific reasons",
+        "Open Credits-CC file": "file tracking open credits, possibly related to credit cards",
+        "RT Group": "route group classification for shipments",
+        "Pickeremployee": "field identifying the warehouse employee who picked the order"
+      },
+      "numeric_thresholds": {
+        "divisions": {
+          "value": 3,
+          "context": "number of divisions (AMS, PA, Wayne)"
+        },
+        "reasons": {
+          "value": 4,
+          "context": "reasons to filter for shorts/mispicks/damages"
+        },
+        "customer_screen": {
+          "value": 37,
+          "context": "system screen number for customer file lookup"
+        },
+        "customer_input": {
+          "value": "01",
+          "context": "second input value for customer file access"
+        },
+        "reason_filters": {
+          "value": "03/MW/M8",
+          "context": "codes to filter column Q in Shorts by Reason report"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_13",
+      "content": "Paste all in info over to the other sheet, email to chris caselnova biddept@driscollfoods.com\n\nSales groups:\n\nPandel: Pandelgroup@driscollfoods, Bill Kenney SR & JR, Mandy, Chris Pandel, Sandy Budhu, Stuart Lews, Alma Soto\n\nH & H Camps: Nancy Cook, Grace Delli Santi\n\nLucas PIR Report\n\nFilter Lucas picks col T by CG FS and DO add a column to the right of COL T and use formula below to pull out slot levels. Have 2 sheets one with levels 1,2,3  and the other with 0,4,5,6,7,8,9\n\nLevel pull out formula\n\n=IF(IF(ISERR(RIGHT(T9708,1)*1),\"letter\",\"number\")=\"letter\",MID(T9708&\" \",7,1),RIGHT(T9708,1))\n\nPivot table\n\nUse this to get the\n\nNumber of skus\n\nPer level, highlight all of\n\nQty ordered and look at\n\nThe sum in the bottom\n\nRight for the total cases\n\nLucas 3 and above report\n\nSimilarly to the Lucas PIR Report we are testing cases ordered  first add a column next to the slot column, use this formula\n\n=IF(OR(ISNUMBER(SEARCH(\"CG\", T2)), ISNUMBER(SEARCH(\"FS\", T2)), ISNUMBER(SEARCH(\"DO\", T2))), \"Remove\", \"Keep\")\n\nFilter to only have \u201cKeep\u201d\n\nUse the Left function in excel to pll the first lett in the location cell filter3 tabs based on C for cooler, F for freezer, D for dry\n\nThen use the same formula to pull the level\n\n=IF(IF(ISERR(RIGHT(T9708,1)*1),\"letter\",\"number\")=\"letter\",MID(T9708&\" \",7,1),RIGHT(T9708,1))\n\nAfter this uncheck 1 and 2\n\nShorts & Mispicks Route J & I\n\nWhen the shorts & mispicks report comes across filter the routes by those starting with J & I\n\nSave and send to kudjoe, danny, shaun and CC sara\n\nAny issues labeled driver send to Victor, Mike, Delareese, and CC sara\n\nIn this email copy and paste the error information in the body of the email.\n\nGood afternoon,\n\nPlease see below for the shorts & mispicks for routes J & I for 8/25/25\n\nGood afternoon,\n\nPlease see below for the shorts & mispicks for routes J & I for 8/25/25 noted driver\n\nShorts and mispicks by DSM\n\nWhen the shorts and mispicks report comes across highlight all columns and create a pivot table. Use the fields screenshot below to make the pivot table. Send this to Sara\n\nLucas Batches not called in",
+      "content_hash": "d3df9bd9780bc5a3",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 13,
+      "token_count": 447,
+      "_original": {
+        "keywords": [
+          "right",
+          "use",
+          "shorts",
+          "mispicks",
+          "lucas",
+          "report",
+          "formula",
+          "below",
+          "letter",
+          "email"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "paste",
+        "email",
+        "filter",
+        "add",
+        "use",
+        "highlight",
+        "create",
+        "save",
+        "send",
+        "copy",
+        "pull",
+        "uncheck"
+      ],
+      "entities": [
+        "Lucas PIR Report",
+        "Lucas 3 and above report",
+        "Shorts & Mispicks Report",
+        "pivot table",
+        "sheet",
+        "route",
+        "sku",
+        "level",
+        "case",
+        "slot",
+        "batch",
+        "warehouse"
+      ],
+      "actors": [
+        "chris caselnova",
+        "Bill Kenney",
+        "Mandy",
+        "Chris Pandel",
+        "Sandy Budhu",
+        "Stuart Lews",
+        "Alma Soto",
+        "Nancy Cook",
+        "Grace Delli Santi",
+        "kudjoe",
+        "danny",
+        "shaun",
+        "sara",
+        "Victor",
+        "Mike",
+        "Delareese"
+      ],
+      "conditions": [
+        "CG",
+        "FS",
+        "DO",
+        "levels 1,2,3",
+        "levels 0,4,5,6,7,8,9",
+        "Keep",
+        "cooler",
+        "freezer",
+        "dry",
+        "routes J & I",
+        "driver issues",
+        "shorts",
+        "mispicks"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who do I email after pasting all the info over to the other sheet?",
+        "What's the formula to pull out slot levels in the Lucas PIR Report?",
+        "How do I set up the pivot table for number of SKUs per level in the Lucas PIR Report?",
+        "I'm lost on the Lucas 3 and above report\u2014how do I filter out CG, FS, and DO picks?",
+        "For Shorts & Mispicks on routes J & I with driver issues, who gets the email and what do I include?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational procedures for handling specific reports (Lucas PIR, shorts/mispicks), Excel formulas, and targeted emails in ops_admin; highly actionable with clear steps, assumes basic Excel/domain familiarity, bounded to frequent warehouse tasks.",
+      "acronyms": {
+        "SKU": "Stock Keeping Unit",
+        "SR": "Senior",
+        "JR": "Junior",
+        "CC": "Carbon Copy",
+        "DSM": "District Sales Manager"
+      },
+      "jargon": {
+        "PIR Report": "Pick report from the Lucas system, filtered by CG/FS/DO for slot level analysis",
+        "slot levels": "Vertical position levels (0-9) in warehouse storage slots",
+        "shorts & mispicks": "Item shortages and picking errors on delivery routes",
+        "pivot table": "Excel tool to summarize SKUs per level and total ordered cases",
+        "Lucas": "Warehouse picking and batch management system",
+        "cooler": "Refrigerated storage area (location code starting with C)",
+        "freezer": "Frozen storage area (location code starting with F)",
+        "dry": "Room temperature storage area (location code starting with D)"
+      },
+      "numeric_thresholds": {
+        "sheet1_slot_levels": {
+          "value": [
+            1,
+            2,
+            3
+          ],
+          "unit": "level",
+          "context": "First sheet for pulling out slot levels 1,2,3 in Lucas PIR Report"
+        },
+        "sheet2_slot_levels": {
+          "value": [
+            0,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9
+          ],
+          "unit": "level",
+          "context": "Second sheet for pulling out slot levels 0,4,5,6,7,8,9 in Lucas PIR Report"
+        },
+        "min_level_for_report": {
+          "value": 3,
+          "unit": "level",
+          "context": "Lucas 3 and above report; uncheck 1 and 2 after filtering"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_14",
+      "content": "Filter col Q of the Lucas report by blanks, For JITMEAT and JITSEA remove all PA and NY routes (below) remove JITOFFICE and JIT\n\nPA IDs\n\nP\n\nR\n\nS\n\nN\n\nO\n\nNY IDs\n\nG\n\nW\n\nY\n\nX\n\nZ\n\nCopy and paste all assignments by temp zone into a new tab use =count(unique,{col of data}) for the total batches not called in\n\nFind a way to get all the unique batch values look at those values for every line make sure all items are not called in\n\nRun the Lucas report for empty picked by, remove all rows with a number greater than 0 in quantity scratched and short. Filter by temp zone, copy all assignments use data tab in excel to remove all duplicated. Open the lucas report from the moring, look up all batches individually. Any assignments that have other items called in remove them from the list. Any that don\u2019t have any items called in were not called in the batches were not called in\n\nGood afternoon,\n\nPlease see attached for the Lucas picks reports filtered to show batches not called in. There were 154 Dry, 248 cooler, and 79 Freezer batches not called in. All batches should be called into Lucas even if a Jennifer device is not being used to select the batch.\n\nChecker report\n\nCannot paste these formulas you have to rewrite them\n\nFor routes with number of pallets listed\n\n=SUM(SUMIFS('Lucas Picks'!I82:I36377,'Lucas Picks'!M82:M36377,Sheet2!A81,'Lucas Picks'!N82:N36377,TEXTSPLIT(B81,\",\")))\n\nFor routes with Full written in\n\n=SUMIF('Lucas Picks'!M38:M36849,Sheet6!A121,'Lucas Picks'!I38:I36849)\n\nAfter separating by temp zone in the checker sheet, use these formulas based on Temp zone\n\n=SUMIFS('Lucas Picks'!I2:I28545,'Lucas Picks'!M2:M28545,Sheet1!A4,'Lucas Picks'!P2:P28545,\"Refer\")\n\n=SUMIFS('Lucas Picks'!I27:I28570,'Lucas Picks'!M27:M28570,Sheet1!A29,'Lucas Picks'!P27:P28570,\"Dry\")\n\n=SUMIFS('Lucas Picks'!I46:I28589,'Lucas Picks'!M46:M28589,Sheet1!A48,'Lucas Picks'!P46:P28589,\"Freezer\")\n\nM col is routes, I is qty picked, N is stops sheet2!A# is the cell in col A for this row\n\nYou will need the checking sheet, Pallet summary sheet and Lucas Pick from the date you are running this report for.",
+      "content_hash": "6b3563811c30f115",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 14,
+      "token_count": 413,
+      "_original": {
+        "keywords": [
+          "lucas",
+          "picks",
+          "called",
+          "batches",
+          "report",
+          "remove",
+          "col",
+          "routes",
+          "temp",
+          "zone"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training",
+        "troubleshoot"
+      ],
+      "verbs": [
+        "filter",
+        "remove",
+        "copy",
+        "paste",
+        "count",
+        "find",
+        "look",
+        "make sure",
+        "run",
+        "open",
+        "lookup",
+        "separate",
+        "rewrite",
+        "calculate",
+        "sumifs",
+        "sumif",
+        "verify"
+      ],
+      "entities": [
+        "lucas_report",
+        "route",
+        "batch",
+        "assignment",
+        "pallet",
+        "temp_zone",
+        "checker_report",
+        "qty_picked",
+        "quantity_scratched",
+        "quantity_short"
+      ],
+      "actors": [
+        "checker",
+        "warehouse"
+      ],
+      "conditions": [
+        "blanks",
+        "not_called_in",
+        "empty_picked",
+        "quantity_scratched_short_greater_than_0",
+        "temp_zone_dry",
+        "temp_zone_cooler",
+        "temp_zone_freezer",
+        "jitmeat",
+        "jitsea",
+        "pa_routes",
+        "ny_routes"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I remove PA and NY routes from the Lucas report for JITMEAT and JITSEA?",
+        "What's the step-by-step process to identify batches not called in from the Lucas picks report?",
+        "The checker report formulas won't paste\u2014what am I supposed to do instead?",
+        "How do I use SUMIFS to sum qty picked by route and temp zone like Refer or Dry in the checking sheet?",
+        "For routes with 'Full' written in, what's the formula to calculate pallets in the checker report?"
+      ],
+      "question_complexity": [
+        1,
+        3,
+        1,
+        2,
+        2
+      ],
+      "importance": 8,
+      "specificity": 9,
+      "complexity": 7,
+      "completeness_score": 5,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core ops procedure for tracking uncalled batches in Lucas reports, highly specific to JIT routes and Excel workflows, requires domain and Excel knowledge, somewhat fragmented with sheet dependencies and hardcoded ranges, but provides direct steps and formulas.",
+      "acronyms": {
+        "PA": "Pennsylvania",
+        "NY": "New York"
+      },
+      "jargon": {
+        "Lucas report": "Specific warehouse picking report used for tracking picks and batches",
+        "Lucas Picks": "Sheet or report tab detailing picked quantities, routes, and stops",
+        "temp zone": "Temperature-controlled storage or handling zone (e.g., Dry, Cooler, Freezer)",
+        "JITMEAT": "Specific route identifier to remove from filtering",
+        "JITSEA": "Specific route identifier to remove from filtering",
+        "JITOFFICE": "Specific route identifier to remove from filtering",
+        "JIT": "Specific route identifier to remove from filtering",
+        "blanks": "Empty or blank cells in a column (e.g., column Q)",
+        "picked by": "Field indicating picker or pick status",
+        "quantity scratched": "Quantity marked as scratched (cancelled or erroneous picks)",
+        "quantity short": "Quantity deficient or short of required amount",
+        "batches not called in": "Batches that have not been selected or called into the Lucas system",
+        "Jennifer device": "Handheld device used for selecting batches in the system",
+        "Checker report": "Report or sheet for verifying pick accuracy by routes and temp zones",
+        "Checker sheet": "Excel sheet for calculations on picks using SUMIFS formulas",
+        "Pallet summary sheet": "Summary sheet aggregating pallet counts by route"
+      },
+      "numeric_thresholds": {
+        "scratched_short_quantity": {
+          "value": 0,
+          "unit": "units",
+          "context": "Remove rows with quantity scratched and short greater than this value"
+        },
+        "dry_batches_not_called": {
+          "value": 154,
+          "unit": "batches",
+          "context": "Count of Dry temp zone batches not called in from filtered Lucas picks reports"
+        },
+        "cooler_batches_not_called": {
+          "value": 248,
+          "unit": "batches",
+          "context": "Count of Cooler temp zone batches not called in from filtered Lucas picks reports"
+        },
+        "freezer_batches_not_called": {
+          "value": 79,
+          "unit": "batches",
+          "context": "Count of Freezer temp zone batches not called in from filtered Lucas picks reports"
+        }
+      }
+    },
+    {
+      "id": "warehouse_ops_admin_introduction_15",
+      "content": "On the checking sheet filter so that the first checker name column has no blank cells, add another column after use a vlookup using the route as the comparison to the pallet summary sheet to get the total orders for that route.\n\nignore\n\nOpen Lucas, filter only by Full Routes, copy route to work type, delete stop column highlight all of the pallet column delete duplicate data highlight all, pivot table\n\nCopy all full routes two extra times one for each zone, copy checkers into sections below, paste over the amount of pallets per temp zone\n\n=LEN(D8)-LEN(SUBSTITUTE(D8,\",\",\"\"))+1 count non full cells\n\nFor the routes with numbers i.e 1,7  5  1,2,3. Count the number of orders the previous example would be 2 1 3 and write them in that new column.\n\nNext look for any with split checkers on the route\n\nIn this example ernest would get 6 and freddy would get 5\n\nCreate a pivot table data source should look something like this, make sure to include the selectors names. Once the pivot table is created it should have only the checkers name and the number of orders\n\nAdd these numbers to the Checker report.\n\nOpen the Lucas picks report copy the route column and vip check column into a second tab in the Lucas picks report. Now use the two formulas at the top of this section if the column as numbers of pallets listed use the first formula if it says full use the second formula. Using a vlookup with route as the comparison point get the selector names next to the case numbers.\n\nNow make a pivot table with the names and cases columns, and put these numbers into the checker report\n\nAfter each day copy all the checker names and paste them into the sheet titled \u201cChecker\u201d along with the day of the week. On Friday take all of those names refresh the pivot table with the one week of names paste those into the weekly tab\n\nEmail\n\nNight selectors batch times\n\nRoute J & I errors\n\nRuns shorts by reason report, filter for routes J & I filter out sales errors",
+      "content_hash": "621b2c4a453b115e",
+      "section_title": "ops_admin",
+      "source_file": "ops_admin_manual_(made_by_matt_fava)_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 15,
+      "token_count": 462,
+      "_original": {
+        "keywords": [
+          "column",
+          "route",
+          "names",
+          "checker",
+          "copy",
+          "pivot",
+          "table",
+          "into",
+          "numbers",
+          "report"
+        ],
+        "email": "",
+        "category": "ops_admin",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "filter",
+        "add",
+        "lookup",
+        "copy",
+        "delete",
+        "highlight",
+        "create",
+        "paste",
+        "count",
+        "look for",
+        "write",
+        "get",
+        "make",
+        "refresh"
+      ],
+      "entities": [
+        "route",
+        "pallet",
+        "checker",
+        "orders",
+        "pivot table",
+        "pallet summary sheet",
+        "checking sheet",
+        "Lucas picks report",
+        "vip check",
+        "cases",
+        "checker report",
+        "Checker sheet",
+        "weekly tab",
+        "Night selectors batch times",
+        "Route J & I errors",
+        "Runs shorts by reason report"
+      ],
+      "actors": [
+        "checker",
+        "selector",
+        "first checker",
+        "ernest",
+        "freddy"
+      ],
+      "conditions": [
+        "full routes",
+        "no blank cells",
+        "split checkers",
+        "routes with numbers",
+        "sales errors",
+        "routes J & I"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I use VLOOKUP on the checking sheet to pull total orders per route from the pallet summary?",
+        "What's the formula to count the number of orders in a route cell like '1,7' or '1,2,3'?",
+        "How do I split pallets between checkers on a route, like giving Ernest 6 and Freddy 5?",
+        "My pivot table for checkers and orders isn't including the names\u2014what am I doing wrong?",
+        "Walk me through getting cases per selector from the Lucas picks report into the checker report using VLOOKUP and pivot table."
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 6,
+      "completeness_score": 4,
+      "actionability_score": 7,
+      "confidence_score": 0.88,
+      "quality_reasoning": "Core ops process for daily checker/route reporting; detailed Excel steps (vlookup, pivots, formulas) but fragmented with notes like 'ignore', assumes specific sheets exist.",
+      "acronyms": {},
+      "jargon": {
+        "vlookup": "Excel function using route as key to retrieve data like total orders from another sheet",
+        "pivot table": "Excel tool for summarizing data by checkers names and orders or cases",
+        "checker": "Worker assigned to routes for checking or handling orders/pallets",
+        "route": "Identifier for delivery or picking path, e.g., J & I, may have numbers like 1,7 or split assignments",
+        "pallet": "Unit of goods tracked by quantity per route or temp zone",
+        "selector": "Warehouse worker, e.g., night selectors handling picks",
+        "full routes": "Routes filtered as completely assigned or filled",
+        "temp zone": "Temperature-specific section for pallets",
+        "split checkers": "Multiple checkers sharing a route, e.g., Ernest gets 6, Freddy gets 5",
+        "Lucas picks report": "Report source for routes, VIP checks, and case numbers",
+        "VIP check": "Priority check column in picks report",
+        "batch times": "Timing metric for night selectors",
+        "Runs shorts by reason report": "Report filtered for route errors like sales errors"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

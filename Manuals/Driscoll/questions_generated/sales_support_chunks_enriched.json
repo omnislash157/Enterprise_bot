@@ -1,0 +1,1344 @@
+{
+  "source_file": "manuals\\Driscoll\\Sales\\sales_support_chunks.json",
+  "enriched_at": "2025-12-22T10:32:57.714008",
+  "chunk_count": 17,
+  "chunks": [
+    {
+      "id": "credits_submission",
+      "content": "Submit credits to credits@driscollfoods.com (Wayne & PA DSMs). Credits must be submitted by the district manager to inside sales. Include: completed credit form, pictures of product, pick labels, manufacturer codes, identifying materials, signed invoice (from archive), and operational error email if applicable.",
+      "content_hash": "ac340f110e1383af",
+      "section_title": "credits - process",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 0,
+      "token_count": 54,
+      "_original": {
+        "keywords": [
+          "credit",
+          "submit credit",
+          "credit form",
+          "Wayne",
+          "PA",
+          "DSM",
+          "refund"
+        ],
+        "email": "credits@driscollfoods.com",
+        "category": "credits",
+        "subcategory": "process"
+      },
+      "query_types": [
+        "how_to",
+        "policy"
+      ],
+      "verbs": [
+        "submit",
+        "include",
+        "complete"
+      ],
+      "entities": [
+        "credit_memo",
+        "invoice"
+      ],
+      "actors": [
+        "district_manager",
+        "inside_sales"
+      ],
+      "conditions": [
+        "operational_error"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit credits for Wayne and PA DSMs?",
+        "What documents and items need to be included when submitting a credit to inside sales?",
+        "Does a credit sub require pick labels, manufacturer codes, product pics, and the signed invoice from archive?",
+        "Why do credits have to be submitted by the district manager? I can't do it myself?",
+        "What if there's an operational error on a credit - do I need to include that email too?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core sales credit submission process, frequently used; clear steps and requirements make it actionable and mostly self-contained, with minor domain jargon.",
+      "acronyms": {
+        "PA": "Pennsylvania",
+        "DSMs": "District Sales Managers"
+      },
+      "jargon": {
+        "credits": "Reimbursement or allowance requests for product defects or errors",
+        "district manager": "Regional supervisor overseeing sales or operations",
+        "inside sales": "Internal sales team handling customer service and orders remotely",
+        "pick labels": "Warehouse labels used to identify and pick items for orders",
+        "manufacturer codes": "Unique identifiers assigned by product manufacturers",
+        "identifying materials": "Documents or items used to verify product details",
+        "operational error email": "Notification email documenting mistakes in operations"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "credits_required_docs",
+      "content": "Credit submission requirements: completed credit form, product pictures (as many as possible), pick labels, manufacturer codes, other identifying materials, signed invoice (usually via archive). If credit results from operational error, include the ops error email.",
+      "content_hash": "f819f3c6291a56f7",
+      "section_title": "credits - requirements",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 1,
+      "token_count": 45,
+      "_original": {
+        "keywords": [
+          "credit pictures",
+          "credit documentation",
+          "pick labels",
+          "manufacturer codes",
+          "signed invoice"
+        ],
+        "email": "",
+        "category": "credits",
+        "subcategory": "requirements"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "reference"
+      ],
+      "verbs": [
+        "submit",
+        "complete",
+        "include"
+      ],
+      "entities": [
+        "credit",
+        "credit_form",
+        "product_pictures",
+        "pick_labels",
+        "manufacturer_codes",
+        "identifying_materials",
+        "signed_invoice",
+        "invoice",
+        "ops_error_email"
+      ],
+      "actors": [
+        "sales_rep",
+        "credit_analyst"
+      ],
+      "conditions": [
+        "operational_error"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the requirements for submitting a credit?",
+        "What if the credit is from an ops error - what extra stuff do I need?",
+        "Do I need pick labels, manufacturer codes, and product pics for every credit submission?",
+        "Ugh, my credit submission got bounced back again - what am I missing?",
+        "How do I get a signed invoice via archive for credit requests?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core process for credit submissions, straightforward list of requirements, highly actionable and mostly self-contained",
+      "acronyms": {
+        "ops": "operations"
+      },
+      "jargon": {
+        "credit form": "Form required to initiate a credit request for returns or errors",
+        "pick labels": "Labels generated during the warehouse picking process to identify items",
+        "manufacturer codes": "Unique codes assigned by product manufacturers for identification",
+        "signed invoice": "Invoice bearing an authorized signature, typically retrieved from the archive system",
+        "ops error email": "Email notification documenting an operational error",
+        "operational error": "Mistake occurring in daily operations, such as picking or shipping"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "operational_errors",
+      "content": "Report operational errors to opserrors@driscollfoods.com. Subject line format: 'customer #; issue'. Include: customer name and number, order number, date, item code, route number, stop number, reason for error, and pictures if applicable.",
+      "content_hash": "246bc4f79fc47efd",
+      "section_title": "operations - errors",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 2,
+      "token_count": 41,
+      "_original": {
+        "keywords": [
+          "ops error",
+          "operational error",
+          "driver error",
+          "delivery error",
+          "mistake"
+        ],
+        "email": "opserrors@driscollfoods.com",
+        "category": "operations",
+        "subcategory": "errors"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "escalation",
+        "troubleshoot"
+      ],
+      "verbs": [
+        "report",
+        "include",
+        "notify",
+        "document"
+      ],
+      "entities": [
+        "customer",
+        "order",
+        "item",
+        "route",
+        "stop",
+        "error"
+      ],
+      "actors": [
+        "sales_rep",
+        "dispatch"
+      ],
+      "conditions": [
+        "operational_error"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": true,
+      "synthetic_questions": [
+        "How do I report an operational error?",
+        "What's the subject line format for emailing ops errors?",
+        "Customer 234 had a route 67 stop 4 shortage on item ABC123 - what details do I need to include?",
+        "I'm so annoyed, I have an error but no idea what to put in the email to opserrors@driscollfoods.com!",
+        "What if there's a delivery issue with pictures - where does it go and what else to list like order number or reason?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core operational procedure for error reporting, frequently needed; straightforward, self-contained instructions with clear steps anyone can follow.",
+      "acronyms": {},
+      "jargon": {
+        "customer number": "Unique identifier for a customer",
+        "order number": "Unique identifier for a customer order",
+        "item code": "Unique code for a product or item",
+        "route number": "Identifier for a delivery route",
+        "stop number": "Identifier for a specific delivery stop on a route"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pickup_request_process",
+      "content": "Request product pickups via pickuprequest@driscollfoods.com. Include completed pickup form with: customer number, invoice number, original date, item number, item description, case count, total credit amount, reason for pickup, order number to attach request to, and driver instructions (who to ask for, key drop location, product location).",
+      "content_hash": "15399e7e5ff844e3",
+      "section_title": "pickups - process",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 3,
+      "token_count": 59,
+      "_original": {
+        "keywords": [
+          "pick up",
+          "pickup",
+          "return product",
+          "pickup request",
+          "product return"
+        ],
+        "email": "pickuprequest@driscollfoods.com",
+        "category": "pickups",
+        "subcategory": "process"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "request",
+        "include",
+        "submit",
+        "attach",
+        "process"
+      ],
+      "entities": [
+        "customer",
+        "invoice",
+        "item",
+        "order",
+        "driver"
+      ],
+      "actors": [
+        "customer",
+        "driver"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": true,
+      "synthetic_questions": [
+        "How do I request a product pickup?",
+        "What information needs to be included on the completed pickup form?",
+        "pickuprequest@driscollfoods.com rejected my form again\u2014what fields am I missing?",
+        "What driver instructions like key drop location do I put on the pickup form?",
+        "What if the pickup requires specifying case count, credit amount, and reason?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core sales support process for product pickups/returns; clear, specific instructions with required fields; straightforward and mostly self-contained, assumes access to pickup form.",
+      "acronyms": {},
+      "jargon": {
+        "pickup form": "Completed form required for requesting product pickups, including customer details, invoice info, item specifics, quantities, credit amount, reason, order number, and driver instructions",
+        "case count": "Number of cases (standard wholesale unit) of the product to be picked up",
+        "total credit amount": "Monetary value of credit requested for the returned/picked-up products",
+        "key drop location": "Specified location for dropping off keys (e.g., for access during pickup)",
+        "product location": "Physical location where the product is stored for pickup"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pickup_perishable_policy",
+      "content": "Perishable pickup policy: We will NOT pick up perishable items ordered in error - these must be refused at time of delivery. Exception: perishable meat items with quality issues will be picked up for inspection so customer doesn't have to hold them.",
+      "content_hash": "19e68ebf6266f994",
+      "section_title": "pickups - policy",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 4,
+      "token_count": 54,
+      "_original": {
+        "keywords": [
+          "perishable",
+          "refuse delivery",
+          "meat pickup",
+          "quality issue",
+          "perishable return"
+        ],
+        "email": "",
+        "category": "pickups",
+        "subcategory": "policy"
+      },
+      "query_types": [
+        "policy"
+      ],
+      "verbs": [
+        "pick up",
+        "refuse",
+        "hold"
+      ],
+      "entities": [
+        "perishable items",
+        "customer"
+      ],
+      "actors": [
+        "customer"
+      ],
+      "conditions": [
+        "ordered in error",
+        "quality issues",
+        "exception"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the policy on picking up perishable items ordered by mistake?",
+        "What if a customer refuses perishables at delivery because they ordered wrong?",
+        "Can we do a pickup on erroneous perishables, or must they be refused at POD?",
+        "Why can't we just pick up these perishable items the customer doesn't want? It's a hassle!",
+        "Is there an exception to the no-pickup rule for perishable meat with quality issues?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core pickup policy for perishables, bounded to error orders with clear meat exception; simple, self-contained, and directly guides actions",
+      "acronyms": {},
+      "jargon": {
+        "perishable items": "Items subject to spoilage or decay such as food products requiring special handling",
+        "perishable meat items": "Specific perishable goods (meat) eligible for pickup exception due to quality defects",
+        "pickup": "Retrieval of goods from customer location for return or inspection"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pickup_dry_chemical_policy",
+      "content": "Dry and chemical item pickup policy: Will pick up within two weeks from invoice date. Submit request to pickuprequest@driscollfoods.com with completed pickup form.",
+      "content_hash": "ec6bdb30c6211213",
+      "section_title": "pickups - policy",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 5,
+      "token_count": 29,
+      "_original": {
+        "keywords": [
+          "dry goods",
+          "chemical",
+          "pickup window",
+          "two weeks",
+          "non-perishable"
+        ],
+        "email": "",
+        "category": "pickups",
+        "subcategory": "policy"
+      },
+      "query_types": [
+        "policy",
+        "how_to"
+      ],
+      "verbs": [
+        "pick up",
+        "submit"
+      ],
+      "entities": [
+        "invoice",
+        "pickup form"
+      ],
+      "actors": [
+        "customer"
+      ],
+      "conditions": [
+        "dry and chemical item",
+        "within two weeks from invoice date"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the pickup policy for dry and chemical items?",
+        "How do I submit a request for dry item pickup?",
+        "How long after the invoice date can we expect pickup on chem items?",
+        "What if an invoice for dry goods is almost two weeks old - what's the process to get pickup?",
+        "Ugh, I filled out the pickup form for chemical items but where the hell do I send it and is it too late?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core policy for dry/chemical item pickups in sales support; clear timeline, email, and form requirement; simple to understand but form source unspecified.",
+      "acronyms": {},
+      "jargon": {
+        "Dry and chemical item": "Categories of products (dry goods and chemicals) eligible for pickup under this policy",
+        "pickup form": "Required form to submit for item pickup requests"
+      },
+      "numeric_thresholds": {
+        "pickup_deadline": {
+          "value": 2,
+          "unit": "weeks",
+          "context": "Will pick up within this timeframe from invoice date"
+        }
+      }
+    },
+    {
+      "id": "class_bid_request",
+      "content": "Request new class bids via classbidrequest@driscollfoods.com. Inside sales sets up the bid; salesperson maintains it after creation. Class bids can hold multiple customers on a single bid.",
+      "content_hash": "da588635a97d9efd",
+      "section_title": "bids - setup",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 6,
+      "token_count": 35,
+      "_original": {
+        "keywords": [
+          "class bid",
+          "new bid",
+          "bid setup",
+          "create bid",
+          "multiple customers"
+        ],
+        "email": "classbidrequest@driscollfoods.com",
+        "category": "bids",
+        "subcategory": "setup"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "request",
+        "set up",
+        "maintain",
+        "create"
+      ],
+      "entities": [
+        "class bid",
+        "bid",
+        "customer"
+      ],
+      "actors": [
+        "inside sales",
+        "salesperson"
+      ],
+      "conditions": [
+        "new"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I request a new class bid?",
+        "Who sets up class bids and who maintains them afterward?",
+        "Can one class bid include multiple customers?",
+        "I'm lost on setting up a new class bid\u2014where do I even start?",
+        "What's the email for submitting a class bid request, and what happens next?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core sales process for bid setup, clear actionable steps via email, self-contained for common scenario, basic understanding needed",
+      "acronyms": {},
+      "jargon": {
+        "class bids": "Bids that can hold multiple customers on a single bid",
+        "inside sales": "Sales team responsible for initially setting up bids"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pcm_request",
+      "content": "Request PCM (Product Category Margin) setup via pcmrequest@driscollfoods.com. PCM assigns pricing headers by category - drill into subcategories and assign margins over sales cost. PCM is mandatory for customers using Cut & Dry (online ordering system).",
+      "content_hash": "36e0bbab535521bd",
+      "section_title": "pricing - pcm",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 7,
+      "token_count": 46,
+      "_original": {
+        "keywords": [
+          "PCM",
+          "product category margin",
+          "pricing header",
+          "margin",
+          "cut and dry",
+          "online ordering"
+        ],
+        "email": "pcmrequest@driscollfoods.com",
+        "category": "pricing",
+        "subcategory": "pcm"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition"
+      ],
+      "verbs": [
+        "request",
+        "setup",
+        "assign",
+        "drill"
+      ],
+      "entities": [
+        "PCM",
+        "pricing headers",
+        "category",
+        "subcategories",
+        "margins",
+        "sales cost",
+        "Cut & Dry",
+        "customer"
+      ],
+      "actors": [
+        "customer",
+        "PCM"
+      ],
+      "conditions": [
+        "mandatory for customers using Cut & Dry"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I request PCM setup for a customer?",
+        "Is PCM mandatory for customers using Cut & Dry?",
+        "How does PCM assign pricing headers by category and drill into subcategories for margins over sales cost?",
+        "My Cut & Dry customer doesn't have PCM\u2014what do I do now?",
+        "What's the email to request Product Category Margin setup?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core pricing process mandatory for specific customers; clear email action, self-contained with purpose and steps, simple to understand.",
+      "acronyms": {
+        "PCM": "Product Category Margin"
+      },
+      "jargon": {
+        "Cut & Dry": "online ordering system",
+        "pricing headers": "Pricing categories assigned by PCM",
+        "margins over sales cost": "Profit margins calculated above the cost of sales"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "order_changes",
+      "content": "Request order date changes or cancellations via orderchanges@driscollfoods.com. Include: customer name, customer/account number, order number, and new order date. Important: if canceling just-in-time items (cutshop & fishery), communicate directly with those departments.",
+      "content_hash": "f0c4ba266fd7e9ee",
+      "section_title": "orders - modifications",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 8,
+      "token_count": 41,
+      "_original": {
+        "keywords": [
+          "change order",
+          "cancel order",
+          "order date",
+          "reschedule",
+          "order cancellation"
+        ],
+        "email": "orderchanges@driscollfoods.com",
+        "category": "orders",
+        "subcategory": "modifications"
+      },
+      "query_types": [
+        "how_to",
+        "policy"
+      ],
+      "verbs": [
+        "request",
+        "change",
+        "cancel",
+        "include",
+        "communicate"
+      ],
+      "entities": [
+        "customer",
+        "account",
+        "order"
+      ],
+      "actors": [
+        "customer",
+        "cutshop",
+        "fishery"
+      ],
+      "conditions": [
+        "just-in-time items"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I request a date change for a customer's order?",
+        "What info do I need to include when emailing orderchanges@driscollfoods.com?",
+        "What if I'm canceling just-in-time items from cutshop or fishery?",
+        "Customer wants to cancel their order#12345 - what's the process?",
+        "Argh, how do I cancel this fishery JIT order without screwing up?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core process for order modifications in sales support, frequently needed; straightforward instructions with email, required details, and key exception for JIT items; highly self-contained and immediately actionable for anyone handling customer requests.",
+      "acronyms": {},
+      "jargon": {
+        "just-in-time items": "Items prepared or delivered exactly as needed with minimal lead time, often perishable or custom-cut, requiring special handling for changes",
+        "cutshop": "Department responsible for cutting and processing fresh produce or similar items",
+        "fishery": "Department handling seafood or fishery products"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "routing_request_wayne",
+      "content": "Wayne routing requests: submit to routingrequest@driscollfoods.com for route changes or routing modifications.",
+      "content_hash": "375004f60a123245",
+      "section_title": "routing - wayne",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 9,
+      "token_count": 15,
+      "_original": {
+        "keywords": [
+          "routing",
+          "route change",
+          "Wayne routing",
+          "delivery route"
+        ],
+        "email": "routingrequest@driscollfoods.com",
+        "category": "routing",
+        "subcategory": "wayne"
+      },
+      "query_types": [
+        "how_to",
+        "lookup"
+      ],
+      "verbs": [
+        "submit",
+        "change",
+        "modify"
+      ],
+      "entities": [
+        "route",
+        "routing_request"
+      ],
+      "actors": [
+        "sales_rep",
+        "dispatch"
+      ],
+      "conditions": [
+        "route_changes",
+        "routing_modifications",
+        "wayne"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit a Wayne routing request for a route change?",
+        "What do I do if I need to modify a route in Wayne?",
+        "Where do I send Wayne routing requests for modifications?",
+        "I'm stuck! What's the email for Wayne route changes?",
+        "For complex routing modifications in the Wayne section, what's the submission process?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core operational procedure for Wayne routing changes, highly actionable and self-contained with direct email instruction, simple for anyone to use.",
+      "acronyms": {},
+      "jargon": {
+        "Wayne routing requests": "Specific requests for route changes or modifications at the Wayne facility, submitted to routingrequest@driscollfoods.com",
+        "route changes": "Alterations to delivery or transportation routes",
+        "routing modifications": "Adjustments or updates to established routing plans"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "nca_new_customer_alert",
+      "content": "Submit New Customer Alert (NCA) to ncarequests@driscollfoods.com for opening orders. Include: customer number, customer name, order number, delivery day, time window, and applicable notes. NCA flags the system for special care for 60 days. Critical: get delivery days and time window precisely correct.",
+      "content_hash": "3654b53e9f5f5e03",
+      "section_title": "operations - new_customer",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 10,
+      "token_count": 55,
+      "_original": {
+        "keywords": [
+          "NCA",
+          "new customer alert",
+          "new customer",
+          "opening order",
+          "first order",
+          "60 days"
+        ],
+        "email": "ncarequests@driscollfoods.com",
+        "category": "operations",
+        "subcategory": "new_customer"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "submit",
+        "include",
+        "flag",
+        "notify"
+      ],
+      "entities": [
+        "customer",
+        "order"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "new_customer"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit a New Customer Alert for opening orders?",
+        "What details do I need to include in an NCA email to ncarequests@driscollfoods.com?",
+        "How long does the special care flag from an NCA last?",
+        "My NCA submission failed because the delivery time window was off - why is that so critical?",
+        "What's the exact process for flagging a new customer's opening orders with NCA, including all required fields and duration?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core operational process for new customers, highly actionable with precise steps and requirements; self-contained and straightforward.",
+      "acronyms": {
+        "NCA": "New Customer Alert"
+      },
+      "jargon": {
+        "opening orders": "Initial orders placed by new customers",
+        "time window": "Specific timeframe for delivery",
+        "flags the system": "Marks the system to indicate special handling or attention"
+      },
+      "numeric_thresholds": {
+        "special_care_duration": {
+          "value": 60,
+          "unit": "days",
+          "context": "NCA flags the system for special care for this period"
+        }
+      }
+    },
+    {
+      "id": "car_critical_attention",
+      "content": "Submit Critical Attention Request (CAR) to carrequests@driscollfoods.com for one-time special handling. Unlike NCA, CAR is a single-instance request for case-by-case special care. Include: customer number, name, order number, delivery day, time window, and applicable notes.",
+      "content_hash": "dfb6351194c83827",
+      "section_title": "operations - special_handling",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 11,
+      "token_count": 45,
+      "_original": {
+        "keywords": [
+          "CAR",
+          "critical attention",
+          "special care",
+          "one time",
+          "flag account"
+        ],
+        "email": "carrequests@driscollfoods.com",
+        "category": "operations",
+        "subcategory": "special_handling"
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "policy"
+      ],
+      "verbs": [
+        "submit"
+      ],
+      "entities": [
+        "customer",
+        "order"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "exception"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit a Critical Attention Request for special handling?",
+        "What's the difference between a CAR and an NCA?",
+        "What if I only need special care for one delivery?",
+        "I'm frustrated\u2014NCA doesn't work for this one-time request, how do I submit a CAR instead?",
+        "What details like customer number and order info do I need to include in a CAR email?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core operational process for special handling, specific to CAR requests, simple to follow, fully self-contained with exact steps and details needed.",
+      "acronyms": {
+        "CAR": "Critical Attention Request"
+      },
+      "jargon": {
+        "NCA": "a contrasting request type to CAR (not specified as single-instance)"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "nca_vs_car",
+      "content": "NCA vs CAR: NCA (New Customer Alert) flags account for 60 days of special care for new customers. CAR (Critical Attention Request) is a one-time request for special handling on a specific order/situation. Use NCA for new accounts, CAR for existing accounts needing one-time attention.",
+      "content_hash": "e245c3e64909ef05",
+      "section_title": "operations - comparison",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 12,
+      "token_count": 58,
+      "_original": {
+        "keywords": [
+          "NCA vs CAR",
+          "difference",
+          "new customer vs critical",
+          "which request"
+        ],
+        "email": "",
+        "category": "operations",
+        "subcategory": "comparison"
+      },
+      "query_types": [
+        "definition",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "flag",
+        "request",
+        "use",
+        "handle"
+      ],
+      "entities": [
+        "customer",
+        "account",
+        "order"
+      ],
+      "actors": [
+        "customer",
+        "sales_rep"
+      ],
+      "conditions": [
+        "new_customer"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the difference between NCA and CAR?",
+        "How do I flag a new customer for special care?",
+        "What if an existing account needs special handling for one order?",
+        "I'm so confused about NCA vs CAR\u2014which one for new accounts?",
+        "NCA is for 60 days on new accounts, but when exactly do we use CAR instead?"
+      ],
+      "question_complexity": [
+        2,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core business process for customer handling in operations, common bounded scenario comparing two alert types, simple to understand, fully self-contained with direct usage guidance.",
+      "acronyms": {
+        "NCA": "New Customer Alert",
+        "CAR": "Critical Attention Request"
+      },
+      "jargon": {},
+      "numeric_thresholds": {
+        "NCA_duration": {
+          "value": 60,
+          "unit": "days",
+          "context": "flags account for special care for new customers"
+        }
+      }
+    },
+    {
+      "id": "bill_to_ship_to",
+      "content": "Request bill-to/ship-to arrangements via billtoshiptorequests@driscollfoods.com. Include: bill-to customer account number, ship-to customer number, delivery day, and order number if applicable. Important: ensure ship-to customer knows they will receive product that is not theirs.",
+      "content_hash": "f465d0c335636308",
+      "section_title": "billing - split_billing",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 13,
+      "token_count": 42,
+      "_original": {
+        "keywords": [
+          "bill to ship to",
+          "split billing",
+          "different billing",
+          "ship to different location"
+        ],
+        "email": "billtoshiptorequests@driscollfoods.com",
+        "category": "billing",
+        "subcategory": "split_billing"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "request",
+        "include",
+        "ensure",
+        "notify"
+      ],
+      "entities": [
+        "customer",
+        "order",
+        "product"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "split_billing"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I request bill-to/ship-to arrangements?",
+        "What info do I need to email for a split billing setup?",
+        "What's the process for billtoshiptorequests including order number?",
+        "I keep forgetting stuff for bill-to/ship-to emails\u2014what's required?",
+        "Do I have to make sure the ship-to knows it's not their product for split_billing?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core process for split billing/shipping in sales support; clear, self-contained instructions with exact email, required details, and key warning; simple for anyone to follow.",
+      "acronyms": {},
+      "jargon": {
+        "bill-to": "Customer or account responsible for billing and invoicing",
+        "ship-to": "Customer, location, or account designated for receiving shipments",
+        "bill-to/ship-to arrangements": "Process for setting up different billing and shipping parties/accounts"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "forced_pickups",
+      "content": "Forced pickup requests: submit to forcedpickups@driscollfoods.com for mandatory product retrievals.",
+      "content_hash": "e9dc79829b30e0d3",
+      "section_title": "pickups - forced",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 14,
+      "token_count": 13,
+      "_original": {
+        "keywords": [
+          "forced pickup",
+          "mandatory pickup",
+          "forced pick up"
+        ],
+        "email": "forcedpickups@driscollfoods.com",
+        "category": "pickups",
+        "subcategory": "forced"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "submit"
+      ],
+      "entities": [
+        "pickup_request",
+        "product"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "forced",
+        "mandatory"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit a forced pickup request?",
+        "What's the email for forced pickup requests in the pickups section?",
+        "What if we have a mandatory product retrieval that needs a forced pickup?",
+        "Where do I send FPRs for forced pickups?",
+        "The system won't process my forced pickup - where the heck do I submit it?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 9,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core process for mandatory retrievals, highly specific to forced pickups, simple self-contained instruction with direct email action",
+      "acronyms": {},
+      "jargon": {
+        "forced pickup requests": "Requests submitted to forcedpickups@driscollfoods.com for mandatory product retrievals",
+        "mandatory product retrievals": "Compulsory collection of products, handled via forced pickup requests"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "employee_purchases_wayne",
+      "content": "Wayne employee purchases: submit requests to employeepurchases@driscollfoods.com.",
+      "content_hash": "8315fce59efd9438",
+      "section_title": "purchasing - employee",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 15,
+      "token_count": 9,
+      "_original": {
+        "keywords": [
+          "employee purchase",
+          "staff purchase",
+          "Wayne employee",
+          "employee order"
+        ],
+        "email": "employeepurchases@driscollfoods.com",
+        "category": "purchasing",
+        "subcategory": "employee"
+      },
+      "query_types": [
+        "how_to",
+        "lookup"
+      ],
+      "verbs": [
+        "submit",
+        "purchase"
+      ],
+      "entities": [
+        "purchase",
+        "request"
+      ],
+      "actors": [
+        "employee"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I submit a request for Wayne employee purchases?",
+        "What's the email for Wayne employee purchase requests?",
+        "Where do I send my Wayne EPR as an employee?",
+        "I'm at Wayne and can't find where to submit my employee purchase - help!",
+        "What if I'm a Wayne associate needing to requisition an employee purchase?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 7,
+      "specificity": 8,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core procedure for Wayne employee purchases; highly specific, simple to understand, fully actionable with email instruction.",
+      "acronyms": {},
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "email_directory",
+      "content": "Driscoll Foods Sales Support Email Directory: Credits: credits@driscollfoods.com | Ops Errors: opserrors@driscollfoods.com | Pickups: pickuprequest@driscollfoods.com | Class Bids: classbidrequest@driscollfoods.com | PCM: pcmrequest@driscollfoods.com | Order Changes: orderchanges@driscollfoods.com | Routing (Wayne): routingrequest@driscollfoods.com | NCA: ncarequests@driscollfoods.com | CAR: carrequests@driscollfoods.com | Bill-to/Ship-to: billtoshiptorequests@driscollfoods.com | Forced Pickups: forcedpickups@driscollfoods.com | Employee Purchases (Wayne): employeepurchases@driscollfoods.com",
+      "content_hash": "ec97d959ed02480b",
+      "section_title": "reference - contacts",
+      "source_file": "sales_support_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 16,
+      "token_count": 62,
+      "_original": {
+        "keywords": [
+          "email list",
+          "who to contact",
+          "email directory",
+          "all emails"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "contacts"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "request",
+        "report",
+        "change",
+        "purchase",
+        "submit"
+      ],
+      "entities": [
+        "credits",
+        "ops_errors",
+        "pickups",
+        "class_bids",
+        "pcm",
+        "order_changes",
+        "routing",
+        "nca",
+        "car",
+        "bill_to",
+        "ship_to",
+        "forced_pickups",
+        "employee_purchases",
+        "credit_memo",
+        "order",
+        "route"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer",
+        "employee",
+        "credit_analyst",
+        "dispatch"
+      ],
+      "conditions": [
+        "ops_errors",
+        "forced_pickups",
+        "wayne",
+        "exception"
+      ],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the email for credits requests?",
+        "How do I submit an order change request?",
+        "What email do I use for Class Bids?",
+        "I can't find the right email for ops errors, where is it?!",
+        "For routing issues in Wayne, what's the support email?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 10,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core sales support contacts, frequently needed for operations, straightforward list, fully self-contained and immediately usable",
+      "acronyms": {
+        "Ops": "Operations"
+      },
+      "jargon": {
+        "Credits": "Requests for account credits, such as for returns, shortages, or billing adjustments",
+        "Ops Errors": "Errors in operations, such as picking, packing, or fulfillment mistakes",
+        "Pickups": "Requests to schedule product pickups from customer locations",
+        "Class Bids": "Bids or requests related to Class B products (typically secondary, surplus, or off-grade inventory)",
+        "PCM": "PCM requests (likely Product Category Management or Pricing/Contract Management, internal sales support process)",
+        "Order Changes": "Requests to modify existing customer orders",
+        "Routing (Wayne)": "Routing coordination requests specific to the Wayne facility or team",
+        "NCA": "NCA requests (domain-specific, possibly New Customer Approval or Non-Conformance Action)",
+        "CAR": "CAR requests (domain-specific, possibly Corrective Action Request)",
+        "Bill-to/Ship-to": "Requests to handle discrepancies or changes between billing address (bill-to) and shipping address (ship-to)",
+        "Forced Pickups": "Urgent or mandatory pickup requests that bypass standard scheduling",
+        "Employee Purchases (Wayne)": "Purchases made by employees, handled through the Wayne facility"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

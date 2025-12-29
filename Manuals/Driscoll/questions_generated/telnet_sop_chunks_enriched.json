@@ -1,0 +1,4133 @@
+{
+  "source_file": "manuals\\Driscoll\\Sales\\telnet_sop_chunks.json",
+  "enriched_at": "2025-12-22T10:36:30.949737",
+  "chunk_count": 49,
+  "chunks": [
+    {
+      "id": "order_entry_basics",
+      "content": "Order Entry (Option 1) is for NEW orders with next day delivery (except Friday-Saturday). Enter operator number, then customer number (or type name to search). For multiple ship-to addresses, enter '?' and hit Enter to cycle through, press F4 to accept. Enter PO in Reference Number field if required, or Enter to skip. Use arrow keys to select delivery date per transportation guidelines.",
+      "content_hash": "14de0b142de8cab8",
+      "section_title": "order_entry - navigation",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 0,
+      "token_count": 81,
+      "_original": {
+        "keywords": [
+          "enter order",
+          "new order",
+          "start order",
+          "option 1",
+          "next day delivery"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "navigation"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "enter",
+        "type",
+        "search",
+        "cycle",
+        "accept",
+        "skip",
+        "select",
+        "create",
+        "lookup"
+      ],
+      "entities": [
+        "order",
+        "customer",
+        "purchase_order",
+        "ship_to_address",
+        "delivery_date",
+        "operator_number",
+        "reference_number"
+      ],
+      "actors": [
+        "operator",
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "new_order",
+        "next_day_delivery",
+        "friday_saturday_exception",
+        "multiple_ship_to_addresses",
+        "po_required",
+        "transportation_guidelines"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I start a new order for next day delivery using Option 1?",
+        "What if the customer I'm entering has multiple ship-to addresses?",
+        "In OE Option 1, how do I cycle through ship-tos with '?' and hit F4 to accept?",
+        "Ugh, the ship-to screen is looping and won't let me proceed\u2014what now?",
+        "Do I have to enter the PO in the Reference Number field, or can I skip it?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core order entry process for new next-day orders, clear step-by-step navigation, mostly self-contained but references external guidelines.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "Order Entry": "System module (Option 1) for entering new customer orders",
+        "ship-to addresses": "Multiple delivery addresses associated with a customer",
+        "operator number": "Unique identifier for the user or operator",
+        "customer number": "Unique identifier for the customer",
+        "Reference Number field": "Designated field for entering purchase order or reference details",
+        "transportation guidelines": "Company rules dictating allowable delivery dates based on transport schedules"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "order_entry_product_search",
+      "content": "In an open order: 'L' + Enter = Look Up (customer's order history). Spacebar searches within history, sorted by last order date. 'X' or down arrow exits history. 'A' + Enter = Alpha search for all products (new items). In Alpha: enter line number to select item. Blue highlighted items = previously purchased by customer.",
+      "content_hash": "6dc8cbb00dc3ac76",
+      "section_title": "order_entry - product_lookup",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 1,
+      "token_count": 71,
+      "_original": {
+        "keywords": [
+          "find product",
+          "alpha search",
+          "product history",
+          "lookup",
+          "L",
+          "A"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "product_lookup"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "lookup",
+        "search",
+        "exit",
+        "select",
+        "enter",
+        "purchase"
+      ],
+      "entities": [
+        "order",
+        "customer",
+        "product",
+        "order_history"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "open_order",
+        "previously_purchased",
+        "new_items",
+        "sorted_by_last_order_date"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I look up a customer's order history in an open order?",
+        "What if I need to add a new product not in the customer's history?",
+        "In product lookup, how does spacebar work in the order history?",
+        "What do blue highlighted items mean during alpha search?",
+        "I'm stuck in the order history screen and can't exit \u2013 what do I press?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core order entry process for product lookup, clear keystroke steps, self-contained for common scenario",
+      "acronyms": {},
+      "jargon": {
+        "open order": "A system mode or screen for entering or managing ongoing customer orders",
+        "Look Up": "Function to view a customer's order history, accessed via 'L' + Enter",
+        "Alpha search": "Alphabetical search for all products including new items, accessed via 'A' + Enter in open order",
+        "line number": "Numeric identifier for items in search results, entered to select an item",
+        "Blue highlighted items": "Products previously purchased by the customer, visually distinguished in the search"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "order_entry_quantity_splits",
+      "content": "After selecting item, enter case count (or Enter for 1 case). To SPLIT a case: enter quantity, then press LEFT ARROW key. F1 after item selection (before qty) shows stock status. Up arrow in stock status shows incoming orders/transfers from Amsterdam. Down arrow shows committed quantity.",
+      "content_hash": "3cfe0c52ec90078d",
+      "section_title": "order_entry - quantities",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 2,
+      "token_count": 59,
+      "_original": {
+        "keywords": [
+          "case count",
+          "split case",
+          "quantity",
+          "how to split",
+          "left arrow"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "quantities"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "select",
+        "enter",
+        "split",
+        "press",
+        "show"
+      ],
+      "entities": [
+        "item",
+        "case",
+        "quantity",
+        "stock_status",
+        "incoming_orders",
+        "transfers",
+        "committed_quantity"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter the case count after selecting an item in order entry?",
+        "How do you split a case when entering quantities?",
+        "What does F1 do right after I select an item?",
+        "I entered the quantity for a split but nothing happened\u2014what key next?",
+        "What do the up and down arrows mean in stock status for incoming from Amsterdam and committed quantity?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core order entry process for handling quantities and stock checks, common bounded scenario in UI, needs basic training on telnet interface, self-contained steps, highly actionable with clear key instructions",
+      "acronyms": {},
+      "jargon": {
+        "case": "Unit of item packaging or counting (e.g., a box or carton)",
+        "SPLIT a case": "Procedure to divide a full case into a partial quantity by entering amount and pressing LEFT ARROW key",
+        "stock status": "Inventory information displayed by pressing F1 after item selection (before quantity)",
+        "Up arrow": "Indicator in stock status for incoming orders or transfers (e.g., from Amsterdam)",
+        "Down arrow": "Indicator in stock status for committed quantity",
+        "committed quantity": "Amount of stock reserved or allocated to existing orders",
+        "qty": "Quantity of items or cases"
+      },
+      "numeric_thresholds": {
+        "default_case_count": {
+          "value": 1,
+          "unit": "case",
+          "context": "Default when pressing Enter after item selection without specifying count"
+        }
+      }
+    },
+    {
+      "id": "order_entry_corrections",
+      "content": "To UNDO price, quantity, or item: press UP ARROW to go back. To DELETE wrong item: press F4 (change mode), enter 'D' on qty line, press F4 again to return to ADD mode. Order number appears at top right after first item accepted - always write it down.",
+      "content_hash": "c2a563a79441cf73",
+      "section_title": "order_entry - editing",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 3,
+      "token_count": 62,
+      "_original": {
+        "keywords": [
+          "undo",
+          "delete item",
+          "wrong item",
+          "fix order",
+          "F4",
+          "change mode"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "editing"
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "undo",
+        "delete",
+        "go back",
+        "press",
+        "change mode",
+        "enter",
+        "return",
+        "write down",
+        "accept"
+      ],
+      "entities": [
+        "order",
+        "order_number",
+        "item",
+        "price",
+        "quantity"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "wrong item",
+        "first item accepted"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I undo a price or quantity I entered wrong in order entry?",
+        "What if I added the wrong item\u2014how do I delete it?",
+        "How do you use F4 to change mode and enter 'D' on the qty line to delete?",
+        "I messed up and entered the wrong item again\u2014help, how do I fix it?!",
+        "Where does the order number appear after the first item, and why write it down?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core order entry editing procedures for frequent error correction; highly actionable keystroke instructions, self-contained with minimal assumptions beyond basic system access.",
+      "acronyms": {},
+      "jargon": {
+        "UP ARROW": "Key to undo price, quantity, or item entry",
+        "F4": "Function key to change modes (e.g., to DELETE or back to ADD)",
+        "qty line": "Line for entering or modifying quantity in item entry",
+        "ADD mode": "Default mode for adding items to the order",
+        "DELETE": "Mode for removing wrong items (entered as 'D' on qty line)",
+        "Order number": "Unique identifier displayed at top right after first item accepted"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "order_entry_review_exit",
+      "content": "In order: 'R' = redisplay all items. F2 = Detail History (full customer order history). UP ARROW exits order and shows Net Income, GP%, GP$, cases, splits. At print prompt: Y=Yes (line version), N=No, U=Uniform (customer version), E=Excel version.",
+      "content_hash": "5fb90b9593b857b8",
+      "section_title": "order_entry - completion",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 4,
+      "token_count": 50,
+      "_original": {
+        "keywords": [
+          "review order",
+          "exit order",
+          "print order",
+          "redisplay",
+          "R",
+          "F2"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "completion"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "redisplay",
+        "exit",
+        "show",
+        "print"
+      ],
+      "entities": [
+        "order",
+        "items",
+        "customer"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "print_prompt"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I redisplay all the items in the order?",
+        "What does F2 do when I'm finishing up an order?",
+        "I'm at the print prompt and confused - what are Y, N, U, and E for?",
+        "How do I exit the order and see Net Income, GP%, cases, and splits?",
+        "What happens if I hit the up arrow before printing, and what's the sequence of keys?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core shortcuts for order entry completion in telnet system, highly actionable for users at that screen, assumes basic interface familiarity",
+      "acronyms": {
+        "GP%": "Gross Profit percentage",
+        "GP$": "Gross Profit dollars"
+      },
+      "jargon": {
+        "Detail History": "full customer order history",
+        "Net Income": "net income metric displayed on order exit",
+        "cases": "product cases metric",
+        "splits": "order splits metric",
+        "line version": "line-item print format",
+        "Uniform": "customer version print format",
+        "Excel version": "Excel print format"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "invoice_entry_overview",
+      "content": "Invoice Entry is for same-day Cash & Carry pickups OR invoicing customers for received product. Same steps as Option 1 with extras: prompted for pickup time (enter as 12:30 or 12.30). Both order number AND invoice number appear. Used to send order to Food Depot for picking.",
+      "content_hash": "bc9bc63f96b311c1",
+      "section_title": "invoice_entry - process",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 5,
+      "token_count": 61,
+      "_original": {
+        "keywords": [
+          "invoice entry",
+          "cash and carry",
+          "same day",
+          "pickup",
+          "food depot"
+        ],
+        "email": "",
+        "category": "invoice_entry",
+        "subcategory": "process"
+      },
+      "query_types": [
+        "how_to",
+        "definition",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "process",
+        "invoice",
+        "enter",
+        "pickup",
+        "send",
+        "pick"
+      ],
+      "entities": [
+        "invoice",
+        "order",
+        "customer",
+        "product"
+      ],
+      "actors": [
+        "customer",
+        "Food Depot"
+      ],
+      "conditions": [
+        "same-day",
+        "Cash & Carry",
+        "pickups",
+        "received product"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What is Invoice Entry used for?",
+        "How do I enter the pickup time when using Invoice Entry?",
+        "For same-day Cash & Carry pickups, what's different about the invoice_entry process?",
+        "Why does Invoice Entry show both order number and invoice number, and how does it work with Food Depot?",
+        "The system is prompting me for pickup time in Invoice Entry and I don't know the format - what do I do?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 6,
+      "actionability_score": 8,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for invoicing same-day pickups, bounded use case with clear extras to base steps (Option 1), straightforward but needs some prior context",
+      "acronyms": {},
+      "jargon": {
+        "Invoice Entry": "Process for same-day Cash & Carry pickups or invoicing customers for received product",
+        "Cash & Carry": "Business model for same-day pickups where customers pay cash and take goods immediately",
+        "Food Depot": "Facility or department where orders are sent for picking"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "invoice_entry_printing",
+      "content": "Invoice Entry print sequence: Y=Yes to print, T=Temperature Zone (helps warehouse efficiency), 29=Cash & Carry printer, N=don't show GP, Y=show prices. This sends order to Cash & Carry. If only invoicing (no pickup), no need to send to printer.",
+      "content_hash": "97b9ba9a8da20f4b",
+      "section_title": "invoice_entry - printing",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 6,
+      "token_count": 50,
+      "_original": {
+        "keywords": [
+          "print invoice",
+          "cash carry printer",
+          "printer 29",
+          "temperature zone"
+        ],
+        "email": "",
+        "category": "invoice_entry",
+        "subcategory": "printing"
+      },
+      "query_types": [
+        "definition",
+        "reference",
+        "how_to",
+        "policy"
+      ],
+      "verbs": [
+        "print",
+        "send",
+        "show",
+        "invoice"
+      ],
+      "entities": [
+        "invoice",
+        "order",
+        "printer"
+      ],
+      "actors": [
+        "warehouse"
+      ],
+      "conditions": [
+        "only invoicing",
+        "no pickup",
+        "temperature_zone",
+        "cash_carry"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does 'Y' mean in the print sequence field for invoice entry?",
+        "How do I send an order to the Cash & Carry printer during invoice entry?",
+        "What's the 'T' code for in print sequence, and how does Temperature Zone help warehouse efficiency?",
+        "If I'm just invoicing with no pickup, do I still need to set the print sequence or send to printer?",
+        "Ugh, my invoice print is showing GP and I don't want it - what print sequence do I use to hide GP?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core invoicing process for Cash & Carry orders, provides clear print code options and conditional use, actionable for trained users with minor context needed.",
+      "acronyms": {
+        "Y": "Yes",
+        "T": "Temperature Zone",
+        "N": "don't show GP"
+      },
+      "jargon": {
+        "Invoice Entry print sequence": "Field controlling print options (Y=print, T=Temperature Zone, 29=Cash & Carry printer, N=don't show GP, Y=show prices)",
+        "Cash & Carry": "Order destination/printer (code 29) for cash and carry operations",
+        "GP": "Item not to show on print (likely Gross Profit)",
+        "Temperature Zone": "Print code that helps warehouse efficiency"
+      },
+      "numeric_thresholds": {
+        "Cash & Carry printer code": {
+          "value": 29,
+          "unit": "",
+          "context": "Identifier for Cash & Carry printer"
+        }
+      }
+    },
+    {
+      "id": "order_inquiry_correction",
+      "content": "Order/Invoice Inquiry/Correction (Option 3) returns to previously entered orders. Shipped orders from last 48 hours are viewable but NOT changeable. Enter order number, or 'C' to search by customer number, 'I' for invoice number, 'P' for PO number. Up arrow/F3 cycles through multiple orders.",
+      "content_hash": "8650d04a734f32ab",
+      "section_title": "order_management - inquiry",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 7,
+      "token_count": 57,
+      "_original": {
+        "keywords": [
+          "find order",
+          "order inquiry",
+          "correction",
+          "option 3",
+          "change order",
+          "shipped orders"
+        ],
+        "email": "",
+        "category": "order_management",
+        "subcategory": "inquiry"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "search",
+        "view",
+        "cycle",
+        "inquire",
+        "correct"
+      ],
+      "entities": [
+        "order",
+        "invoice",
+        "purchase_order",
+        "customer"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "shipped orders last 48 hours viewable but not changeable",
+        "multiple orders"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I access previously entered orders with Option 3?",
+        "What if I need to change a shipped order from yesterday?",
+        "How do I search for an order by PO number in inquiry?",
+        "Why can't I edit this order that shipped 24 hours ago in Option 3?",
+        "How do I cycle through multiple orders using up arrow or F3?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core order management inquiry process; provides clear, self-contained steps for frequent user task with specific inputs and limitations.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {},
+      "numeric_thresholds": {
+        "shipped_orders_change_restriction": {
+          "value": 48,
+          "unit": "hours",
+          "context": "Shipped orders from last 48 hours are viewable but NOT changeable"
+        }
+      }
+    },
+    {
+      "id": "order_inquiry_editing",
+      "content": "In Order Inquiry: Enter=totals, A=add items, C=change (qty/price) or Delete, F3=next open order, R=review/update order, L=review in entry order. IMPORTANT: To reduce case count, you MUST delete the item then re-add with correct count. Reducing without delete/add causes shortage on invoice.",
+      "content_hash": "9ad9d60d6ee38cff",
+      "section_title": "order_management - editing",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 8,
+      "token_count": 53,
+      "_original": {
+        "keywords": [
+          "change quantity",
+          "reduce cases",
+          "delete add",
+          "order correction"
+        ],
+        "email": "",
+        "category": "order_management",
+        "subcategory": "editing"
+      },
+      "query_types": [
+        "how_to",
+        "policy"
+      ],
+      "verbs": [
+        "enter",
+        "add",
+        "change",
+        "delete",
+        "review",
+        "update"
+      ],
+      "entities": [
+        "order",
+        "item",
+        "invoice"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "shortage"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I add items in Order Inquiry?",
+        "What does the C key do in Order Inquiry?",
+        "How do I switch to the next open order?",
+        "I lowered the case count but now the invoice is short\u2014what gives?",
+        "What's the exact process to reduce case count without messing up the invoice?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core order management process with critical tip to prevent invoicing shortages; specific to telnet interface commands, requires basic system familiarity, highly actionable steps.",
+      "acronyms": {
+        "qty": "quantity"
+      },
+      "jargon": {
+        "Order Inquiry": "System screen or function for viewing order details",
+        "open order": "Order that is pending or not yet completed",
+        "entry order": "Sequence in which items were originally entered",
+        "case count": "Quantity measured in cases (packaging units)",
+        "shortage on invoice": "Discrepancy where invoiced quantity is less than expected due to improper adjustment"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "order_header_correction",
+      "content": "Order/Invoice Header Correction (Option 4) adjusts OPEN order info (not yet invoiced/shipped). Enter order number, then line number to adjust (e.g., #17 for PO Number). Lines 22-24 add remarks that show on invoice (e.g., 'Driver Pick Up Check'). DATE CHANGES must go to Routing & Customer Service Supervisor.",
+      "content_hash": "568e9143ff067bbc",
+      "section_title": "order_management - header",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 9,
+      "token_count": 62,
+      "_original": {
+        "keywords": [
+          "header correction",
+          "change PO",
+          "add remarks",
+          "option 4",
+          "invoice remarks"
+        ],
+        "email": "",
+        "category": "order_management",
+        "subcategory": "header"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "escalation",
+        "reference"
+      ],
+      "verbs": [
+        "adjust",
+        "enter",
+        "add",
+        "modify",
+        "escalate"
+      ],
+      "entities": [
+        "order",
+        "invoice",
+        "purchase_order"
+      ],
+      "actors": [
+        "sales_rep",
+        "supervisor"
+      ],
+      "conditions": [
+        "open_order",
+        "not_invoiced",
+        "not_shipped",
+        "date_changes"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I use Option 4 to correct an open order header?",
+        "What line number changes the PO Number in header correction?",
+        "How do I add remarks like 'Driver Pick Up Check' that show up on the invoice?",
+        "I can't change the date on this order header\u2014what do I do now?",
+        "Who handles date changes for Order/Invoice Header Corrections?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core order management process for header corrections on open orders; provides clear steps, examples, and escalation; self-contained for trained users in the system.",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "OPEN order": "Order not yet invoiced or shipped",
+        "Order/Invoice Header Correction": "Process (Option 4) to adjust open order information",
+        "line number": "Specific field identifier on order entry screen (e.g., #17 for PO Number)",
+        "remarks": "Notes added to specific lines (22-24) that appear on the invoice",
+        "Routing & Customer Service Supervisor": "Role responsible for handling date changes"
+      },
+      "numeric_thresholds": {
+        "option_number": {
+          "value": 4,
+          "context": "Order/Invoice Header Correction"
+        },
+        "po_line_number": {
+          "value": 17,
+          "context": "Line number for PO Number adjustment"
+        },
+        "remarks_lines": {
+          "value": "22-24",
+          "context": "Lines to add remarks shown on invoice"
+        }
+      }
+    },
+    {
+      "id": "call_sheet_inquiry",
+      "content": "Call Sheet Inquiry (Option 5) shows customer product history. Enter customer number, Enter to search all items. Shows order history with pricing and last order date. End options: Enter=return to menu, enter item number to delete from history, 'COPY' to copy to bid (Option 27), 'P' to print.",
+      "content_hash": "4ca5a8cfed06336b",
+      "section_title": "customer_data - history",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 10,
+      "token_count": 62,
+      "_original": {
+        "keywords": [
+          "call sheet",
+          "order history",
+          "product history",
+          "option 5",
+          "customer history"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "history"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "search",
+        "show",
+        "delete",
+        "copy",
+        "print",
+        "return"
+      ],
+      "entities": [
+        "customer",
+        "customer_number",
+        "product_history",
+        "order_history",
+        "item",
+        "item_number",
+        "pricing",
+        "bid"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I access a customer's product history and order details using Option 5?",
+        "What info shows up when I run Call Sheet Inquiry for a cust number?",
+        "I'm in Call Sheet Inquiry but want to delete an item from the history - how?",
+        "How do I copy customer order history from the call sheet to a bid?",
+        "What if I type 'P' at the end of Option 5 - what happens?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core process for customer history in sales/support; specific to Option 5 but provides clear, self-contained steps for immediate use.",
+      "acronyms": {},
+      "jargon": {
+        "Call Sheet Inquiry": "System menu option (Option 5) for viewing customer product history and order history including pricing and last order date",
+        "bid": "Menu option (Option 27) that inquiry data can be copied to"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "stock_status_navigation",
+      "content": "Stock Status Inquiry (Option 6) shows product availability, prices, manufacturer numbers. Enter product number if known, or 'A' for Alpha search. Search by product name, brand, vendor, description, manufacturer number - max 2 words, watch spelling. Products listed 1-10, enter line number to view details.",
+      "content_hash": "c6c143a23cd979b3",
+      "section_title": "inventory - lookup",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 11,
+      "token_count": 58,
+      "_original": {
+        "keywords": [
+          "stock status",
+          "check inventory",
+          "option 6",
+          "product availability",
+          "alpha search"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": "lookup"
+      },
+      "query_types": [
+        "lookup",
+        "how_to"
+      ],
+      "verbs": [
+        "enter",
+        "search",
+        "view",
+        "lookup",
+        "inquire"
+      ],
+      "entities": [
+        "product",
+        "inventory",
+        "vendor"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "known product number",
+        "alpha search",
+        "max 2 words",
+        "watch spelling",
+        "products listed 1-10"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I check product availability using Option 6?",
+        "What if I don't know the product number for Stock Status Inquiry?",
+        "Can I search by vendor or manufacturer number in the alpha search?",
+        "My alpha search isn't finding the product even though I spelled it right\u2014what's wrong?",
+        "After Option 6 lists products 1-10, how do I get full details on one?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core inventory lookup function, frequently used in business ops; provides clear, direct steps with minimal prior context needed",
+      "acronyms": {},
+      "jargon": {
+        "Stock Status Inquiry": "Menu option (6) to check product availability, prices, and manufacturer numbers",
+        "Alpha search": "Option 'A' to search products by name, brand, vendor, description, or manufacturer number (max 2 words)",
+        "line number": "Number (1-10) of listed product to select for details"
+      },
+      "numeric_thresholds": {
+        "max_search_words": {
+          "value": 2,
+          "unit": "words",
+          "context": "Limit for search terms by product name, brand, vendor, description, manufacturer number"
+        },
+        "products_listed": {
+          "value": 10,
+          "unit": "",
+          "context": "Products displayed numbered 1-10"
+        }
+      }
+    },
+    {
+      "id": "stock_status_details",
+      "content": "Stock Status screen shows: Item#, (S)=splittable, Kosher grade, description, brand, manufacturer#, physical cases/pieces available, temp zone, base cost, zone (R=Refrigerated, D=Dry, F=Frozen), warehouse (01=Clifton, 02=Amsterdam), slot#, weight, pack size, buyer. 'QTY AVAILABLE'=for sale, 'QTY ON-ORDER'=ordered by purchasing. Numbers with 'P'=individual pieces.",
+      "content_hash": "df6fbba6f56744b0",
+      "section_title": "inventory - product_info",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 12,
+      "token_count": 53,
+      "_original": {
+        "keywords": [
+          "stock details",
+          "qty available",
+          "qty on order",
+          "amsterdam",
+          "warehouse"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": "product_info"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "lookup",
+        "shows"
+      ],
+      "entities": [
+        "inventory",
+        "warehouse"
+      ],
+      "actors": [
+        "buyer",
+        "purchasing_agent"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does (S) mean next to an Item# on the Stock Status screen?",
+        "What's the difference between QTY AVAILABLE and QTY ON-ORDER on Stock Status?",
+        "What do the zone codes R, D, F stand for?",
+        "I'm looking at Stock Status and the quantity has a 'P' by it\u2014what the heck does that mean?",
+        "How do I figure out if an item is splittable, its temp zone, Kosher grade, and warehouse location from the Stock Status screen?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core inventory reference for Stock Status screen, frequently used in operations; lists fields clearly and self-contained for immediate interpretation and action.",
+      "acronyms": {
+        "S": "splittable",
+        "R": "Refrigerated",
+        "D": "Dry",
+        "F": "Frozen",
+        "P": "individual pieces",
+        "01": "Clifton",
+        "02": "Amsterdam"
+      },
+      "jargon": {
+        "Item#": "Item identifier number",
+        "manufacturer#": "Manufacturer identifier number",
+        "Kosher grade": "Certification level for kosher dietary compliance",
+        "temp zone": "Temperature zone for storage",
+        "base cost": "Base purchase cost of the item",
+        "zone": "Storage zone type (R=Refrigerated, D=Dry, F=Frozen)",
+        "slot#": "Specific warehouse storage slot number",
+        "pack size": "Number of units per package",
+        "QTY AVAILABLE": "Quantity available for sale",
+        "QTY ON-ORDER": "Quantity ordered by purchasing department",
+        "physical cases/pieces available": "Actual inventory count in cases or individual pieces"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "stock_status_actions",
+      "content": "Stock Status actions: F3/up arrow=view incoming POs, F4/down arrow=view open customer orders (enter line# to go to order), F10=Amsterdam product info (F10 again returns to Clifton). LEFT ARROW/F2=additional info page (manufacturer#, vendor for special orders). Type 'BUYER' for buyer contact info.",
+      "content_hash": "ea288aa159c62e79",
+      "section_title": "inventory - navigation",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 13,
+      "token_count": 53,
+      "_original": {
+        "keywords": [
+          "incoming product",
+          "purchase orders",
+          "F3",
+          "F4",
+          "F10",
+          "buyer contact"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": "navigation"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "view",
+        "enter",
+        "go",
+        "return",
+        "type"
+      ],
+      "entities": [
+        "purchase_order",
+        "customer",
+        "order",
+        "inventory",
+        "product",
+        "manufacturer",
+        "vendor",
+        "special_order"
+      ],
+      "actors": [
+        "buyer",
+        "sales_rep"
+      ],
+      "conditions": [
+        "special_order"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I view incoming POs from the stock status screen?",
+        "What does F10 do in stock status, and how do I get back?",
+        "I'm stuck in stock status and need the manufacturer number or vendor for a special order\u2014what key do I hit?",
+        "In inventory navigation, how do I pull up open customer orders and jump to a specific line number?",
+        "How do I quickly get buyer contact info while in stock status?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        1
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core inventory navigation for Stock Status screen, frequently needed for business processes; specific to that screen but straightforward shortcuts that are self-contained and immediately usable by basic users.",
+      "acronyms": {
+        "POs": "Purchase Orders"
+      },
+      "jargon": {
+        "Stock Status": "Screen or function for viewing and acting on stock information",
+        "incoming POs": "Purchase orders arriving from suppliers",
+        "open customer orders": "Unfulfilled orders from customers",
+        "line#": "Order line number",
+        "manufacturer#": "Manufacturer identifier",
+        "special orders": "Non-standard orders requiring specific vendors",
+        "buyer": "Procurement or purchasing contact",
+        "Amsterdam product info": "Product details from Amsterdam facility or system",
+        "Clifton": "Clifton facility or system location"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "stock_status_extra_fields",
+      "content": "Stock Status extra fields: ETA=arrival date incoming product, AVG COST=#17, SPLIT CASE=#42 (whether case splits), TAXABLE=#26, VENDOR=#38 (for special order forms), CS/PAL=#27 (cases per pallet), NET WEIGHT=#10, GROSS WEIGHT=#11.",
+      "content_hash": "4cd33fe1d1136556",
+      "section_title": "inventory - fields",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 14,
+      "token_count": 37,
+      "_original": {
+        "keywords": [
+          "ETA",
+          "average cost",
+          "split case",
+          "taxable",
+          "vendor",
+          "cases per pallet"
+        ],
+        "email": "",
+        "category": "inventory",
+        "subcategory": "fields"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [
+        "inventory",
+        "product",
+        "vendor",
+        "pallet",
+        "case",
+        "special_order_form"
+      ],
+      "actors": [
+        "vendor",
+        "sales_rep"
+      ],
+      "conditions": [
+        "case splits",
+        "special order"
+      ],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": true,
+      "synthetic_questions": [
+        "What does ETA mean in the Stock Status extra fields?",
+        "I'm confused by all these numbers in stock status \u2013 what is SPLIT CASE #42 for?",
+        "Which field number do I use for cases per pallet (CS/PAL)?",
+        "For special order forms, where does the VENDOR info go in extra fields? It's #38?",
+        "What's the difference between NET WEIGHT #10 and GROSS WEIGHT #11 in inventory fields?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core inventory field definitions with codes, vital for stock management processes, clear and self-contained reference for system users.",
+      "acronyms": {
+        "ETA": "arrival date incoming product",
+        "CS/PAL": "cases per pallet"
+      },
+      "jargon": {
+        "AVG COST": "average cost field",
+        "SPLIT CASE": "whether case splits",
+        "TAXABLE": "taxable status field",
+        "VENDOR": "vendor for special order forms",
+        "NET WEIGHT": "net weight field",
+        "GROSS WEIGHT": "gross weight field"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "ar_inquiry",
+      "content": "A/R Inquiry (Option 7) shows all customer invoices (paid & unpaid), credits, checks. Enter customer number, Enter for ALL invoices (from account opening), or 'O' for OPEN invoices only. Shows: invoice date, invoice#, debits (order amount), credits (submitted), line balance, running balance (total owed), time frame.",
+      "content_hash": "94cf3c7d78af47ef",
+      "section_title": "accounts_receivable - lookup",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 15,
+      "token_count": 59,
+      "_original": {
+        "keywords": [
+          "AR",
+          "accounts receivable",
+          "invoices",
+          "option 7",
+          "unpaid invoices",
+          "credits",
+          "balance"
+        ],
+        "email": "",
+        "category": "accounts_receivable",
+        "subcategory": "lookup"
+      },
+      "query_types": [
+        "lookup",
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "show",
+        "lookup",
+        "inquire"
+      ],
+      "entities": [
+        "customer",
+        "invoice",
+        "credit",
+        "check",
+        "payment"
+      ],
+      "actors": [
+        "customer",
+        "accounting",
+        "sales_rep"
+      ],
+      "conditions": [
+        "paid",
+        "unpaid",
+        "open",
+        "all invoices"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I pull up all invoices for a customer in A/R Inquiry?",
+        "What if I only want to see open invoices in Option 7?",
+        "In A/R Inquiry, what's the difference between line balance and running balance for a customer's debits and credits?",
+        "Ugh, why is Option 7 showing every invoice since account opening when I just need the open ones?",
+        "How do I use customer number in accounts receivable lookup to view paid and unpaid invoices, credits, and checks?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core AR business process frequently used for customer balance checks; specific to Option 7 inquiry with clear, self-contained steps that require minimal expertise and enable immediate action.",
+      "acronyms": {
+        "A/R": "Accounts Receivable"
+      },
+      "jargon": {
+        "A/R Inquiry": "Function (Option 7) to view customer invoices (paid and unpaid), credits, and checks",
+        "debits": "Order amounts charged to the customer",
+        "credits": "Amounts credited to the customer (submitted)",
+        "line balance": "Balance for each individual transaction line",
+        "running balance": "Cumulative total owed by the customer",
+        "OPEN invoices": "Unpaid invoices only",
+        "time frame": "Date range or period covered by the inquiry"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "ar_inquiry_options",
+      "content": "A/R Inquiry options: H=print A/R info, C=view submitted payment checks, L=lookup invoice info & credits. Options N, U-S not used.",
+      "content_hash": "d0d224ab02c1f458",
+      "section_title": "accounts_receivable - actions",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 16,
+      "token_count": 26,
+      "_original": {
+        "keywords": [
+          "print AR",
+          "view checks",
+          "lookup invoice",
+          "H",
+          "C",
+          "L"
+        ],
+        "email": "",
+        "category": "accounts_receivable",
+        "subcategory": "actions"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "print",
+        "view",
+        "lookup"
+      ],
+      "entities": [
+        "invoice",
+        "payment",
+        "credit"
+      ],
+      "actors": [
+        "credit_analyst",
+        "accounting"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I print A/R info in the inquiry screen?",
+        "What's the option for viewing submitted payment checks in A/R?",
+        "In A/R inquiry, how do I lookup invoice info and credits?",
+        "Why are options N through S not used in A/R inquiry\u2014driving me nuts!",
+        "What are all the available A/R Inquiry options and what do they do?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core A/R menu options for frequent inquiries, self-contained list of actions, straightforward for trained users",
+      "acronyms": {
+        "A/R": "Accounts Receivable"
+      },
+      "jargon": {
+        "A/R Inquiry": "Menu or function for inquiring about Accounts Receivable details",
+        "payment checks": "Checks submitted for payment processing",
+        "invoice info": "Details about customer invoices",
+        "credits": "Credit memos or adjustments in Accounts Receivable"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "customer_search",
+      "content": "Customer Search (Option 8) - 'Do We Sell This Customer?' Search by name, phone, city, state, or zip code. Shows account name/number if opened, plus last delivery date on far right. View full account info in Options 7 and 11.",
+      "content_hash": "3cc99f222cebf352",
+      "section_title": "customer_data - search",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 17,
+      "token_count": 52,
+      "_original": {
+        "keywords": [
+          "find customer",
+          "customer search",
+          "do we sell",
+          "option 8",
+          "last delivery"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "search"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "search",
+        "view",
+        "lookup"
+      ],
+      "entities": [
+        "customer",
+        "account"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I use Option 8 to check if we sell to a customer?",
+        "What if I only know a prospect's phone number or zip code\u2014can I search for them?",
+        "How do I run the 'Do We Sell This Customer?' search by city and state?",
+        "I can't find this customer in Option 8 even with their name\u2014what's wrong?",
+        "After Option 8 shows the account number and last delivery date, how do I view full details?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core customer lookup process in telnet system, frequently used in ops; specific to Option 8 but straightforward, self-contained with clear steps and minor cross-refs.",
+      "acronyms": {},
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "call_sheet_print",
+      "content": "Call Sheet Print (Option 9) prints customer call sheet with last purchase date/qty. Enter C=Customer (or E=email to self), C=Category, date range or Enter for all, S=Selection, customer#, Enter, printer# (100=email). Choose M=Monthly/W=Weekly/N=None usage, A=All items, Y/N for prices, bid prices, market prices, never-sold items.",
+      "content_hash": "a2877060466302a1",
+      "section_title": "customer_data - printing",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 18,
+      "token_count": 58,
+      "_original": {
+        "keywords": [
+          "print call sheet",
+          "order guide",
+          "option 9",
+          "email order guide"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "printing"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "print",
+        "enter",
+        "choose"
+      ],
+      "entities": [
+        "customer",
+        "call_sheet"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I print a customer call sheet using option 9?",
+        "What do I enter to email a call sheet to myself?",
+        "How can I get weekly usage, bid prices, and never-sold items on the call sheet print?",
+        "I'm lost with all these prompts for call sheet print\u2014what's the exact sequence?",
+        "What if I need a category call sheet for a specific date range with market prices?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 7,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for printing customer call sheets in sales/customer service workflow; specific to Option 9 with clear input steps, assumes basic system familiarity but highly actionable.",
+      "acronyms": {
+        "C": "Customer or Category",
+        "E": "email to self",
+        "S": "Selection",
+        "M": "Monthly",
+        "W": "Weekly",
+        "N": "None",
+        "A": "All items",
+        "qty": "quantity"
+      },
+      "jargon": {
+        "call sheet": "Customer report printed for sales calls including last purchase date and quantity",
+        "usage": "Customer or item usage statistics (selectable as Monthly, Weekly, or None)",
+        "bid prices": "Prices derived from bids",
+        "market prices": "Current market value prices",
+        "never-sold items": "Items that have never been sold"
+      },
+      "numeric_thresholds": {
+        "call_sheet_option": {
+          "value": 9,
+          "unit": "",
+          "context": "Menu option for Call Sheet Print"
+        },
+        "printer_email_code": {
+          "value": 100,
+          "unit": "printer#",
+          "context": "Printer number code for emailing the report"
+        }
+      }
+    },
+    {
+      "id": "call_sheet_email_guide",
+      "content": "To email Order Guide as PDF: Enter E for email, select C1 or C2 columns, Y/N for prices, enter customer number, enter your email address, Y/N to show brand. PDF sent to email entered.",
+      "content_hash": "fb149a167f4d1272",
+      "section_title": "customer_data - order_guide",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 19,
+      "token_count": 44,
+      "_original": {
+        "keywords": [
+          "email order guide",
+          "PDF order guide",
+          "send order guide"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "order_guide"
+      },
+      "query_types": [
+        "how_to"
+      ],
+      "verbs": [
+        "enter",
+        "select",
+        "email",
+        "send"
+      ],
+      "entities": [
+        "order_guide",
+        "customer",
+        "pdf"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I email the order guide as a PDF?",
+        "What are the steps to send a C1 column order guide PDF with prices to a customer's email?",
+        "How do I email an order guide PDF using C2 columns, no prices, no brands for customer #789?",
+        "I entered the customer number but no PDF came to my email\u2014what did I do wrong?",
+        "What if I want to hide brands when emailing the order guide PDF?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core procedure for emailing order guides in customer data process; clear, step-by-step, self-contained, and immediately usable with minimal system familiarity.",
+      "acronyms": {
+        "E": "email",
+        "Y/N": "Yes/No",
+        "PDF": "Portable Document Format"
+      },
+      "jargon": {
+        "Order Guide": "Customizable PDF document listing products or orders for a customer",
+        "C1 columns": "Specific column set option 1 in the Order Guide",
+        "C2 columns": "Specific column set option 2 in the Order Guide",
+        "customer number": "Unique identifier for a customer"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "customer_file_maintenance",
+      "content": "Customer File Maintenance (Option 11) shows Customer Master File: address, phone, salesperson, terms, class bid, delivery window. Enter customer# or A=Alpha search by name, P=phone search. To change delivery window, email Phil Carson & Routing. F1=A/R, F2=Graph, F3=Sales movement, F4=Second screen for permanent invoice remarks (#57, #58).",
+      "content_hash": "b3378077c3b52d4f",
+      "section_title": "customer_data - master_file",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 20,
+      "token_count": 61,
+      "_original": {
+        "keywords": [
+          "customer master",
+          "customer info",
+          "option 11",
+          "delivery window",
+          "customer file"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "master_file"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "search",
+        "change",
+        "email",
+        "show",
+        "display",
+        "maintain"
+      ],
+      "entities": [
+        "customer",
+        "customer_master_file",
+        "invoice",
+        "delivery_window"
+      ],
+      "actors": [
+        "salesperson",
+        "customer",
+        "phil_carson",
+        "routing"
+      ],
+      "conditions": [
+        "delivery_window"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I search for a customer by name in Option 11?",
+        "What if I only have a customer's phone number\u2014how do I find their master file?",
+        "How do I check sales movement for a customer from the Customer Master File?",
+        "I can't edit the delivery window in Option 11\u2014what do I do now?",
+        "In Customer File Maintenance, how do I get to the second screen for permanent invoice remarks #57 and #58, and what are the other F-keys for?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core customer data management process in business system, provides specific navigation and actions with minimal external needs",
+      "acronyms": {
+        "A/R": "Accounts Receivable"
+      },
+      "jargon": {
+        "Customer Master File": "Primary database record containing core customer details like address, phone, salesperson, terms, class bid, and delivery window",
+        "class bid": "Customer classification or bidding category used in pricing or procurement",
+        "delivery window": "Specified time frame for acceptable delivery of goods or services",
+        "Alpha search": "Search functionality for customers by alphabetical name order",
+        "phone search": "Search functionality for customers by phone number",
+        "Sales movement": "Customer sales history or transaction volume tracking",
+        "permanent invoice remarks": "Fixed comments or notes that appear on all invoices for the customer, stored in specific fields (#57, #58)"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "modify_call_sheet",
+      "content": "Modify Call Sheet Records (Option 12) adds/deletes items from customer Order Guide. Enter customer#, then product# (must know item# - print call sheet from Option 5 first). If item exists: D=Delete or C=Change price. If NEW item: prompted to submit price.",
+      "content_hash": "0ecdcae13d02688d",
+      "section_title": "customer_data - editing",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 21,
+      "token_count": 53,
+      "_original": {
+        "keywords": [
+          "modify call sheet",
+          "add item",
+          "delete item",
+          "option 12",
+          "order guide edit"
+        ],
+        "email": "",
+        "category": "customer_data",
+        "subcategory": "editing"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "modify",
+        "add",
+        "delete",
+        "enter",
+        "print",
+        "change",
+        "submit"
+      ],
+      "entities": [
+        "call_sheet",
+        "customer",
+        "order_guide",
+        "product",
+        "item"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "item_exists",
+        "new_item",
+        "must_know_item_number",
+        "print_call_sheet_first"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I add or delete items from a customer's Order Guide?",
+        "What do I enter first in Option 12 to modify Call Sheet Records?",
+        "What happens if the product# I enter in Option 12 already exists on the customer's call sheet?",
+        "The system says I must know the item# for Option 12 but I don't - how do I get it?",
+        "Using Option 12, can I change prices on existing Order Guide items or only add new ones?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core procedure for editing customer order guides in telnet system, specific to Option 12 but frequently needed for customer data tasks, clear actionable steps with minor prerequisite reference",
+      "acronyms": {},
+      "jargon": {
+        "Call Sheet Records": "Customer order item records modifiable via Option 12, printable from Option 5",
+        "Order Guide": "Customer-specific list of products or items",
+        "Option 12": "Menu option to add/delete/change items in customer Order Guide",
+        "Option 5": "Menu option to print call sheet"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "salesman_manifest",
+      "content": "Salesman Manifest (Option 13) - Telnet emails manifest report each morning showing all deliveries for the day. Use this option if email not received. Enter date (060114 format), printer# (100=email to self).",
+      "content_hash": "d03c3a2bf20f0a9c",
+      "section_title": "reports - delivery",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 22,
+      "token_count": 41,
+      "_original": {
+        "keywords": [
+          "manifest",
+          "delivery report",
+          "option 13",
+          "daily deliveries"
+        ],
+        "email": "",
+        "category": "reports",
+        "subcategory": "delivery"
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot"
+      ],
+      "verbs": [
+        "use",
+        "enter",
+        "email",
+        "receive"
+      ],
+      "entities": [
+        "salesman_manifest",
+        "manifest_report",
+        "deliveries"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "email_not_received"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I get the Salesman Manifest report if the morning email didn't arrive?",
+        "What do I do if I didn't receive the daily manifest email?",
+        "How do I run Telnet Option 13 to email the Salesman Manifest to myself?",
+        "Manifest email is missing again \u2013 how can I pull the deliveries report manually?",
+        "What's the exact date format and printer# for requesting the Salesman Manifest via Option 13?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 7,
+      "specificity": 7,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core process for accessing daily delivery reports via Telnet when emails fail, specific to Option 13 use case, simple instructions with clear format, highly self-contained and actionable",
+      "acronyms": {},
+      "jargon": {
+        "Salesman Manifest": "Daily report showing all deliveries for the day, accessible via Option 13 in Telnet",
+        "manifest report": "Report emailed each morning listing all deliveries for the day",
+        "Telnet": "System interface used to generate and email the manifest report",
+        "printer#": "Printer identifier number, where 100 is configured to email the report to self"
+      },
+      "numeric_thresholds": {
+        "option_number": {
+          "value": 13,
+          "context": "Telnet menu option for Salesman Manifest"
+        },
+        "date_format_example": {
+          "value": "060114",
+          "context": "Required date entry format (MMDDYY)"
+        },
+        "email_printer_number": {
+          "value": 100,
+          "context": "Printer number for emailing report to self"
+        }
+      }
+    },
+    {
+      "id": "daily_order_report",
+      "content": "Daily Salesman Order Report (Option 14) views daily order reports. Enter date, salesman# (once only), printer 100=email. Press Enter to final line, follow prompts: 1=send, 2=cancel, 3=change info.",
+      "content_hash": "08d6085fcb57a28c",
+      "section_title": "reports - orders",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 23,
+      "token_count": 36,
+      "_original": {
+        "keywords": [
+          "daily order report",
+          "option 14",
+          "order report"
+        ],
+        "email": "",
+        "category": "reports",
+        "subcategory": "orders"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "view",
+        "enter",
+        "press",
+        "send",
+        "cancel",
+        "change"
+      ],
+      "entities": [
+        "order_report",
+        "salesman"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I run the Daily Salesman Order Report?",
+        "What are the steps for Option 14 to email a salesman's daily orders?",
+        "What if I need to change the date or salesman# after entering it in Option 14?",
+        "I entered the date and salesman# for the daily report but the prompts aren't showing up\u2014what am I doing wrong?",
+        "How exactly do I use printer 100 to send the Daily Salesman Order Report via Option 14?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 7,
+      "specificity": 7,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core sales reporting process, specific to option 14 with clear steps, self-contained for trained users",
+      "acronyms": {},
+      "jargon": {
+        "Option 14": "Menu option to access Daily Salesman Order Report",
+        "salesman#": "Salesman identification number (entered once only)",
+        "printer 100": "Printer code specifying email output"
+      },
+      "numeric_thresholds": {
+        "menu_option": {
+          "value": 14,
+          "unit": "",
+          "context": "Accesses Daily Salesman Order Report"
+        },
+        "printer_code": {
+          "value": 100,
+          "unit": "",
+          "context": "Designates email for report output"
+        },
+        "send_prompt": {
+          "value": 1,
+          "unit": "",
+          "context": "Option to send the report"
+        },
+        "cancel_prompt": {
+          "value": 2,
+          "unit": "",
+          "context": "Option to cancel the report"
+        },
+        "change_prompt": {
+          "value": 3,
+          "unit": "",
+          "context": "Option to change information"
+        }
+      }
+    },
+    {
+      "id": "pickup_slip_overview",
+      "content": "Pick Up Slip (Option 15) enters pickups when customer returns product. CRITICAL: Only enter pickups AFTER an order exists to attach pickup to. Drivers won't do pickups without a slip. Option 1=Enter Pickup, Option 2=Pickups on File, Option 3=Pickup Status Inquiry.",
+      "content_hash": "e21a3466912a1386",
+      "section_title": "pickups - entry",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 24,
+      "token_count": 53,
+      "_original": {
+        "keywords": [
+          "pickup slip",
+          "return product",
+          "option 15",
+          "enter pickup"
+        ],
+        "email": "",
+        "category": "pickups",
+        "subcategory": "entry"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "attach",
+        "do",
+        "lookup",
+        "inquire"
+      ],
+      "entities": [
+        "Pick Up Slip",
+        "pickup",
+        "order",
+        "product",
+        "slip"
+      ],
+      "actors": [
+        "customer",
+        "driver"
+      ],
+      "conditions": [
+        "customer returns product",
+        "order exists",
+        "requires slip",
+        "drivers require slip"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter a pickup when a customer returns product?",
+        "What is Pick Up Slip Option 15 for?",
+        "What if I try to enter a pickup before the order exists?",
+        "Driver won't do the pickup - says no slip! What did I miss?",
+        "What are the options under Pick Up Slip for pickup entry, file, and status?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Critical core process for pickup entry with explicit warning and options, bounded to specific system function, clear for basic training, self-contained and directly actionable",
+      "acronyms": {},
+      "jargon": {
+        "Pick Up Slip": "Form (Option 15) used to enter pickups when a customer returns product",
+        "pickups": "Customer returns of product that require driver collection, must be attached to an existing order",
+        "slip": "Shorthand for Pick Up Slip, required document for drivers to perform pickups",
+        "Option 1": "Enter Pickup",
+        "Option 2": "Pickups on File",
+        "Option 3": "Pickup Status Inquiry"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pickup_slip_entry",
+      "content": "Enter Pickup (Option 15-1): Enter customer#, select Option 1, enter invoice# (or X if unknown/multiple), invoice date, credit dollar amount, product#, case count (F2 for split). Enter reason in NOTES (mispick, wrong item, dented). Y to post, then enter order# to attach pickup to.",
+      "content_hash": "85dacdf7be9eaf3f",
+      "section_title": "pickups - process",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 25,
+      "token_count": 57,
+      "_original": {
+        "keywords": [
+          "enter pickup",
+          "pickup process",
+          "credit amount",
+          "pickup notes"
+        ],
+        "email": "",
+        "category": "pickups",
+        "subcategory": "process"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "enter",
+        "select",
+        "post",
+        "attach",
+        "process",
+        "split",
+        "document"
+      ],
+      "entities": [
+        "customer",
+        "invoice",
+        "product",
+        "order",
+        "pickup",
+        "credit"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer",
+        "credit_analyst"
+      ],
+      "conditions": [
+        "mispick",
+        "wrong_item",
+        "dented",
+        "unknown_invoice",
+        "multiple_invoices",
+        "split"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter a pickup using option 15-1?",
+        "What do I enter for invoice# if it's unknown or there are multiple?",
+        "How do I process a mispick pickup with split cases using F2?",
+        "The pickup screen won't post after I enter everything\u2014what am I missing?",
+        "After posting a pickup for wrong item, how do I attach it to an order#?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for pickup entry in warehouse/credit operations, specific to Option 15-1 with clear steps, actionable for trained staff, mostly self-contained.",
+      "acronyms": {},
+      "jargon": {
+        "Pickup": "Procedure for entering customer returns or credits (accessed via Option 15-1)",
+        "mispick": "Error where the wrong item was picked or shipped",
+        "case count": "Quantity of product measured in cases",
+        "split": "Dividing a case into partial units (using F2 key)",
+        "NOTES": "Field for entering the reason for the pickup"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "pickup_slip_inquiry",
+      "content": "Pickups on File (Option 15-2) shows entered pickups alphabetically by account#. Enter to scroll, select by line#. Shows: customer#, name, city, time/date entered, order# assigned. Pickup Status Inquiry (Option 15-3) shows: customer#, name, delivery date, queued/date entered, printed by routing, route picking up.",
+      "content_hash": "fef730afeeae68db",
+      "section_title": "pickups - lookup",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 26,
+      "token_count": 55,
+      "_original": {
+        "keywords": [
+          "pickups on file",
+          "pickup status",
+          "find pickup"
+        ],
+        "email": "",
+        "category": "pickups",
+        "subcategory": "lookup"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "scroll",
+        "select",
+        "shows",
+        "lookup",
+        "inquire"
+      ],
+      "entities": [
+        "pickup",
+        "customer",
+        "account",
+        "order",
+        "route"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I access the Pickups on File using Option 15-2?",
+        "What details does Option 15-2 show for each entered pickup?",
+        "In Pickup Status Inquiry (Option 15-3), how do I check printed by routing and route picking up?",
+        "The Pickups on File list is by account# and I can't find my customer - how do I scroll and select?",
+        "What if I need the queued date or delivery date for a pickup status?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core lookup functions in pickup management process, specific to system options 15-2/15-3, straightforward for basic users, self-contained descriptions with direct usage info.",
+      "acronyms": {
+        "account#": "account number",
+        "customer#": "customer number",
+        "line#": "line number",
+        "order#": "order number"
+      },
+      "jargon": {
+        "pickups": "entered customer pickup requests/orders",
+        "Pickups on File": "menu option (15-2) displaying entered pickups alphabetically by account#",
+        "Pickup Status Inquiry": "menu option (15-3) for viewing pickup status details including customer info, delivery date, queued/date entered, printed by routing, route picking up",
+        "queued": "status indicating pickup is queued (with date entered)",
+        "printed by routing": "status indicating pickup has been printed by routing",
+        "route picking up": "status indicating route is currently picking up"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "quotes_overview",
+      "content": "Quotes (Option 16) enters 'faux' orders to price out potential or existing customers. If customer has account, use their customer#. If NO account, use your Quote Account# (from A/R). ALWAYS SET QUOTE FOR SUNDAY DELIVERY. Enter same as Option 1 order entry. Print follows prompts (auto-uniform/customer version).",
+      "content_hash": "ab7cebb89a8f8fde",
+      "section_title": "quotes - entry",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 27,
+      "token_count": 61,
+      "_original": {
+        "keywords": [
+          "quote",
+          "price quote",
+          "option 16",
+          "faux order",
+          "prospect"
+        ],
+        "email": "",
+        "category": "quotes",
+        "subcategory": "entry"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "use",
+        "set",
+        "print"
+      ],
+      "entities": [
+        "customer",
+        "order",
+        "quote",
+        "account"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [
+        "has_account",
+        "no_account",
+        "sunday_delivery"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter a quote for a potential customer?",
+        "What if the customer doesn't have an account\u2014whose customer# do I use for Option 16?",
+        "Do faux orders in quotes always need Sunday delivery set?",
+        "The print for my quote isn't working right\u2014what prompts do I follow?",
+        "Using my A/R Quote Account#, how do I price out an existing customer's order via Option 16 vs. Option 1?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core sales process for quote entry, specific steps with some system assumptions (e.g., Option 1), highly actionable for trained users",
+      "acronyms": {
+        "A/R": "Accounts Receivable"
+      },
+      "jargon": {
+        "faux orders": "Fake or simulated orders entered to generate pricing quotes for customers",
+        "customer#": "Customer account number or identifier",
+        "Quote Account#": "Designated account number from Accounts Receivable used for quote entries when customer lacks an account",
+        "Option 16": "System menu option for entering quotes",
+        "Option 1": "System menu option for standard order entry",
+        "auto-uniform/customer version": "Automated uniform print format or customer-specific print version"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "quotes_options",
+      "content": "Quote options: Option 2=Quote Changes (modify existing), Option 3=Quote Deletion/Change Date (adjust info or delete), Option 4=Quotes on File (view all). Quotes can copy to bid: at end of quote, enter 'COPY', then customer#.",
+      "content_hash": "a3606facdf96f110",
+      "section_title": "quotes - management",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 28,
+      "token_count": 44,
+      "_original": {
+        "keywords": [
+          "change quote",
+          "delete quote",
+          "copy quote to bid"
+        ],
+        "email": "",
+        "category": "quotes",
+        "subcategory": "management"
+      },
+      "query_types": [
+        "how_to",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "modify",
+        "change",
+        "adjust",
+        "delete",
+        "view",
+        "copy",
+        "enter"
+      ],
+      "entities": [
+        "quote",
+        "bid",
+        "customer"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I modify an existing quote?",
+        "What if I need to delete a quote or change its date?",
+        "How do I view Quotes on File?",
+        "I'm trying to delete this quote but can't find the right option\u2014what do I pick?",
+        "How do I copy a quote to a bid for a specific customer?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core business process for quote management, specific options and copy procedure, clear actions but assumes menu context",
+      "acronyms": {},
+      "jargon": {
+        "Quote Changes": "modify existing quotes",
+        "Quote Deletion/Change Date": "adjust quote information or delete",
+        "Quotes on File": "view all stored quotes",
+        "copy to bid": "copy a quote to a bid by entering 'COPY' followed by customer number",
+        "customer#": "customer number"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "download_bid_excel_item",
+      "content": "Download Bid to Excel by Item (Option 32): B=Bid, enter date range or Enter to skip, Y/N show pricing, A/U all items or usage only, I=Individual customer, Y/N 2nd line description, Y/N category/group, L/S long or short version, customer#, Enter. Bid emailed.",
+      "content_hash": "9a8d047ebdc3f082",
+      "section_title": "bids - export",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 29,
+      "token_count": 54,
+      "_original": {
+        "keywords": [
+          "download bid",
+          "bid excel",
+          "option 32",
+          "export bid",
+          "bid spreadsheet"
+        ],
+        "email": "",
+        "category": "bids",
+        "subcategory": "export"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "download",
+        "enter",
+        "skip",
+        "show",
+        "email"
+      ],
+      "entities": [
+        "bid",
+        "customer",
+        "item"
+      ],
+      "actors": [
+        "sales_rep",
+        "customer"
+      ],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I use Option 32 to download a bid to Excel by item?",
+        "What if I want to export only usage items for a specific customer in Option 32?",
+        "In the Bid to Excel by Item (Option 32), what do A/U stand for?",
+        "Ugh, Option 32 isn't emailing the bid after I enter the customer number\u2014what am I doing wrong?",
+        "How do I set up Option 32 for long version with pricing, categories, individual customer, no date range?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core procedure for bid export in telnet system, specific to Option 32 with clear sequential prompts, self-contained and highly actionable for users familiar with the interface.",
+      "acronyms": {
+        "B": "Bid",
+        "Y/N": "Yes/No",
+        "A/U": "All items or usage only",
+        "I": "Individual customer",
+        "L/S": "Long or short version"
+      },
+      "jargon": {
+        "Download Bid to Excel by Item": "Menu option for exporting bid data to Excel sorted by item",
+        "date range": "Period for filtering bid data",
+        "usage only": "Filter to include only items with recorded usage",
+        "2nd line description": "Secondary line of item description",
+        "category/group": "Item categorization or grouping",
+        "customer#": "Customer identifier number"
+      },
+      "numeric_thresholds": {
+        "option": 32,
+        "2nd": 2
+      }
+    },
+    {
+      "id": "download_bid_excel_line",
+      "content": "Download Bid to Excel by Line (Option 33) sends bid organized by line item. Same steps as Option 32.",
+      "content_hash": "e755b30f142fdc01",
+      "section_title": "bids - export",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 30,
+      "token_count": 24,
+      "_original": {
+        "keywords": [
+          "bid by line",
+          "option 33",
+          "line item bid"
+        ],
+        "email": "",
+        "category": "bids",
+        "subcategory": "export"
+      },
+      "query_types": [
+        "how_to",
+        "reference"
+      ],
+      "verbs": [
+        "download",
+        "send",
+        "organize"
+      ],
+      "entities": [
+        "bid",
+        "line_item"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I download a bid to Excel organized by line item?",
+        "What's Option 33 for in the bids-export section?",
+        "Are the steps for Option 33 the same as Option 32 when exporting bids by line?",
+        "My bid export isn't by line item\u2014do I need to use Option 33 instead?",
+        "In bids-export, how does 'Download Bid to Excel by Line (Option 33)' differ from Option 32?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 7,
+      "specificity": 8,
+      "complexity": 2,
+      "completeness_score": 4,
+      "actionability_score": 5,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core bid export process in business ops; highly specific to Option 33; simple to understand but incomplete without Option 32 steps; actionable only with prior context.",
+      "acronyms": {},
+      "jargon": {
+        "line item": "Individual components or entries in a bid or order document",
+        "Download Bid to Excel by Line": "Feature (Option 33) that exports bid data organized by line item to Excel format"
+      },
+      "numeric_thresholds": {
+        "Option 33": {
+          "value": 33,
+          "context": "Specific option for bid export by line"
+        },
+        "Option 32": {
+          "value": 32,
+          "context": "Related option with same steps for bid export"
+        }
+      }
+    },
+    {
+      "id": "back_order_entry",
+      "content": "Back Order Entry (Option 34) enters next-day delivery for shorted/mispicked product from current day's delivery. Allows small qty deliveries without affecting margin. Same as Option 1 but: Reference Number = previous ORDER#. FIRST item MUST be from previous order or system rejects. Saturday back orders require John Levatino approval.",
+      "content_hash": "f59680ac45dce872",
+      "section_title": "order_entry - back_orders",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 31,
+      "token_count": 63,
+      "_original": {
+        "keywords": [
+          "back order",
+          "shorted",
+          "mispick",
+          "option 34",
+          "next day backorder"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "back_orders"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "definition",
+        "reference"
+      ],
+      "verbs": [
+        "enter",
+        "deliver",
+        "reject",
+        "approve"
+      ],
+      "entities": [
+        "order",
+        "back_order",
+        "shipment",
+        "product",
+        "item"
+      ],
+      "actors": [
+        "sales_rep",
+        "supervisor"
+      ],
+      "conditions": [
+        "shortage",
+        "mispicked",
+        "backorder",
+        "saturday",
+        "small_qty"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter a back order for shorted items from today's delivery?",
+        "What's the difference between Option 34 and Option 1 when doing back orders?",
+        "The system rejected my Option 34 back order because the first item wasn't from the previous ORDER# - what gives?",
+        "What if I need to send a small quantity tomorrow for mispicked product without hurting the margin?",
+        "Who approves Saturday back orders entered with Option 34?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core process for handling shorted/mispicked deliveries via specific Option 34; actionable rules provided, minor reference to Option 1 reduces completeness slightly.",
+      "acronyms": {
+        "qty": "quantity"
+      },
+      "jargon": {
+        "Back Order Entry": "Process using Option 34 to enter next-day delivery for shorted or mispicked product from current day's delivery",
+        "shorted": "Product delivered in lesser quantity than ordered",
+        "mispicked": "Product incorrectly picked for delivery",
+        "margin": "Profit margin (small qty back order deliveries do not affect it)",
+        "Reference Number": "Field that must be set to the previous order number",
+        "back orders": "Entries for delivery of shorted or mispicked items from a previous order"
+      },
+      "numeric_thresholds": {
+        "system_option_back_order": {
+          "value": 34,
+          "unit": "",
+          "context": "Option for back order entry"
+        },
+        "system_option_standard": {
+          "value": 1,
+          "unit": "",
+          "context": "Standard option similar to back order entry"
+        },
+        "delivery_lead_time": {
+          "value": 1,
+          "unit": "day",
+          "context": "Next-day delivery for back orders"
+        },
+        "item_position_requirement": {
+          "value": 1,
+          "unit": "position",
+          "context": "FIRST item must be from previous order or system rejects"
+        }
+      }
+    },
+    {
+      "id": "cutshop_steaks_search",
+      "content": "Cut Shop steak search terms: FILET STK (filet steaks), STRIP STK (strip steaks), COWBOY (bone-in ribeyes frenched), RIB STK (bone not frenched), T-BONE (small filet), PORTERHOUSE (bigger filet), RIBEYE STK, SKIRT STK. Chops: LAMB RACK/SHOULDER/LOIN, VEAL RACK/LOIN, PORK LOIN/RACK.",
+      "content_hash": "bd52ad51beb462d1",
+      "section_title": "product_search - cutshop",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 32,
+      "token_count": 50,
+      "_original": {
+        "keywords": [
+          "filet",
+          "strip steak",
+          "ribeye",
+          "porterhouse",
+          "t-bone",
+          "steak search",
+          "cut shop"
+        ],
+        "email": "",
+        "category": "product_search",
+        "subcategory": "cutshop"
+      },
+      "query_types": [
+        "lookup",
+        "definition",
+        "reference"
+      ],
+      "verbs": [
+        "search",
+        "lookup"
+      ],
+      "entities": [
+        "FILET STK",
+        "STRIP STK",
+        "COWBOY",
+        "RIB STK",
+        "T-BONE",
+        "PORTERHOUSE",
+        "RIBEYE STK",
+        "SKIRT STK",
+        "LAMB RACK",
+        "LAMB SHOULDER",
+        "LAMB LOIN",
+        "VEAL RACK",
+        "VEAL LOIN",
+        "PORK LOIN",
+        "PORK RACK",
+        "steak",
+        "chop",
+        "cut_shop"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What\u2019s the search term for filet steaks in Cut Shop?",
+        "How do I find strip steaks or ribeyes in the Cut Shop?",
+        "I\u2019m not seeing any Cowboy cuts\u2014those frenched bone-in ribeyes\u2014what term do I use?",
+        "What\u2019s the difference between searching RIB STK, T-BONE, and PORTERHOUSE?",
+        "Can\u2019t locate skirt steaks or pork loin chops, what are the exact search terms?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core reference for product search in cut shop, frequently used in meat department operations; specific to steaks/chops terms with clear mappings; simple to understand with basic context; fully self-contained list; directly enables immediate searches.",
+      "acronyms": {
+        "STK": "steaks"
+      },
+      "jargon": {
+        "FILET STK": "filet steaks",
+        "STRIP STK": "strip steaks",
+        "COWBOY": "bone-in ribeyes frenched",
+        "RIB STK": "bone not frenched",
+        "T-BONE": "small filet",
+        "PORTERHOUSE": "bigger filet",
+        "RIBEYE STK": "ribeye steaks",
+        "SKIRT STK": "skirt steaks",
+        "LAMB RACK": "lamb rack chops",
+        "LAMB SHOULDER": "lamb shoulder chops",
+        "LAMB LOIN": "lamb loin chops",
+        "VEAL RACK": "veal rack chops",
+        "VEAL LOIN": "veal loin chops",
+        "PORK LOIN": "pork loin chops",
+        "PORK RACK": "pork rack chops"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "cutshop_whole_pieces",
+      "content": "Cut Shop whole pieces search: PSMO (whole filet mignon), STRIP LOIN (whole), RIBEYE BNLS (whole ribeyes), EXPORT RIB (bone-in ribeye), SHORT LOIN (filet/strip together), 109 RIB. Other cuts searchable directly: TERES MAJOR, FLATIRON, HANGER, FLANK.",
+      "content_hash": "63ffc87be0628b1c",
+      "section_title": "product_search - cutshop",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 33,
+      "token_count": 45,
+      "_original": {
+        "keywords": [
+          "whole filet",
+          "PSMO",
+          "strip loin",
+          "export rib",
+          "short loin",
+          "primal"
+        ],
+        "email": "",
+        "category": "product_search",
+        "subcategory": "cutshop"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "search"
+      ],
+      "entities": [
+        "PSMO",
+        "STRIP LOIN",
+        "RIBEYE BNLS",
+        "EXPORT RIB",
+        "SHORT LOIN",
+        "109 RIB",
+        "TERES MAJOR",
+        "FLATIRON",
+        "HANGER",
+        "FLANK",
+        "filet mignon",
+        "ribeyes",
+        "bone-in ribeye",
+        "filet/strip"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I search for whole filet mignon in Cut Shop?",
+        "What are the search terms for whole pieces like STRIP LOIN or RIBEYE BNLS?",
+        "I can't find PSMO or whole ribeyes in Cut Shop\u2014what do I type?",
+        "What if a customer wants a SHORT LOIN with filet and strip together?",
+        "How do I directly search for cuts like TERES MAJOR, FLATIRON, or HANGER?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        3,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational info for product search in Cut Shop (meat processing context), bounded to specific cuts, simple list format that's self-contained and directly usable for searches.",
+      "acronyms": {
+        "PSMO": "whole filet mignon",
+        "BNLS": "boneless"
+      },
+      "jargon": {
+        "Cut Shop": "system or department for whole pieces search",
+        "STRIP LOIN": "whole",
+        "RIBEYE": "whole ribeyes",
+        "EXPORT RIB": "bone-in ribeye",
+        "SHORT LOIN": "filet/strip together",
+        "109 RIB": "specific rib cut",
+        "TERES MAJOR": "cut searchable directly",
+        "FLATIRON": "cut searchable directly",
+        "HANGER": "cut searchable directly",
+        "FLANK": "cut searchable directly"
+      },
+      "numeric_thresholds": {
+        "109": {
+          "value": 109,
+          "unit": "",
+          "context": "RIB cut specification/code"
+        }
+      }
+    },
+    {
+      "id": "system_recovery",
+      "content": "If stuck in any option: enter RUN\"CTL\" to return to main Sales menu. After login: enter SLS to go to Main Sales Screen. To log off Telnet: enter 'R' on Main Sales Screen.",
+      "content_hash": "3216d070870d6c7d",
+      "section_title": "navigation - troubleshooting",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 34,
+      "token_count": 42,
+      "_original": {
+        "keywords": [
+          "stuck",
+          "frozen",
+          "escape",
+          "log off",
+          "RUN CTL",
+          "SLS"
+        ],
+        "email": "",
+        "category": "navigation",
+        "subcategory": "troubleshooting"
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot"
+      ],
+      "verbs": [
+        "enter",
+        "return",
+        "go",
+        "log off"
+      ],
+      "entities": [
+        "Sales menu",
+        "Main Sales Screen",
+        "Telnet"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [
+        "stuck in any option",
+        "after login"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "After logging in, how do I get to the Main Sales Screen with SLS?",
+        "What if I'm stuck in some option - how do I get back to the main Sales menu?",
+        "How do I log off Telnet from the Main Sales Screen?",
+        "Argh, I'm stuck in this sales option and can't escape - what do I type?",
+        "If I'm hung up in a sales submenu, what's the sequence using RUN\"CTL\" to return and log off?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Critical navigation aid for Telnet sales users, frequently needed to avoid getting stuck; specific to this system, simple for anyone to follow, self-contained actionable commands.",
+      "acronyms": {},
+      "jargon": {
+        "RUN\"CTL\"": "Command to return to main Sales menu if stuck in any option",
+        "SLS": "Command to access Main Sales Screen after login",
+        "Main Sales Screen": "Primary interface for sales operations",
+        "Telnet": "Remote terminal protocol used for system access, log off by entering 'R' on Main Sales Screen"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "arrow_key_mapping",
+      "content": "Arrow key equivalents in order entry: Up arrow = F3, Down arrow = F1, Left arrow = F2, Right arrow = F4. Extra codes: A=Add (order/quote/bid), C=Change/Maintain, hide margin % in open order.",
+      "content_hash": "3bf7368d198f4e91",
+      "section_title": "navigation - keys",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 35,
+      "token_count": 42,
+      "_original": {
+        "keywords": [
+          "arrow keys",
+          "function keys",
+          "F1",
+          "F2",
+          "F3",
+          "F4",
+          "keyboard"
+        ],
+        "email": "",
+        "category": "navigation",
+        "subcategory": "keys"
+      },
+      "query_types": [
+        "how_to",
+        "reference",
+        "lookup"
+      ],
+      "verbs": [
+        "add",
+        "change",
+        "maintain",
+        "hide"
+      ],
+      "entities": [
+        "order",
+        "quote",
+        "bid"
+      ],
+      "actors": [
+        "sales_rep"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What F-key does the up arrow equal in order entry?",
+        "How do I navigate left or right in order entry using function keys?",
+        "What's the shortcut key for Add in order entry\u2014like for quotes or bids?",
+        "Arrow keys are not working in order entry, what the heck are the equivalents?!",
+        "How do I hide margin % in an open order with the C key?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Key mappings for order entry navigation are core for frequent users, specific to that context, simple to grasp, self-contained, and immediately usable.",
+      "acronyms": {
+        "A": "Add (order/quote/bid)",
+        "C": "Change/Maintain"
+      },
+      "jargon": {
+        "order entry": "Interface or process for entering trading orders",
+        "open order": "Active or unfilled order display",
+        "margin %": "Margin percentage",
+        "bid": "Trading bid",
+        "quote": "Trading quote"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "abbreviations_food",
+      "content": "Common product abbreviations: BRD=Breaded, NTB=Not Breaded, BNLS=Boneless, BTR=Battered, CAB=Certified Angus Beef, CKD=Cooked, FC=Fully Cooked, IQF=Instant Quick Freeze, IVP=Ind Vacuum Packed, IW=Ind Wrapped, PC=Portion Control, PCK=Pre-Cooked, RTC=Ready to Cook.",
+      "content_hash": "d15e8a9096a859ac",
+      "section_title": "reference - codes",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 36,
+      "token_count": 36,
+      "_original": {
+        "keywords": [
+          "abbreviation",
+          "code",
+          "BRD",
+          "BNLS",
+          "IQF",
+          "FC",
+          "product code"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "codes"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does BRD stand for in our product codes?",
+        "I'm seeing NTB on a seafood order\u2014what does that mean?",
+        "What's the difference between FC and RTC for chicken products?",
+        "Ugh, these abbreviations are confusing\u2014 what is IQF and IVP?",
+        "How do I distinguish between BTR, BRD, and BNLS on beef and poultry labels?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 10,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Essential reference for common product codes in food/meat operations, frequently needed for quick lookups; simple, self-contained list anyone can use immediately.",
+      "acronyms": {
+        "BRD": "Breaded",
+        "NTB": "Not Breaded",
+        "BNLS": "Boneless",
+        "BTR": "Battered",
+        "CAB": "Certified Angus Beef",
+        "CKD": "Cooked",
+        "FC": "Fully Cooked",
+        "IQF": "Instant Quick Freeze",
+        "IVP": "Ind Vacuum Packed",
+        "IW": "Ind Wrapped",
+        "PC": "Portion Control",
+        "PCK": "Pre-Cooked",
+        "RTC": "Ready to Cook"
+      },
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "abbreviations_dietary",
+      "content": "Dietary abbreviations: GTF=Gluten Free, LFT=Low Fat, LRS=Low Sodium, LSR=Low Sugar, SGF=Sugar Free, NSA=No Sugar Added, FFR=Fat Free, CLF=Cholesterol Free, LTF=Lactose Free, VGT=Vegetarian, WGR=Whole Grain, WW=Whole Wheat, ZTF=Zero Trans Fat, PARVE=no meat/milk/derivatives.",
+      "content_hash": "fa0060e2e9c1c405",
+      "section_title": "reference - codes",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 37,
+      "token_count": 40,
+      "_original": {
+        "keywords": [
+          "gluten free",
+          "kosher",
+          "low fat",
+          "sugar free",
+          "dietary codes"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "codes"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does GTF stand for in the dietary abbreviations?",
+        "What's the reference code for vegetarian products?",
+        "A customer wants low sodium items\u2014what's the abbreviation LRS for?",
+        "I'm confused by PARVE in the codes section, what does it mean?",
+        "In reference codes, what's the difference between SGF, NSA, and LSR for sugar-related claims?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 10,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Valuable reference for dietary codes in food service or hospitality, frequently used for customer accommodations and compliance with diet requests; simple list, fully self-contained, directly usable for lookups.",
+      "acronyms": {
+        "GTF": "Gluten Free",
+        "LFT": "Low Fat",
+        "LRS": "Low Sodium",
+        "LSR": "Low Sugar",
+        "SGF": "Sugar Free",
+        "NSA": "No Sugar Added",
+        "FFR": "Fat Free",
+        "CLF": "Cholesterol Free",
+        "LTF": "Lactose Free",
+        "VGT": "Vegetarian",
+        "WGR": "Whole Grain",
+        "WW": "Whole Wheat",
+        "ZTF": "Zero Trans Fat",
+        "PARVE": "no meat/milk/derivatives"
+      },
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "abbreviations_packaging",
+      "content": "Packaging abbreviations: CVP=Controlled Vacuum Packaging, PIJ=Packed in Juice, PIW=Packed in Water, PET=Plastic, UHT=Ultra High Temp (shelf milk), PB=Par Baked, UNB=Unbaked, OVN=Ovenable, CN=Child Nutrition, OB=Opportunity Buy.",
+      "content_hash": "1b482ed7679e9965",
+      "section_title": "reference - codes",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 38,
+      "token_count": 32,
+      "_original": {
+        "keywords": [
+          "CVP",
+          "PIJ",
+          "PIW",
+          "UHT",
+          "packaging codes"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "codes"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does CVP stand for in packaging codes?",
+        "What's PIW mean when I'm checking canned fruit inventory?",
+        "Ugh, there's this OB on the order\u2014what the heck is Opportunity Buy?",
+        "For par baked items, what's the abbreviation we use?",
+        "How do I distinguish between PB, UNB, and OVN products from the codes?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        1,
+        2,
+        3
+      ],
+      "importance": 7,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Frequently needed reference for packaging codes in operations; simple list anyone can use, fully self-contained for decoding abbreviations, directly actionable for lookups.",
+      "acronyms": {
+        "CVP": "Controlled Vacuum Packaging",
+        "PIJ": "Packed in Juice",
+        "PIW": "Packed in Water",
+        "PET": "Plastic",
+        "UHT": "Ultra High Temp (shelf milk)",
+        "PB": "Par Baked",
+        "UNB": "Unbaked",
+        "OVN": "Ovenable",
+        "CN": "Child Nutrition",
+        "OB": "Opportunity Buy"
+      },
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "kosher_codes_common",
+      "content": "Common Kosher codes: OU=Orthodox Union, UD=OU Dairy, UP=OU Parve, UG=OU Glatt, UC=OU Cholov Yisroel, UF=OU Fish, UM=OU Meat. K codes: D=Kosher Dairy, P=Kosher Parve. N=Not Kosher, NA=N/A.",
+      "content_hash": "e9eabd8271669e84",
+      "section_title": "reference - kosher",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 39,
+      "token_count": 35,
+      "_original": {
+        "keywords": [
+          "OU",
+          "kosher dairy",
+          "kosher parve",
+          "kosher grade",
+          "orthodox union"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "kosher"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference",
+        "compliance"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [],
+      "conditions": [
+        "not_kosher"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What does OU stand for in kosher certifications?",
+        "What's UD on a product label mean?",
+        "How do I know if UG means OU Glatt Kosher?",
+        "I'm staring at this UC code - what the heck is Cholov Yisroel?",
+        "What's the difference between the K codes D/P and the OU versions like UD/UP?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Essential quick reference for kosher compliance in product handling or verification; straightforward list anyone can use immediately for code lookups, self-contained for its purpose.",
+      "acronyms": {
+        "OU": "Orthodox Union",
+        "UD": "OU Dairy",
+        "UP": "OU Parve",
+        "UG": "OU Glatt",
+        "UC": "OU Cholov Yisroel",
+        "UF": "OU Fish",
+        "UM": "OU Meat",
+        "D": "Kosher Dairy",
+        "P": "Kosher Parve",
+        "N": "Not Kosher",
+        "NA": "N/A"
+      },
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "phone_directory_executive",
+      "content": "Executive contacts: Tim Driscoll (President) x211, Ron Pereen (Exec VP) x181, Steve Donnelly (Sr VP Sales/Purchasing/Marketing) x180, George Williams (Chief Performance Officer) x137, John Levatino (VP Sales) x288.",
+      "content_hash": "06593db7ad5f87c1",
+      "section_title": "contacts - leadership",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 40,
+      "token_count": 36,
+      "_original": {
+        "keywords": [
+          "Tim Driscoll",
+          "Ron Pereen",
+          "Steve Donnelly",
+          "John Levatino",
+          "executive",
+          "president"
+        ],
+        "email": "",
+        "category": "contacts",
+        "subcategory": "leadership"
+      },
+      "query_types": [
+        "lookup",
+        "escalation",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [
+        "President",
+        "Exec VP",
+        "Sr VP Sales/Purchasing/Marketing",
+        "Chief Performance Officer",
+        "VP Sales",
+        "Tim Driscoll",
+        "Ron Pereen",
+        "Steve Donnelly",
+        "George Williams",
+        "John Levatino"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's the extension for Tim Driscoll, our President?",
+        "Who do I contact in leadership for sales or purchasing issues?",
+        "If there's a major performance bottleneck, what's the CPO's extension?",
+        "I'm frustrated \u2013 can't find the Exec VP's number anywhere!",
+        "What if I need Sr VP approval for a cross-departmental marketing push \u2013 who and x#?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 10,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Executive leadership contacts with direct extensions; critical for escalations and business communications, highly actionable and self-contained, universally understandable.",
+      "acronyms": {
+        "Exec VP": "Executive Vice President",
+        "Sr VP": "Senior Vice President",
+        "VP": "Vice President"
+      },
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "phone_directory_operations",
+      "content": "Operations contacts: Helder Coelho (Operations Manager), Sara Kenyon (Director of Transportation), Michael Palma (Transportation Manager). Customer Service: Kimberly Flores (Supervisor), Rosa Torres.",
+      "content_hash": "a43d7e06209588c9",
+      "section_title": "contacts - operations",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 41,
+      "token_count": 28,
+      "_original": {
+        "keywords": [
+          "operations",
+          "transportation",
+          "routing",
+          "customer service",
+          "Helder",
+          "Sara Kenyon"
+        ],
+        "email": "",
+        "category": "contacts",
+        "subcategory": "operations"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "lookup"
+      ],
+      "entities": [],
+      "actors": [
+        "operations_manager",
+        "director_of_transportation",
+        "transportation_manager",
+        "supervisor"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who is the Operations Manager?",
+        "If there's a delivery delay, who do I contact in transportation?",
+        "Who handles backhaul issues in ops?",
+        "I'm so frustrated, who is the customer service supervisor anyway?",
+        "How do I get the Director of Transportation's name for a routing dispute?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        1,
+        2
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 9,
+      "actionability_score": 8,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Key contacts for operations and customer service, frequently needed for escalations or support, fully self-contained list of names and roles, immediately usable to identify who to contact (assuming internal directory access).",
+      "acronyms": {},
+      "jargon": {},
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "phone_directory_departments",
+      "content": "Department contacts: Bid Dept - Nancy Cook (Manager), Grace Amecagelo. Finance - Carolina Ortega (Accounting Mgr) x172. A/P - Nicole Abudeye (Supervisor) x220. A/R - Carolina O x102. IT - Shamar Basu (Mgr) 973-464-3894. Cut Shop - Vito Scardigno (Director), Frank Ryan, Dan Roth. Purchasing - Paul Gillen (Director), Chris Driscoll (Director).",
+      "content_hash": "4fd6a60d5d3131a3",
+      "section_title": "contacts - departments",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 42,
+      "token_count": 67,
+      "_original": {
+        "keywords": [
+          "bid department",
+          "finance",
+          "AP",
+          "AR",
+          "IT",
+          "cut shop",
+          "purchasing"
+        ],
+        "email": "",
+        "category": "contacts",
+        "subcategory": "departments"
+      },
+      "query_types": [
+        "lookup",
+        "reference",
+        "escalation"
+      ],
+      "verbs": [],
+      "entities": [],
+      "actors": [
+        "Nancy Cook (Manager, Bid Dept)",
+        "Grace Amecagelo (Bid Dept)",
+        "Carolina Ortega (Accounting Mgr, Finance)",
+        "Nicole Abudeye (Supervisor, A/P)",
+        "Carolina O (A/R)",
+        "Shamar Basu (Mgr, IT)",
+        "Vito Scardigno (Director, Cut Shop)",
+        "Frank Ryan (Cut Shop)",
+        "Dan Roth (Cut Shop)",
+        "Paul Gillen (Director, Purchasing)",
+        "Chris Driscoll (Director, Purchasing)"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who is the manager of the Bid Department?",
+        "What's the extension for the A/P supervisor?",
+        "How do I contact the IT manager for a system issue?",
+        "I'm frustrated, nobody's picking up in A/R\u2014who do I call there?",
+        "Who are the directors in both Cut Shop and Purchasing?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Essential department contacts for frequent internal business needs, simple to understand, highly actionable with names/roles/extensions, mostly self-contained.",
+      "acronyms": {
+        "A/P": "Accounts Payable",
+        "A/R": "Accounts Receivable",
+        "IT": "Information Technology",
+        "Mgr": "Manager",
+        "Dept": "Department"
+      },
+      "jargon": {
+        "Bid Dept": "Department handling bids or tenders",
+        "Cut Shop": "Department or workshop for cutting operations"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "phone_directory_other",
+      "content": "Other contacts: HR - Carolina Ortega x172, Natasha Driscoll x120, Alexandra Narrea (Payroll) x222. Cash & Carry - Mike Tighe, Edward Blaskewicz. Inventory - Bill Lulack x123, James Serrago x179, Jacob Veeren x153. Receptionist - Ashley Rodriguez x100. Meal Production - Frank Ryan. NYC Schools - James Hartman x101.",
+      "content_hash": "d747f7dd5b303937",
+      "section_title": "contacts - misc",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 43,
+      "token_count": 63,
+      "_original": {
+        "keywords": [
+          "HR",
+          "payroll",
+          "cash carry",
+          "inventory",
+          "receptionist"
+        ],
+        "email": "",
+        "category": "contacts",
+        "subcategory": "misc"
+      },
+      "query_types": [
+        "lookup",
+        "reference"
+      ],
+      "verbs": [],
+      "entities": [
+        "inventory"
+      ],
+      "actors": [
+        "Carolina Ortega",
+        "Natasha Driscoll",
+        "Alexandra Narrea",
+        "Mike Tighe",
+        "Edward Blaskewicz",
+        "Bill Lulack",
+        "James Serrago",
+        "Jacob Veeren",
+        "Ashley Rodriguez",
+        "Frank Ryan",
+        "James Hartman"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What's Carolina Ortega's extension in HR?",
+        "Who do I contact for inventory problems?",
+        "I'm pissed, where's the damn receptionist\u2014Ashley's number?",
+        "For Cash & Carry orders, who are the go-to guys?",
+        "What if I have an issue with NYC Schools delivery\u2014who handles that?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 7,
+      "specificity": 5,
+      "complexity": 1,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Key operational contacts list, simple for anyone, self-contained and directly usable for calling departments like HR/inventory",
+      "acronyms": {
+        "HR": "Human Resources",
+        "NYC": "New York City"
+      },
+      "jargon": {
+        "Cash & Carry": "Wholesale model where customers pay cash and carry goods themselves",
+        "Meal Production": "Department responsible for preparing meals",
+        "Payroll": "Employee compensation processing"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "seafood_notes",
+      "content": "Seafood special notes (SEAFOOD ONLY): Use when customer requests non-standard pack size (e.g., 18 pieces when pack is 20). Contact Donnie N. if unsure about splitting. Enter item normally, BEFORE final Enter hit F1 for notes line at bottom. Enter specs, Enter to accept. Notes print on seafood labels only (not invoice). Extended price may be incorrect - warehouse adjusts cut weight before shipping.",
+      "content_hash": "8c9c72efa4754cf1",
+      "section_title": "order_entry - seafood",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 44,
+      "token_count": 83,
+      "_original": {
+        "keywords": [
+          "seafood",
+          "fish",
+          "custom cut",
+          "special specs",
+          "F1 notes",
+          "Donnie"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "seafood"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "escalation",
+        "reference"
+      ],
+      "verbs": [
+        "use",
+        "contact",
+        "enter",
+        "hit",
+        "accept",
+        "print",
+        "adjust",
+        "split"
+      ],
+      "entities": [
+        "customer",
+        "item",
+        "invoice",
+        "warehouse",
+        "labels",
+        "pack"
+      ],
+      "actors": [
+        "customer",
+        "Donnie N.",
+        "sales_rep",
+        "warehouse"
+      ],
+      "conditions": [
+        "non-standard pack size",
+        "unsure about splitting",
+        "SEAFOOD ONLY",
+        "extended price incorrect"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I enter special notes for non-standard seafood pack sizes like 18 pieces instead of 20?",
+        "What if a customer requests a split seafood pack and I'm not sure about it?",
+        "In order entry, when do I hit F1 for the notes line on a seafood split?",
+        "Why is the extended price wrong after I add notes for a seafood pack split? The system is messing up!",
+        "Do seafood special notes print on invoices or just labels, and how does warehouse handle the cut weight adjustment?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 7,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core procedure for seafood order entry edge case (non-standard packs), frequently relevant in that domain, clear steps with minor system familiarity needed, self-contained",
+      "acronyms": {},
+      "jargon": {
+        "pack size": "Standard packaging quantity for seafood items (e.g., 20 pieces)",
+        "splitting": "Dividing standard packs into non-standard sizes; contact Donnie N. if unsure",
+        "F1": "Function key 1 to access notes line at bottom of entry screen",
+        "specs": "Item specifications entered in notes",
+        "Extended price": "Calculated total price for the item, which may be inaccurate",
+        "cut weight": "Adjusted weight after warehouse trimming/cutting seafood"
+      },
+      "numeric_thresholds": {
+        "standard_pack_size": {
+          "value": 20,
+          "unit": "pieces",
+          "context": "Default pack size for seafood"
+        },
+        "non_standard_example": {
+          "value": 18,
+          "unit": "pieces",
+          "context": "Customer-requested pack size when deviating from standard"
+        }
+      }
+    },
+    {
+      "id": "special_order_entry",
+      "content": "Special Order process: Start order with customer#, enter item#, Y to place special order (N to cancel), enter requested receive date, enter cancel date (latest acceptable). Exit order. Item is now allocated - buyers can't add to PO unless allocated (shown shaded). Buyers receive daily Excel of all special orders. Sales reps get their allocations only.",
+      "content_hash": "466e50e7ab796185",
+      "section_title": "order_entry - special_orders",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 45,
+      "token_count": 72,
+      "_original": {
+        "keywords": [
+          "special order",
+          "allocate",
+          "cancel date",
+          "buyer notification"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "special_orders"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference",
+        "training"
+      ],
+      "verbs": [
+        "start",
+        "enter",
+        "place",
+        "cancel",
+        "exit",
+        "allocate",
+        "add",
+        "receive",
+        "get"
+      ],
+      "entities": [
+        "customer",
+        "item",
+        "special_order",
+        "purchase_order",
+        "allocation"
+      ],
+      "actors": [
+        "sales_rep",
+        "purchasing_agent",
+        "buyer",
+        "customer"
+      ],
+      "conditions": [
+        "special_order",
+        "requested_receive_date",
+        "cancel_date",
+        "allocated",
+        "shaded"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I place a special order in order entry?",
+        "What dates do I need to enter when starting a special order?",
+        "Why can't buyers add a special order item to their PO\u2014it's all shaded and allocated?",
+        "I entered a special order and now it's locked\u2014buyers are pissed, what happened?",
+        "How do buyers and sales reps get updates on special orders?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core special order process in order entry; clear steps make it highly actionable and mostly self-contained, requires basic system familiarity",
+      "acronyms": {
+        "PO": "Purchase Order"
+      },
+      "jargon": {
+        "Special Order": "Custom order process starting with customer number, item number, confirmation (Y/N), requested receive date, and cancel date, resulting in item allocation",
+        "allocated": "Item status where it is reserved for a special order, preventing buyers from adding it to a PO (visually indicated as shaded)",
+        "buyers": "Procurement staff who manage purchase orders and receive daily Excel reports of special orders",
+        "sales reps": "Sales representatives who receive visibility only to their own allocations",
+        "shaded": "Visual indicator in the system showing an item is allocated and restricted",
+        "allocations": "Reserved items for special orders, accessible differently to buyers and sales reps",
+        "customer#": "Customer identifier or number used to start a special order",
+        "item#": "Item identifier or number entered in the special order process",
+        "requested receive date": "Desired delivery date specified for the special order",
+        "cancel date": "Latest acceptable date for receiving the special order"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "special_order_management",
+      "content": "Special Order management: Buyers must communicate if item discontinued or unavailable within dates. Sales reps manage their list - can remove items from SLS screen (only if not yet ordered by Purchasing). Buyer gets email notification when removed. Reasons to remove: customer out of business, credit hold, etc.",
+      "content_hash": "1e58e1c9bb3bddf4",
+      "section_title": "order_entry - special_orders",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 46,
+      "token_count": 62,
+      "_original": {
+        "keywords": [
+          "remove special order",
+          "cancel special order",
+          "discontinued item"
+        ],
+        "email": "",
+        "category": "order_entry",
+        "subcategory": "special_orders"
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference"
+      ],
+      "verbs": [
+        "communicate",
+        "manage",
+        "remove",
+        "notify",
+        "order"
+      ],
+      "entities": [
+        "special_order",
+        "item",
+        "customer"
+      ],
+      "actors": [
+        "buyer",
+        "sales_rep",
+        "purchasing_agent",
+        "customer"
+      ],
+      "conditions": [
+        "discontinued",
+        "unavailable",
+        "not_yet_ordered",
+        "customer_out_of_business",
+        "credit_hold"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do sales reps remove items from their special order list?",
+        "What if a customer goes out of business\u2014can I take their special order off my list?",
+        "Can I remove a special order from the SLS screen if Purchasing has already ordered it?",
+        "The buyer didn't get an email when I removed that item from SLS\u2014what's going on?",
+        "Who has to tell me if a special order item is discontinued or unavailable?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core process for special order handling in sales/ordering system; bounded to specific roles and screens; clear actions with conditions; self-contained chunk.",
+      "acronyms": {},
+      "jargon": {
+        "Special Order management": "Process where buyers notify if items are discontinued or unavailable, and sales reps manage lists via SLS screen",
+        "SLS screen": "System interface for sales reps to remove items from their special order lists (before Purchasing orders them)",
+        "Purchasing": "Department responsible for placing orders with suppliers",
+        "credit hold": "Customer status restriction preventing orders, e.g., due to unpaid bills"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_locations",
+      "content": "Warehouse codes: 01=Clifton (primary), 02=Amsterdam. In stock status, F10 toggles between Clifton and Amsterdam info. Up arrow in stock status shows incoming orders and transfers from Amsterdam.",
+      "content_hash": "28924988311b9084",
+      "section_title": "reference - warehouses",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 47,
+      "token_count": 35,
+      "_original": {
+        "keywords": [
+          "Clifton",
+          "Amsterdam",
+          "warehouse 01",
+          "warehouse 02",
+          "transfer"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "warehouses"
+      },
+      "query_types": [
+        "reference",
+        "lookup",
+        "definition"
+      ],
+      "verbs": [
+        "toggle",
+        "show"
+      ],
+      "entities": [
+        "warehouse",
+        "inventory",
+        "order",
+        "transfer"
+      ],
+      "actors": [],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do the warehouse codes 01 and 02 stand for?",
+        "How do I toggle between Clifton and Amsterdam info in stock status?",
+        "What's F10 do in the stock status screen?",
+        "Stock status is only showing Clifton stuff and it's driving me nuts\u2014how do I see Amsterdam?",
+        "What does the up arrow show in stock status for incoming orders and Amsterdam transfers?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        2,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 6,
+      "complexity": 3,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse inventory management info, frequently used in stock checks; specific to stock status screen but common scenario; simple instructions needing minimal training; self-contained with clear codes and actions; highly actionable for immediate use in the system.",
+      "acronyms": {},
+      "jargon": {
+        "warehouse codes": "Numeric identifiers for warehouses: 01=Clifton (primary), 02=Amsterdam",
+        "stock status": "Display or screen showing inventory information with warehouse-specific details and indicators",
+        "F10": "Keyboard function key that toggles between Clifton and Amsterdam warehouse info in stock status",
+        "Up arrow": "Indicator in stock status that shows incoming orders and transfers from Amsterdam"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "temperature_zones",
+      "content": "Temperature zone codes: R=Refrigerated, D=Dry, F=Frozen. Temperature zone option (T) when printing helps warehouse pickers pull orders efficiently by grouping items.",
+      "content_hash": "0a804f2f90fd3349",
+      "section_title": "reference - storage",
+      "source_file": "telnet_sop_chunks.json",
+      "department_id": "sales",
+      "chunk_index": 48,
+      "token_count": 27,
+      "_original": {
+        "keywords": [
+          "temperature zone",
+          "refrigerated",
+          "dry",
+          "frozen",
+          "R",
+          "D",
+          "F"
+        ],
+        "email": "",
+        "category": "reference",
+        "subcategory": "storage"
+      },
+      "query_types": [
+        "definition",
+        "lookup",
+        "reference"
+      ],
+      "verbs": [
+        "print",
+        "pull",
+        "group"
+      ],
+      "entities": [
+        "warehouse",
+        "orders",
+        "inventory"
+      ],
+      "actors": [
+        "warehouse_picker"
+      ],
+      "conditions": [],
+      "is_procedure": false,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "What do the temperature zone codes R, D, and F stand for?",
+        "How does the T option when printing help warehouse pickers?",
+        "I'm lost on these temp zone codes for storage\u2014what's R, D, F?",
+        "How can I use printing to group items by refrigerated, dry, or frozen for efficient picking?",
+        "In storage reference, why enable the (T) temperature zone option for pulling R/D/F orders?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 2,
+      "completeness_score": 9,
+      "actionability_score": 9,
+      "confidence_score": 0.95,
+      "quality_reasoning": "Core warehouse process for storage and picking efficiency; simple codes and printing tip, fully self-contained and directly usable by staff.",
+      "acronyms": {
+        "R": "Refrigerated",
+        "D": "Dry",
+        "F": "Frozen",
+        "T": "Temperature zone option"
+      },
+      "jargon": {
+        "Temperature zone codes": "Codes indicating required storage temperature (R=Refrigerated, D=Dry, F=Frozen)",
+        "warehouse pickers": "Employees who select and gather items from warehouse locations to fulfill orders",
+        "pull orders": "Process of retrieving items from storage to prepare customer orders"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

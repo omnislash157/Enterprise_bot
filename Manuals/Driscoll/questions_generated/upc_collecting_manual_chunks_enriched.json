@@ -1,0 +1,224 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\upc_collecting_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:46:08.837124",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_upc_introduction_0",
+      "content": "UPC Collecting Manual\n\nOverview\n\nUPC Collection is a critical process at Driscoll Foods because it provides visibility into every product within the warehouse. By tracking each case and piece through its Universal Product Code (UPC), the company ensures accuracy in identifying where products are, how they are labeled, and which slots they occupy. This visibility is essential for both internal operations and customer confidence.\n\nPurpose and Importance\n\nThe purpose of UPC Collection is to maintain an accurate and up-to-date connection between physical products and the warehouse management system. Every item that enters the facility should be scanned by its UPC, allowing Driscoll Foods to know exactly what product is associated with what label, vendor, and storage location. This process enables the company to provide precise product information to customers and supports various departments such as Purchasing, Sales, and Inventory Control.\n\nScanning Process\n\nUPC Collection requires the use of a scanning gun and attention to detail to ensure accuracy. The process generally follows these steps:\n\n1. Obtain a scan gun connected to the warehouse system.\n2. Go to the slot containing the product that needs to be verified.\n3. Scan the slot location to record where the product is stored.\n4. Scan the case of the product to capture its UPC and confirm that it matches the system\u2019s record.\n5. Open the case (if applicable) and scan an individual piece, especially for products that are sold individually rather than by the entire case.\n6. Ensure the scanned UPC updates the system accurately so the correct product information is linked.\n\nCommon Issues and Resolutions\n\nAt times, products may not be scanned correctly or may have missing UPC data. This can cause confusion in the warehouse and discrepancies in the system. When such issues are identified, UPC collectors play a crucial role in resolving them by rescanning and updating the proper information.\n\nCommon issues include:",
+      "content_hash": "034889281814be6e",
+      "section_title": "upc",
+      "source_file": "upc_collecting_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 405,
+      "_original": {
+        "keywords": [
+          "upc",
+          "product",
+          "system",
+          "process",
+          "warehouse",
+          "case",
+          "products",
+          "scan",
+          "collection",
+          "its"
+        ],
+        "email": "",
+        "category": "upc",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "definition",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "track",
+        "ensure",
+        "identify",
+        "scan",
+        "obtain",
+        "go",
+        "record",
+        "capture",
+        "confirm",
+        "open",
+        "ensure",
+        "update",
+        "resolve",
+        "rescan"
+      ],
+      "entities": [
+        "UPC",
+        "product",
+        "case",
+        "piece",
+        "slot",
+        "label",
+        "vendor",
+        "storage location",
+        "warehouse management system",
+        "warehouse"
+      ],
+      "actors": [
+        "UPC collector",
+        "Purchasing",
+        "Sales",
+        "Inventory Control",
+        "customer"
+      ],
+      "conditions": [
+        "not scanned correctly",
+        "missing UPC data",
+        "discrepancies"
+      ],
+      "is_procedure": true,
+      "is_policy": false,
+      "is_form": false,
+      "synthetic_questions": [
+        "Why is UPC collection so important here at Driscoll Foods?",
+        "How do I perform the UPC scanning process step by step?",
+        "What do I scan first with the scan gun - slot location or the case UPC?",
+        "The UPC on this case isn't matching the system or it's missing - what now?",
+        "How does UPC collection help departments like Purchasing and Inventory Control?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        1,
+        2,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse process for product tracking with clear scanning steps; mostly self-contained despite truncated issues section",
+      "acronyms": {
+        "UPC": "Universal Product Code"
+      },
+      "jargon": {
+        "UPC Collection": "process of scanning UPCs to track and verify products in the warehouse",
+        "scan gun": "handheld device connected to the warehouse system for scanning UPCs and locations",
+        "slot": "specific storage location in the warehouse",
+        "case": "packaged unit containing multiple pieces of product",
+        "piece": "individual product item scanned from within a case",
+        "warehouse management system": "software system that tracks product locations, labels, and inventory"
+      },
+      "numeric_thresholds": {}
+    },
+    {
+      "id": "warehouse_upc_introduction_1",
+      "content": "Products not scanned during receiving or putaway.\n\nIncorrect or outdated UPCs associated with certain items.\n\nSystem showing mismatched item descriptions or missing product data\n\nBroken or unreadable UPC barcodes on packaging.\n\nSystem Integration and Departmental Impact\n\nUPC Collection supports nearly every operational department at Driscoll Foods. Accurate UPC data enables Purchasing to reorder correctly, Inventory Control to maintain integrity, and Sales to provide customers with correct product details. When UPCs are properly collected and recorded, the entire organization benefits from reliable product traceability and streamlined communication.\n\nWhat you do:\n\nAlways double-check that the UPC scanned matches the correct product description on the screen.\n\nHandle packaging carefully to avoid damaging UPC labels.\n\nFor split or mixed pallets, scan each unique UPC separately\n\nCommunicate with Inventory Control if you notice any recurring UPC mismatches.\n\nEnsure all scans are saved and confirmed in the system before moving to the next product.\n\nWhy UPC Collection matters:\n\nUPC Collection is a foundational process that strengthens data accuracy across the company. By carefully scanning slots, cases, and individual pieces, warehouse personnel ensure the system remains aligned with the physical inventory. This improves visibility, supports efficient operations, and maintains Driscoll Foods\u2019 commitment to quality and reliability.",
+      "content_hash": "5f26fd4e14c07dbd",
+      "section_title": "upc",
+      "source_file": "upc_collecting_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 258,
+      "_original": {
+        "keywords": [
+          "upc",
+          "product",
+          "system",
+          "data",
+          "collection",
+          "inventory",
+          "scanned",
+          "upcs",
+          "packaging",
+          "supports"
+        ],
+        "email": "",
+        "category": "upc",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "training"
+      ],
+      "verbs": [
+        "double-check",
+        "handle",
+        "scan",
+        "communicate",
+        "notice",
+        "ensure",
+        "save",
+        "confirm",
+        "collect",
+        "record",
+        "reorder",
+        "maintain",
+        "provide"
+      ],
+      "entities": [
+        "UPC",
+        "product",
+        "item",
+        "packaging",
+        "pallet",
+        "inventory"
+      ],
+      "actors": [
+        "warehouse personnel",
+        "Inventory Control",
+        "Purchasing",
+        "Sales",
+        "customer"
+      ],
+      "conditions": [
+        "products not scanned during receiving or putaway",
+        "incorrect or outdated UPCs",
+        "mismatched item descriptions",
+        "missing product data",
+        "broken or unreadable UPC barcodes",
+        "split or mixed pallets",
+        "recurring UPC mismatches"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What if the UPC I scanned doesn't match the product description on the screen?",
+        "How do I handle scanning UPCs on split or mixed pallets?",
+        "Who should I contact about recurring UPC mismatches during putaway?",
+        "The system keeps showing mismatched item descriptions\u2014what am I doing wrong?",
+        "Why does accurate UPC collection matter for Purchasing, Inventory Control, and Sales?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 8,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core warehouse process for UPC accuracy impacting multiple departments; clear actionable steps, self-contained with issues, instructions, and rationale.",
+      "acronyms": {
+        "UPC": "Universal Product Code"
+      },
+      "jargon": {
+        "receiving": "Process of accepting and inspecting incoming shipments",
+        "putaway": "Process of moving received goods to storage locations",
+        "UPC Collection": "Process of scanning and recording UPC barcodes for inventory accuracy",
+        "split or mixed pallets": "Pallets containing multiple different products or SKUs requiring separate scanning",
+        "product traceability": "Ability to track products through the supply chain for accountability",
+        "physical inventory": "Actual stock of goods present in the warehouse"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

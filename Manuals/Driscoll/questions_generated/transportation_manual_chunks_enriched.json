@@ -1,0 +1,443 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\transportation_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:45:50.338578",
+  "chunk_count": 3,
+  "chunks": [
+    {
+      "id": "warehouse_transportation_introduction_0",
+      "content": "Transportation Manual\n\nIntroduction\n\nPurpose: Transportation ensures that all drivers complete deliveries accurately, safely, and on time, while also serving as the liaison between drivers, customers, and internal departments.\n\nScope: Covers all transportation employees, supervisors, and their workflows, including school routes, street routes, backhauls, hotshots, equipment tracking, and reporting.\n\nTeam Structure\n\nMike Palma \u2013 Transportation Manager: Oversees department operations.\n\nDelareese Delgado \u2013 Supervisor of Schools: Ensures school routes are completed by 2 PM.\n\nPatrick Brown \u2013 Supervises alphabetical route IDs.\n\nVictor Polanco \u2013 Supervises letter IDs and Connecticut routes, truck maintenance, fuel, cameras, cleaning, and safety compliance.\n\nChun Ng \u2013 Handles backhauls and unplanned \u201chotshots.\u201d\n\nBernie \u2013 Handles backend operations, equipment tracking, and reporting.\n\nDaily Workflow \u2013 Transportation Staff\n\nStart of Shift (Approx. 2 AM)\n\nOrganize invoices, loading sheets, and route documents received from night clerks.\n\nAssign drivers to routes and verify route IDs, keydrop documents, and e-jack batteries.\n\nTrack each driver\u2019s equipment and ensure readiness for the shift.\n\nDriver Monitoring\n\nTrack driver location and stops using IntelliShift.\n\nLog remaining stops at 10 AM, 12 PM, 2 PM, 4 PM to monitor on-time completion.\n\nEnsure school deliveries meet deadlines (latest by 2 PM).\n\nCoordinate with nearby drivers to redistribute stops if someone is falling behind.\n\nIssue Handling\n\nVehicle breakdowns: Contact Allegiance or Penske trucks; use in-house mechanics if possible.\n\nReport truck issues in Telnet: 30, 18, date, route ID, E, 100, message, driver, location, follow, 1 (send), enter.\n\nCustomer issues: Merge calls with sales teams, resolve delivery errors, verify keydrops, and coordinate backhauls.\n\nSafety issues: Monitor Netradyne cameras for speeding, hard braking, drowsiness, or distracted driving; enforce corrective action or bonus adjustments.\n\nDriver Types and Responsibilities\n\nA. School Drivers\n\nStart times: Typically 5 AM.",
+      "content_hash": "d0eee72727a5de09",
+      "section_title": "transportation",
+      "source_file": "transportation_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 367,
+      "_original": {
+        "keywords": [
+          "transportation",
+          "drivers",
+          "routes",
+          "driver",
+          "school",
+          "route",
+          "backhauls",
+          "equipment",
+          "ids",
+          "stops"
+        ],
+        "email": "",
+        "category": "transportation",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "troubleshoot",
+        "definition",
+        "lookup",
+        "reference",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "oversee",
+        "ensure",
+        "supervise",
+        "handle",
+        "organize",
+        "assign",
+        "verify",
+        "track",
+        "log",
+        "monitor",
+        "coordinate",
+        "redistribute",
+        "contact",
+        "report",
+        "merge",
+        "resolve",
+        "enforce",
+        "complete",
+        "serve"
+      ],
+      "entities": [
+        "invoice",
+        "loading_sheet",
+        "route",
+        "route_id",
+        "keydrop_document",
+        "e_jack_battery",
+        "equipment",
+        "driver",
+        "stop",
+        "truck",
+        "backhaul",
+        "delivery",
+        "camera"
+      ],
+      "actors": [
+        "driver",
+        "supervisor",
+        "transportation_manager",
+        "customer",
+        "sales_team",
+        "mechanic",
+        "night_clerk"
+      ],
+      "conditions": [
+        "late_delivery",
+        "vehicle_breakdown",
+        "delivery_error",
+        "safety_violation",
+        "school_route_deadline"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who is the supervisor for school routes?",
+        "What do we do at the start of the shift around 2 AM?",
+        "How do I report a truck breakdown in Telnet with the 30, 18 code?",
+        "What if a driver is falling behind\u2014how do we handle redistributing stops?",
+        "I'm totally lost on who handles backhauls and hotshots\u2014who is it?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 6,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core transportation operations including safety, workflows, team structure, and specific procedures; highly actionable with clear steps but chunk cuts off abruptly.",
+      "acronyms": {},
+      "jargon": {
+        "backhauls": "Return trips carrying additional cargo",
+        "hotshots": "Unplanned urgent or expedited deliveries",
+        "keydrop documents": "Documents associated with keydrop deliveries (leaving keys in a secure drop location)",
+        "IntelliShift": "Software system for tracking driver locations and stops",
+        "Netradyne": "Camera system for monitoring driver safety (speeding, hard braking, drowsiness, distracted driving)",
+        "route IDs": "Unique identifiers for delivery routes (e.g., alphabetical or letter-based)",
+        "street routes": "Regular urban or non-school delivery routes",
+        "school routes": "Dedicated delivery routes to schools",
+        "e-jack batteries": "Electronic device batteries required for routes",
+        "Telnet": "Internal reporting system for logging truck issues"
+      },
+      "numeric_thresholds": {
+        "shift_start_time": {
+          "value": 2,
+          "unit": "AM",
+          "context": "Approximate start of shift for organizing documents and assigning drivers"
+        },
+        "school_route_deadline": {
+          "value": 2,
+          "unit": "PM",
+          "context": "School routes and deliveries must be completed by this time"
+        },
+        "stop_logging_times": {
+          "value": [
+            "10",
+            "12",
+            "2",
+            "4"
+          ],
+          "unit": "AM/PM",
+          "context": "Times to log remaining stops for monitoring on-time completion"
+        },
+        "school_driver_start_time": {
+          "value": 5,
+          "unit": "AM",
+          "context": "Typical start time for school drivers"
+        }
+      }
+    },
+    {
+      "id": "warehouse_transportation_introduction_1",
+      "content": "Obtain documents, batteries (if applicable), and review loading sheets\n\nDeliver products to schools, ensuring accuracy due to potential fines ($500 per case).\n\nKey duties:\n\nFollow loading sheets carefully.\n\nHandle refrigerated and dry items efficiently.\n\nMaintain professional interactions with school staff.\n\nTrack deliveries, mark invoices, and return all equipment.\n\nB. Street Drivers / NYC Drivers\n\nStart times: Manhattan \u2013 3 AM, other zones \u2013 5 AM.\n\nCollect paperwork and equipment from dispatch.\n\nDeliver to restaurants, stores, or keydrop locations.\n\nVerify product against invoices, check cases for mispicks, and handle refrigerated/dry items with helper.\n\nFor keydrop stops: Photograph storage for verification, lock premises afterward.\n\nFollow DOT rules, traffic regulations, and maintain safety awareness.\n\nC. Tractor Trailer Drivers\n\nRequire CDL A license.\n\nDeliver products to warehouses or other Driscoll Foods locations.\n\nMay perform transfers and backhauls.\n\nSame verification processes as street drivers.\n\nEnsure full trucks leaving and returning to optimize efficiency and revenue.\n\nBackhauls and Hotshots (Chun Ng)\n\nPre-planned backhauls: Ensure trucks return with product for revenue optimization.\n\nHotshots: Unplanned deliveries to collect product quickly.\n\nTrack and coordinate with drivers for timely execution.\n\nEquipment Management (Bernie / Victor)\n\nMonitor all trucks, jacks, e-jack batteries, straps, blankets, and handtrucks.\n\nMaintain and repair equipment, assign to responsible employees, and document in reports.\n\nDaily reporting ensures all resources are accounted for, available, and ready.\n\nReporting and Documentation\n\nIntelliShift: Track truck location, driver, stops, and completion.\n\nNetradyne: Monitor driving behavior and enforce safety standards.\n\nTelnet: Log vehicle issues, route problems, and communicate with internal teams.\n\nDispatch sheets: Document driver assignments, route completion, and keydrop statuses.\n\nEnd-of-day: Cease routes in IntelliShift, ensure all reports are accurate for the next day.\n\nSafety and Compliance",
+      "content_hash": "32430bedf7839181",
+      "section_title": "transportation",
+      "source_file": "transportation_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 357,
+      "_original": {
+        "keywords": [
+          "drivers",
+          "equipment",
+          "sheets",
+          "deliver",
+          "maintain",
+          "track",
+          "keydrop",
+          "product",
+          "safety",
+          "backhauls"
+        ],
+        "email": "",
+        "category": "transportation",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "obtain",
+        "review",
+        "deliver",
+        "follow",
+        "handle",
+        "maintain",
+        "track",
+        "mark",
+        "return",
+        "collect",
+        "verify",
+        "check",
+        "photograph",
+        "lock",
+        "require",
+        "perform",
+        "ensure",
+        "monitor",
+        "repair",
+        "assign",
+        "document",
+        "log",
+        "cease",
+        "coordinate",
+        "optimize"
+      ],
+      "entities": [
+        "loading_sheets",
+        "batteries",
+        "products",
+        "schools",
+        "invoices",
+        "equipment",
+        "paperwork",
+        "restaurants",
+        "stores",
+        "keydrop_locations",
+        "cases",
+        "refrigerated_items",
+        "dry_items",
+        "storage",
+        "premises",
+        "warehouses",
+        "transfers",
+        "backhauls",
+        "trucks",
+        "jacks",
+        "e_jack_batteries",
+        "straps",
+        "blankets",
+        "handtrucks",
+        "reports",
+        "IntelliShift",
+        "Netradyne",
+        "Telnet",
+        "dispatch_sheets",
+        "routes",
+        "shipment"
+      ],
+      "actors": [
+        "school_drivers",
+        "street_drivers",
+        "nyc_drivers",
+        "tractor_trailer_drivers",
+        "dispatch",
+        "school_staff",
+        "helper",
+        "chun_ng",
+        "bernie",
+        "victor",
+        "drivers",
+        "internal_teams",
+        "customer"
+      ],
+      "conditions": [
+        "potential_fines",
+        "mispicks",
+        "refrigerated_items",
+        "dry_items",
+        "keydrop_stops",
+        "dot_rules",
+        "traffic_regulations",
+        "safety_awareness",
+        "full_trucks",
+        "pre_planned_backhauls",
+        "hotshots",
+        "vehicle_issues",
+        "route_problems",
+        "end_of_day",
+        "temperature_violation"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What time do Manhattan Street Drivers start their shifts?",
+        "What do I do if I notice a mispick while checking cases against the invoice on a street route?",
+        "For keydrop stops, what's the exact procedure with photos and locking up?",
+        "My e-jack battery is dead halfway through the route - who do I report this to right now?",
+        "How do Tractor Trailer Drivers optimize efficiency with full trucks on backhauls and hotshots?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 4,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core transportation procedures with compliance (fines, DOT), safety, and specific driver duties; actionable steps provided, mostly self-contained but references external systems/tools.",
+      "acronyms": {
+        "CDL A": "Commercial Driver's License Class A",
+        "DOT": "Department of Transportation"
+      },
+      "jargon": {
+        "loading sheets": "Documents detailing items to load for specific routes",
+        "keydrop stops": "Unattended delivery locations accessed with a key, requiring photo verification of storage and locking afterward",
+        "mispicks": "Incorrectly selected or picked items during loading or delivery",
+        "backhauls": "Return trips loaded with product to generate revenue",
+        "Hotshots": "Unplanned, urgent deliveries to quickly collect product",
+        "e-jack batteries": "Batteries for electric pallet jacks",
+        "IntelliShift": " telematics system for tracking truck locations, drivers, stops, and route completion",
+        "Netradyne": "Camera-based system for monitoring driving behavior and enforcing safety",
+        "Telnet": "System for logging vehicle issues, route problems, and communicating with internal teams",
+        "dispatch sheets": "Documents assigning drivers to routes and tracking completion statuses"
+      },
+      "numeric_thresholds": {
+        "fine_per_case": {
+          "value": 500,
+          "unit": "USD",
+          "context": "Potential fine for inaccurate product deliveries to schools"
+        }
+      }
+    },
+    {
+      "id": "warehouse_transportation_introduction_2",
+      "content": "DOT rules: Hours of service, break requirements, vehicle inspections.\n\nRoad safety: Defensive driving, safe handling of refrigerated and dry products.\n\nIncident management: Immediate reporting of accidents, vehicle issues, or customer complaints.\n\nEquipment safety: Proper use of jacks, handtrucks, e-jacks, and securing loads.\n\nCommunication Protocols\n\nTransportation acts as the central liaison between drivers, dispatch, sales, and warehouse.\n\nAll issues, delays, or customer concerns are communicated promptly.\n\nTeam members support each other and can cover for absences.\n\nOverview\n\nTransportation is essential to Driscoll Foods\u2019 operations: ensures timely deliveries, driver safety, vehicle maintenance, equipment management, and customer satisfaction.\n\nEffective teamwork, communication, and vigilance ensure operational efficiency, compliance with DOT, and maximized company revenue.",
+      "content_hash": "e93f46337271a25e",
+      "section_title": "transportation",
+      "source_file": "transportation_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 2,
+      "token_count": 143,
+      "_original": {
+        "keywords": [
+          "vehicle",
+          "safety",
+          "customer",
+          "dot",
+          "management",
+          "issues",
+          "equipment",
+          "jacks",
+          "communication",
+          "transportation"
+        ],
+        "email": "",
+        "category": "transportation",
+        "subcategory": ""
+      },
+      "query_types": [
+        "policy",
+        "compliance",
+        "training",
+        "reference"
+      ],
+      "verbs": [
+        "report",
+        "communicate",
+        "support",
+        "cover",
+        "ensure",
+        "deliver",
+        "inspect",
+        "handle",
+        "secure",
+        "drive"
+      ],
+      "entities": [
+        "vehicle",
+        "driver",
+        "shipment",
+        "product",
+        "load",
+        "jack",
+        "handtruck",
+        "e-jack",
+        "accident",
+        "complaint"
+      ],
+      "actors": [
+        "driver",
+        "dispatch",
+        "sales",
+        "warehouse",
+        "team_member",
+        "customer"
+      ],
+      "conditions": [
+        "accident",
+        "vehicle_issue",
+        "customer_complaint",
+        "delay",
+        "absence"
+      ],
+      "is_procedure": false,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "What are the DOT rules for hours of service and breaks?",
+        "What do I do if there's a vehicle issue during delivery?",
+        "How do I properly secure loads using e-jacks and handtrucks?",
+        "Why do I have to report every customer complaint right away\u2014it's killing my schedule!",
+        "If I'm maxed out on HOS and delayed, who do I notify in dispatch or sales?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        1,
+        3
+      ],
+      "importance": 9,
+      "specificity": 2,
+      "complexity": 3,
+      "completeness_score": 7,
+      "actionability_score": 6,
+      "confidence_score": 0.92,
+      "quality_reasoning": "High importance due to compliance (DOT), safety, and core operations; broad overview applicable to entire transportation team; simple language requiring minimal expertise; self-contained as summary but lacks deep details; guides actions like reporting and communication but not step-by-step.",
+      "acronyms": {
+        "DOT": "Department of Transportation"
+      },
+      "jargon": {
+        "Hours of service": "Federal regulations limiting daily/weekly driving and on-duty time for commercial drivers",
+        "break requirements": "Mandatory rest periods mandated by DOT regulations",
+        "vehicle inspections": "Required pre-trip and post-trip checks to ensure roadworthiness",
+        "Defensive driving": "Proactive driving techniques to anticipate and avoid hazards",
+        "refrigerated products": "Temperature-controlled cargo, often in reefer trailers",
+        "dry products": "Non-perishable freight transported in dry van trailers",
+        "handtrucks": "Manual two-wheeled carts for moving palletized loads",
+        "e-jacks": "Electric-powered pallet jacks for lifting and moving heavy loads",
+        "securing loads": "Using straps, chains, or tarps to fasten cargo and prevent shifting",
+        "dispatch": "Operations center coordinating driver routes, loads, and schedules"
+      },
+      "numeric_thresholds": {}
+    }
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_dispatching_manual",
+  "version": "1.0",
+  "description": "Warehouse dispatching processes and procedures",
+  "source_file": "Dispatching Manual.docx",
+  "file_hash": "dc983abe74c45270be237506fc976a2e340ea975177883def61e524dd3cf8cf6",
+  "chunks": [
+    {
+      "id": "warehouse_dispatching_introduction_0",
+      "category": "dispatching",
+      "section_title": "Introduction",
+      "keywords": [
+        "dispatchers",
+        "paperwork",
+        "driver",
+        "drivers",
+        "routes",
+        "route",
+        "helpers",
+        "dispatch",
+        "their",
+        "loading"
+      ],
+      "content": "Dispatching Manual\n\nOverview of Night Dispatch Operations\n\nNight dispatching at Driscoll Foods begins at approximately 2:00 AM. The dispatch team is responsible for preparing routes, organizing paperwork, coordinating equipment, and ensuring that every driver begins their day correctly. This job requires focus, organization, attention to detail, and strong communication.\n\nBeginning Shift Setup\n\nAt the start of the shift, dispatchers organize invoices, stop paperwork, and loading sheets. Route IDs are marked on documents. Key-drop routes require retrieving and organizing keys from the key wall in alphabetical (AA–ZZ) and numerical (01–99) order.\n\nEarly Driver Processing (3:00 AM – 4:00 AM)\n\nThe first wave of drivers arrives around 3:00 AM. Dispatchers distribute paperwork, assign helpers if needed, provide e-jack batteries, and track everything on the Dispatch Sheet.\n\nMain Driver Rush (4:00 AM – 5:30 AM)\n\nThis is the busiest period. Dispatchers must work one driver at a time to avoid mistakes, distribute paperwork, ensure key-drop forms are included, and manage available drivers without routes.\n\nEquipment Distribution\n\nDispatchers distribute correctly labeled e-jack batteries and ensure drivers collect their personal handtrucks. Battery tracking is important for end-of-day accounting.\n\nUsing Omnitracs\n\nDispatchers must enter truck numbers into Omnitracs for each route. Accuracy is critical for tracking and compliance.\n\nLoading Report\n\nEach driver must receive a loading report as part of their paperwork. Dispatchers verify that the correct version is included.\n\nManaging Helpers\n\nDrivers may request helpers. Dispatchers decide based on stop count, case volume, and route difficulty. Safety and efficiency guide decisions.\n\nHandling Missing Routes or Issues\n\nDrivers without a route are notified and may become available helpers. Dispatchers track all available personnel.\n\nEnd-of-Setup Responsibilities",
+      "chunk_token_count": 465
+    },
+    {
+      "id": "warehouse_dispatching_introduction_1",
+      "category": "dispatching",
+      "section_title": "Introduction",
+      "keywords": [
+        "dispatchers",
+        "accuracy",
+        "transportation",
+        "after",
+        "drivers",
+        "processed",
+        "review",
+        "dispatch",
+        "sheet",
+        "send"
+      ],
+      "content": "After all drivers have been processed, dispatchers review the Dispatch Sheet for accuracy and send it to transportation leadership. This document guides operations for the entire day.\n\nImportance of the Role\n\nNight dispatching is a high-pressure position requiring organization and calm decision-making. Dispatchers ensure correct paperwork, equipment, helper assignments, and route accuracy, directly affecting customer satisfaction and transportation success.",
+      "chunk_token_count": 113
+    }
+  ]
+}

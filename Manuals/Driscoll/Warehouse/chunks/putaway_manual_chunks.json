@@ -1,0 +1,47 @@
+{
+  "knowledge_base": "driscoll_warehouse_putaway_manual",
+  "version": "1.0",
+  "description": "Warehouse putaway processes and procedures",
+  "source_file": "putaway manual.docx",
+  "file_hash": "e242d2bf186c93766eaca3c843571a646d425b6bcc8ffd0a3dd419a842a9dc3d",
+  "chunks": [
+    {
+      "id": "warehouse_putaway_introduction_0",
+      "category": "putaway",
+      "section_title": "Introduction",
+      "keywords": [
+        "product",
+        "zone",
+        "pallet",
+        "putaway",
+        "pallets",
+        "items",
+        "placed",
+        "system",
+        "slot",
+        "receiving"
+      ],
+      "content": "Putaway Manual\n\nPutaway Workflow\n\nReceiving and Staging\n\nProducts arrive from vendors or backhauls and are verified by the Receiving Team. Once verified, pallets are labeled and staged by temperature zone: Dry Zone, Cooler Zone, and Freezer Zone. Each staged pallet is ready for transfer to its respective zone by a pallet jack operator.\n\nZone Transfer\n\nPallet jack operators move pallets from the dock to their assigned zones. Pallets are dropped in staging lanes or designated drop points within each zone for the Putaway Team (Hi-Lo Operators).\n\nSlotting Strategy\n\nSlotting decisions are based on:\n- Product type and size: Heavier, high-velocity items are placed in lower aisles (e.g., A–C). Slower-moving or lighter items are placed in higher aisles (e.g., Q–S).\n- Product similarity: Similar items are placed near each other but not adjacent to avoid mispicks (e.g., tomatoes from Company ABC should not be directly next to tomatoes from Company XYZ).\n- FIFO rotation: New inventory is slotted above or behind older stock to maintain proper product rotation.\n- Accessibility: High-volume items are stored in easily accessible areas for efficient picking.\n\nScanning and System Update\n\nEach pallet must be accurately scanned to ensure system accuracy:\n1.Scan the slot barcode using the handheld scanner.\n2. Scan the product barcode on the pallet.\n3. Confirm the product and location on the scanner screen before completing the transaction.\n\nThis process records the product as physically available in the system, updating inventory levels, slot locations, and purchasing/sales visibility.\n\nSafety and Accuracy\n\nAlways inspect slots for clearance and product stability before putting away. Ensure all product labels face outward for easy identification. Double-check slot numbers to prevent misplacement. Report any damaged pallets, missing labels, or unsafe racking conditions to a supervisor immediately.\n\nWhy Putaway Matters",
+      "chunk_token_count": 471
+    },
+    {
+      "id": "warehouse_putaway_introduction_1",
+      "category": "putaway",
+      "section_title": "Introduction",
+      "keywords": [
+        "warehouse",
+        "inventory",
+        "putaway",
+        "picking",
+        "correct",
+        "control",
+        "aisles",
+        "organized",
+        "foundational",
+        "operation"
+      ],
+      "content": "Putaway is a foundational warehouse operation. Its accuracy affects:\n- Picking efficiency: Pickers rely on correct slot information.\n- Inventory control: Prevents shrink, miscounts, and lost product.\n- Customer satisfaction: Ensures correct, on-time deliveries.\n- Operational flow: Keeps aisles organized and reduces congestion.\n\nWithout timely and accurate putaway, the warehouse cannot operate smoothly — leading to picking delays, mispicks, and inaccurate inventory.\n\nWhat you do:\n\n• Complete putaways as soon as possible after receiving.\n\n• Maintain clean and organized aisles at all times.\n\n• Use FIFO rotation diligently.\n\n• Follow all warehouse safety procedures.\n\n• Communicate with Inventory Control if discrepancies occur.",
+      "chunk_token_count": 178
+    }
+  ]
+}

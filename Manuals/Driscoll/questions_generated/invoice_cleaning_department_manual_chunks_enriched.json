@@ -1,0 +1,271 @@
+{
+  "source_file": "manuals\\Driscoll\\Warehouse\\chunks\\invoice_cleaning_department_manual_chunks.json",
+  "enriched_at": "2025-12-22T10:38:51.928277",
+  "chunk_count": 2,
+  "chunks": [
+    {
+      "id": "warehouse_invoice_introduction_0",
+      "content": "Invoice Cleaning Department Manual\n\nOverview\n\nThe Invoice Cleaning Department is responsible for processing, organizing, releasing, archiving, and maintaining invoices from all company warehouses. This role ensures accurate credit allocation, correct documentation, internal communication, and compliance with workflow standards.\n\nFour employees work in this department:\n\nSandra \u2013 Handles Street accounts and Stroudsburg invoices.\n\nMikayla \u2013 Handles Street accounts and Stroudsburg invoices.\n\nAlexa \u2013 Scans all invoices and completes the daily sales report.\n\nCorinna \u2013 Handles all remaining invoices and creates the Customer Pick-Up Report.\n\nDaily Workflow Timeline\n\n**9:00 AM \u2013 10:00 AM:** Alexa completes the Sales Report for all warehouses.\n\n**10:30 AM \u2013 11:00 AM:** Other warehouses begin sending their invoices via Revver.\n\n**11:00 AM \u2013 3:00 PM:** The team works on invoices from the previous day.\n\n**Morning Priority:** All transfer invoices must be processed first.\n\n*Same-Day Releases:** Certain groups require same-day invoice releasing.\n\n**Around 3:00 PM:** The department completes the daily work and begins getting ahead for the next day.\n\nSystems Used\n\n**Revver:** Receives invoices from non-Wayne warehouses.\n\n**Telnet:** Main invoice processing system (releasing, deleting, printing barcodes).\n\n**UnForm Archive:** Stores all released invoices and displays customer credits.\n\n**Email:** All communications must CC the Invoice Cleaning group to maintain transparency.\n\nProcessing Transfer Invoices\n\nTransfer invoices always come first each day.\n\nSteps:\n\n1. In Telnet enter: S \u2192 X \u2192 'transfer' to pull all transfers.\n\n2. Manually delete transfer orders using the command: 2 \u2192 2 \u2192 Order # \u2192 Password: del69.\n\n3. These transfers are deleted even though the department works on yesterday\u2019s invoices.\n\n4. All transfer order barcodes are saved for **one week** in case they need to be scanned or reappear in the system.\n\nSame-Day Release Groups\n\nThese accounts require same-day invoice processing because they care about credit but not the items on invoices:",
+      "content_hash": "c31111ed31b7f81d",
+      "section_title": "invoice",
+      "source_file": "invoice_cleaning_department_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 0,
+      "token_count": 383,
+      "_original": {
+        "keywords": [
+          "invoices",
+          "day",
+          "invoice",
+          "transfer",
+          "department",
+          "processing",
+          "warehouses",
+          "cleaning",
+          "releasing",
+          "handles"
+        ],
+        "email": "",
+        "category": "invoice",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "reference",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "process",
+        "organize",
+        "release",
+        "archive",
+        "maintain",
+        "handle",
+        "scan",
+        "complete",
+        "send",
+        "work",
+        "pull",
+        "delete",
+        "save",
+        "enter"
+      ],
+      "entities": [
+        "invoice",
+        "warehouse",
+        "sales_report",
+        "customer_pick_up_report",
+        "transfer_invoice",
+        "transfer_order",
+        "barcode"
+      ],
+      "actors": [
+        "Sandra",
+        "Mikayla",
+        "Alexa",
+        "Corinna",
+        "invoice_cleaning_department"
+      ],
+      "conditions": [
+        "transfer_invoices_first",
+        "morning_priority",
+        "same_day_release",
+        "save_barcodes_one_week"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "Who handles the Street accounts and Stroudsburg invoices?",
+        "What do we prioritize first thing in the morning?",
+        "How do I pull all transfer invoices in Telnet?",
+        "Why the heck do we delete transfer orders when we're supposed to be working on yesterday's invoices?",
+        "How long should I keep the barcodes for transfer orders?"
+      ],
+      "question_complexity": [
+        1,
+        1,
+        3,
+        2,
+        2
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 7,
+      "actionability_score": 9,
+      "confidence_score": 0.9,
+      "quality_reasoning": "Core operational manual for invoice department with daily workflows, roles, systems, and specific processing steps; slightly incomplete due to cutoff but highly actionable for team members.",
+      "acronyms": {},
+      "jargon": {
+        "Invoice Cleaning Department": "Department responsible for processing, organizing, releasing, archiving, and maintaining invoices from all company warehouses",
+        "Revver": "System for receiving invoices from non-Wayne warehouses",
+        "Telnet": "Main invoice processing system used for releasing, deleting, printing barcodes",
+        "UnForm Archive": "System that stores all released invoices and displays customer credits",
+        "transfer invoices": "Invoices that must be processed first each day, pulled via Telnet command S \u2192 X \u2192 'transfer'",
+        "transfer orders": "Orders manually deleted from transfer invoices using Telnet command 2 \u2192 2 \u2192 Order # \u2192 Password: del69",
+        "Same-Day Releases": "Invoice processing required on the same day for certain groups who prioritize credit over item details",
+        "Sales Report": "Daily report for all warehouses completed by Alexa",
+        "Customer Pick-Up Report": "Report created by Corinna for remaining invoices",
+        "Street accounts": "Accounts handled by Sandra and Mikayla",
+        "Stroudsburg invoices": "Invoices handled by Sandra and Mikayla"
+      },
+      "numeric_thresholds": {
+        "employees_count": {
+          "value": 4,
+          "unit": "",
+          "context": "Number of employees in the Invoice Cleaning Department"
+        },
+        "sales_report_timeframe": {
+          "value": "9:00 AM \u2013 10:00 AM",
+          "unit": "",
+          "context": "Alexa completes the Sales Report"
+        },
+        "invoice_arrival_timeframe": {
+          "value": "10:30 AM \u2013 11:00 AM",
+          "unit": "",
+          "context": "Other warehouses send invoices via Revver"
+        },
+        "previous_day_processing_timeframe": {
+          "value": "11:00 AM \u2013 3:00 PM",
+          "unit": "",
+          "context": "Team works on invoices from the previous day"
+        },
+        "daily_completion_time": {
+          "value": "3:00 PM",
+          "unit": "",
+          "context": "Department completes daily work and prepares for next day"
+        },
+        "barcode_retention_period": {
+          "value": 1,
+          "unit": "week",
+          "context": "Transfer order barcodes saved in case needed"
+        }
+      }
+    },
+    {
+      "id": "warehouse_invoice_introduction_1",
+      "content": "**Einstein Bagels:** S \u2192 Z \u2192 E+\n\n**Massachusetts:** S \u2192 Z \u2192 MA\n\n**Harvest Group:** S \u2192 Z \u2192 C*7\n\n**Sage:** S \u2192 Z \u2192 =W\n\n**Williams College:** S \u2192 Z \u2192 W\n\nThese must be processed immediately upon arrival.\n\nReleasing Invoices to UnForm Archive\n\nReleasing invoices moves them into the archive for visibility by the sales team.\n\nSteps:\n\n1. In Telnet enter: 14 \u2192 3 \u2192 INV \u2192 Enter \u2192 Enter \u2192 Date.\n\n2. Alexa scans all barcodes so they move into the UnForm Archive.\n\n3. The archive records credits and provides customer visibility.\n\n4. All credits for returned cases are created based on the archived documentation.\n\nPrinting Invoice Barcodes\n\nAll barcodes for invoices can be printed as needed.\n\nSteps:\n\n1. In Telnet enter: 14 \u2192 5 \u2192 M (or any printer)\n\n2. All invoice barcodes will print for scanning or filing.\n\nCustomer Pick-Up Report\n\nCorinna creates the Customer Pick-Up Report each day.\n\nThis report shows:\n\nAll items scheduled for pickup by drivers.\n\nThe exact cases customers expect to be returned.\n\nConfirmation sections for driver check-in.\n\nThis report ensures:\n\nTransportation knows what to collect.\n\nDrivers verify pickups by marking items off.\n\nThe rest of the company is notified that all customer pickup requests were satisfied.\n\nDeleting Invoices from Telnet\n\nAfter invoices are processed and archived, they must be deleted from Telnet.\n\nSteps:\n\n1. In Telnet enter: 14 \u2192 6 \u2192 Y \u2192 Printer # \u2192 Y \u2192 Enter.\n\n2. This removes them permanently from the Telnet system.\n\nCommunication Standards\n\nAll communication involving invoices MUST include the Invoice Cleaning email group.\n\nReasons:\n\nEnsures all team members stay aligned.\n\nPrevents missed transfers, same-day releases, or customer credits.\n\nCreates a record of questions, issues, and clarifications.\n\nEnd-of-Day Tasks\n\nBy around 3 PM the department completes the day\u2019s invoice workload.\n\nEnd-of-day duties include:\n\nPreparing ahead for the next day\u2019s invoices.\n\nEnsuring all same-day release groups are completed\n\nValidating that all transfers were deleted.\n\nConfirming barcodes were scanned and archived properly.\n\nClearing any remaining Telnet queues.",
+      "content_hash": "f9d38a544172fa4f",
+      "section_title": "invoice",
+      "source_file": "invoice_cleaning_department_manual_chunks.json",
+      "department_id": "warehouse",
+      "chunk_index": 1,
+      "token_count": 431,
+      "_original": {
+        "keywords": [
+          "invoices",
+          "telnet",
+          "day",
+          "enter",
+          "barcodes",
+          "customer",
+          "archive",
+          "invoice",
+          "report",
+          "steps"
+        ],
+        "email": "",
+        "category": "invoice",
+        "subcategory": ""
+      },
+      "query_types": [
+        "how_to",
+        "policy",
+        "compliance",
+        "training"
+      ],
+      "verbs": [
+        "process",
+        "release",
+        "scan",
+        "record",
+        "create",
+        "print",
+        "delete",
+        "remove",
+        "include",
+        "prepare",
+        "ensure",
+        "complete",
+        "validate",
+        "confirm",
+        "clear",
+        "verify",
+        "notify"
+      ],
+      "entities": [
+        "invoice",
+        "barcode",
+        "UnForm Archive",
+        "credit",
+        "returned case",
+        "Customer Pick-Up Report",
+        "Telnet",
+        "queue"
+      ],
+      "actors": [
+        "sales_team",
+        "Corinna",
+        "Alexa",
+        "drivers",
+        "transportation",
+        "team_members",
+        "invoice_cleaning_department"
+      ],
+      "conditions": [
+        "immediate_upon_arrival",
+        "same-day_release",
+        "end-of-day",
+        "after_processed_and_archived",
+        "returned_cases"
+      ],
+      "is_procedure": true,
+      "is_policy": true,
+      "is_form": false,
+      "synthetic_questions": [
+        "How do I process an Einstein Bagels invoice when it arrives?",
+        "What's the Telnet sequence to release invoices to UnForm Archive?",
+        "I archived the invoices but they're still showing in Telnet\u2014how do I delete them?",
+        "What are the end-of-day tasks to clear the invoice workload?",
+        "Do all invoice emails have to go to the Invoice Cleaning group, and why?"
+      ],
+      "question_complexity": [
+        1,
+        2,
+        2,
+        3,
+        1
+      ],
+      "importance": 9,
+      "specificity": 5,
+      "complexity": 5,
+      "completeness_score": 8,
+      "actionability_score": 9,
+      "confidence_score": 0.92,
+      "quality_reasoning": "Core operational procedures for invoice cleaning department, including specific processing codes, Telnet steps, and daily tasks; highly actionable and frequently needed, assumes basic system familiarity.",
+      "acronyms": {
+        "INV": "Invoices",
+        "MA": "Massachusetts"
+      },
+      "jargon": {
+        "UnForm Archive": "System for archiving invoices to provide sales team visibility and record credits",
+        "Telnet": "Internal system used for invoice processing, barcode printing, archiving, and deletion",
+        "Customer Pick-Up Report": "Daily report showing scheduled pickups, expected customer returns, and driver confirmations",
+        "Invoice Cleaning email group": "Required email group for all invoice-related communications to ensure alignment and record-keeping",
+        "same-day releases": "Invoice groups processed and released on the same day",
+        "transfers": "Invoice transfers that must be validated and deleted after processing",
+        "returned cases": "Customer-returned items documented for credit creation"
+      },
+      "numeric_thresholds": {
+        "end_of_day_deadline": {
+          "value": 3,
+          "unit": "PM",
+          "context": "By around 3 PM, complete daily invoice workload including preparations, releases, deletions, and queue clearing"
+        }
+      }
+    }
+  ]
+}

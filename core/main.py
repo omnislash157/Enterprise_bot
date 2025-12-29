@@ -146,6 +146,14 @@ except ImportError as e:
     logger.warning(f"SSO routes not loaded: {e}")
     SSO_ROUTES_LOADED = False
 
+# Credit routes import
+try:
+    from auth.credit_routes import router as credit_router
+    CREDIT_ROUTES_LOADED = True
+except ImportError as e:
+    logger.warning(f"Credit routes not loaded: {e}")
+    CREDIT_ROUTES_LOADED = False
+
 # Azure auth import
 try:
     from auth.azure_auth import validate_access_token, is_configured as azure_configured
@@ -375,6 +383,11 @@ if ANALYTICS_LOADED:
 if SSO_ROUTES_LOADED:
     app.include_router(sso_router)
     logger.info("[STARTUP] SSO routes loaded at /api/auth")
+
+# Include credit router
+if CREDIT_ROUTES_LOADED:
+    app.include_router(credit_router)
+    logger.info("[STARTUP] Credit routes loaded at /api/credit")
 
 # Include metrics router
 app.include_router(metrics_router, prefix="/api/metrics", tags=["metrics"])
