@@ -119,8 +119,8 @@ def get_driscoll_cursor():
 
     conn_str = (
         "DRIVER={ODBC Driver 17 for SQL Server};"
-        "SERVER=BID1;"  # TODO: Confirm server name
-        "DATABASE=DriscollERP;"  # TODO: Confirm database name
+        "SERVER=BID1;"
+        "DATABASE=CreditManagement;"
         "Trusted_Connection=yes;"
     )
 

@@ -39,7 +39,7 @@ export const NOTES_MAX_LENGTH = 500;
 export const NOTES_OVERFLOW_MESSAGE = "for a sob story this long you're gonna have to sum it up or call credit bro";
 
 // API base URL - empty for same-origin requests in production
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 // ============================================
 // TYPES
@@ -374,11 +374,13 @@ function createCreditStore() {
                 }
 
                 const data = await res.json();
+                // Map PascalCase backend → camelCase frontend
                 const customers: Customer[] = data.customers.map((c: any) => ({
-                    customerId: c.customerNumber,
-                    customerName: c.customerName,
-                    customerNumber: c.customerNumber,
-                    displayText: c.displayText || `${c.customerName} (${c.customerNumber})`,
+                    customerId: c.CustomerNumber,
+                    customerName: c.CustomerName,
+                    customerNumber: c.CustomerNumber,
+                    salesmanId: c.SalesmanID,
+                    displayText: c.DisplayText || `${c.CustomerName} (${c.CustomerNumber})`,
                 }));
 
                 update(s => ({ ...s, customerResults: customers, loadingCustomers: false }));
@@ -440,14 +442,17 @@ function createCreditStore() {
                 }
 
                 const data = await res.json();
+                // Map PascalCase backend → camelCase frontend
                 const invoices: Invoice[] = data.invoices.map((inv: any) => ({
-                    invoiceId: inv.invoiceNumber,
-                    invoiceNumber: inv.invoiceNumber,
-                    invoiceDate: inv.invoiceDate,
-                    poNumber: inv.poNumber,
-                    customerId: inv.customerId,
-                    totalAmount: inv.totalAmount || 0,
-                    displayText: inv.displayText || `${inv.invoiceNumber} | ${inv.invoiceDate} | ${inv.poNumber ? 'PO: ' + inv.poNumber : 'No PO'}`,
+                    invoiceId: inv.InvoiceNumber,
+                    invoiceNumber: inv.InvoiceNumber,
+                    invoiceDate: inv.InvoiceDate,
+                    poNumber: inv.PONumber,
+                    salesmanId: inv.SalesmanID,
+                    warehouse: inv.Warehouse,
+                    customerId: customerId,
+                    totalAmount: 0,
+                    displayText: inv.DisplayText || `${inv.InvoiceNumber} | ${inv.InvoiceDate} | ${inv.PONumber ? 'PO: ' + inv.PONumber : 'No PO'}`,
                 }));
 
                 update(s => ({
@@ -491,16 +496,17 @@ function createCreditStore() {
                 }
 
                 const data = await res.json();
+                // Map PascalCase backend → camelCase frontend
                 const items: LineItem[] = data.lineItems.map((li: any) => ({
-                    lineItemId: li.lineItemId || `${li.invoiceId}-${li.itemNumber}`,
-                    invoiceId: li.invoiceId,
-                    itemNumber: li.itemNumber,
-                    description: li.description,
-                    quantity: li.quantity,
-                    uom: li.uom || 'CS',
-                    unitPrice: li.unitPrice,
-                    extendedPrice: li.extendedPrice,
-                    invoiceKey: li.invoiceKey || `${li.invoiceId}|${li.itemNumber}`,
+                    lineItemId: li.LineItemId || `${li.InvoiceNumber}-${li.ItemNumber}`,
+                    invoiceId: li.InvoiceNumber,
+                    itemNumber: li.ItemNumber,
+                    description: li.ItemDescription,
+                    quantity: parseFloat(li.Quantity) || 0,
+                    uom: li.UOM,  // Keep exact case
+                    unitPrice: parseFloat(li.UnitPrice) || 0,
+                    extendedPrice: parseFloat(li.LineTotal) || 0,
+                    invoiceKey: li.InvoiceKey || `${li.InvoiceNumber}|${li.ItemNumber}`,
                     credit: createDefaultCredit(),
                 }));
 
