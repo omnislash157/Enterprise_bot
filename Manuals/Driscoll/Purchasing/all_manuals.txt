@@ -1,0 +1,318 @@
+================================================================================
+PURCHASING DEPARTMENT - STANDARD OPERATING PROCEDURES
+================================================================================
+
+WAREHOUSE CODES
+---------------
+01 - Wayne (Primary)
+02 - Amsterdam (NY)
+05 - Stroudsburg (PA)
+09 - 5th Street
+
+DAILY RESPONSIBILITIES
+----------------------
+- Review Lost Sales Report every morning (sent by reports@driscollfoods.com)
+- Target fill rate: 99.5%
+- Adjust ETA dates daily
+- Address PO discrepancies immediately
+- Confirm POs at least two days prior to delivery
+
+================================================================================
+PURCHASE ORDER ENTRY
+================================================================================
+
+Path: 9-Purchasing > 1-Purchase Order Entry
+
+1. Enter operator number (first order of session only)
+2. Enter vendor number or "A" to search vendors
+3. Pick Up order? Y/N
+   - If Y: Select M (Managed) or B (Backhaul)
+   - If Managed: Enter pickup date, then arrival date
+4. Enter PO date (format: MMDDYY, e.g., 011924 for Jan 19, 2024)
+5. Use left/right arrows to select ETA based on lead time
+6. Dropship defaults to N
+7. Warehouse defaults to 01 (Wayne)
+   - Press F4 to change: 02 (Amsterdam) or 05 (Stroudsburg)
+8. Enter item numbers and quantities
+9. Enter through until Print (Y/N) - enter Y
+10. Select P/F/E (Print, Fax, Email) - enter E
+11. Confirm email address and CC
+12. Add message if needed
+13. Select 1=Send to transmit order
+
+================================================================================
+PO MAINTENANCE & LOOKUP
+================================================================================
+
+PO On File Screen
+-----------------
+Path: 9-Purchasing > 21-Purchase Orders on File
+Enter warehouse and buyer/analyst number
+
+PO History Lookup
+-----------------
+Path: 9-Purchasing > 30-Look Up PO History
+- Enter PO# directly, OR
+- Enter V + vendor number
+- On vendor 28 screen, press H for full history
+
+================================================================================
+STOCK STATUS REPORT
+================================================================================
+
+Path: 5-Inventory Control > 15-Stock Status Menu > 2-Stock Status by Vendor
+
+Settings:
+- Version: S (Short)
+- Day: D (specific day) or S (select vendor)
+- If Day: Enter M, T, W, R, or F
+- Enter buyer code
+- Enter printer number
+- Warehouse: 01 (Wayne)
+- Print secondary vendors: N
+- Show other warehouse: Y
+- Print flagged items: N (or Y for lockouts/special orders)
+- Enter through to print
+
+================================================================================
+SCHOOL REPORT
+================================================================================
+
+Path: 2-Order Processing > 14-Projection Reports > 4-School Vendor Projection
+
+1. Press Enter
+2. Enter next school day
+3. Enter date 10 school days out (exclude weekends)
+4. Enter buyer number
+5. Press Enter x3
+6. Enter printer number
+
+Reading the Report:
+- Lists items by vendor for NYC Schools
+- ITALICIZED items = potential shorts within 10 days (action required)
+- Options: Place new order, increase existing order, or expedite PO
+
+Note: Email version loses italics formatting.
+
+================================================================================
+INTERCOMPANY TRANSFERS
+================================================================================
+
+Path: 31-Transfer Entry
+
+Transfer Vendor Codes:
+----------------------
+AMSTERDAM TRANSFERS:
+  222111 - Amsterdam Internal (Dry)
+  222112 - Amsterdam Internal (Cooler)
+  222113 - Amsterdam Internal (Freezer)
+
+WAYNE TRANSFERS:
+  898989 - Wayne Internal (Dry)
+  899898 - Wayne Internal (Cooler)
+  899999 - Wayne Internal (Freezer)
+
+CROSS-WAREHOUSE:
+  104807 - Wayne to NY (1-2)
+  111111 - NY to Wayne (2-1)
+  666666 - Wayne to PA (1-5)
+  555555 - PA to Wayne (5-1)
+  104809 - Wayne to 5th Street (1-9)
+  999111 - 5th Street to Wayne (9-1)
+
+================================================================================
+NEW ITEM SETUP
+================================================================================
+
+APPROVAL REQUIRED: All new items must be approved by a manager. Sales requests 
+require DSM approval.
+
+Required Specifications:
+- Pack size
+- Net weight & Gross weight
+- Case cube
+- Manufacturer number
+- Item number
+- UPC
+- TI/HI
+- Billing type
+- Shelf life & Guaranteed shelf life
+
+Setup Procedure:
+----------------
+1. Search for similar items (keep item numbers grouped)
+2. Select similar item number, note it
+3. Return to empty item screen
+4. Press F1, enter the reference number
+5. Select from populated numbers
+6. Enter A to begin
+
+Key Fields:
+-----------
+Field 2 - Item Description:
+  Format: Category first, then specifics
+  Example: "CHIP POTATO BBQ" (not "BBQ Potato Chip")
+  Example: "DRESSING ITALIAN HOMESTYLE" (not "Homestyle Italian Dressing")
+
+Field 6 - Billing Type:
+  1 = By case
+  2 = By weight (LB, OZ)
+  3 = Catchweight (variable weight per delivery)
+
+Field 8 - Pieces Per Case:
+  Enter split quantity, or 1 if no split
+  Note: Avoid splits except for sturdy self-contained items (gallon jugs, etc.)
+
+Field 10/11 - Net and Gross Weight
+Field 14 - Case Cube
+Field 17 - Landed Cost
+Field 20 - Unit type (bag, box, bottle) if applicable
+Field 21 - Manufacturer and item number
+Field 22 - Temperature zone
+Field 27 - TI/HI
+Field 28 - UPC
+Field 32 - Category number (enter ? then spacebar to search)
+Field 38 - Vendor number
+Field 40 - Alpha name (search term for sales reps)
+Field 41 - Brand name
+
+Lockout Options (Field 43):
+---------------------------
+X = Cannot key out until back in stock or on order (ETA-based release)
+Y = Locked to everyone unless inventory on hand
+S = Locked to BOE only
+D = Locked to street sales only
+
+Other Flags:
+------------
+Field 45 - Taxable: Y for non-food items only
+Field 46 - DWO (Done When Out): Item discontinued
+Field 47 - Special Order: Y if one-time purchase, N if stocked
+Field 53 - Exclude Special: Y to keep special order flag permanent
+
+================================================================================
+CLOSE CODING AN ITEM
+================================================================================
+
+Path: 5-Inventory Control > 1-Inventory File Maintenance
+
+1. Enter item number
+2. Left arrow to movement screen
+3. Press F8
+4. Enter salesman number OR 6-digit customer number
+5. Confirm "Ok to add this salesman" - Y
+
+Warehouse Close Codes:
+- C = Wayne
+- P = Stroudsburg
+- Type DIV, Enter, A, Enter = Amsterdam
+
+Note: Close coding restricts item to specific salesman/customer. Different from 
+lockout (Field 43) which blocks all sales.
+
+================================================================================
+CATEGORY BURDEN LOOKUP
+================================================================================
+
+Path: 5-Inventory Control > 8-Inventory Group File Maintenance
+Press ? for dropdown list
+
+================================================================================
+SALES COST CALCULATOR
+================================================================================
+
+From Telnet home screen, type: SLSCOST
+
+1. Enter landed cost (include freight)
+2. Select category from dropdown
+3. Enter if special order (Y/N)
+4. Enter cost basis (case or pound)
+
+Results:
+- SLS Cost = Base cost for sales rep markup
+- MKT Price = Target price (~7% margin for profit goals)
+
+================================================================================
+VENDOR ALLOWANCES & CHARGES
+================================================================================
+
+Path: 9-Purchasing > 28-Vendor Master File Maintenance > AL (Allowance Maintenance)
+
+Header Setup (Select H):
+------------------------
+- Affect Totals: Y (deduct from invoice) or N (no effect)
+- COG: Y (deduct from cost of goods) or N (no effect)
+- Total PO: 0 for item-level allowances, or negative amount for PO-wide
+
+Item Allowances (Select C):
+---------------------------
+1. Enter 6-digit item number
+2. Select: 1=Allowance or 3=Charge
+3. Select basis: Case price, Net weight, Catch weight, Percentage, or Gross weight
+4. Select: 2=Add allowance value or 4=Add charge value
+5. Up arrow, then Y to save
+
+Note: Allowances reduce COG. Charges add to COG.
+To apply to open PO: Enter the PO and tab through items.
+
+================================================================================
+FREIGHT FIELDS
+================================================================================
+
+Freight Allowance 1: Pickup allowance - nets down on invoice
+Freight Allowance 2: Pickup allowance - NO invoice effect (for billbacks)
+Freight Charge 1: Delivery freight - affects PO (delivery orders only)
+Freight Charge 2: Delivery freight - NO invoice effect
+
+IMPORTANT: Review PO freight screen before confirming. Contact manager if unsure.
+
+Minimum backhaul freight: $200
+
+================================================================================
+TRUCKING SPECIFICATIONS
+================================================================================
+
+Straight Truck:
+- Max Pallets: 12
+- Max Weight: 2,400 lbs
+- Max Cube: 700
+
+Tractor Trailer (53'):
+- Max Pallets: 24-25
+- Max Weight: 42,500 lbs (dry) / 43,500 lbs (reefer)
+- Max Cube: 1,400
+
+================================================================================
+DOT SCHEDULE
+================================================================================
+
+Cutoff: Noon
+
+Wayne: Monday for Friday, Thursday for Wednesday
+NY: Monday for Friday
+PA: Thursday for Wednesday
+
+DOT Website: https://www.dotfoods.com/shop/
+
+================================================================================
+UNIPRO FOODSERVICE
+================================================================================
+
+Driscoll Foods is a member of Unipro Foodservice - the largest foodservice 
+cooperative in the US with 850+ distributor members.
+
+Allowance Types:
+----------------
+UPA1 (EDA) - Earned Distributor Allowance:
+  Monthly rebate from suppliers (percentage or dollar amount)
+
+UPA2 (SPA) - Supplier Pooled Allowance:
+  Periodic deals offered through Unipro
+
+Unipro Website Resources:
+- Payment terms
+- Vendor contacts (email, phone)
+- Broker information
+- FOB locations
+- Shipping minimums
+- Letters of Guarantee

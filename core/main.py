@@ -162,6 +162,14 @@ except ImportError as e:
     logger.warning(f"Azure auth not loaded: {e}")
     AZURE_AUTH_LOADED = False
 
+# Personal auth imports (for personal deployment mode)
+try:
+    from auth.personal_auth_routes import router as personal_auth_router
+    PERSONAL_AUTH_LOADED = True
+except ImportError as e:
+    logger.warning(f"Personal auth routes not loaded: {e}")
+    PERSONAL_AUTH_LOADED = False
+
 # =============================================================================
 # AUTH DEPENDENCIES
 # =============================================================================
@@ -400,6 +408,11 @@ if OBSERVABILITY_LOADED:
     app.include_router(alerting_router, prefix="/api/observability/alerts", tags=["observability"])
     logger.info("[STARTUP] Observability routes loaded at /api/observability")
 
+# Personal auth routes (only in personal deployment mode)
+if PERSONAL_AUTH_LOADED and cfg('deployment.mode', 'enterprise') == 'personal':
+    app.include_router(personal_auth_router)
+    logger.info("[STARTUP] Personal auth routes loaded at /api/personal/auth")
+
 # Global engine instance
 engine: Optional[CogTwin] = None
 
@@ -501,6 +514,23 @@ async def startup_event():
             logger.info("[STARTUP] Alert engine started")
         except Exception as e:
             logger.error(f"[STARTUP] Observability init failed: {e}")
+
+    # Initialize Redis for sessions (personal mode)
+    if PERSONAL_AUTH_LOADED and cfg('deployment.mode', 'enterprise') == 'personal':
+        try:
+            import aioredis
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+            app.state.redis = aioredis.from_url(redis_url, decode_responses=True)
+            logger.info("[STARTUP] Redis connected for personal sessions")
+
+            # DB pool already initialized above for enterprise mode, but ensure it's in app.state
+            if not hasattr(app.state, 'db_pool'):
+                from core.database import get_db_pool
+                config = get_config()
+                app.state.db_pool = await get_db_pool(config)
+                logger.info("[STARTUP] DB pool initialized for personal auth")
+        except Exception as e:
+            logger.error(f"[STARTUP] Personal auth infrastructure init failed: {e}")
 
 # =============================================================================
 # SHUTDOWN

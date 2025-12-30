@@ -38,6 +38,10 @@ msal>=1.24.0
 PyJWT>=2.8.0
 cryptography>=41.0.0
 
+# Personal Auth
+argon2-cffi>=21.0.0
+aioredis>=2.0.0
+
 # SDK Tools (for Railway, Memory, DB tools)
 # Note: python-dotenv already listed above
 faiss-cpu>=1.7.4  # or faiss-gpu if CUDA available
