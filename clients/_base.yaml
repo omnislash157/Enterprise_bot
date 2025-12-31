@@ -1,0 +1,16 @@
+# Enterprise Client Base Configuration
+# Features NOT listed here do not exist for the client
+# No need to set features: false - just omit them
+
+auth:
+  azure_ad: true
+  google: false
+  email: false
+
+branding:
+  logo: null
+  primary_color: "#6366f1"
+  theme_css: null
+
+rls:
+  enabled: true

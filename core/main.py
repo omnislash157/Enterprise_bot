@@ -170,6 +170,14 @@ except ImportError as e:
     logger.warning(f"Personal auth routes not loaded: {e}")
     PERSONAL_AUTH_LOADED = False
 
+# Tenant routes import
+try:
+    from core.tenant_routes import router as tenant_router
+    TENANT_ROUTES_LOADED = True
+except ImportError as e:
+    logger.warning(f"Tenant routes not loaded: {e}")
+    TENANT_ROUTES_LOADED = False
+
 # =============================================================================
 # AUTH DEPENDENCIES
 # =============================================================================
@@ -412,6 +420,11 @@ if OBSERVABILITY_LOADED:
 if PERSONAL_AUTH_LOADED and cfg('deployment.mode', 'enterprise') == 'personal':
     app.include_router(personal_auth_router)
     logger.info("[STARTUP] Personal auth routes loaded at /api/personal/auth")
+
+# Tenant routes
+if TENANT_ROUTES_LOADED:
+    app.include_router(tenant_router)
+    logger.info("[STARTUP] Tenant routes loaded at /api/tenant")
 
 # Global engine instance
 engine: Optional[CogTwin] = None

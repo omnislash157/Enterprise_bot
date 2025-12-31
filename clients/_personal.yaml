@@ -1,0 +1,19 @@
+# Cogzy Personal Tier Configuration
+mode: personal
+name: "Cogzy"
+
+auth:
+  google: true
+  email: true
+  azure_ad: false
+
+features:
+  memory_search: true
+  voice_mode: true
+  chat_export: true
+  file_upload: true
+
+branding:
+  logo: /assets/cogzy-logo.svg
+  primary_color: "#8b5cf6"
+  tagline: "Your cognitive companion"

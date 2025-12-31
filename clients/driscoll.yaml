@@ -1,0 +1,29 @@
+tenant_id: "REPLACE_WITH_ACTUAL_UUID"
+slug: driscoll
+name: "Driscoll Intelligence"
+domain: driscollintel.com
+subdomain: null
+
+auth:
+  azure_ad: true
+  # google: omitted = disabled
+  # email: omitted = disabled
+
+features:
+  credit_page: true
+  analytics: true
+  department_switching: true
+  custom_reports: true
+  api_access: true
+
+branding:
+  logo: /assets/clients/driscoll/logo.svg
+  primary_color: "#00ff00"
+  theme_css: /assets/clients/driscoll/theme.css
+
+tables:
+  - enterprise.documents
+  - enterprise.query_log
+  - enterprise.users
+  - enterprise.analytics_events
+  - enterprise.audit_log
