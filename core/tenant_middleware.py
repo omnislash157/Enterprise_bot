@@ -73,6 +73,7 @@ def get_personal_tenant(host: str) -> Optional[TenantContext]:
             branding = yaml_tenant.get("branding", {})
             return TenantContext(
                 tenant_id=tenant_info.get("id", "cogzy"),
+                department="personal",  # Personal tier has no departments
                 slug=tenant_info.get("slug", "cogzy"),
                 name=tenant_info.get("name", "Cogzy"),
                 domain=host,
