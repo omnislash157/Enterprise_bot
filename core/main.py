@@ -416,8 +416,8 @@ if OBSERVABILITY_LOADED:
     app.include_router(alerting_router, prefix="/api/observability/alerts", tags=["observability"])
     logger.info("[STARTUP] Observability routes loaded at /api/observability")
 
-# Personal auth routes (only in personal deployment mode)
-if PERSONAL_AUTH_LOADED and cfg('deployment.mode', 'enterprise') == 'personal':
+# Personal auth routes - always available (tenant routing determines which UI shows)
+if PERSONAL_AUTH_LOADED:
     app.include_router(personal_auth_router)
     logger.info("[STARTUP] Personal auth routes loaded at /api/personal/auth")
 
@@ -528,16 +528,20 @@ async def startup_event():
         except Exception as e:
             logger.error(f"[STARTUP] Observability init failed: {e}")
 
-    # Initialize Redis for sessions (personal mode)
-    if PERSONAL_AUTH_LOADED and cfg('deployment.mode', 'enterprise') == 'personal':
+    # Initialize Redis for personal auth sessions (always, domain routing picks auth method)
+    if PERSONAL_AUTH_LOADED:
         try:
             import aioredis
-            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
-            app.state.redis = aioredis.from_url(redis_url, decode_responses=True)
-            await app.state.redis.ping()  # Verify connection
-            logger.info("[STARTUP] Redis session store initialized")
+            redis_url = os.getenv("REDIS_URL")
+            if redis_url:
+                app.state.redis = aioredis.from_url(redis_url, decode_responses=True)
+                await app.state.redis.ping()
+                logger.info("[STARTUP] Redis session store initialized")
+            else:
+                app.state.redis = None
+                logger.warning("[STARTUP] REDIS_URL not set - personal auth sessions disabled")
 
-            # DB pool already initialized above for enterprise mode, but ensure it's in app.state
+            # Ensure DB pool is in app.state for personal auth
             if not hasattr(app.state, 'db_pool'):
                 from core.database import get_db_pool
                 config = get_config()
@@ -545,7 +549,7 @@ async def startup_event():
                 logger.info("[STARTUP] DB pool initialized for personal auth")
         except Exception as e:
             app.state.redis = None
-            logger.error(f"[STARTUP] Personal auth infrastructure init failed: {e}")
+            logger.error(f"[STARTUP] Redis init failed: {e}")
 
 # =============================================================================
 # SHUTDOWN
