@@ -8,7 +8,7 @@
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
 	import { tenant, tenantLoading } from '$lib/stores/tenant';
-	import CogzySplash from '$lib/components/CogzySplash.svelte';
+	import CogzySplash from '$lib/components/Cogzysplash.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import ConnectionStatus from '$lib/components/ConnectionStatus.svelte';
