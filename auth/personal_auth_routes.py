@@ -35,7 +35,7 @@ COOKIE_NAME = "session_id"
 COOKIE_SECURE = os.getenv("ENV", "production") == "production"  # HTTPS only in prod
 COOKIE_DOMAIN = os.getenv("COOKIE_DOMAIN", None)  # None = current domain
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
-FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://cogzy.ai")
 
 
 # =============================================================================
