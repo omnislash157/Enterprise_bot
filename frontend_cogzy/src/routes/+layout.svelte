@@ -8,11 +8,11 @@
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
 	import { tenant, tenantLoading } from '$lib/stores/tenant';
-	import Login from '$lib/components/Login.svelte';
+	import CogzySplash from '$lib/components/CogzySplash.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
 	import ConnectionStatus from '$lib/components/ConnectionStatus.svelte';
-	
+
 	// NO static import of AmbientBackground - it contains Canvas which breaks SSR
 	let AmbientBackground: any = null;
 
@@ -65,7 +65,7 @@
 		<p>{$tenantLoading ? 'Loading tenant...' : $authLoading ? 'Authenticating...' : 'Loading...'}</p>
 	</div>
 {:else if !$isAuthenticated}
-	<Login />
+	<CogzySplash />
 {:else}
 	<!-- AUTHENTICATED: Show Ribbon + Content -->
 	<div class="app-shell" class:normie-mode={$theme === 'normie'}>
