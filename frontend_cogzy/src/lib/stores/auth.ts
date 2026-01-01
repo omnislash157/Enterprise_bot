@@ -27,7 +27,8 @@ interface AuthState {
 }
 
 function getApiBase(): string {
-    return import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    // TODO: revert to env var once Railway build-time injection is fixed
+    return import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
 }
 
 function createAuthStore() {

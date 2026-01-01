@@ -42,7 +42,7 @@ function createTenantStore() {
             update(state => ({ ...state, loading: true, error: null }));
 
             try {
-                const apiBase = import.meta.env.VITE_API_URL || '';
+                const apiBase = import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
                 const res = await fetch(`${apiBase}/api/tenant/config`, {
                     credentials: 'include',
                 });
