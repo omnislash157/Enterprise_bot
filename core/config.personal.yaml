@@ -1,0 +1,25 @@
+# Personal mode config for local testing
+# Use: COGTWIN_CONFIG=core/config.personal.yaml uvicorn core.main:app
+
+deployment:
+  mode: personal
+  tier: basic
+
+tenant:
+  id: cogzy
+  name: "Cogzy"
+  allowed_domains:
+    - gmail.com
+    - cogzy.ai
+
+features:
+  context_stuffing:
+    enabled: false
+  memory_search: true
+  voice_mode: true
+  chat_export: true
+  file_upload: true
+
+model:
+  provider: xai
+  model_id: grok-beta
