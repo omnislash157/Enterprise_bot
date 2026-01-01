@@ -36,7 +36,7 @@ interface VaultState {
 }
 
 function getApiBase(): string {
-    return import.meta.env.VITE_API_URL || 'http://localhost:8000';
+    return import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
 }
 
 function createVaultStore() {

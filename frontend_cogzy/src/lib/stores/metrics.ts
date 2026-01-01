@@ -121,7 +121,7 @@ function createMetricsStore() {
     const maxReconnectAttempts = 5;
 
     function getWsUrl(): string {
-        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const apiUrl = import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
         const wsProtocol = apiUrl.startsWith('https') ? 'wss' : 'ws';
         const host = new URL(apiUrl).host;
         return `${wsProtocol}://${host}/api/metrics/stream`;
@@ -207,7 +207,7 @@ function createMetricsStore() {
         // Fallback: manual fetch if WebSocket not available
         async fetchSnapshot() {
             try {
-                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+                const apiUrl = import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
                 const res = await fetch(`${apiUrl}/api/metrics/snapshot`, {
                     headers: { 'X-User-Email': auth.getEmail() || '' }
                 });

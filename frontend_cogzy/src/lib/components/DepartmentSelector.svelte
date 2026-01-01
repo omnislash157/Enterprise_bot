@@ -18,7 +18,7 @@
     let initialized = false;  // Track if we've done initial setup
 
     function getApiBase(): string {
-        return import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        return import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
     }
 
     onMount(async () => {

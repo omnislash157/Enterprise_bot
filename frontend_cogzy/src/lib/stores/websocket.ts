@@ -25,8 +25,8 @@ function getWebSocketUrl(sessionId: string): string {
 		return `${wsProtocol}://${window.location.host}/ws/${sessionId}`;
 	}
 
-	// Dev fallback
-	return `ws://localhost:8000/ws/${sessionId}`;
+	// Production fallback
+	return `wss://lucky-love-production.up.railway.app/ws/${sessionId}`;
 }
 
 function createWebSocketStore() {

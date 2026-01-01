@@ -105,12 +105,13 @@ async def get_current_user(request: Request, auth: PersonalAuthService = Depends
 
 def set_session_cookie(response: Response, session_id: str):
     """Set the session cookie with secure defaults."""
+    # Cross-origin requires SameSite=None (frontend on cogzy.ai, backend on railway)
     response.set_cookie(
         key=COOKIE_NAME,
         value=session_id,
         httponly=True,
-        secure=COOKIE_SECURE,
-        samesite="lax",
+        secure=True,  # Required for SameSite=None
+        samesite="none",  # Allow cross-origin
         max_age=7 * 24 * 60 * 60,  # 7 days
         domain=COOKIE_DOMAIN,
         path="/",
@@ -122,8 +123,8 @@ def clear_session_cookie(response: Response):
     response.delete_cookie(
         key=COOKIE_NAME,
         httponly=True,
-        secure=COOKIE_SECURE,
-        samesite="lax",
+        secure=True,
+        samesite="none",
         domain=COOKIE_DOMAIN,
         path="/",
     )
