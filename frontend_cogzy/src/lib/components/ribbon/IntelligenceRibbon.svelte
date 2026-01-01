@@ -26,6 +26,7 @@
     // Navigation items - always visible
     const primaryNav = [
         { href: '/', label: 'Chat', icon: 'chat' as const },
+        { href: '/vault', label: 'Memory', icon: 'vault' as const },
         { href: '/credit', label: 'Credits', icon: 'document' as const },
     ];
 

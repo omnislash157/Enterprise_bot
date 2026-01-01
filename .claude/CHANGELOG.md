@@ -1,5 +1,26 @@
 # CogTwin Development Changelog
 
+## [2026-01-01 22:00] - Cogzy Personal SaaS Frontend Complete
+### Files Modified
+- frontend_cogzy/src/lib/stores/auth.ts - Complete rewrite for cookie-based sessions with Google OAuth + email/password
+- frontend_cogzy/src/lib/components/Login.svelte - New login component with Google as primary, email/password toggle, registration flow
+- frontend_cogzy/src/routes/auth/google/callback/+page.svelte - Updated for new auth store
+- frontend_cogzy/src/lib/components/ChatOverlay.svelte - Rebranded to Cogzy
+- frontend_cogzy/src/lib/components/ribbon/IntelligenceRibbon.svelte - Rebranded to Cogzy
+- frontend_cogzy/src/routes/+page.svelte - Title changed to Cogzy
+- frontend_cogzy/src/routes/admin/+page.svelte - Title changed to Cogzy
+- frontend_cogzy/src/routes/admin/analytics/+page.svelte - Title changed to Cogzy
+- frontend_cogzy/src/lib/components/admin/BatchImportModal.svelte - Placeholder emails updated
+- frontend_cogzy/src/lib/components/admin/CreateUserModal.svelte - Placeholder emails updated
+- frontend_cogzy/src/lib/cheeky/phrases.ts - Replaced Driscoll food service phrases with Cogzy cognitive themes
+- core/main.py - Domain-based twin routing (enterprise vs personal by email domain)
+- auth/personal_auth.py - Vault provisioning on signup (Google + email registration)
+- auth/personal_vault_routes.py - Moved from routes/, uncommented B2 and pipeline calls
+- core/tenant_loader.py - Tenant resolution for cogzy.ai, *.cogzy.ai, custom domains
+- core/tenant_routes.py - /api/tenant/config endpoint for frontend config
+### Summary
+**COGZY PERSONAL SAAS TIER COMPLETE**: Full frontend and backend wiring for Cogzy personal tier. **Frontend Auth Rewrite**: Replaced JWT/Azure AD auth store with cookie-based session auth. Google OAuth as primary login (white button with Google logo), email/password as secondary (toggle to show form). Registration flow with display name and password confirmation. Added getEmail() and getAuthHeader() methods for backwards compatibility with enterprise stores. All derived stores (isAuthenticated, currentUser, authLoading) preserved. **Branding Overhaul**: Changed all "Driscoll Intelligence" references to "Cogzy" across ChatOverlay, IntelligenceRibbon, page titles, admin pages. Updated placeholder emails from driscollfoods.com to gmail.com. Replaced Driscoll food service spinner with Cogzy cognitive theme (brain, thought bubble, lightning, sparkles, crystal ball). **Domain-Based Twin Routing**: Single backend serves both enterprise and personal. Enterprise domains (driscollfoods.com) route to EnterpriseTwin with context stuffing. Personal domains (gmail.com, cogzy.ai) route to CogTwin with memory pipelines. Lazy-loaded twin singletons for efficiency. **Vault Provisioning**: On signup (both Google OAuth and email registration), automatically creates B2 vault at users/{uuid}/, inserts vault record to personal.vaults, inserts free tier record to personal.user_tiers. **Cleanup**: Removed redundant /login route (main app shows Login component when not authenticated), removed old personalAuth.ts store (consolidated into main auth.ts), removed unused Microsoft SSO callback. **Architecture**: Cookie-based sessions (HTTP-only, Secure, SameSite=Lax), credentials: 'include' on all fetch calls, no JWT tokens or localStorage for auth, 7-day session TTL with Redis storage. **Status**: ✅ Ready for end-to-end testing. Run `cd frontend_cogzy && npm run dev` with backend at localhost:8000.
+
 ## [2026-01-01 18:30] - Vault Ingestion Build (Phases 1-3 Complete)
 ### Files Modified
 - migrations/007_personal_vaults.sql - Created database migration with 3 tables (vaults, vault_uploads, user_tiers)
