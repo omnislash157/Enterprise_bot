@@ -52,4 +52,4 @@ psutil>=5.9.0
 
 # Credit Module (PDF generation, SQL Server)
 reportlab>=4.0.0
-pyodbc>=5.0.0b; 2sdk>=2.0.0
+pyodbc>=5.0.0

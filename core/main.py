@@ -55,7 +55,7 @@ except ImportError as e:
 
 class Settings:
     app_name: str = "Driscoll Enterprise Bot"
-    cors_origins: list = ["https://driscollintel.com", "http://localhost:5173"]
+    cors_origins: list = ["https://cogzy.ai", "https://driscollintel.com", "http://localhost:5173", "http://localhost:5174"]
     data_dir: Path = Path("./data")
 
     # Email whitelist - loaded from JSON or env
