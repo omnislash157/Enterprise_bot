@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uvicorn:*)",
+      "Bash(npm run:*)",
+      "Bash(pytest:*)",
+      "Bash(python:*)"
+    ],
+    "deny": []
+  },
+  "env": {
+    "COGTWIN_CONFIG": "core/config.yaml"
+  }
+}

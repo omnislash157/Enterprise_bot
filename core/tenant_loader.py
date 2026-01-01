@@ -44,19 +44,43 @@ def load_personal() -> dict:
         return yaml.safe_load(f)
 
 
-@lru_cache(maxsize=32)
-def load_tenant(slug: str) -> dict:
-    """Load tenant config by slug, merged with base."""
+def load_tenant_yaml(slug: str) -> dict:
+    """Load a tenant YAML with _extends inheritance support."""
     tenant_file = CLIENTS_DIR / f"{slug}.yaml"
 
     if not tenant_file.exists():
         raise ValueError(f"Unknown tenant: {slug}")
 
     with open(tenant_file) as f:
-        tenant = yaml.safe_load(f)
+        tenant = yaml.safe_load(f) or {}
 
-    base = load_base()
-    return deep_merge(base, tenant)
+    # Handle _extends inheritance
+    if "_extends" in tenant:
+        extends = tenant["_extends"].replace(".yaml", "")
+        if extends == "_personal":
+            base = load_personal()
+        elif extends == "_base":
+            base = load_base()
+        else:
+            base = load_tenant_yaml(extends)
+        merged = deep_merge(base, tenant)
+        del merged["_extends"]
+        return merged
+
+    return tenant
+
+
+@lru_cache(maxsize=32)
+def load_tenant(slug: str) -> dict:
+    """Load tenant config by slug, with inheritance and base merging."""
+    tenant = load_tenant_yaml(slug)
+
+    # If mode is not personal and no explicit _extends, merge with enterprise base
+    if tenant.get("mode") != "personal":
+        base = load_base()
+        return deep_merge(base, tenant)
+
+    return tenant
 
 
 def get_tenant_by_domain(domain: str) -> Optional[dict]:
@@ -88,16 +112,19 @@ def resolve_tenant(host: str) -> dict:
     Resolve tenant from request host.
 
     Logic:
-    1. cogzy.ai (exact) -> personal config
+    1. cogzy.ai (exact) -> cogzy.yaml (personal tier)
     2. *.cogzy.ai -> extract subdomain -> enterprise tenant
     3. custom domain -> enterprise tenant by domain
     4. fallback -> personal config
     """
     host = host.lower().split(":")[0]  # Remove port if present
 
-    # Exact match: cogzy.ai
-    if host == "cogzy.ai":
-        return load_personal()
+    # Personal tier domains: cogzy.ai, localhost, 127.0.0.1
+    if host in ("cogzy.ai", "localhost", "127.0.0.1"):
+        try:
+            return load_tenant("cogzy")
+        except ValueError:
+            return load_personal()
 
     # Subdomain: xxx.cogzy.ai
     if host.endswith(".cogzy.ai"):

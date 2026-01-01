@@ -534,7 +534,8 @@ async def startup_event():
             import aioredis
             redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
             app.state.redis = aioredis.from_url(redis_url, decode_responses=True)
-            logger.info("[STARTUP] Redis connected for personal sessions")
+            await app.state.redis.ping()  # Verify connection
+            logger.info("[STARTUP] Redis session store initialized")
 
             # DB pool already initialized above for enterprise mode, but ensure it's in app.state
             if not hasattr(app.state, 'db_pool'):
@@ -543,6 +544,7 @@ async def startup_event():
                 app.state.db_pool = await get_db_pool(config)
                 logger.info("[STARTUP] DB pool initialized for personal auth")
         except Exception as e:
+            app.state.redis = None
             logger.error(f"[STARTUP] Personal auth infrastructure init failed: {e}")
 
 # =============================================================================
@@ -551,7 +553,15 @@ async def startup_event():
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    """Clean shutdown of observability components."""
+    """Clean shutdown of all components."""
+    # Close Redis session store
+    if hasattr(app.state, 'redis') and app.state.redis:
+        try:
+            await app.state.redis.close()
+            logger.info("[SHUTDOWN] Redis session store closed")
+        except Exception as e:
+            logger.error(f"[SHUTDOWN] Redis cleanup error: {e}")
+
     # Close database pool
     try:
         from core.database import close_db_pool

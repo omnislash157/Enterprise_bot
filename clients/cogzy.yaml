@@ -1,0 +1,18 @@
+# Cogzy - Personal SaaS Tier
+# cogzy.ai root domain
+_extends: _personal.yaml
+
+tenant:
+  id: cogzy
+  name: "Cogzy"
+  slug: cogzy
+  type: personal
+
+branding:
+  logo: /assets/cogzy-logo.svg
+  logo_alt: "Cogzy"
+  title: "Cogzy"
+  tagline: "Your cognitive companion"
+  primary_color: "#00ff41"
+  accent_color: "#ff0055"
+  background: "#050505"
