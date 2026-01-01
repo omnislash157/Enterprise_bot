@@ -210,11 +210,39 @@ class PersonalAuthService:
                 verification_token, verification_expires
             )
 
+            user_id = str(user["id"])
             logger.info(f"Registered new user: {email}")
+
+            # === VAULT PROVISIONING (Phase 4A) ===
+            try:
+                from core.vault_service import get_vault_service
+                from core.config_loader import load_config
+
+                config = load_config()
+                vault_service = get_vault_service(config)
+                await vault_service.create_vault(user_id)
+
+                # Create vault record in DB
+                await conn.execute("""
+                    INSERT INTO personal.vaults (user_id, prefix, status)
+                    VALUES ($1, $2, 'empty')
+                """, user["id"], f"users/{user_id}")
+
+                # Create tier record (free by default)
+                await conn.execute("""
+                    INSERT INTO personal.user_tiers (user_id, tier)
+                    VALUES ($1, 'free')
+                """, user["id"])
+
+                logger.info(f"Provisioned vault for new user: {email}")
+            except Exception as e:
+                logger.error(f"Vault provisioning failed for {email}: {e}")
+                # Don't fail registration - vault can be created later
+            # === END VAULT PROVISIONING ===
 
             return AuthResult(
                 success=True,
-                user_id=str(user["id"]),
+                user_id=user_id,
                 email=user["email"],
                 display_name=user["display_name"],
             )
@@ -464,6 +492,33 @@ class PersonalAuthService:
                     )
                     user_id = str(user["id"])
                     logger.info(f"Created new Google user: {email}")
+
+                    # === VAULT PROVISIONING (Phase 4A) ===
+                    try:
+                        from core.vault_service import get_vault_service
+                        from core.config_loader import load_config
+
+                        config = load_config()
+                        vault_service = get_vault_service(config)
+                        await vault_service.create_vault(user_id)
+
+                        # Create vault record in DB
+                        await conn.execute("""
+                            INSERT INTO personal.vaults (user_id, prefix, status)
+                            VALUES ($1, $2, 'empty')
+                        """, user["id"], f"users/{user_id}")
+
+                        # Create tier record (free by default)
+                        await conn.execute("""
+                            INSERT INTO personal.user_tiers (user_id, tier)
+                            VALUES ($1, 'free')
+                        """, user["id"])
+
+                        logger.info(f"Provisioned vault for new Google user: {email}")
+                    except Exception as e:
+                        logger.error(f"Vault provisioning failed for {email}: {e}")
+                        # Don't fail auth - vault can be created later
+                    # === END VAULT PROVISIONING ===
 
             # Create session
             session_id = await self.create_session(

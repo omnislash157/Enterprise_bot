@@ -921,3 +921,142 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+# =============================================================================
+# USER-SCOPED PIPELINE ENTRY POINT
+# =============================================================================
+
+async def run_pipeline_for_user(
+    user_id: str,
+    source_type: str,
+    upload_id: str,
+    config: dict,
+) -> dict:
+    """
+    Run ingestion pipeline for a specific user's upload.
+
+    Reads from user's B2 vault, processes, writes back to vault.
+
+    Args:
+        user_id: User UUID
+        source_type: anthropic, openai, grok, gemini
+        upload_id: UUID of the vault_uploads record
+        config: Full config dict
+
+    Returns:
+        dict with nodes_created, nodes_deduplicated counts
+    """
+    from core.vault_service import get_vault_service
+    from io import BytesIO
+
+    vault = get_vault_service(config)
+    paths = vault.get_paths(user_id)
+
+    logger.info(f"Running pipeline for user {user_id}, upload {upload_id}")
+
+    # 1. List files in uploads/{source_type}/
+    upload_prefix = f"{paths.uploads}/{source_type}/"
+    upload_files = await vault.list_files(upload_prefix)
+
+    if not upload_files:
+        raise ValueError(f"No files found in {upload_prefix}")
+
+    # 2. Download and parse each file
+    all_exchanges = []
+    for file_path in upload_files:
+        if file_path.endswith("/.keep"):
+            continue
+
+        content = await vault.download_file(file_path)
+
+        # Use existing chat parser
+        from memory.ingest.chat_parser import parse_chat_export
+        exchanges = parse_chat_export(content, source_type)
+        all_exchanges.extend(exchanges)
+
+    logger.info(f"Parsed {len(all_exchanges)} exchanges from {len(upload_files)} files")
+
+    # 3. Load existing nodes for dedup
+    existing_nodes = []
+    try:
+        existing_content = await vault.download_file(paths.nodes_json())
+        existing_data = json.loads(existing_content)
+        existing_nodes = [MemoryNode.from_dict(d) for d in existing_data]
+    except:
+        pass  # No existing nodes yet
+
+    # 4. Deduplicate
+    from memory.ingest.dedup import deduplicate_exchanges
+    new_exchanges, dedup_count = deduplicate_exchanges(
+        all_exchanges,
+        existing_nodes
+    )
+
+    logger.info(f"After dedup: {len(new_exchanges)} new, {dedup_count} duplicates skipped")
+
+    if not new_exchanges:
+        return {"nodes_created": 0, "nodes_deduplicated": dedup_count}
+
+    # 5. Convert to nodes
+    nodes = [exchange_to_node(ex, user_id=user_id) for ex in new_exchanges]
+
+    # 6. Embed (GPU parallel)
+    from embedder import get_embedder
+    embedder = get_embedder(config)
+
+    texts = [f"{n.human_content} {n.assistant_content}" for n in nodes]
+    embeddings = await embedder.embed_batch(texts, show_progress=True)
+
+    # 7. Cluster (optional, can skip for now)
+    # from streaming_cluster import StreamingClusterEngine
+    # ...
+
+    # 8. Save to vault
+    # Merge with existing
+    all_nodes = existing_nodes + nodes
+    nodes_json = json.dumps([n.to_dict() for n in all_nodes], default=str)
+    await vault.upload_bytes(user_id, "corpus/nodes.json", nodes_json.encode())
+
+    # Save embeddings
+    import numpy as np
+    if existing_nodes:
+        # Load existing embeddings
+        try:
+            existing_emb_bytes = await vault.download_file(paths.embeddings_npy())
+            existing_emb = np.load(BytesIO(existing_emb_bytes))
+            all_embeddings = np.vstack([existing_emb, np.array(embeddings)])
+        except:
+            all_embeddings = np.array(embeddings)
+    else:
+        all_embeddings = np.array(embeddings)
+
+    emb_buffer = BytesIO()
+    np.save(emb_buffer, all_embeddings)
+    await vault.upload_bytes(user_id, "vectors/nodes.npy", emb_buffer.getvalue())
+
+    logger.info(f"Saved {len(nodes)} new nodes to vault ({len(all_nodes)} total)")
+
+    return {
+        "nodes_created": len(nodes),
+        "nodes_deduplicated": dedup_count
+    }
+
+
+def exchange_to_node(exchange: dict, user_id: str) -> MemoryNode:
+    """Convert a parsed exchange to a MemoryNode with user scoping."""
+    from core.schemas import MemoryNode, Source
+
+    return MemoryNode(
+        id=exchange.get("id") or hashlib.sha256(
+            f"{exchange['human'][:100]}{exchange['assistant'][:100]}".encode()
+        ).hexdigest()[:16],
+        source=Source(exchange.get("source", "unknown")),
+        conversation_id=exchange.get("conversation_id", "import"),
+        sequence_index=exchange.get("sequence_index", 0),
+        created_at=exchange.get("timestamp") or datetime.now(),
+        human_content=exchange["human"],
+        assistant_content=exchange["assistant"],
+        user_id=user_id,  # CRITICAL: Scope to user
+        tenant_id=None,   # Personal tier, no tenant
+    )

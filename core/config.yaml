@@ -79,6 +79,32 @@ features:
     analytics_dashboard: false
 
 # =============================================================================
+# USER TIERS (Personal SaaS)
+# =============================================================================
+tiers:
+  free:
+    messages_per_day: 20
+    upload_enabled: true        # The hook - let them taste memory
+    max_vault_size_mb: 100      # ~10k conversations
+    features:
+      - basic_chat
+      - memory_upload
+      - context_window_1m       # Use Grok's context
+
+  premium:
+    messages_per_day: -1        # Unlimited (-1)
+    upload_enabled: true
+    max_vault_size_mb: 10000    # 10GB - years of conversation
+    features:
+      - basic_chat
+      - memory_upload
+      - context_window_2m
+      - memory_search
+      - metacognitive_mirror
+      - voice_mode
+    price_monthly_usd: 20
+
+# =============================================================================
 # MODEL
 # =============================================================================
 model:
@@ -126,11 +152,59 @@ voice:
     default: corporate
 
 # =============================================================================
+# VAULT STORAGE (B2)
+# =============================================================================
+vault:
+  provider: b2
+  bucket: ${B2_BUCKET_NAME}          # From .env
+  key_id: ${B2_APPLICATION_KEY_ID}   # From .env
+  app_key: ${B2_APPLICATION_KEY}     # From .env
+  base_prefix: users                 # users/{user_uuid}/...
+
+  # Subdirectories created per user
+  structure:
+    uploads: uploads      # Raw chat exports
+    corpus: corpus        # Processed nodes.json
+    vectors: vectors      # Embeddings .npy files
+    indexes: indexes      # FAISS, clusters
+
+# =============================================================================
+# INGESTION PIPELINE (Personal tier)
+# =============================================================================
+ingestion:
+  enabled: true
+
+  # Embedding acceleration
+  embedder:
+    provider: deepinfra
+    model: BAAI/bge-m3
+    max_concurrent: 200           # DeepInfra limit - redline it
+    batch_size: 32
+
+  # Job queue (Redis)
+  queue:
+    redis_key_prefix: cogzy:jobs
+    max_retries: 3
+    job_timeout_seconds: 3600     # 1 hour max per upload
+
+  # Deduplication
+  dedup:
+    enabled: true
+    hash_fields:                  # Fields used for content hash
+      - human_content
+      - assistant_content
+      - conversation_id
+
+# =============================================================================
 # PATHS
 # =============================================================================
 paths:
-  data_dir: ./data              # Will be empty (no memories yet)
+  # Local paths (enterprise mode / dev fallback)
+  data_dir: ./data
   manuals_root: ./manuals
+
+  # Personal tier uses vault paths instead
+  # Resolved at runtime: vault.base_prefix/{user_id}/corpus/nodes.json
 
 # =============================================================================
 # RETRIEVAL (only when memory_pipelines: true - dormant)

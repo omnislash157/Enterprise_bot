@@ -87,22 +87,72 @@ except ImportError as e:
 
 
 # =============================================================================
-# TWIN ROUTER
+# TWIN ROUTER - Domain-based lazy singletons
 # =============================================================================
 
-def get_twin():
-    """Router: select orchestrator based on deployment mode."""
-    from .config_loader import get_config
-    mode = cfg('deployment.mode', 'personal')
+# Lazy-loaded singletons
+_enterprise_twin = None
+_cog_twin = None
 
-    if mode == 'enterprise':
+# Domain routing rules
+ENTERPRISE_DOMAINS = {'driscollfoods.com'}  # Enterprise SSO domains
+PERSONAL_DOMAINS = {'gmail.com', 'cogzy.ai', 'localhost'}  # Personal tier domains
+
+
+def get_enterprise_twin():
+    """Lazy-load EnterpriseTwin singleton."""
+    global _enterprise_twin
+    if _enterprise_twin is None:
         from .enterprise_twin import EnterpriseTwin
-        logger.info("[STARTUP] Initializing EnterpriseTwin (enterprise mode)...")
-        return EnterpriseTwin(get_config())  # Pass config
-    else:
+        from .config_loader import get_config
+        logger.info("[TWIN] Initializing EnterpriseTwin (lazy)...")
+        _enterprise_twin = EnterpriseTwin(get_config())
+    return _enterprise_twin
+
+
+def get_cog_twin():
+    """Lazy-load CogTwin singleton."""
+    global _cog_twin
+    if _cog_twin is None:
         from .cog_twin import CogTwin
-        logger.info("[STARTUP] Initializing CogTwin (personal mode)...")
-        return CogTwin()
+        logger.info("[TWIN] Initializing CogTwin (lazy)...")
+        _cog_twin = CogTwin()
+    return _cog_twin
+
+
+def get_twin_for_domain(domain: str):
+    """
+    Route to appropriate twin based on domain.
+
+    Args:
+        domain: Email domain (e.g., 'driscollfoods.com', 'gmail.com')
+
+    Returns:
+        EnterpriseTwin for enterprise domains, CogTwin for personal domains
+    """
+    domain_lower = domain.lower() if domain else ''
+
+    # Check enterprise domains first
+    if domain_lower in ENTERPRISE_DOMAINS:
+        return get_enterprise_twin(), 'enterprise'
+
+    # Check personal domains
+    if domain_lower in PERSONAL_DOMAINS or domain_lower.endswith('.cogzy.ai'):
+        return get_cog_twin(), 'personal'
+
+    # Default: check config for fallback behavior
+    mode = cfg('deployment.mode', 'personal')
+    if mode == 'enterprise':
+        return get_enterprise_twin(), 'enterprise'
+    return get_cog_twin(), 'personal'
+
+
+def get_twin():
+    """Legacy function - returns twin based on config mode."""
+    mode = cfg('deployment.mode', 'personal')
+    if mode == 'enterprise':
+        return get_enterprise_twin()
+    return get_cog_twin()
 
 
 # Auth imports
@@ -169,6 +219,14 @@ try:
 except ImportError as e:
     logger.warning(f"Personal auth routes not loaded: {e}")
     PERSONAL_AUTH_LOADED = False
+
+# Personal vault routes
+try:
+    from auth.personal_vault_routes import router as personal_vault_router
+    PERSONAL_VAULT_LOADED = True
+except ImportError as e:
+    logger.warning(f"Personal vault routes not loaded: {e}")
+    PERSONAL_VAULT_LOADED = False
 
 # Tenant routes import
 try:
@@ -421,12 +479,17 @@ if PERSONAL_AUTH_LOADED:
     app.include_router(personal_auth_router)
     logger.info("[STARTUP] Personal auth routes loaded at /api/personal/auth")
 
+# Personal vault routes
+if PERSONAL_VAULT_LOADED:
+    app.include_router(personal_vault_router)
+    logger.info("[STARTUP] Personal vault routes loaded at /api/personal/vault")
+
 # Tenant routes
 if TENANT_ROUTES_LOADED:
     app.include_router(tenant_router)
     logger.info("[STARTUP] Tenant routes loaded at /api/tenant")
 
-# Global engine instance
+# Global engine instance (legacy fallback - prefer domain-based routing)
 engine: Optional[CogTwin] = None
 
 # =============================================================================
@@ -448,19 +511,16 @@ async def startup_event():
     # Load email whitelist
     email_whitelist.load()
 
-    # Initialize appropriate twin based on mode
+    # Twins are now lazy-loaded per-domain
+    # Pre-warm the default twin based on config mode for legacy compatibility
+    mode = cfg('deployment.mode', 'personal')
+    logger.info(f"[STARTUP] Domain-based twin routing enabled")
+    logger.info(f"[STARTUP] Enterprise domains: {ENTERPRISE_DOMAINS}")
+    logger.info(f"[STARTUP] Personal domains: {PERSONAL_DOMAINS}")
+    logger.info(f"[STARTUP] Default fallback mode: {mode}")
+
+    # Legacy: set global engine for non-domain-routed paths
     engine = get_twin()
-
-    # Start async components if needed
-    if hasattr(engine, 'start'):
-        await engine.start()
-
-    # Log twin info
-    logger.info(f"[STARTUP] Twin ready: {type(engine).__name__}")
-    if hasattr(engine, 'memory_count'):
-        logger.info(f"  Memory count: {engine.memory_count}")
-    if hasattr(engine, 'model'):
-        logger.info(f"  Model: {engine.model}")
 
     # Initialize Redis cache
     logger.info("[STARTUP] Initializing Redis cache...")
@@ -531,10 +591,10 @@ async def startup_event():
     # Initialize Redis for personal auth sessions (always, domain routing picks auth method)
     if PERSONAL_AUTH_LOADED:
         try:
-            import aioredis
+            import redis.asyncio as aioredis
             redis_url = os.getenv("REDIS_URL")
             if redis_url:
-                app.state.redis = aioredis.from_url(redis_url, decode_responses=True)
+                app.state.redis = await aioredis.from_url(redis_url, decode_responses=True)
                 await app.state.redis.ping()
                 logger.info("[STARTUP] Redis session store initialized")
             else:
@@ -1109,13 +1169,21 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                 # Capture auth_method from client (set by frontend during SSO or email login)
                 client_auth_method = data.get("auth_method", "email")
 
-                if AUTH_LOADED and email:
+                # Extract domain for twin routing
+                email_domain = email.split('@')[1].lower() if '@' in email else ''
+
+                # Route to appropriate twin based on email domain
+                request_twin, twin_mode = get_twin_for_domain(email_domain)
+                logger.info(f"[TWIN] Routed {email} -> {twin_mode} mode")
+
+                if twin_mode == 'enterprise' and AUTH_LOADED:
+                    # Enterprise path: use enterprise auth service
                     auth = get_auth_service()
                     user = auth.get_or_create_user(email)
 
                     if user:
                         user_email = email
-                        user_verified = True  # SECURITY: Mark session as verified
+                        user_verified = True
 
                         # Use requested division if user has access
                         requested_division = data.get("division", "warehouse")
@@ -1129,10 +1197,7 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             user_email=email,
                         )
 
-                        # Get twin based on deployment mode (config.yaml)
-                        request_twin = get_twin()
-
-                        auth.update_last_login(user.id)  # Track login
+                        auth.update_last_login(user.id)
 
                         # Log login event to analytics
                         if ANALYTICS_LOADED:
@@ -1153,21 +1218,44 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             "email": email,
                             "division": tenant.department,
                             "departments": user.department_access,
+                            "mode": "enterprise",
                         })
-                        metrics_collector.record_ws_message('out')  # Record outgoing message
+                        metrics_collector.record_ws_message('out')
                     else:
-                        # Domain not allowed
                         logger.warning(f"[SECURITY] Failed auth: email={email}, ip={client_ip}, reason=domain_not_authorized")
                         await websocket.send_json({
                             "type": "error",
-                            "message": "Email domain not authorized",
+                            "message": "Email domain not authorized for enterprise access",
                         })
-                        metrics_collector.record_ws_message('out')  # Record outgoing message
+                        metrics_collector.record_ws_message('out')
+
+                elif twin_mode == 'personal' and email:
+                    # Personal path: simplified auth (email verified via session cookie or direct)
+                    user_email = email
+                    user_verified = True
+
+                    tenant = TenantContext(
+                        tenant_id="cogzy",
+                        department="personal",
+                        role="user",
+                        user_email=email,
+                    )
+
+                    logger.info(f"[PERSONAL] User verified: {email}")
+
+                    await websocket.send_json({
+                        "type": "verified",
+                        "email": email,
+                        "division": "personal",
+                        "mode": "personal",
+                    })
+                    metrics_collector.record_ws_message('out')
+
                 elif email:
-                    # Fallback to old whitelist behavior
+                    # Fallback to whitelist for unknown domains
                     if email_whitelist.verify(email):
                         user_email = email
-                        user_verified = True  # SECURITY: Mark session as verified
+                        user_verified = True
                         tenant = TenantContext(
                             tenant_id="driscoll",
                             department=data.get("division", tenant.department),
@@ -1179,15 +1267,15 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                             "email": email,
                             "division": tenant.department,
                         })
-                        metrics_collector.record_ws_message('out')  # Record outgoing message
+                        metrics_collector.record_ws_message('out')
                     else:
                         logger.warning(f"[SECURITY] Failed auth: email={email}, ip={client_ip}, reason=not_in_whitelist")
                         await websocket.send_json({
                             "type": "error",
-                            "message": "Email not authorized. Please use SSO login.",
+                            "message": "Email not authorized. Please sign up at cogzy.ai or use enterprise SSO.",
                         })
-                        metrics_collector.record_ws_message('out')  # Record outgoing message
-                        continue  # Don't proceed with unauthorized email
+                        metrics_collector.record_ws_message('out')
+                        continue
 
             elif msg_type == "message":
                 # SECURITY: Require verification before processing messages
@@ -1414,6 +1502,41 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                     elif user_email:
                         auth_user_id = user_email
 
+                    # === TIER CHECK (Phase 4B) ===
+                    # Check message limits for personal tier users
+                    try:
+                        from core.tier_service import get_tier_service
+                        from core.config_loader import load_config
+
+                        config = load_config()
+                        if app.state.db_pool:
+                            tier_service = await get_tier_service(config, app.state.db_pool)
+
+                            # Look up user_id from email for tier check
+                            async with app.state.db_pool.acquire() as conn:
+                                user_row = await conn.fetchrow(
+                                    "SELECT id FROM personal.users WHERE email = $1",
+                                    user_email
+                                )
+                                if user_row:
+                                    user_uuid = str(user_row["id"])
+                                    usage_status = await tier_service.get_usage_status(user_uuid)
+
+                                    if not usage_status.can_send_message:
+                                        await websocket.send_json({
+                                            "type": "error",
+                                            "message": f"Daily limit reached ({usage_status.messages_limit} messages). Upgrade to premium for unlimited!",
+                                            "code": "TIER_LIMIT_REACHED",
+                                            "messages_used": usage_status.messages_today,
+                                            "messages_limit": usage_status.messages_limit,
+                                        })
+                                        metrics_collector.record_ws_message('out')
+                                        continue  # Block message
+                    except Exception as tier_err:
+                        logger.warning(f"Tier check failed (non-blocking): {tier_err}")
+                        # Don't block on tier check failure - allow message through
+                    # === END TIER CHECK ===
+
                     # Stream response with auth context
                     response_text = ""
                     async for chunk in active_twin.think(content, user_id=auth_user_id, tenant_id=auth_tenant_id):
@@ -1443,6 +1566,26 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
                         **stats,
                     })
                     metrics_collector.record_ws_message('out')  # Record outgoing message
+
+                    # === INCREMENT USAGE (Phase 4B) ===
+                    try:
+                        if app.state.db_pool and user_email:
+                            from core.tier_service import get_tier_service
+                            from core.config_loader import load_config
+
+                            config = load_config()
+                            tier_service = await get_tier_service(config, app.state.db_pool)
+
+                            async with app.state.db_pool.acquire() as conn:
+                                user_row = await conn.fetchrow(
+                                    "SELECT id FROM personal.users WHERE email = $1",
+                                    user_email
+                                )
+                                if user_row:
+                                    await tier_service.increment_usage(str(user_row["id"]))
+                    except Exception as inc_err:
+                        logger.warning(f"Usage increment failed (non-blocking): {inc_err}")
+                    # === END INCREMENT USAGE ===
 
             elif msg_type == "set_division":
                 # Allow changing division mid-session (with authorization check)
