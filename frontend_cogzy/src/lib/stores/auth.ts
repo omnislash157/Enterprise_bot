@@ -27,7 +27,7 @@ interface AuthState {
 }
 
 function getApiBase(): string {
-    // TODO: revert to env var once Railway build-time injection is fixed
+    // Force rebuild: 2026-01-01
     return import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
 }
 
