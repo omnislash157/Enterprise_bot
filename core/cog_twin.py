@@ -106,6 +106,8 @@ from memory.chat_memory import ChatMemoryStore
 
 from memory.squirrel import SquirrelTool, SquirrelQuery
 
+from memory.deep_context_search import Bloodhound, BloodhoundTool
+
 # Configuration - load first to determine voice engine
 from .config_loader import cfg, get_config
 from .model_adapter import create_adapter
@@ -286,6 +288,16 @@ class CogTwin:
 
         # Initialize squirrel tool - Phase 6.3
         self.squirrel = SquirrelTool(self.chat_memory)
+
+        # Initialize bloodhound tool - Deep context archaeology
+        # Conversations path: use config or default to data_dir/conversations
+        conversations_path = cfg("memory.conversations_path", str(self.data_dir / "conversations"))
+        self.bloodhound: Optional[BloodhoundTool] = None
+        if Path(conversations_path).exists():
+            self.bloodhound = BloodhoundTool(conversations_path)
+            logger.info(f"Bloodhound initialized: {conversations_path}")
+        else:
+            logger.warning(f"Bloodhound not initialized: {conversations_path} does not exist")
 
         # Initialize training mode - Phase 3 scoring
         self.training_mode = TrainingModeUI(
@@ -822,20 +834,56 @@ class CogTwin:
                 tool_results['episodic'] = "\n\n".join(formatted_results)
                 logger.info(f"EPISODIC collected: {len(episodic_matches)} queries, {len(episodic_results)} unique results")
 
+        # --- BLOODHOUND (deep context archaeology) ---
+        if "[BLOODHOUND" in full_response:
+            bloodhound_matches = re.findall(
+                r'\[BLOODHOUND\s+term="([^"]+)"(?:\s+radius=(\d+))?(?:\s+gap=(\d+))?\]',
+                full_response
+            )
+            if bloodhound_matches and self.bloodhound:
+                logger.info(f"BLOODHOUND tool invoked for: {[m[0] for m in bloodhound_matches]}")
+
+                all_bloodhound_contexts = []
+                for term, radius_str, gap_str in bloodhound_matches:
+                    # Parse optional params with defaults
+                    radius = int(radius_str) if radius_str else 200
+                    gap = int(gap_str) if gap_str else 100
+
+                    # Execute bloodhound search
+                    bloodhound_md = self.bloodhound.execute(
+                        term=term,
+                        token_radius=radius,
+                        merge_gap=gap,
+                    )
+                    all_bloodhound_contexts.append(bloodhound_md)
+
+                    # Record in trace
+                    self.tracer.record_step(
+                        StepType.RETRIEVE,
+                        f"BLOODHOUND: term={term}, radius={radius}, gap={gap}",
+                    )
+
+                if all_bloodhound_contexts:
+                    tool_results['bloodhound'] = "\n\n".join(all_bloodhound_contexts)
+                    logger.info(f"BLOODHOUND collected: {len(bloodhound_matches)} terms")
+
         # ===== SINGLE SYNTHESIS CALL (if any tools were invoked) =====
         if tool_results:
             # Build combined context from all tool results
             synthesis_sections = []
             
+            if 'bloodhound' in tool_results:
+                synthesis_sections.append(f"=== BLOODHOUND RESULTS (deep context archaeology) ===\n{tool_results['bloodhound']}")
+
             if 'grep' in tool_results:
-                synthesis_sections.append(f"=== GREP RESULTS (keyword frequency) ===\n{tool_results['grep']}")
-            
+                synthesis_sections.append(f"=== GREP RESULTS (keyword frequency - DEPRECATED) ===\n{tool_results['grep']}")
+
             if 'squirrel' in tool_results:
                 synthesis_sections.append(f"=== SQUIRREL RESULTS (temporal recall) ===\n{tool_results['squirrel']}")
-            
+
             if 'vector' in tool_results:
                 synthesis_sections.append(f"=== VECTOR RESULTS (semantic similarity) ===\n{tool_results['vector']}")
-            
+
             if 'episodic' in tool_results:
                 synthesis_sections.append(f"=== EPISODIC RESULTS (conversation arcs) ===\n{tool_results['episodic']}")
 

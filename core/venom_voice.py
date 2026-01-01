@@ -51,10 +51,11 @@ class OutputAction(Enum):
     SLEEP = "sleep"                 # Enter idle state
     CLARIFY = "clarify"             # Request clarification
     ESCALATE = "escalate"           # Crisis escalation
-    GREP = "grep"                   # Exact keyword search tool
+    GREP = "grep"                   # Exact keyword search tool (DEPRECATED)
     SQUIRREL = "squirrel"           # Temporal recall tool
     VECTOR = "vector"               # Semantic memory search tool
     EPISODIC = "episodic"           # Conversation arc search tool
+    BLOODHOUND = "bloodhound"       # Deep context archaeology tool
 
 
 # Action markers in LLM output
@@ -71,6 +72,7 @@ ACTION_MARKERS = {
     "[SQUIRREL": OutputAction.SQUIRREL,  # Note: partial match for [SQUIRREL ...]
     "[VECTOR": OutputAction.VECTOR,  # Note: partial match for [VECTOR query="..."]
     "[EPISODIC": OutputAction.EPISODIC,  # Note: partial match for [EPISODIC query="..."]
+    "[BLOODHOUND": OutputAction.BLOODHOUND,  # Note: partial match for [BLOODHOUND term="..."]
 }
 
 
@@ -135,6 +137,9 @@ class VoiceContext:
     # Session analytics block - visible AI self-awareness (Phase 8)
     analytics_block: str = ""
     show_analytics: bool = True  # Toggle for analytics visibility
+
+    # Bloodhound deep context results (comprehensive topic archaeology)
+    bloodhound_results: str = ""
 
 
 class VenomVoice:
@@ -204,9 +209,10 @@ TRUST HIERARCHY - ABSOLUTE (MEMORIZE THIS):
 1. What user said THIS SESSION → Absolute truth
 2. What user said LAST HOUR → Near-absolute truth
 3. SQUIRREL results → High trust (temporal recall)
-4. EPISODIC results → Medium trust (may be old context)
-5. VECTOR results → Low trust (topically similar ≠ factually relevant)
-6. GREP results → Verification only (word frequency ≠ meaning)
+4. BLOODHOUND results → Medium-high trust (comprehensive archaeology)
+5. EPISODIC results → Medium trust (may be old context)
+6. VECTOR results → Low trust (topically similar ≠ factually relevant)
+7. GREP results → Lowest trust (word frequency, DEPRECATED)
 
 User statements THIS SESSION override ALL search results.
 If user said "PFG is my employer" and GREP says "PFG = Australian company" → User wins.
@@ -302,11 +308,16 @@ CRITICAL: All tools fire in parallel, then ONE synthesis happens. DO NOT report 
    - Give ONE unified answer, not tool-by-tool breakdown
 
 AVAILABLE TOOLS:
-- [GREP term="..."] - HYBRID search (semantic + keyword combined)
-  Use for: frequency verification AND finding related concepts
-  Now finds both exact matches AND semantically similar content
-  Results show: "found by semantic", "found by keyword", or "found by both"
-  "vitamin" now finds "supplement", "nutrition" + exact "vitamin" mentions
+- [BLOODHOUND term="..." radius=200 gap=100] - Deep context archaeology
+  Use for: "where did we leave off with X", "what's our full history with X"
+  Searches ALL conversations for term (fuzzy: datadog/Datadog/data-dog all match)
+  Returns: Chronological chunks +/-200 tokens around each hit, merged when close
+  Trust: MEDIUM-HIGH (comprehensive history, may include old context)
+  Fires WITH other tools, not instead of. BLOODHOUND + SQUIRREL = full picture.
+
+- [GREP term="..."] - HYBRID search (DEPRECATED - use BLOODHOUND for deep context)
+  Still works but BLOODHOUND provides richer context for history queries.
+  Keep GREP for quick frequency checks only.
 
 - [VECTOR query="..."] - Semantic similarity search (BGE-M3 embeddings)
   Use for: concept matching, finding related discussions
@@ -320,8 +331,17 @@ AVAILABLE TOOLS:
   Use for: recent session context, "what was that 1hr ago"
   Syntax: timeframe="-60min", back=5, search="keyword"
 
+PARALLEL FIRE EXAMPLE:
+"Where did we leave off with datadog?"
+
+[BLOODHOUND term="datadog"]
+[SQUIRREL timeframe="-24h" search="datadog"]
+
+BLOODHOUND gives the full journey. SQUIRREL gives temporal recency.
+Together = complete picture.
+
 ZERO-RESULT HANDLING:
-If you suspect sparse results, fire ALL FOUR tools preemptively.
+If you suspect sparse results, fire ALL tools preemptively.
 Better to over-retrieve and filter than to miss context.
 The unified synthesis will handle deduplication.'''
 
@@ -333,14 +353,19 @@ Memory is NOT pre-loaded. Fire tools to retrieve context. ALL tools execute in p
 CRITICAL: Emit ALL relevant tool calls at once. Do NOT report intermediate results.
 
 AVAILABLE TOOLS:
+- [BLOODHOUND term="..." radius=200 gap=100] - Deep context archaeology
+  Use for: Full history of a topic across all conversations
+  Fuzzy matches: datadog, Datadog, DATADOG, data-dog, data dog
+  Returns chronological chunks with expanded context, daisy-chained when close.
+
 - [VECTOR query="..."] - Semantic search across 22K memories
   Use for: "What have we discussed about X?", concept matching
 
 - [EPISODIC query="..." timeframe="..."] - Conversation arc retrieval
   Use for: "Remember that conversation about X?", project history
 
-- [GREP term="..."] - HYBRID search (semantic + keyword)
-  Use for: Finding exact mentions AND related concepts together
+- [GREP term="..."] - HYBRID search (DEPRECATED - use BLOODHOUND for deep context)
+  Still works for quick frequency checks, but BLOODHOUND is preferred.
 
 - [SQUIRREL timeframe="..." back=N search="..."] - Temporal recall
   Use for: "What was that 1hr ago?", recent session context
@@ -349,15 +374,16 @@ PARALLEL FIRE PATTERN:
 For memory queries, emit ALL relevant tools in ONE response:
 
 "Let me search for our Python discussions.
-[GREP term="Python"]
+[BLOODHOUND term="Python"]
 [VECTOR query="Python programming discussions code"]
-[EPISODIC query="Python" timeframe="all"]"
+[EPISODIC query="Python" timeframe="all"]
+[SQUIRREL timeframe="-24h" search="Python"]"
 
 Then WAIT for unified synthesis with all results combined.
 
 WHEN TO USE TOOLS:
-- Questions about past work: Fire VECTOR + EPISODIC + GREP together
-- "Did we ever discuss X?": Fire all four tools
+- Questions about past work: Fire BLOODHOUND + VECTOR + EPISODIC together
+- "Where did we leave off with X?": BLOODHOUND + SQUIRREL
 - "What did we say earlier?": SQUIRREL + EPISODIC
 - Greeting/casual chat: No tools needed
 
@@ -801,6 +827,34 @@ Focus: {context.focus_score:.2f} (attention concentration){drift_info}"""
         lines.append("REMINDER: Synthesize with your episodic context. Grep confirms frequency, doesn't replace meaning.")
         lines.append("")
 
+        return "\n".join(lines)
+
+    def _format_bloodhound_results(self, bloodhound_md: str) -> str:
+        """
+        Format BLOODHOUND deep context results.
+
+        BLOODHOUND provides comprehensive archaeology - all mentions
+        of a term across entire conversation history with expanded context.
+        """
+        if not bloodhound_md or "No matches found" in bloodhound_md:
+            return ""
+
+        lines = [
+            "",
+            "=" * 60,
+            "BLOODHOUND DEEP CONTEXT (COMPREHENSIVE HISTORY)",
+            "=" * 60,
+            "Trust: MEDIUM-HIGH - full archaeology across all conversations",
+            "Use: Understand complete journey with this topic",
+            "Note: Chronological order, oldest first. Daisy-chained nearby hits.",
+            "",
+            bloodhound_md,
+            "",
+            "=" * 60,
+            "BLOODHOUND shows the JOURNEY. Combine with SQUIRREL for WHERE YOU LEFT OFF.",
+            "=" * 60,
+            "",
+        ]
         return "\n".join(lines)
 
     def _format_gap_analysis(
