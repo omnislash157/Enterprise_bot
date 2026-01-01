@@ -1,0 +1,18 @@
+export { theme, toggleTheme } from './theme';
+export { websocket } from './websocket';
+export { session } from './session';
+export type { SessionAnalytics } from './session';
+export { voice, isRecording } from './voice';
+export type { VoiceState } from './voice';
+export { artifacts, visibleArtifacts } from './artifacts';
+export type { StoredArtifact } from './artifacts';
+export { panels, hasFullscreenPanel, closedPanels } from './panels';
+export type { PanelMode, PanelState, PanelsState } from './panels';
+export { workspaces, activeWorkspace, workspaceCount } from './workspaces';
+export type { Workspace, WorkspacesState } from './workspaces';
+export { config, configLoading, loadConfig, isEnterpriseMode, isBasicTier, isMemoryEnabled, showSwarm, showMemorySpace, showAnalytics } from './config';
+export type { AppConfig } from './config';
+// Auth (stub - disabled)
+export { user, isAuthenticated, signIn, signOut } from './auth';
+// Analytics
+export * from './analytics';

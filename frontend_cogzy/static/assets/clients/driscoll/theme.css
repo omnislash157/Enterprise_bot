@@ -1,0 +1,23 @@
+/* Driscoll Custom Theme
+ * This file is loaded dynamically based on tenant config
+ * Override CSS variables and add custom styles here
+ */
+
+:root {
+    --color-primary: #00ff00;
+    --color-primary-dark: #00cc00;
+    --color-background: #0a0f0a;
+    --color-surface: rgba(0, 255, 0, 0.03);
+    --color-border: rgba(0, 255, 0, 0.15);
+}
+
+/* Custom Driscoll styles */
+.login-card {
+    border-color: rgba(0, 255, 0, 0.2);
+}
+
+.nav-brand {
+    color: var(--color-primary);
+}
+
+/* Add any Driscoll-specific overrides here */

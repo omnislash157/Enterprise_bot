@@ -1,0 +1,188 @@
+<script lang="ts">
+    import { onMount, onDestroy } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import { cubicOut } from 'svelte/easing';
+    import { cheeky, type PhraseCategory, SPINNERS } from '$lib/cheeky';
+
+    // Props
+    export let category: PhraseCategory = 'searching';
+    export let spinnerType: keyof typeof SPINNERS = 'food';
+    export let showProgress: boolean = false;
+    export let progress: number = 0;
+    export let rotationMs: number = 5000; // Slower - 1-2 phrases per search
+    export let size: 'sm' | 'md' | 'lg' = 'md';
+
+    // State
+    let phrase = '';
+    let spinnerFrame = 0;
+    let phraseKey = 0;
+
+    // Get spinner frames
+    $: spinner = SPINNERS[spinnerType] || SPINNERS.dots;
+
+    // Single interval for synced updates
+    let rotationInterval: ReturnType<typeof setInterval>;
+
+    // Custom transition: emerge from depth (not snot rocket)
+    function emerge(node: Element, { duration = 600, delay = 0 }) {
+        return {
+            duration,
+            delay,
+            css: (t: number) => {
+                const eased = cubicOut(t);
+                return `
+                    opacity: ${eased};
+                    transform: scale(${0.97 + 0.03 * eased});
+                    filter: blur(${(1 - eased) * 2}px);
+                `;
+            }
+        };
+    }
+
+    function updateContent() {
+        // SYNC: phrase and emoji change together
+        phrase = cheeky.get(category);
+        spinnerFrame = (spinnerFrame + 1) % spinner.length;
+        phraseKey++;
+    }
+
+    onMount(() => {
+        updateContent();
+        // Single interval for BOTH phrase and spinner
+        rotationInterval = setInterval(updateContent, rotationMs);
+    });
+
+    onDestroy(() => {
+        clearInterval(rotationInterval);
+    });
+
+    // Size classes
+    $: sizeClasses = {
+        sm: 'loader-sm',
+        md: 'loader-md',
+        lg: 'loader-lg',
+    }[size];
+</script>
+
+<div class="cheeky-loader {sizeClasses}" role="status" aria-live="polite">
+    <div class="spinner-container">
+        <span class="spinner">{spinner[spinnerFrame]}</span>
+    </div>
+
+    <div class="content">
+        {#key phraseKey}
+            <p
+                class="phrase"
+                in:emerge={{ duration: 600, delay: 100 }}
+                out:fade={{ duration: 300 }}
+            >
+                {phrase}...
+            </p>
+        {/key}
+
+        {#if showProgress}
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div
+                        class="progress-fill"
+                        style="width: {Math.min(100, Math.max(0, progress))}%"
+                    ></div>
+                </div>
+                <span class="progress-text">{Math.round(progress)}%</span>
+            </div>
+        {/if}
+    </div>
+</div>
+
+<style>
+    .cheeky-loader {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 0;
+    }
+
+    .spinner-container {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .spinner {
+        font-size: 1.25rem;
+        line-height: 1;
+    }
+
+    .content {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .phrase {
+        margin: 0;
+        color: #ffffff;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        min-height: 1.4em;
+    }
+
+    .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .progress-bar {
+        flex: 1;
+        height: 6px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #00ff41 0%, #00cc33 100%);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+        box-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+    }
+
+    .progress-text {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #00ff41;
+        min-width: 3ch;
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+    }
+
+    /* Size variants */
+    .loader-sm {
+        gap: 0.5rem;
+    }
+
+    .loader-sm .spinner {
+        font-size: 1rem;
+    }
+
+    .loader-sm .phrase {
+        font-size: 0.8rem;
+    }
+
+    .loader-lg {
+        gap: 1rem;
+    }
+
+    .loader-lg .spinner {
+        font-size: 1.5rem;
+    }
+
+    .loader-lg .phrase {
+        font-size: 1rem;
+    }
+</style>
