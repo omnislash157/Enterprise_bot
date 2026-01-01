@@ -1,6 +1,10 @@
 """
 Tenant Resolution Middleware
 Resolves domain -> tenant on every request, injects into request.state
+
+Priority:
+1. Database lookup (enterprise tenants)
+2. YAML fallback for personal tier (cogzy.ai, localhost)
 """
 from fastapi import Request, HTTPException
 from typing import Optional
@@ -8,8 +12,17 @@ import asyncpg
 import logging
 
 from .enterprise_tenant import TenantContext
+from .tenant_loader import resolve_tenant as resolve_yaml_tenant
 
 logger = logging.getLogger(__name__)
+
+# Personal tier domains that use YAML config instead of DB
+PERSONAL_DOMAINS = {
+    "cogzy.ai",
+    "localhost",
+    "127.0.0.1",
+    "lucky-love-production.up.railway.app",
+}
 
 
 async def get_tenant_by_domain(domain: str, pool: asyncpg.Pool) -> Optional[dict]:
@@ -51,6 +64,27 @@ async def get_tenant_by_domain(domain: str, pool: asyncpg.Pool) -> Optional[dict
     return None
 
 
+def get_personal_tenant(host: str) -> Optional[TenantContext]:
+    """Get tenant from YAML config for personal tier domains."""
+    try:
+        yaml_tenant = resolve_yaml_tenant(host)
+        if yaml_tenant:
+            tenant_info = yaml_tenant.get("tenant", {})
+            branding = yaml_tenant.get("branding", {})
+            return TenantContext(
+                tenant_id=tenant_info.get("id", "cogzy"),
+                slug=tenant_info.get("slug", "cogzy"),
+                name=tenant_info.get("name", "Cogzy"),
+                domain=host,
+                azure_tenant_id=None,
+                azure_client_id=None,
+                branding=branding,
+            )
+    except Exception as e:
+        logger.error(f"[TENANT] YAML fallback error for {host}: {e}")
+    return None
+
+
 async def tenant_middleware(request: Request, call_next):
     """
     Middleware to resolve tenant from Host header.
@@ -62,7 +96,14 @@ async def tenant_middleware(request: Request, call_next):
     if request.url.path in ["/health", "/api/health"]:
         return await call_next(request)
 
-    # Get DB pool from app state
+    # Check if this is a personal tier domain first
+    if host in PERSONAL_DOMAINS:
+        request.state.tenant = get_personal_tenant(host)
+        if request.state.tenant:
+            logger.debug(f"[TENANT] Personal tier: {host} -> {request.state.tenant.slug}")
+        return await call_next(request)
+
+    # Get DB pool from app state for enterprise tenants
     pool = getattr(request.app.state, 'db_pool', None)
 
     if pool:
