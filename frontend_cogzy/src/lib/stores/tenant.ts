@@ -43,7 +43,7 @@ function createTenantStore() {
 
             try {
                 const apiBase = import.meta.env.VITE_API_URL || '';
-                const res = await fetch(`${apiBase}/api/auth/tenant`, {
+                const res = await fetch(`${apiBase}/api/tenant/config`, {
                     credentials: 'include',
                 });
 

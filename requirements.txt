@@ -41,6 +41,7 @@ cryptography>=41.0.0
 # Personal Auth
 argon2-cffi>=21.0.0
 aioredis>=2.0.0
+email-validator>=2.0.0  # Required for pydantic EmailStr
 
 # SDK Tools (for Railway, Memory, DB tools)
 # Note: python-dotenv already listed above
