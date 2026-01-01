@@ -1,6 +1,7 @@
 # Cogzy - Personal SaaS Tier
 # cogzy.ai root domain
 _extends: _personal.yaml
+mode: personal
 
 tenant:
   id: cogzy
