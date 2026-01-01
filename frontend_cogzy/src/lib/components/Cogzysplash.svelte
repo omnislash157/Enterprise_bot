@@ -1,12 +1,15 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    
+
     let email = '';
     let password = '';
     let error = '';
     let loading = false;
     let isLogin = true; // toggle between login/register
-    
+
+    // API base URL - must match backend
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
+
     // Generate matrix rain particles
     const particles = Array.from({ length: 50 }, (_, i) => ({
       id: i,
@@ -16,35 +19,35 @@
       duration: 2 + Math.random() * 3,
       delay: Math.random() * 2,
     }));
-    
+
     async function handleEmailAuth() {
       if (!email) {
         error = 'Email is required';
         return;
       }
-      
+
       loading = true;
       error = '';
-      
+
       try {
-        const endpoint = isLogin 
-          ? '/api/personal/auth/login' 
-          : '/api/personal/auth/register';
-        
+        const endpoint = isLogin
+          ? `${API_BASE}/api/personal/auth/login`
+          : `${API_BASE}/api/personal/auth/register`;
+
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
           body: JSON.stringify({ email, password }),
         });
-        
+
         const data = await res.json();
-        
+
         if (!res.ok) {
           error = data.detail || data.error || 'Authentication failed';
           return;
         }
-        
+
         // Success - redirect to chat
         window.location.href = '/';
       } catch (err) {
@@ -53,13 +56,13 @@
         loading = false;
       }
     }
-    
+
     async function handleGoogleAuth() {
       loading = true;
       try {
-        const res = await fetch('/api/personal/auth/google');
+        const res = await fetch(`${API_BASE}/api/personal/auth/google`);
         const data = await res.json();
-        
+
         if (data.url) {
           // Store state for CSRF validation
           sessionStorage.setItem('oauth_state', data.state);
