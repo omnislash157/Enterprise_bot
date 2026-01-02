@@ -1012,17 +1012,30 @@ async def run_pipeline_for_user(
 
     # 6. Embed (GPU parallel)
     from memory.embedder import create_embedder
-    embedder = create_embedder(provider="deepinfra")
+    import os
+
+    # Use Modal (serverless GPU) if available, else fall back to DeepInfra
+    provider = os.getenv("EMBEDDING_PROVIDER", "deepinfra")
+    embedder = create_embedder(provider=provider)
 
     texts = [f"{n.human_content} {n.assistant_content}" for n in nodes]
-    # Larger batches = fewer API calls (DeepInfra rate limited to 180 RPM)
-    # batch_size=64 with max_concurrent=4 = ~12 req/sec sustained
-    embeddings = await embedder.embed_batch(
-        texts,
-        batch_size=64,  # More texts per request
-        max_concurrent=4,  # Fewer concurrent to avoid rate limit bursts
-        show_progress=True
-    )
+
+    if provider == "modal":
+        # Modal handles batching internally on GPU - send larger chunks
+        embeddings = await embedder.embed_batch(
+            texts,
+            batch_size=256,  # GPU can handle big batches
+            max_concurrent=2,  # Modal handles parallelism
+            show_progress=True
+        )
+    else:
+        # DeepInfra rate limited to 180 RPM
+        embeddings = await embedder.embed_batch(
+            texts,
+            batch_size=64,
+            max_concurrent=4,
+            show_progress=True
+        )
 
     # 7. Cluster (optional, can skip for now)
     # from streaming_cluster import StreamingClusterEngine

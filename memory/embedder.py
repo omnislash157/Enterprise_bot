@@ -282,6 +282,68 @@ class CloudflareProvider:
 
 
 # ═══════════════════════════════════════════════════════════════════════════
+# MODAL SERVERLESS GPU PROVIDER
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ModalProvider:
+    """
+    Modal serverless GPU provider.
+
+    Spins up GPU on-demand, runs embeddings, shuts down.
+    No rate limits, pay per second of compute (~$0.0003/sec for A10G).
+
+    Requires:
+        pip install modal
+        modal token new  # One-time auth
+
+    The Modal function is defined in modal_embedder.py and deployed with:
+        modal deploy memory/modal_embedder.py
+    """
+
+    EMBEDDING_DIM = 1024
+
+    def __init__(self):
+        try:
+            import modal
+            self.modal = modal
+        except ImportError:
+            raise ValueError("modal not installed. Run: pip install modal")
+
+        # Get the deployed function
+        try:
+            self.embed_fn = modal.Function.lookup("cogzy-embedder", "embed_batch")
+        except modal.exception.NotFoundError:
+            raise ValueError(
+                "Modal function not deployed. Run: modal deploy memory/modal_embedder.py"
+            )
+
+        logger.info("Modal provider initialized (serverless GPU)")
+
+    async def rate_limit(self) -> None:
+        """No rate limiting for serverless GPU."""
+        pass
+
+    async def embed_batch_raw(
+        self,
+        client: httpx.AsyncClient,  # Unused, Modal handles transport
+        texts: List[str],
+        batch_id: int,
+    ) -> List[np.ndarray]:
+        """Embed via Modal serverless GPU."""
+        try:
+            # Modal functions are async-compatible
+            # Call the remote GPU function
+            embeddings = await asyncio.to_thread(
+                self.embed_fn.remote, texts
+            )
+            return [np.array(e, dtype=np.float32) for e in embeddings]
+
+        except Exception as e:
+            logger.error(f"Batch {batch_id} Modal error: {e}")
+            return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
+
+
+# ═══════════════════════════════════════════════════════════════════════════
 # MAIN EMBEDDER CLASS
 # ═══════════════════════════════════════════════════════════════════════════
 
@@ -340,6 +402,8 @@ class AsyncEmbedder:
                 api_token=api_key,
                 requests_per_minute=requests_per_minute,
             )
+        elif self.provider_name == "modal":
+            self.provider = ModalProvider()
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
