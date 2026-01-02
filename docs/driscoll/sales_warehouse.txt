@@ -3,8 +3,81 @@ DRISCOLL FOODS - SALES & WAREHOUSE MANUALS
 ============================================================
 Access Level: RESTRICTED (Sales + Warehouse only - No Purchasing)
 Generated: 2025-01-26
+Indexed: 2025-01-02
 ============================================================
 
+================================================================================
+                            DOCUMENT INDEX (TOC)
+================================================================================
+
+Use this index to quickly locate information. Each section is marked with
+<!-- SECTION: name --> for precise navigation.
+
+SALES MANUAL
+------------
+[SALES-CONTACTS]     Email addresses for credits, ops errors, pickups, routing, NCA/CAR requests
+[SALES-SHORTCUTS]    Telnet keyboard shortcuts and navigation commands
+[SALES-EMAIL-PROCS]  Detailed email procedures for credits, ops errors, pickups, class bids, PCM, order changes
+[SALES-OPT1]         Option 1: Order Entry - new orders, product selection, editing, printing
+[SALES-OPT2]         Option 2: Invoice Entry - same-day cash & carry, one-step invoicing
+[SALES-OPT3]         Option 3: Order/Invoice Inquiry/Correction - find and edit orders
+[SALES-OPT4]         Option 4: Order Header Correction - adjust PO, remarks, dates
+[SALES-OPT5]         Option 5: Call Sheet Inquiry - customer product history
+[SALES-OPT6]         Option 6: Stock Status Inquiry - inventory, prices, manufacturer numbers
+[SALES-OPT7]         Option 7: A/R Inquiry - invoices, credits, payments
+[SALES-OPT8]         Option 8: Do We Sell This Customer - account lookup
+[SALES-OPT9]         Option 9: Call Sheet Print - print/email order guides
+[SALES-OPT11]        Option 11: Customer File Maintenance - master file, delivery windows
+[SALES-OPT12]        Option 12: Modify Call Sheet - add/delete items from order guide
+[SALES-OPT13]        Option 13: Salesman Manifest - daily delivery manifest
+[SALES-OPT14]        Option 14: Daily Salesman Order Report
+[SALES-OPT15]        Option 15: Pick Up Slip - product returns to warehouse
+[SALES-OPT16]        Option 16: Quotes - faux orders for pricing
+[SALES-OPT27]        Option 27: Bids and Price Books - create, maintain, lock pricing
+[SALES-OPT32]        Option 32: Download Bid to Excel (by Item)
+[SALES-OPT33]        Option 33: Download Bid to Excel (by Line)
+[SALES-OPT34]        Option 34: Back Order Entry - next-day delivery of shorts/mispicks
+[SALES-SEAFOOD]      Seafood notes on orders - non-standard pack sizes
+[SALES-SPECIAL]      Special Order Process - allocations for buyers
+[SALES-REF-CUTSHOP]  Reference: Cut Shop alpha search tips (steaks, chops, loins)
+[SALES-REF-ABBREV]   Reference: Product abbreviations (BRD, BNLS, IQF, etc.)
+[SALES-REF-KOSHER]   Reference: Kosher grades and certification codes
+[SALES-REF-PHONES]   Reference: Phone extensions by department
+
+WAREHOUSE MANUAL
+----------------
+[WH-NIGHT-OVERVIEW]  Night shift schedule, breaks, temperature zones, safety requirements
+[WH-PICKING]         Picking role - workflow, productivity tips, weight entry, performance
+[WH-CHECKING]        Checking role - quality control, priority orders, accuracy requirements
+[WH-LOADING]         Loading role - sequence (last stops to nose), safety, stability
+[WH-HILO]            Hi-Lo Operation - replenishment, short sheets, safety protocols
+[WH-CLERKS]          Clerks - weight entry, distribution, label prep, workflow tracking
+[WH-SUPERVISORS]     Supervisors - productivity, write-ups, safety enforcement
+[WH-SWITCHERS]       Switchers - truck movement, door lights, route assignments
+[WH-VOLUME]          Nightly volume stats (~95K cases, ~130 VIP orders)
+[WH-DAY-CONTACTS]    Day operations contacts and route ID prefixes
+[WH-DAY-TELNET]      Day operations Telnet quick reference
+[WH-RECEIVING]       Receiving - accept, verify, label incoming deliveries
+[WH-PUTAWAY]         Putaway - transfer to storage slots, scanning, FIFO
+[WH-REPLENISHMENT]   Replenishment - keep pick slots stocked, aisle maintenance
+[WH-INVENTORY]       Inventory Control - cycle counts, adjustments, Telnet commands
+[WH-UPC]             UPC Collection - link products to system via scanning
+[WH-ROUTING]         Routing - RNA, DispatchTrack, school vs street routes
+[WH-DISPATCHING]     Dispatching - route prep, driver processing, equipment
+[WH-DRIVERS]         Drivers - types, shifts, pre-route, delivery, school rules
+[WH-DRIVER-CHECKIN]  Driver Check-In - returns, paperwork, reason codes
+[WH-TRANSPORTATION]  Transportation - team roles, daily workflow, systems
+[WH-INVOICE-CLEAN]   Invoice Cleaning - process, release, archive invoices
+[WH-DRIVER-HOTLINE]  Driver Hotline & Ops Support - weight changes, credits, VIP reports
+[WH-OPS-ADMIN]       Ops Admin - daily/weekly report schedule, APT, Lucas, VIP processes
+[WH-TELNET-QUICK]    Ops Admin Telnet Quick Reference
+
+================================================================================
+                              END OF INDEX
+================================================================================
+
+
+<!-- SECTION: SALES-CONTACTS -->
 ================================================================================
 MANUAL: SALES - STANDARD OPERATING PROCEDURES (TELNET)
 ================================================================================
@@ -24,6 +97,7 @@ Bill To Ship To Requests          billtoshiptorequests@driscollfoods.com
 Forced Pick Ups                   forcedpickups@driscollfoods.com
 Employee Purchases (Wayne)        employeepurchases@driscollfoods.com
 
+<!-- SECTION: SALES-SHORTCUTS -->
 QUICK REFERENCE - KEYBOARD SHORTCUTS
 -------------------------------------
 Arrow Key Equivalents:
@@ -40,6 +114,7 @@ Common Commands:
   SLS         = Go to Main Sales Screen Menu (after login)
   R           = Log Off Telnet (from Main Sales Screen)
 
+<!-- SECTION: SALES-EMAIL-PROCS -->
 ================================================================================
 EMAIL REQUEST PROCEDURES
 ================================================================================
@@ -115,6 +190,7 @@ Include: Bill to customer account#, Ship to customer#, Delivery day, Order# if a
 
 Important: Make sure ship to customer knows they will receive product THAT IS NOT THEIRS.
 
+<!-- SECTION: SALES-OPT1 -->
 ================================================================================
 OPTION 1: ORDER ENTRY
 ================================================================================
@@ -155,6 +231,7 @@ Printing:
 - Y = Yes (line version), N = No
 - U = Uniform (customer version), E = Excel version
 
+<!-- SECTION: SALES-OPT2 -->
 ================================================================================
 OPTION 2: INVOICE ENTRY (ONE STEP)
 ================================================================================
@@ -177,6 +254,7 @@ Printing for Cash & Carry:
 
 Note: If only invoicing a customer, no need to send to printer.
 
+<!-- SECTION: SALES-OPT3 -->
 ================================================================================
 OPTION 3: ORDER/INVOICE INQUIRY/CORRECTION
 ================================================================================
@@ -210,6 +288,7 @@ Reducing Quantity:
 
 Warning: Reducing quantity without delete/add causes shortages on customer invoice.
 
+<!-- SECTION: SALES-OPT4 -->
 ================================================================================
 OPTION 4: ORDER/INVOICE HEADER CORRECTION
 ================================================================================
@@ -229,6 +308,7 @@ Note: Date change requests MUST go to Routing & Customer Service Supervisor.
 
 Always verify changes using Option 3.
 
+<!-- SECTION: SALES-OPT5 -->
 ================================================================================
 OPTION 5: CALL SHEET INQUIRY
 ================================================================================
@@ -247,6 +327,7 @@ Options (from last page):
 - COPY = Copy call sheet to a Bid (Option 27)
 - P = Print Call Sheet
 
+<!-- SECTION: SALES-OPT6 -->
 ================================================================================
 OPTION 6: STOCK STATUS INQUIRY
 ================================================================================
@@ -294,6 +375,7 @@ Extra Information Available:
 - CS/PAL = Cases per pallet (#27)
 - NET WEIGHT & GROSS WEIGHT = #10 & #11
 
+<!-- SECTION: SALES-OPT7 -->
 ================================================================================
 OPTION 7: A/R INQUIRY
 ================================================================================
@@ -319,6 +401,7 @@ Options:
 - C = View submitted payment checks
 - L = Lookup invoice information & credits
 
+<!-- SECTION: SALES-OPT8 -->
 ================================================================================
 OPTION 8: DO WE SELL THIS CUSTOMER?
 ================================================================================
@@ -335,6 +418,7 @@ Results show:
 
 For account details, use Options 7 and 11.
 
+<!-- SECTION: SALES-OPT9 -->
 ================================================================================
 OPTION 9: CALL SHEET PRINT
 ================================================================================
@@ -367,6 +451,7 @@ Email as Order Guide:
 6. Y/N for Show Brand
 7. PDF sent to email
 
+<!-- SECTION: SALES-OPT11 -->
 ================================================================================
 OPTION 11: CUSTOMER FILE MAINTENANCE
 ================================================================================
@@ -387,6 +472,7 @@ Function Keys:
 
 Note: Delivery window changes require email to Phil Carson & Routing.
 
+<!-- SECTION: SALES-OPT12 -->
 ================================================================================
 OPTION 12: MODIFY CALL SHEET RECORDS
 ================================================================================
@@ -404,6 +490,7 @@ If product previously purchased:
 
 If product is new to customer: Enter price when prompted.
 
+<!-- SECTION: SALES-OPT13 -->
 ================================================================================
 OPTION 13: SALESMAN MANIFEST
 ================================================================================
@@ -415,6 +502,7 @@ Use for: Printing daily delivery manifest (normally emailed each morning)
 1. Enter date (e.g., 060114 for 6/1/2014)
 2. Enter Printer# (100 = email to yourself)
 
+<!-- SECTION: SALES-OPT14 -->
 ================================================================================
 OPTION 14: DAILY SALESMAN ORDER REPORT
 ================================================================================
@@ -428,6 +516,7 @@ Use for: Viewing daily order reports
 3. Enter Printer# (100 = email to yourself)
 4. Press ENTER to final line, follow prompts (1=send, 2=cancel, 3=change info)
 
+<!-- SECTION: SALES-OPT15 -->
 ================================================================================
 OPTION 15: PICK UP SLIP
 ================================================================================
@@ -462,6 +551,7 @@ Display: Line#, Customer#, Name, City, Time Entered, Date Entered, Order# Assign
 OPTION 3 - PICK UP STATUS INQUIRY:
 Shows: Customer#, Name, Delivery Date, Queued/Date Entered, Printed by Routing, Route
 
+<!-- SECTION: SALES-OPT16 -->
 ================================================================================
 OPTION 16: QUOTES
 ================================================================================
@@ -485,6 +575,7 @@ Copy Quote to Bid:
 1. At end of quote, enter "COPY"
 2. Enter Customer number
 
+<!-- SECTION: SALES-OPT27 -->
 ================================================================================
 OPTION 27: BIDS AND PRICE BOOKS
 ================================================================================
@@ -528,6 +619,7 @@ COPYING CALL SHEET TO BID:
 6. Type "COPY"
 7. Enter new customer/class bid number
 
+<!-- SECTION: SALES-OPT32 -->
 ================================================================================
 OPTION 32: DOWNLOAD BID INTO EXCEL (BY ITEM)
 ================================================================================
@@ -548,6 +640,7 @@ Use for: Emailing Bid in Excel format organized by Item number
 10. Press ENTER
 11. Bid sent to email
 
+<!-- SECTION: SALES-OPT33 -->
 ================================================================================
 OPTION 33: DOWNLOAD BID INTO EXCEL (BY LINE)
 ================================================================================
@@ -558,6 +651,7 @@ Use for: Emailing Bid in Excel format organized by Line Item
 
 Same steps as Option 32.
 
+<!-- SECTION: SALES-OPT34 -->
 ================================================================================
 OPTION 34: BACK ORDER ENTRY
 ================================================================================
@@ -574,6 +668,7 @@ Use for: Next-day delivery of shorted/mispicked product (small quantity without 
 
 Note: Saturday back orders require approval from John Levatino.
 
+<!-- SECTION: SALES-SEAFOOD -->
 ================================================================================
 SEAFOOD NOTES ON ORDERS
 ================================================================================
@@ -591,6 +686,7 @@ Contact Donnie N. if unsure whether item can be split.
 
 Note: Info prints on seafood labels only, not invoice. Extended price may be incorrect - warehouse adjusts cut weight before shipping.
 
+<!-- SECTION: SALES-SPECIAL -->
 ================================================================================
 SPECIAL ORDER PROCESS
 ================================================================================
@@ -620,6 +716,7 @@ Communication:
 - Buyer responsibility: Notify sales if item discontinued or unavailable within dates
 - Sales responsibility: Manage special order list, remove if customer closed/on credit hold
 
+<!-- SECTION: SALES-REF-CUTSHOP -->
 ================================================================================
 REFERENCE - DRISCOLL CUT SHOP ALPHA SEARCH TIPS
 ================================================================================
@@ -650,6 +747,7 @@ WHOLE PIECES/LOINS (search term):
 OTHER CUTS (search by name):
   TERES MAJOR, FLATIRON, HANGER, FLANK
 
+<!-- SECTION: SALES-REF-ABBREV -->
 ================================================================================
 REFERENCE - PRODUCT ABBREVIATIONS
 ================================================================================
@@ -684,6 +782,7 @@ MTG    = Multi-Grain                ZTF    = Zero Trans Fat
 NS     = No Sodium
 NSA    = No Sugar Added
 
+<!-- SECTION: SALES-REF-KOSHER -->
 ================================================================================
 REFERENCE - KOSHER GRADES
 ================================================================================
@@ -729,6 +828,7 @@ KD     Kof K Dairy                  UG     OU Glatt
 KF     Kof K Fish                   UM     OU Meat
 KJ     KAJ                          UP     OU Parve
 
+<!-- SECTION: SALES-REF-PHONES -->
 ================================================================================
 REFERENCE - PHONE EXTENSIONS
 ================================================================================
@@ -818,6 +918,7 @@ END OF SALES MANUAL
 ================================================================================
 
 
+<!-- SECTION: WH-NIGHT-OVERVIEW -->
 ================================================================================
 MANUAL: WAREHOUSE - COMPLETE OPERATIONS MANUAL
 ================================================================================
@@ -851,6 +952,7 @@ Equipment:    Electric jacks are powerful - maintain awareness
 Prohibited:   Taking any product (security cameras monitor all areas)
               Eating on floor or in machine room
 
+<!-- SECTION: WH-PICKING -->
 ================================================================================
 PICKING
 ================================================================================
@@ -886,6 +988,7 @@ PERFORMANCE:
 - Approximately 95,000 cases processed nightly
 - Faster/accurate completion = earlier shift end
 
+<!-- SECTION: WH-CHECKING -->
 ================================================================================
 CHECKING
 ================================================================================
@@ -915,6 +1018,7 @@ EFFICIENCY:
 - Loaders depend on checkers to clear pallets quickly
 - Slow checking congests floor and delays entire shift
 
+<!-- SECTION: WH-LOADING -->
 ================================================================================
 LOADING
 ================================================================================
@@ -953,6 +1057,7 @@ FLOOR FLOW:
 - Slow loading congests floor with pallets
 - Staying on schedule keeps workflow smooth for all positions
 
+<!-- SECTION: WH-HILO -->
 ================================================================================
 HI-LO OPERATION
 ================================================================================
@@ -986,6 +1091,7 @@ SAFETY (highest priority):
 - Never lift unbalanced loads
 - Use proper lighting and visibility checks between aisles
 
+<!-- SECTION: WH-CLERKS -->
 ================================================================================
 CLERKS
 ================================================================================
@@ -1034,6 +1140,7 @@ BEST PRACTICES:
 - Memorize picker IDs and routes
 - Verify Telnet weight entries carefully
 
+<!-- SECTION: WH-SUPERVISORS -->
 ================================================================================
 SUPERVISORS
 ================================================================================
@@ -1070,6 +1177,7 @@ BEST PRACTICES:
 - Monitor attendance and break compliance carefully
 - Communicate with Kudjoe on staffing, performance, incidents
 
+<!-- SECTION: WH-SWITCHERS -->
 ================================================================================
 SWITCHERS
 ================================================================================
@@ -1106,6 +1214,7 @@ BEST PRACTICES:
 - Communicate with drivers and warehouse staff
 - Remain vigilant in adverse weather
 
+<!-- SECTION: WH-VOLUME -->
 ================================================================================
 NIGHTLY VOLUME AND PERFORMANCE
 ================================================================================
@@ -1120,6 +1229,7 @@ Performance directly impacts:
 - Customer satisfaction
 - Company efficiency
 
+<!-- SECTION: WH-DAY-CONTACTS -->
 ================================================================================
 DAY OPERATIONS
 ================================================================================
@@ -1142,6 +1252,7 @@ NY IDs:       G, W, Y, X, Z
 78:           Holding pattern for unrouted orders
 99:           Pick and stage route (Wayne)
 
+<!-- SECTION: WH-DAY-TELNET -->
 QUICK REFERENCE - TELNET COMMANDS
 ----------------------------------
 Reprint live invoice:       2, 25, printer# 3
@@ -1155,6 +1266,7 @@ Picker lookup:              27, 36, 4, date, route#, customer name
 VIP report:                 30, 21, tomorrow's date
 Live mispicks:              276
 
+<!-- SECTION: WH-RECEIVING -->
 ================================================================================
 RECEIVING
 ================================================================================
@@ -1186,6 +1298,7 @@ REFUSAL CRITERIA:
 - Past or near expiration date
 - Spoiled produce
 
+<!-- SECTION: WH-PUTAWAY -->
 ================================================================================
 PUTAWAY
 ================================================================================
@@ -1215,6 +1328,7 @@ SAFETY:
 - Double-check slot numbers
 - Report damaged pallets, missing labels, unsafe racking
 
+<!-- SECTION: WH-REPLENISHMENT -->
 ================================================================================
 REPLENISHMENT
 ================================================================================
@@ -1237,6 +1351,7 @@ AISLE MAINTENANCE:
 - Verify product matches slot description
 - Communicate discrepancies to Inventory Control
 
+<!-- SECTION: WH-INVENTORY -->
 ================================================================================
 INVENTORY CONTROL
 ================================================================================
@@ -1266,6 +1381,7 @@ TEAM ROLES:
 YEAR-END:
 - Company-wide cycle count for audits and financial reporting
 
+<!-- SECTION: WH-UPC -->
 ================================================================================
 UPC COLLECTION
 ================================================================================
@@ -1290,6 +1406,7 @@ RESOLUTION:
 - Rescan and update proper information
 - Communicate recurring issues to Inventory Control
 
+<!-- SECTION: WH-ROUTING -->
 ================================================================================
 ROUTING
 ================================================================================
@@ -1338,6 +1455,7 @@ BACKHAULS:
 - Chun schedules backhaul pickups
 - View in Telnet: 9, 3, PO#
 
+<!-- SECTION: WH-DISPATCHING -->
 ================================================================================
 DISPATCHING
 ================================================================================
@@ -1379,6 +1497,7 @@ END OF SETUP:
 - Review Dispatch Sheet for accuracy
 - Send to transportation leadership
 
+<!-- SECTION: WH-DRIVERS -->
 ================================================================================
 DRIVERS
 ================================================================================
@@ -1432,6 +1551,7 @@ SAFETY:
 - Seatbelts, traffic laws, defensive driving
 - Netradyne cameras monitor behavior (speeding, hard braking, drowsiness)
 
+<!-- SECTION: WH-DRIVER-CHECKIN -->
 ================================================================================
 DRIVER CHECK-IN
 ================================================================================
@@ -1480,6 +1600,7 @@ END OF DAY:
 - Remain until transportation clears all drivers
 - All pallets, equipment, paperwork accounted for
 
+<!-- SECTION: WH-TRANSPORTATION -->
 ================================================================================
 TRANSPORTATION
 ================================================================================
@@ -1519,6 +1640,7 @@ SYSTEMS:
 - Netradyne: Driving behavior monitoring
 - Telnet: Log issues, communicate internally
 
+<!-- SECTION: WH-INVOICE-CLEAN -->
 ================================================================================
 INVOICE CLEANING
 ================================================================================
@@ -1571,6 +1693,7 @@ CUSTOMER PICK-UP REPORT:
 - Shows items for driver pickup
 - Confirms requests fulfilled
 
+<!-- SECTION: WH-DRIVER-HOTLINE -->
 ================================================================================
 DRIVER HOTLINE & OPERATIONS SUPPORT
 ================================================================================
@@ -1620,6 +1743,7 @@ SHORTS INVESTIGATION:
 3. Check invoice archive for check-off and signature
 4. Report findings to sales rep with screenshots
 
+<!-- SECTION: WH-OPS-ADMIN -->
 ================================================================================
 OPS ADMIN - DAILY REPORT SCHEDULE
 ================================================================================
@@ -1682,6 +1806,7 @@ CATCH WEIGHT UPDATES:
 3. Check Lucas for individual case weights if needed
 4. Print updated invoice, send to sales rep for customer
 
+<!-- SECTION: WH-TELNET-QUICK -->
 ================================================================================
 OPS ADMIN - TELNET QUICK REFERENCE
 ================================================================================

@@ -76,28 +76,38 @@ except ImportError:
 
 # Custom tools
 try:
-    from tools import create_tools_server, list_available_tools
+    from ..tools import create_mcp_server, ALL_TOOLS
     CUSTOM_TOOLS_AVAILABLE = True
+
+    def create_tools_server():
+        """Compatibility wrapper for old create_tools_server function"""
+        return create_mcp_server()
+
+    def list_available_tools():
+        """Compatibility wrapper for old list_available_tools function"""
+        return [tool.__name__ if hasattr(tool, '__name__') else str(tool) for tool in ALL_TOOLS]
 except ImportError:
     CUSTOM_TOOLS_AVAILABLE = False
+    def create_tools_server():
+        return None
     def list_available_tools():
         return []
 
 # Direct tool access (for CLI commands)
 try:
-    from tools.db_tools import db_query, db_tables, db_describe, db_sample
+    from ..tools.db import TOOLS as DB_TOOLS
     DB_TOOLS_DIRECT = True
 except ImportError:
     DB_TOOLS_DIRECT = False
 
 try:
-    from tools.memory_tools import memory_vector, memory_grep, memory_episodic, memory_squirrel, memory_search
+    from ..tools.memory import TOOLS as MEMORY_TOOLS
     MEMORY_TOOLS_DIRECT = True
 except ImportError:
     MEMORY_TOOLS_DIRECT = False
 
 try:
-    from tools.railway_tools import railway_services, railway_status, railway_logs, railway_redeploy
+    from ..tools.railway import TOOLS as RAILWAY_TOOLS
     RAILWAY_TOOLS_DIRECT = True
 except ImportError:
     RAILWAY_TOOLS_DIRECT = False

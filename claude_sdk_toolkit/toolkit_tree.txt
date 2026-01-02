@@ -1,0 +1,215 @@
+│   BUILD_SHEET_ADMIN_INTEGRATION_FIX.md
+│   claude_chat.py
+│   claude_cli.py
+│   claude_run.py
+│   convert_tools.py
+│   db_tools.py
+│   db_tools_sdk.py
+│   ENHANCED_INGESTION_SPEC.md
+│   FILE_UPLOAD_WIRING_MAP.md
+│   HANDOFF_FRONTEND_RECON.md
+│   HANDOFF_GHOST_HUNT.md
+│   HANDOFF_MEMORY_CONSOLIDATION.md
+│   HANDOFF_PROTOCOL_ENFORCEMENT.md
+│   IMPLEMENTATION_SUMMARY.md
+│   MEMORY_ARCHITECTURE_MAP.md
+│   memory_tools.py
+│   memory_tools_sdk.py
+│   migration_tenant_multitenant.py
+│   pyproject.toml
+│   railway_tools.py
+│   railway_tools_sdk.py
+│   README.md
+│   README_SKILL_SCRAPER.md
+│   RECON_ADMIN_INTEGRATION_MAP.md
+│   RECON_FILE_UPLOAD_WIRING.md
+│   RECON_MEMORY_ARCHITECTURE.md
+│   RECON_OBSERVABILITY_GAP.md
+│   SDK_BUILD_OBSERVABILITY.md
+│   sdk_recon.py
+│   skill_scraper_bot.py
+│   vault_recon.md
+│   __init__.py
+│   __init___sdk.py
+│
+├───.claude
+│   ├───agents
+│   │       skill-converter.md
+│   │       skill-crawler.md
+│   │       skill-indexer.md
+│   │
+│   ├───diffs
+│   │   └───691ac8e7
+│   │           20251221_090521_write_._docs_RESTRUCTURE_COMPLETE.md.diff
+│   │
+│   └───sessions
+│           691ac8e7.json
+│
+├───core
+│       database.py
+│
+├───docs
+│       RESTRUCTURE_COMPLETE.md
+│
+├───scraped_skills
+├───skills_data
+│   └───skills
+│           db.skill.md
+│           etl.skill.md
+│           excel.skill.md
+│           powerbi.skill.md
+│           profile.skill.md
+│           schema.skill.md
+│           SKILLS_INDEX.md
+│
+├───src
+│   └───claude_sdk_toolkit
+│       │   __init__.py
+│       │
+│       ├───cli
+│       │       __init__.py
+│       │
+│       ├───core
+│       │       client.py
+│       │       __init__.py
+│       │
+│       ├───mcp
+│       │       __init__.py
+│       │
+│       ├───skills
+│       │       __init__.py
+│       │
+│       ├───tools
+│       │       base.py
+│       │       __init__.py
+│       │
+│       └───utils
+│               config.py
+│               __init__.py
+│
+└───tools
+    │   scraper_tools.py
+    │   __init__.py
+    │
+    └───__pycache__
+            scraper_tools.cpython-313.pyc
+            __init__.cpython-313.pyc
+
+(shared_venv) PS C:\Users\mthar\projects\enterprise_bot> tree /f C:\Users\mthar\projects\enterprise_bot\claude_sdk_toolkit > toolkit_tree.txt
+(shared_venv) PS C:\Users\mthar\projects\enterprise_bot> tree /f C:\Users\mthar\projects\enterprise_bot\claude_sdk_toolkit
+Folder PATH listing
+Volume serial number is A9E7-6B36
+C:\USERS\MTHAR\PROJECTS\ENTERPRISE_BOT\CLAUDE_SDK_TOOLKIT
+│   CHANGELOG.md
+│   CLAUDE.md
+│   pyproject.toml
+│   README.md
+│   REORGANIZATION_COMPLETE.md
+│   toolkit_tree.txt
+│   __init__.py
+│
+├───.claude
+│   ├───diffs
+│   │   └───691ac8e7
+│   │           20251221_090521_write_._docs_RESTRUCTURE_COMPLETE.md.diff
+│   │
+│   └───sessions
+│           691ac8e7.json
+│
+├───archive
+│       claude_chat.py
+│       claude_run.py
+│       convert_tools.py
+│       db_tools.py
+│       memory_tools.py
+│       migration_tenant_multitenant.py
+│       railway_tools.py
+│       sdk_recon.py
+│       __init___sdk.py
+│
+├───core
+│       database.py
+│
+├───docs
+│   │   BUILD_SHEET_ADMIN_INTEGRATION_FIX.md
+│   │   ENHANCED_INGESTION_SPEC.md
+│   │   FILE_UPLOAD_WIRING_MAP.md
+│   │   IMPLEMENTATION_SUMMARY.md
+│   │   MEMORY_ARCHITECTURE_MAP.md
+│   │   RESTRUCTURE_COMPLETE.md
+│   │   SDK_BUILD_OBSERVABILITY.md
+│   │   vault_recon.md
+│   │
+│   ├───handoffs
+│   │       HANDOFF_FRONTEND_RECON.md
+│   │       HANDOFF_GHOST_HUNT.md
+│   │       HANDOFF_MEMORY_CONSOLIDATION.md
+│   │       HANDOFF_PROTOCOL_ENFORCEMENT.md
+│   │
+│   └───recon
+│           RECON_ADMIN_INTEGRATION_MAP.md
+│           RECON_FILE_UPLOAD_WIRING.md
+│           RECON_MEMORY_ARCHITECTURE.md
+│           RECON_OBSERVABILITY_GAP.md
+│
+├───scraped_skills
+├───scraper
+│   │   bot.py
+│   │   README.md
+│   │   tools.py
+│   │   __init__.py
+│   │
+│   ├───agents
+│   │       skill-converter.md
+│   │       skill-crawler.md
+│   │       skill-indexer.md
+│   │
+│   └───__pycache__
+│           tools.cpython-313.pyc
+│
+├───skills
+│       db.skill.md
+│       etl.skill.md
+│       excel.skill.md
+│       powerbi.skill.md
+│       profile.skill.md
+│       schema.skill.md
+│       SKILLS_INDEX.md
+│
+└───src
+    └───claude_sdk_toolkit
+        │   __init__.py
+        │
+        ├───cli
+        │       beast.py
+        │       __init__.py
+        │
+        ├───core
+        │       client.py
+        │       __init__.py
+        │
+        ├───mcp
+        │       __init__.py
+        │
+        ├───skills
+        │       __init__.py
+        │
+        ├───tools
+        │   │   base.py
+        │   │   db.py
+        │   │   memory.py
+        │   │   railway.py
+        │   │   __init__.py
+        │   │
+        │   └───__pycache__
+        │           db.cpython-313.pyc
+        │           memory.cpython-313.pyc
+        │           railway.cpython-313.pyc
+        │           __init__.cpython-313.pyc
+        │
+        ├───utils
+        │       config.py
+        │       __init__.py
+        │
+        └───__pycache__
+                __init__.cpython-313.pyc
