@@ -986,12 +986,21 @@ async def run_pipeline_for_user(
     except:
         pass  # No existing nodes yet
 
-    # 4. Deduplicate
-    from memory.ingest.dedup import deduplicate_exchanges
-    new_exchanges, dedup_count = deduplicate_exchanges(
-        all_exchanges,
-        existing_nodes
-    )
+    # 4. Deduplicate (inline content-hash based)
+    existing_hashes = set()
+    for node in existing_nodes:
+        h = hashlib.sha256(f"{node.human_content[:100]}{node.assistant_content[:100]}".encode()).hexdigest()[:16]
+        existing_hashes.add(h)
+
+    new_exchanges = []
+    dedup_count = 0
+    for ex in all_exchanges:
+        h = hashlib.sha256(f"{ex['human'][:100]}{ex['assistant'][:100]}".encode()).hexdigest()[:16]
+        if h not in existing_hashes:
+            new_exchanges.append(ex)
+            existing_hashes.add(h)
+        else:
+            dedup_count += 1
 
     logger.info(f"After dedup: {len(new_exchanges)} new, {dedup_count} duplicates skipped")
 
@@ -1002,8 +1011,8 @@ async def run_pipeline_for_user(
     nodes = [exchange_to_node(ex, user_id=user_id) for ex in new_exchanges]
 
     # 6. Embed (GPU parallel)
-    from embedder import get_embedder
-    embedder = get_embedder(config)
+    from memory.embedder import create_embedder
+    embedder = create_embedder(provider="deepinfra")
 
     texts = [f"{n.human_content} {n.assistant_content}" for n in nodes]
     embeddings = await embedder.embed_batch(texts, show_progress=True)

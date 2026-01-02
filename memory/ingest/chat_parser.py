@@ -958,3 +958,79 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         sys.exit(1)
+
+
+# ============================================================================
+# PIPELINE CONVENIENCE WRAPPER
+# ============================================================================
+
+def parse_chat_export(content: bytes, source_type: str) -> List[Dict[str, Any]]:
+    """
+    Convenience wrapper for pipeline use.
+    Parses raw bytes into list of exchange dicts.
+
+    Args:
+        content: Raw JSON bytes from uploaded file
+        source_type: 'anthropic', 'openai', 'grok', 'gemini', or 'unknown'
+
+    Returns:
+        List of exchange dicts with keys: id, human, assistant, source,
+        conversation_id, sequence_index
+    """
+    import tempfile
+    import os
+
+    # Write content to temp file for factory parsing
+    with tempfile.NamedTemporaryFile(suffix='.json', delete=False, mode='wb') as tf:
+        tf.write(content)
+        temp_path = tf.name
+
+    try:
+        factory = ChatParserFactory()
+        provider = source_type if source_type in ['anthropic', 'openai', 'grok', 'gemini'] else 'auto'
+        conversations = factory.parse(temp_path, provider=provider)
+
+        exchanges = []
+        for conv in conversations:
+            messages = conv.get('messages', [])
+            conv_id = conv.get('id', '')
+            source = conv.get('metadata', {}).get('source', source_type)
+
+            # Pair human/assistant messages into exchanges
+            i = 0
+            seq = 0
+            while i < len(messages):
+                msg = messages[i]
+                human_content = ""
+                assistant_content = ""
+
+                # Get human message
+                if msg.get('role') == 'human':
+                    human_content = msg.get('content', '')
+                    i += 1
+                    # Get following assistant message if exists
+                    if i < len(messages) and messages[i].get('role') == 'assistant':
+                        assistant_content = messages[i].get('content', '')
+                        i += 1
+                elif msg.get('role') == 'assistant':
+                    # Orphan assistant message
+                    assistant_content = msg.get('content', '')
+                    i += 1
+                else:
+                    i += 1
+                    continue
+
+                if human_content or assistant_content:
+                    exchanges.append({
+                        'id': f"{conv_id}_{seq}",
+                        'human': human_content,
+                        'assistant': assistant_content,
+                        'source': source,
+                        'conversation_id': conv_id,
+                        'sequence_index': seq,
+                    })
+                    seq += 1
+
+        return exchanges
+    finally:
+        os.unlink(temp_path)
