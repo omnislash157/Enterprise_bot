@@ -2,6 +2,7 @@
 Async Embedder - Multi-Provider BGE-M3 Embedding Pipeline
 
 Supports multiple backends:
+- Modal GPU (recommended for production - A10G GPU, pay-per-use)
 - DeepInfra API (rate-limited, good for small scale)
 - TEI (Text Embeddings Inference) - self-hosted GPU (RunPod/Modal)
 - Cloudflare Workers AI (fallback)
@@ -17,6 +18,9 @@ Features:
 BGE-M3: 1024-dim multilingual embeddings, excellent for semantic search.
 
 Usage:
+    # Modal GPU (recommended - set MODAL_EMBEDDING_ENDPOINT env var)
+    embedder = AsyncEmbedder(provider="modal")
+    
     # DeepInfra (rate limited)
     embedder = AsyncEmbedder(provider="deepinfra")
 
@@ -25,7 +29,7 @@ Usage:
 
     embeddings = await embedder.embed_batch(texts, batch_size=32, max_concurrent=8)
 
-Version: 1.1.0 (cog_twin)
+Version: 1.2.0 (cog_twin) - Added Modal GPU provider
 """
 
 import asyncio
@@ -44,9 +48,9 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # PROVIDER PROTOCOL & IMPLEMENTATIONS
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 @runtime_checkable
 class EmbeddingProvider(Protocol):
@@ -208,6 +212,91 @@ class TEIProvider:
             return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
 
 
+class ModalHTTPProvider:
+    """
+    Modal HTTP provider - calls deployed Modal GPU functions via web endpoints.
+    
+    No Modal SDK needed - just HTTP calls to your deployed Modal function.
+    This is the recommended provider for production workloads.
+    
+    Deploy the Modal function separately with: modal deploy modal_embeddings.py
+    Then set MODAL_EMBEDDING_ENDPOINT env var to the endpoint URL.
+    
+    Benefits:
+    - A10G GPU acceleration (fast!)
+    - Pay-per-use (only charged when processing)
+    - No rate limits (Modal handles scaling)
+    - 5 min container warm time between requests
+    """
+    
+    EMBEDDING_DIM = 1024
+    
+    def __init__(
+        self,
+        endpoint: Optional[str] = None,
+        timeout: float = 120.0,
+    ):
+        """
+        Args:
+            endpoint: Modal web endpoint URL 
+                     (e.g., https://mthartigan--cogzy-embedder-embed-batch.modal.run)
+            timeout: Request timeout in seconds (embeddings can take a while on cold start)
+        """
+        self.endpoint = endpoint or os.getenv("MODAL_EMBEDDING_ENDPOINT")
+        if not self.endpoint:
+            raise ValueError(
+                "Modal endpoint required. Set MODAL_EMBEDDING_ENDPOINT env var "
+                "or pass endpoint= parameter"
+            )
+        
+        self.endpoint = self.endpoint.rstrip("/")
+        self.timeout = timeout
+        
+        logger.info(f"ModalHTTPProvider initialized: {self.endpoint}")
+    
+    async def rate_limit(self) -> None:
+        """No rate limiting - Modal handles scaling."""
+        pass
+    
+    async def embed_batch_raw(
+        self,
+        client: httpx.AsyncClient,
+        texts: List[str],
+        batch_id: int,
+    ) -> List[np.ndarray]:
+        """Embed via Modal HTTP endpoint."""
+        try:
+            headers = {"Content-Type": "application/json"}
+            
+            response = await client.post(
+                self.endpoint,
+                headers=headers,
+                json={"texts": texts},
+                timeout=self.timeout,
+            )
+            response.raise_for_status()
+            
+            data = response.json()
+            
+            # Modal returns {"embeddings": [[...], [...], ...], "count": N}
+            embeddings_raw = data.get("embeddings", [])
+            return [np.array(e, dtype=np.float32) for e in embeddings_raw]
+        
+        except httpx.HTTPStatusError as e:
+            logger.error(f"Batch {batch_id} Modal HTTP error: {e.response.status_code}")
+            if e.response.status_code == 503:
+                logger.error("Modal container cold start - retry in a few seconds")
+            return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
+        
+        except httpx.TimeoutException:
+            logger.error(f"Batch {batch_id} Modal timeout after {self.timeout}s (cold start?)")
+            return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
+        
+        except Exception as e:
+            logger.error(f"Batch {batch_id} Modal error: {e}")
+            return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
+
+
 class CloudflareProvider:
     """
     Cloudflare Workers AI provider.
@@ -281,71 +370,9 @@ class CloudflareProvider:
             return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
 
 
-# ═══════════════════════════════════════════════════════════════════════════
-# MODAL SERVERLESS GPU PROVIDER
-# ═══════════════════════════════════════════════════════════════════════════
-
-class ModalProvider:
-    """
-    Modal serverless GPU provider.
-
-    Spins up GPU on-demand, runs embeddings, shuts down.
-    No rate limits, pay per second of compute (~$0.0003/sec for A10G).
-
-    Requires:
-        pip install modal
-        modal token new  # One-time auth
-
-    The Modal function is defined in modal_embedder.py and deployed with:
-        modal deploy memory/modal_embedder.py
-    """
-
-    EMBEDDING_DIM = 1024
-
-    def __init__(self):
-        try:
-            import modal
-            self.modal = modal
-        except ImportError:
-            raise ValueError("modal not installed. Run: pip install modal")
-
-        # Get the deployed function
-        try:
-            self.embed_fn = modal.Function.lookup("cogzy-embedder", "embed_batch")
-        except modal.exception.NotFoundError:
-            raise ValueError(
-                "Modal function not deployed. Run: modal deploy memory/modal_embedder.py"
-            )
-
-        logger.info("Modal provider initialized (serverless GPU)")
-
-    async def rate_limit(self) -> None:
-        """No rate limiting for serverless GPU."""
-        pass
-
-    async def embed_batch_raw(
-        self,
-        client: httpx.AsyncClient,  # Unused, Modal handles transport
-        texts: List[str],
-        batch_id: int,
-    ) -> List[np.ndarray]:
-        """Embed via Modal serverless GPU."""
-        try:
-            # Modal functions are async-compatible
-            # Call the remote GPU function
-            embeddings = await asyncio.to_thread(
-                self.embed_fn.remote, texts
-            )
-            return [np.array(e, dtype=np.float32) for e in embeddings]
-
-        except Exception as e:
-            logger.error(f"Batch {batch_id} Modal error: {e}")
-            return [np.zeros(self.EMBEDDING_DIM, dtype=np.float32) for _ in texts]
-
-
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # MAIN EMBEDDER CLASS
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 class AsyncEmbedder:
     """
@@ -368,17 +395,20 @@ class AsyncEmbedder:
         tei_endpoint: Optional[str] = None,
         # Cloudflare options
         cloudflare_account_id: Optional[str] = None,
+        # Modal options
+        modal_endpoint: Optional[str] = None,
     ):
         """
         Initialize embedder with specified provider.
 
         Args:
-            provider: "deepinfra", "tei", or "cloudflare"
+            provider: "deepinfra", "tei", "cloudflare", or "modal"
             cache_dir: Directory for embedding cache
             api_key: API key for DeepInfra/Cloudflare
             requests_per_minute: Rate limit for API providers
             tei_endpoint: URL for self-hosted TEI instance
             cloudflare_account_id: Cloudflare account ID
+            modal_endpoint: URL for Modal GPU endpoint (or set MODAL_EMBEDDING_ENDPOINT env var)
         """
         self.cache_dir = cache_dir or Path("./data/embedding_cache")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -403,7 +433,7 @@ class AsyncEmbedder:
                 requests_per_minute=requests_per_minute,
             )
         elif self.provider_name == "modal":
-            self.provider = ModalProvider()
+            self.provider = ModalHTTPProvider(endpoint=modal_endpoint)
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
@@ -554,9 +584,9 @@ class AsyncEmbedder:
         }
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CONVENIENCE FUNCTIONS
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 async def embed_memory_nodes(
     nodes: List[Dict[str, Any]],
@@ -632,21 +662,36 @@ async def embed_episodes(
 def create_embedder(
     provider: str = "auto",
     tei_endpoint: Optional[str] = None,
+    modal_endpoint: Optional[str] = None,
     **kwargs
 ) -> AsyncEmbedder:
     """
     Factory function to create embedder with best available provider.
 
     Args:
-        provider: "auto", "deepinfra", "tei", or "cloudflare"
+        provider: "auto", "modal", "deepinfra", "tei", or "cloudflare"
         tei_endpoint: TEI endpoint URL (required if provider="tei")
+        modal_endpoint: Modal endpoint URL (or set MODAL_EMBEDDING_ENDPOINT env var)
         **kwargs: Additional provider-specific arguments
 
     Returns:
         Configured AsyncEmbedder instance
+    
+    Provider priority for "auto":
+        1. Modal (if MODAL_EMBEDDING_ENDPOINT is set)
+        2. TEI (if tei_endpoint provided)
+        3. DeepInfra (fallback)
     """
     if provider == "auto":
-        # Try TEI first if endpoint provided
+        # Try Modal first if endpoint available
+        modal_url = modal_endpoint or os.getenv("MODAL_EMBEDDING_ENDPOINT")
+        if modal_url:
+            try:
+                return AsyncEmbedder(provider="modal", modal_endpoint=modal_url, **kwargs)
+            except Exception as e:
+                logger.warning(f"Modal provider failed: {e}, trying next...")
+        
+        # Try TEI if endpoint provided
         if tei_endpoint:
             try:
                 return AsyncEmbedder(provider="tei", tei_endpoint=tei_endpoint, **kwargs)
@@ -656,12 +701,12 @@ def create_embedder(
         # Fall back to DeepInfra
         return AsyncEmbedder(provider="deepinfra", **kwargs)
 
-    return AsyncEmbedder(provider=provider, tei_endpoint=tei_endpoint, **kwargs)
+    return AsyncEmbedder(provider=provider, tei_endpoint=tei_endpoint, modal_endpoint=modal_endpoint, **kwargs)
 
 
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CLI TEST
-# ═══════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 
 async def main():
     """Test the embedder."""
