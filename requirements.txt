@@ -26,6 +26,9 @@ rank-bm25>=0.2.2
 python-dotenv>=1.0.0
 PyYAML>=6.0
 
+# B2 Cloud Storage
+b2sdk>=2.0.0
+
 # Grok API (uses OpenAI-compatible client)
 openai>=1.12.0
 xai-sdk>=1.4.0
