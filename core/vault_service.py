@@ -205,8 +205,11 @@ class VaultService:
     async def download_file(self, file_path: str) -> bytes:
         """Download a file from B2."""
         def _download():
-            downloaded = self.bucket.download_file_by_name(file_path)
-            return downloaded.read()
+            from io import BytesIO
+            buffer = BytesIO()
+            self.bucket.download_file_by_name(file_path).save(buffer)
+            buffer.seek(0)
+            return buffer.read()
 
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(_executor, _download)
