@@ -1015,7 +1015,14 @@ async def run_pipeline_for_user(
     embedder = create_embedder(provider="deepinfra")
 
     texts = [f"{n.human_content} {n.assistant_content}" for n in nodes]
-    embeddings = await embedder.embed_batch(texts, show_progress=True)
+    # Larger batches = fewer API calls (DeepInfra rate limited to 180 RPM)
+    # batch_size=64 with max_concurrent=4 = ~12 req/sec sustained
+    embeddings = await embedder.embed_batch(
+        texts,
+        batch_size=64,  # More texts per request
+        max_concurrent=4,  # Fewer concurrent to avoid rate limit bursts
+        show_progress=True
+    )
 
     # 7. Cluster (optional, can skip for now)
     # from streaming_cluster import StreamingClusterEngine
