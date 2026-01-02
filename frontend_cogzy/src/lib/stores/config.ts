@@ -40,7 +40,6 @@ export const config = writable<AppConfig>(defaultConfig);
 export const configLoading = writable<boolean>(true);
 
 // Derived stores for easy access
-export const isEnterpriseMode = derived(config, $config => $config.mode === 'enterprise');
 export const isBasicTier = derived(config, $config => $config.tier === 'basic');
 export const isMemoryEnabled = derived(config, $config => $config.memory_enabled);
 

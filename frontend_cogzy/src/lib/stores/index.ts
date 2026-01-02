@@ -10,9 +10,7 @@ export { panels, hasFullscreenPanel, closedPanels } from './panels';
 export type { PanelMode, PanelState, PanelsState } from './panels';
 export { workspaces, activeWorkspace, workspaceCount } from './workspaces';
 export type { Workspace, WorkspacesState } from './workspaces';
-export { config, configLoading, loadConfig, isEnterpriseMode, isBasicTier, isMemoryEnabled, showSwarm, showMemorySpace, showAnalytics } from './config';
+export { config, configLoading, loadConfig, isBasicTier, isMemoryEnabled, showSwarm, showMemorySpace, showAnalytics } from './config';
 export type { AppConfig } from './config';
 // Auth (stub - disabled)
 export { user, isAuthenticated, signIn, signOut } from './auth';
-// Analytics
-export * from './analytics';

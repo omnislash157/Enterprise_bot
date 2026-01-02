@@ -7,7 +7,6 @@
 	import { theme } from '$lib/stores/theme';
 	import { loadConfig, configLoading } from '$lib/stores/config';
 	import { auth, isAuthenticated, authInitialized, authLoading } from '$lib/stores/auth';
-	import { tenant, tenantLoading } from '$lib/stores/tenant';
 	import CogzySplash from '$lib/components/Cogzysplash.svelte';
 	import IntelligenceRibbon from '$lib/components/ribbon/IntelligenceRibbon.svelte';
 	import ToastProvider from '$lib/components/ToastProvider.svelte';
@@ -28,10 +27,7 @@
 	onMount(async () => {
 		const apiBase = import.meta.env.VITE_API_URL || 'https://lucky-love-production.up.railway.app';
 
-		// Load tenant first (determines auth config)
-		await tenant.load();
-
-		// Then load config and init auth
+		// Load config and init auth
 		loadConfig(apiBase).catch(console.warn);
 
 		if (!isAuthCallback) {
@@ -59,10 +55,10 @@
 
 {#if isAuthCallback}
 	<slot />
-{:else if $tenantLoading || $configLoading || !$authInitialized}
+{:else if $configLoading || !$authInitialized}
 	<div class="loading-screen">
 		<div class="spinner"></div>
-		<p>{$tenantLoading ? 'Loading tenant...' : $authLoading ? 'Authenticating...' : 'Loading...'}</p>
+		<p>{$authLoading ? 'Authenticating...' : 'Loading...'}</p>
 	</div>
 {:else if !$isAuthenticated}
 	<CogzySplash />

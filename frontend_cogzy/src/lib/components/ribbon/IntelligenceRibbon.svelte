@@ -1,16 +1,12 @@
 <script lang="ts">
     import { fly } from 'svelte/transition';
     import { page } from '$app/stores';
-    import { currentUser, isSuperUser } from '$lib/stores/auth';
+    import { isSuperUser } from '$lib/stores/auth';
     import NavLink from './NavLink.svelte';
-    import AdminDropdown from './AdminDropdown.svelte';
     import UserMenu from './UserMenu.svelte';
 
     // Reactive route detection
     $: currentPath = $page.url.pathname;
-
-    // Admin access check - can see admin section
-    $: canAccessAdmin = $currentUser?.can_manage_users || $currentUser?.is_super_user;
 
     // Mobile menu state
     let mobileMenuOpen = false;
@@ -27,14 +23,6 @@
     const primaryNav = [
         { href: '/', label: 'Chat', icon: 'chat' as const },
         { href: '/vault', label: 'Memory', icon: 'vault' as const },
-    ];
-
-    // Admin navigation for mobile menu
-    const adminNav = [
-        { href: '/admin', label: 'Nerve Center', icon: '🎛️' },
-        { href: '/admin/analytics', label: 'Analytics', icon: '📊' },
-        { href: '/admin/users', label: 'Users', icon: '👥' },
-        { href: '/admin/audit', label: 'Audit Log', icon: '🔒', superOnly: true },
     ];
 </script>
 
@@ -73,12 +61,8 @@
         </div>
     </div>
 
-    <!-- Right Section: Admin + User -->
+    <!-- Right Section: User Menu -->
     <div class="ribbon-right">
-        {#if canAccessAdmin}
-            <AdminDropdown {currentPath} />
-        {/if}
-
         <UserMenu />
     </div>
 </nav>
@@ -110,27 +94,6 @@
                     <span class="mobile-link-label">{item.label}</span>
                 </a>
             {/each}
-
-            {#if canAccessAdmin}
-                <div class="mobile-divider"></div>
-                <div class="mobile-section-label">Admin Portal</div>
-                {#each adminNav as item}
-                    {#if !item.superOnly || $isSuperUser}
-                        <a
-                            href={item.href}
-                            class="mobile-link admin"
-                            class:active={currentPath === item.href}
-                            on:click={closeMobileMenu}
-                        >
-                            <span class="mobile-link-icon">{item.icon}</span>
-                            <span class="mobile-link-label">{item.label}</span>
-                            {#if item.superOnly}
-                                <span class="mobile-super-badge">SUPER</span>
-                            {/if}
-                        </a>
-                    {/if}
-                {/each}
-            {/if}
         </nav>
 
         <div class="mobile-footer">
@@ -358,52 +321,8 @@
         color: #00ff41;
     }
 
-    .mobile-link.admin {
-        color: rgba(255, 255, 255, 0.7);
-    }
-
-    .mobile-link.admin:hover {
-        background: rgba(255, 200, 0, 0.08);
-    }
-
-    .mobile-link.admin.active {
-        background: rgba(255, 200, 0, 0.15);
-        color: #ffc800;
-    }
-
-    .mobile-link-icon {
-        font-size: 1.1rem;
-        width: 24px;
-        text-align: center;
-    }
-
     .mobile-link-label {
         flex: 1;
-    }
-
-    .mobile-super-badge {
-        font-size: 0.55rem;
-        font-weight: 700;
-        padding: 2px 6px;
-        background: rgba(255, 0, 85, 0.2);
-        color: #ff0055;
-        border-radius: 3px;
-        letter-spacing: 0.5px;
-    }
-
-    .mobile-divider {
-        height: 1px;
-        background: rgba(255, 255, 255, 0.08);
-        margin: 0.75rem 0;
-    }
-
-    .mobile-section-label {
-        font-size: 0.7rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        color: rgba(255, 200, 0, 0.6);
-        padding: 0.5rem 1rem;
     }
 
     .mobile-footer {
