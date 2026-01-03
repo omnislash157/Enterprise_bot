@@ -172,7 +172,7 @@ class EnrichmentPipeline:
         print(f"Embedding {len(contents)} content chunks...")
         content_embeddings = await self.embedder.embed_batch(
             contents,
-            batch_size=32,
+            batch_size=256,
             max_concurrent=8,
             show_progress=True,
         )
@@ -191,7 +191,7 @@ class EnrichmentPipeline:
             print(f"Embedding {len(all_questions)} synthetic questions...")
             question_embeddings = await self.embedder.embed_batch(
                 all_questions,
-                batch_size=32,
+                batch_size=256,
                 max_concurrent=8,
                 show_progress=True,
             )

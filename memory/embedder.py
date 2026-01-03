@@ -27,9 +27,9 @@ Usage:
     # Self-hosted TEI on RunPod (unlimited)
     embedder = AsyncEmbedder(provider="tei", tei_endpoint="http://your-runpod:8080")
 
-    embeddings = await embedder.embed_batch(texts, batch_size=32, max_concurrent=8)
+    embeddings = await embedder.embed_batch(texts, batch_size=256, max_concurrent=8)
 
-Version: 1.2.0 (cog_twin) - Added Modal GPU provider
+Version: 1.3.0 (cog_twin) - Bumped batch_size defaults to 256
 """
 
 import asyncio
@@ -473,7 +473,7 @@ class AsyncEmbedder:
     async def embed_batch(
         self,
         texts: List[str],
-        batch_size: int = 32,
+        batch_size: int = 256,
         max_concurrent: int = 8,
         show_progress: bool = True,
     ) -> np.ndarray:
@@ -482,7 +482,7 @@ class AsyncEmbedder:
 
         Args:
             texts: List of texts to embed
-            batch_size: Texts per API call (TEI can handle 128+)
+            batch_size: Texts per API call (256 default, DeepInfra handles up to ~500)
             max_concurrent: Max parallel requests
             show_progress: Print progress updates
 
@@ -591,7 +591,7 @@ class AsyncEmbedder:
 async def embed_memory_nodes(
     nodes: List[Dict[str, Any]],
     embedder: AsyncEmbedder,
-    batch_size: int = 32,
+    batch_size: int = 256,
     max_concurrent: int = 8,
 ) -> np.ndarray:
     """
@@ -621,8 +621,8 @@ async def embed_memory_nodes(
 async def embed_episodes(
     episodes: List[Dict[str, Any]],
     embedder: AsyncEmbedder,
-    batch_size: int = 16,
-    max_concurrent: int = 4,
+    batch_size: int = 128,
+    max_concurrent: int = 8,
     max_chars: int = 16000,
 ) -> np.ndarray:
     """
@@ -631,7 +631,7 @@ async def embed_episodes(
     Args:
         episodes: List of EpisodicMemory dicts or objects
         embedder: AsyncEmbedder instance
-        batch_size: Texts per API call (smaller for long content)
+        batch_size: Texts per API call (128 for episodes - longer content)
         max_concurrent: Max parallel requests
         max_chars: Max characters to embed per episode
 

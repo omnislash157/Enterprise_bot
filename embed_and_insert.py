@@ -71,7 +71,7 @@ async def embed_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     print(f"  Embedding {len(contents)} content chunks...")
     content_embeddings = await embedder.embed_batch(
         contents,
-        batch_size=32,
+        batch_size=256,
         max_concurrent=8,
         show_progress=True,
     )
@@ -90,7 +90,7 @@ async def embed_chunks(chunks: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     if all_questions:
         question_embeddings = await embedder.embed_batch(
             all_questions,
-            batch_size=32,
+            batch_size=256,
             max_concurrent=8,
             show_progress=True,
         )

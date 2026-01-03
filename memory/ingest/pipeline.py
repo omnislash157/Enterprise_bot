@@ -912,7 +912,7 @@ async def main():
     # Run pipeline
     pipeline = IngestPipeline(
         output_dir=Path("./data"),
-        embedding_batch_size=32,
+        embedding_batch_size=256,
         embedding_concurrency=8,
     )
 
